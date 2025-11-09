@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustBureau.ai - The AI Verification Standard</title>
+    
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans (headings) & Inter (body) --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Alpine.js for mobile menu --><script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom Tailwind Configuration --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-green': '#00C09A', // Verification Green
+                        'brand-dark': '#1A1A1A',   // Near-black for primary text
+                        'brand-gray': '#666666',   // Secondary/muted text
+                        'brand-light': '#F8F9FA',  // Very light grey background
+                        'brand-border': '#E5E7EB', // Subtle border color (Tailwind gray-200)
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #FFFFFF;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #00C09A 0%, #007A63 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .yellow-gradient-text {
+            background: linear-gradient(90deg, #FACC15 0%, #EAB308 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15);
+        }
+        .hero-visual {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="font-sans text-brand-dark">
+
+    <!-- Header / Navigation --><header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center" x-data="{ open: false }">
+            <!-- Logo --><a href="#" class="flex items-center space-x-2.5">
+                <!-- Solid Green Shield with White Check --><svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+                    <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <!-- Solid Black Text --><span class="font-heading text-2xl font-bold text-brand-dark">
+                    TrustBureau.ai
+                </span>
+            </a>
+            
+            <!-- Navigation Links --><div class="hidden md:flex items-center space-x-7">
+                <a href="#platform" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Platform</a>
+                <a href="#process" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Process</a>
+                <a href="#pricing" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Pricing</a>
+                <a href="#" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Developers</a>
+            </div>
+            
+            <!-- CTA Button --><a href="#demo" class="hidden md:inline-block bg-white border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">
+                Members
+            </a>
+
+            <!-- Mobile Menu Button --><button class="md:hidden" @click="open = !open">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+
+            <!-- Mobile Menu --><div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute top-full right-0 mt-2 w-full p-4 md:hidden" @click.away="open = false" x-cloak>
+                <div class="bg-white rounded-lg shadow-xl border border-brand-border p-5 space-y-4">
+                    <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="open = false">Platform</a>
+                    <a href="#process" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="open = false">Process</a>
+                    <a href="#pricing" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="open = false">Pricing</a>
+                    <a href="#" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="open = false">Developers</a>
+                    <a href="#demo" class="block w-full text-center bg-white border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">
+                        Members
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content --><main>
+
+        <section class="bg-white py-24 md:py-36">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <!-- Hero Text --><div class="text-center lg:text-left">
+                        <h1 class="text-5xl md:text-7xl font-heading font-extrabold text-brand-dark leading-tight mb-6">
+                            The <span class="yellow-gradient-text">Gold Standard</span> of
+                            <span class="text-brand-green">AI Underwriting</span>
+                        </h1>
+                        <p class="text-lg md:text-xl text-brand-gray max-w-xl mx-auto lg:mx-0 mb-10">
+                            The AI underwriting tool for advanced decision-making in seconds. Our platform validates, analyzes, and reports on business health to ensure your decisions are fast, fair, and compliant.
+                        </p>
+                        <div class="flex justify-center lg:justify-start items-center space-x-4">
+                            <a href="#demo" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-lg text-lg cta-button">
+                                Request Demo
+                            </a>
+                            <a href="#" class="bg-white border border-brand-border text-brand-dark font-medium py-3.5 px-8 rounded-lg text-lg hover:border-brand-gray transition-colors">
+                                Read Docs
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Visual (Mock UI) --><div class="hero-visual">
+                        <div class="bg-brand-light border-b border-brand-border px-4 py-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-5">
+                            <div class="flex justify-between items-center">
+                                <span class="font-heading font-bold text-lg">Model: FinCredit v2.1</span>
+                                <span class="bg-yellow-100 text-yellow-700 text-sm font-medium px-3 py-1 rounded-full">Scanning...</span>
+                            </div>
+                            <div class="space-y-4">
+                                <!-- Item 1 --><div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-brand-dark font-medium">Fairness & Bias Audit</span>
+                                    <span class="ml-auto text-green-700 font-medium">Passed</span>
+                                </div>
+                                <!-- Item 2 --><div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-brand-dark font-medium">Security & Robustness</span>
+                                    <span class="ml-auto text-green-700 font-medium">Passed</span>
+                                </div>
+                                <!-- Item 3 --><div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-red-100 text-red-700 rounded-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-brand-dark font-medium">EU AI Act Compliance</span>
+                                    <span class="ml-auto text-red-700 font-medium">Failed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section (No Button) --><section id="demo-top" class="bg-brand-dark">
+            <div class="container mx-auto px-6 py-16 text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mb-6">
+                    Make Decisions in Seconds.
+                </h2>
+                <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">
+                    See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.
+                </p>
+            </div>
+        </section>
+
+        <!-- Your Verification Report Section --><section id="report-mockup" class="py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <!-- Section Header --><div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">See The Output</span>
+                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">
+                        Your Verification Report
+                    </h2>
+                    <p class="text-lg text-brand-gray">
+                        Receive a comprehensive, actionable report detailing your model's compliance, risk, and performance.
+                    </p>
+                </div>
+
+                <!-- Report Mockup --><div class="max-w-7xl mx-auto bg-white border border-brand-border rounded-lg shadow-xl overflow-hidden">
+                    <!-- Report Header --><div class="p-6 border-b border-brand-border">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-heading text-2xl font-bold text-brand-green">Business Verification Report</h3>
+                                <p class="text-sm text-gray-500">Business — Report ID: TRUST-88A42F / Generated: Nov 08, 2025 • 23:03 UTC</p>
+                            </div>
+                            <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">The AI Verification Standard</span>
+                        </div>
+                    </div>
+
+                    <!-- Report Body --><div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Left Column: Status --><div class="lg:col-span-1 space-y-6">
+                                <div>
+                                    <h4 class="font-semibold text-brand-dark mb-3">Overall Status</h4>
+                                    <div class="p-4 border border-brand-border rounded-lg">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="relative w-24 h-24">
+                                                <svg class="w-full h-full" viewBox="0 0 100 100">
+                                                    <!-- Background circle --><circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50"></circle>
+                                                    <!-- Progress circle --><circle class="text-brand-green" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="39.6" stroke-linecap="round" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" style="--tw-stroke-dashoffset: calc(264 - (264 * 87.5) / 100); transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
+                                                </svg>
+                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                    <span class="text-3xl font-bold text-brand-dark">875</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="text-2xl font-bold text-brand-green">Verified</span>
+                                                <p class="text-sm text-gray-500">Strong financial health</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Health: <span class="font-medium text-green-600">87.5 / 100</span></span>
+                                                <span class="text-gray-500">Risk: <span class="font-medium text-green-600">Low</span></span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-brand-green h-2 rounded-full" style="width: 87.5%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 p-4 border border-brand-border rounded-lg text-sm space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">NMLS</span>
+                                            <span class="font-medium text-brand-dark">#1234567</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Status</span>
+                                            <span class="font-medium text-green-600">Active</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Entity</span>
+                                            <span class="font-medium text-brand-dark">QuantumLeap AI LLC</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Metrics --><div class="lg:col-span-2">
+                                <h4 class="font-semibold text-brand-dark mb-3">Key Metrics</h4>
+                                <div class="border border-brand-border rounded-lg">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Current Ratio</td>
+                                                <td class="px-4 py-3 text-right font-medium text-green-600">1.88</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Quick Ratio</td>
+                                                <td class="px-4 py-3 text-right font-medium text-green-600">1.21</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Debt Service Coverage</td>
+                                                <td class="px-4 py-3 text-right font-medium text-green-600">1.45</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Cash-Flow to Debt Ratio</td>
+                                                <td class="px-4 py-3 text-right font-medium text-green-600">0.95</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Revenue Trend</td>
+                                                <td class="px-4 py-3 text-right font-medium text-red-600">-12.1%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Cash-Flow Volatility</td>
+                                                <td class="px-4 py-3 text-right font-medium text-brand-dark">28.0%</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MoneyThumb & Charts --><div class="mt-6">
+                            <h4 class="font-semibold text-brand-dark mb-3">Financial Snapshot</h4>
+                            <!-- MoneyThumb Table --><div class="border border-brand-border rounded-lg mb-6">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Deposits</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"># Deposits</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Withdrawals</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg AOB</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg NSFs</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ending Bal</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">T'humpdri Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">Chase, Bank of America</td>
+                                            <td class="px-4 py-3 text-gray-500">$180,277</td>
+                                            <td class="px-4 py-3 text-gray-500">41</td>
+                                            <td class="px-4 py-3 text-gray-500">$95,845</td>
+                                            <td class="px-4 py-3 text-gray-500">$450,705</td>
+                                            <td class="px-4 py-3 font-medium text-green-600">0.1</td>
+                                            <td class="px-4 py-3 text-gray-500">$215,848</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 font-medium text-green-600">820</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Charts --><div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <h5 class="font-medium text-brand-dark mb-2">Revenue Trend</h5>
+                                    <div class="p-4 border border-brand-border rounded-lg h-48">
+                                        <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                                            <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,40 10,35 20,30 30,25 40,20 50,22 60,15 70,10 80,12 90,5 100,10" />
+                                            <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium text-brand-dark mb-2">Ending Balance</h5>
+                                    <div class="p-4 border border-brand-border rounded-lg h-48">
+                                        <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                                            <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,30 10,28 20,35 30,30 40,25 50,20 60,25 70,15 80,18 90,10 100,15" />
+                                            <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium text-brand-dark mb-2">NSF / OVD Events</h5>
+                                    <div class="p-4 border border-brand-border rounded-lg h-48 flex items-end space-x-2">
+                                        <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none" class="flex items-end">
+                                            <rect x="5" y="45" width="10" height="3" fill="#00C09A" />
+                                            <rect x="20" y="48" width="10" height="0" fill="#00C09A" />
+                                            <rect x="35" y="48" width="10" height="0" fill="#00C09A" />
+                                            <rect x="50" y="40" width="10" height="8" fill="#FBBF24" />
+                                            <rect x="65" y="35" width="10" height="13" fill="#EF4444" />
+                                            <rect x="80" y="48" width="10" height="0" fill="#00C09A" />
+                                            <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Banking Activity --><div class="mt-6">
+                            <h4 class="font-semibold text-brand-dark mb-3">Monthly Banking Activity</h4>
+                            <div class="border border-brand-border rounded-lg overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Credits</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Num Credits</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">True Revenue</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Balance</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NSF/OVD</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">Oct 2025</td>
+                                            <td class="px-4 py-3 text-gray-500">190,277</td>
+                                            <td class="px-4 py-3 text-gray-500">41</td>
+                                            <td class="px-4 py-3 text-gray-500">185,845</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 text-gray-500">450,705</td>
+                                            <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                            <td class="px-4 py-3 text-gray-500">215,848</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">Sep 2025</td>
+                                            <td class="px-4 py-3 text-gray-500">215,802</td>
+                                            <td class="px-4 py-3 text-gray-500">47</td>
+                                            <td class="px-4 py-3 text-gray-500">210,000</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 text-gray-500">420,112</td>
+                                            <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                            <td class="px-4 py-3 text-gray-500">190,211</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">Aug 2025</td>
+                                            <td class="px-4 py-3 text-gray-500">199,212</td>
+                                            <td class="px-4 py-3 text-gray-500">38</td>
+                                            <td class="px-4 py-3 text-gray-500">199,212</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 text-gray-500">380,920</td>
+                                            <td class="px-4 py-3 font-medium text-red-600">3</td>
+                                            <td class="px-4 py-3 text-gray-500">180,450</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">Jul 2025</td>
+                                            <td class="px-4 py-3 text-gray-500">230,100</td>
+                                            <td class="px-4 py-3 text-gray-500">42</td>
+                                            <td class="px-4 py-3 text-gray-500">225,000</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 text-gray-500">350,000</td>
+                                            <td class="px-4 py-3 font-medium text-yellow-600">1</td>
+                                            <td class="px-4 py-3 text-gray-500">205,112</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">Jun 2025</td>
+                                            <td class="px-4 py-3 text-gray-500">210,500</td>
+                                            <td class="px-4 py-3 text-gray-500">35</td>
+                                            <td class="px-4 py-3 text-gray-500">210,500</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 text-gray-500">310,200</td>
+                                            <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                            <td class="px-4 py-3 text-gray-500">190,888</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-500">May 2025</td>
+                                            <td class="px-4 py-3 text-gray-500">205,123</td>
+                                            <td class="px-4 py-3 text-gray-500">40</td>
+                                            <td class="px-4 py-3 text-gray-500">200,000</td>
+                                            <td class="px-4 py-3 text-gray-500">0</td>
+                                            <td class="px-4 py-3 text-gray-500">290,000</td>
+                                            <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                            <td class="px-4 py-3 text-gray-500">170,123</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Public Records --><div class="mt-6">
+                            <h4 class="font-semibold text-brand-dark mb-3">Public Records</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- UCC Filings --><div class="border border-brand-border rounded-lg">
+                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">UCC Filings</h5>
+                                    <div class="p-4 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Bank of America, N.A.</span>
+                                            <span class="font-medium text-brand-dark">UCC-1</span>
+                                        </div>
+                                        <p class="text-xs text-gray-400">Filed: 2024-01-15 | All Assets</p>
+                                    </div>
+                                </div>
+                                <!-- Liens & Judgments --><div class="border border-brand-border rounded-lg">
+                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Liens & Judgments</h5>
+                                    <div class="p-4 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">State Tax Lien</span>
+                                            <span class="font-medium text-yellow-600">$5,210.00</span>
+                                        </div>
+                                        <p class="text-xs text-gray-400">Filed: 2025-06-30 | Case #12345</p>
+                                    </div>
+                                </div>
+                                <!-- Court Filings --><div class="border border-brand-border rounded-lg">
+                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Court Filings</h5>
+                                    <div class="p-4 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Civil Lawsuit</span>
+                                            <span class="font-medium text-yellow-600">Pending</span>
+                                        </div>
+                                        <p class="text-xs text-gray-400">Filed: 2025-09-10 | Case #C-56789</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SOS & Recommendations --><div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- SOS Records --><div class="border border-brand-border rounded-lg">
+                                <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">SOS / Secretary of State Records</h5>
+                                <div class="p-4 overflow-x-auto">
+                                    <table class="min-w-full text-sm">
+                                        <thead>
+                                            <tr class="border-b border-brand-border">
+                                                <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Name</th>
+                                                <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Type</th>
+                                                <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Formation Date</th>
+                                                <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity ID</th>
+                                                <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered Agent</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="py-3 text-gray-500">QUANTUMLEAP AI LLC</td>
+                                                <td class="py-3 text-gray-500">Domestic Limited Liability Company (LLC)</td>
+                                                <td class="py-3 text-gray-500">2023-01-15</td>
+                                                <td class="py-3 text-gray-500">5567890-0142</td>
+                                                <td class="py-3 font-medium text-green-600">Active</td>
+                                                <td class="py-3 text-gray-500">A Registered Agent Inc.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Recommendations --><div class="border border-brand-border rounded-lg">
+                                <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Recommendations</h5>
+                                <ul class="p-6 space-y-2 list-disc list-inside text-sm text-gray-500">
+                                    <li class="font-medium text-green-600">Excellent financial health and low risk profile.</li>
+                                    <li>Address negative revenue trend observed in Key Metrics.</li>
+                                    <li>Investigate NSF events in Aug/Jul to prevent recurrence.</li>
+                                    <li>Review public records (UCC, liens) despite strong financials.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section --><section id="pricing" class="py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">
+                        Pricing for Underwriting Teams
+                    </h2>
+                    <p class="text-lg text-brand-gray">
+                        Choose a plan that scales with your team's decision-making volume.
+                    </p>
+                </div>
+                
+                <!-- Pricing Grid --><div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    
+                    <!-- Plan 1: Pro --><div class="bg-white rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
+                        <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Pro</h3>
+                        <p class="text-brand-gray mb-6 h-12">For small teams and regional banks.</p>
+                        <div class="my-4">
+                            <span class="text-5xl font-heading font-extrabold text-brand-dark">$499</span>
+                            <span class="text-brand-gray"> / mo</span>
+                        </div>
+                        <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>5 User Seats</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 250 Reports / mo</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Standard AI Analysis</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Email Support</li>
+                        </ul>
+                        <a href="#" class="mt-auto w-full text-center bg-brand-light text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-brand-border transition-colors">
+                            Get Started
+                        </a>
+                    </div>
+                    
+                    <!-- Plan 2: Business (Featured) --><div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col relative scale-105 border-2 border-brand-green">
+                        <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full">
+                            Most Popular
+                        </div>
+                        <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Business</h3>
+                        <p class="text-brand-gray mb-6 h-12">For established teams and underwriting departments.</p>
+                        <div class="my-4">
+                            <span class="text-5xl font-heading font-extrabold text-brand-dark">$1,999</span>
+                            <span class="text-brand-gray"> / mo</span>
+                        </div>
+                        <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>20 User Seats</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 1,500 Reports / mo</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Analysis & XAI</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Compliance Modules (EU, GDPR)</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority Support</li>
+                        </ul>
+                        <a href="#" class="mt-auto w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-lg cta-button">
+                            Start Free Trial
+                        </a>
+                    </div>
+                    
+                    <!-- Plan 3: Enterprise --><div class="bg-white rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
+                        <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Enterprise</h3>
+                        <p class="text-brand-gray mb-6 h-12">For large-scale, automated, or on-premise deployments.</p>
+                        <div class="my-4">
+                            <span class="text-5xl font-heading font-extrabold text-brand-dark">Custom</span>
+                        </div>
+                        <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited Users & Reports</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Full API & Integration Access</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>On-Premise & VPC Deployment</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Dedicated Account Manager & SLAs</li>
+                        </ul>
+                        <a href="#" class="mt-auto w-full text-center bg-brand-dark text-white font-bold py-3 px-6 rounded-lg hover:bg-brand-green transition-colors">
+                            Contact Sales
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section (MOVED) --><section id="demo-bottom" class="bg-brand-dark">
+            <div class="container mx-auto px-6 py-24 text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
+                    Make Decisions in Seconds
+                </h2>
+                <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">
+                    See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.
+                </p>
+                <a href="#" class="bg-brand-green text-white font-bold py-3.5 px-10 rounded-lg text-lg cta-button">
+                    Request Your Demo
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-brand-border">
+        <div class="container mx-auto px-6 py-16">
+            <div class="flex flex-col md:flex-row justify-between">
+                <!-- Logo and Copyright --><div class="mb-8 md:mb-0 max-w-sm">
+                    <a href="#" class="flex items-center space-x-2.5 mb-4">
+                        <!-- Solid Green Shield with White Check --><svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+                            <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+                    </a>
+                    <p class="text-sm text-brand-gray">
+                        The AI Verification Standard.
+                        <br>&copy; 2025 TrustBureau.ai, Inc. All rights reserved.
+                    </p>
+                </div>
+                
+                <!-- Footer Navigation --><div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Product</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#platform" class="text-brand-gray hover:text-brand-dark">Platform</a></li>
+                            <li><a href="#process" class="text-brand-gray hover:text-brand-dark">Process</a></li>
+                            <li><a href="#pricing" class="text-brand-gray hover:text-brand-dark">Pricing</a></li>
+                            <li><a href="#demo" class="text-brand-gray hover:text-brand-dark">Book a Demo</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Resources</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Blog</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Documentation</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Whitepapers</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">EU AI Act</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Company</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">About Us</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Careers</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Legal</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Privacy Policy</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">Terms of Service</a></li>
+                            <li><a href="#" class="text-brand-gray hover:text-brand-dark">DPA</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
