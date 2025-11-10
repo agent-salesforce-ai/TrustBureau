@@ -1,1941 +1,784 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrustBureau.ai - The AI Verification Standard</title>
-    
-    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Plus Jakarta Sans (headings) & Inter (body) --><link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Alpine.js for mobile menu & page state --><script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <!-- Custom Tailwind Configuration --><script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        heading: ['Plus Jakarta Sans', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        'brand-green': '#00C09A', // Verification Green
-                        'brand-dark': '#1A1A1A',   // Near-black for primary text
-                        'brand-gray': '#666666',   // Secondary/muted text
-                        'brand-light': '#F8F9FA',  // Very light grey background
-                        'brand-border': '#E5E7EB', // Subtle border color (Tailwind gray-200)
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        html {
-            scroll-behavior: smooth; /* Enabled smooth scrolling */
-        }
-        body {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: #FFFFFF;
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #00C09A 0%, #007A63 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .yellow-gradient-text {
-            background: linear-gradient(90deg, #FACC15 0%, #EAB308 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .cta-button {
-            transition: all 0.3s ease;
-        }
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15);
-        }
-        .hero-visual {
-            background: #FFFFFF;
-            border: 1px solid #E5E7EB;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-        }
-        [x-cloak] { display: none !important; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live AI Business Report – TrustBureau.ai</title>
 
-        /* Styles for the new score gauge */
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: 2.5rem;
-            border: 8px solid;
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            'brand-green': '#00C09A',
+            'brand-dark':  '#1A1A1A',
+            'brand-gray':  '#666666',
+            'brand-light': '#F8F9FA',
+            'brand-border':'#E5E7EB',
+          }
         }
-        .score-red {
-            border-color: #FECACA; /* red-200 */
-            color: #DC2626; /* red-600 */
-            background-color: #FEF2F2; /* red-50 */
-        }
-        .score-yellow {
-            border-color: #FDE68A; /* yellow-200 */
-            color: #D97706; /* yellow-600 */
-            background-color: #FFFBEB; /* yellow-50 */
-        }
-        .score-green {
-            border-color: #A7F3D0; /* green-200 */
-            color: #059669; /* green-600 */
-            background-color: #ECFDF5; /* green-50 */
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- *** Your development API key (per your request) *** -->
+  <script>
+    /* You can also override at runtime:  window.zakk = 'YOUR_KEY' */
+    const zakk = 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
+    if (typeof window !== 'undefined' && (window.zakk == null || String(window.zakk).trim()==='')) {
+      window.zakk = zakk;
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
+    .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+
+    /* CTA (match main site) */
+    .cta-button { transition: all .3s ease; }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
+    .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
+    .yellow-gradient-text{background:linear-gradient(90deg,#FACC15 0%,#EAB308 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+    /* Score */
+    .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
+    .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
+    .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
+    .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
+
+    /* ===== Loader: radar + stepper + skeleton ===== */
+    .radar {
+      width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
+      background:
+        radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
+        conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
+      animation: radar-spin 1.6s linear infinite;
+    }
+    .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
+    @keyframes radar-spin { to { transform: rotate(360deg); } }
+
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
+    .skeleton-card { border:1px solid #E5E7EB; border-radius:.75rem; padding:1rem; background:#fff; }
+    .skel-line { height:.7rem; border-radius:.35rem; }
+
+    .step-icon{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border-radius:9999px;background:#E5E7EB;color:#fff;flex:none;margin-top:2px}
+    .step-icon.done{background:#059669}
+    .step-icon>svg{width:.7rem;height:.7rem;display:none}
+    .step-icon.done>svg{display:block}
+
+    .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
+    .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
+  </style>
 </head>
-<!-- Initializing Alpine.js state for mobile menu (open) and page navigation (page) -->
-<body class="font-sans text-brand-dark" x-data="{ open: false, page: 'home' }">
 
-    <!-- Header / Navigation --><header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
-        <!-- Logo now resets page to 'home' -->
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Logo --><a href="#" @click.prevent="page = 'home'" class="flex items-center space-x-2.5">
-                <!-- Solid Green Shield with White Check --><svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-                    <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <!-- Solid Black Text --><span class="font-heading text-2xl font-bold text-brand-dark">
-                    TrustBureau.ai
-                </span>
-            </a>
-            
-            <!-- Navigation Links --><div class="hidden md:flex items-center space-x-7">
-                <!-- Links now set page to 'home' before scrolling -->
-                <a href="#platform" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Platform</a>
-                <a href="#process" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Process</a>
-                <a href="#pricing" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Pricing</a>
-                <a href="#platform" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Developers</a>
+<body class="font-sans text-brand-dark">
+  <!-- Header -->
+  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
+    <nav class="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2.5">
+        <svg width="36" height="36" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
+      </a>
+      <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
+        <span aria-hidden="true">←</span> Back to Main
+      </a>
+    </nav>
+  </header>
+
+  <!-- Search -->
+  <section class="container mx-auto px-4 md:px-6 py-10 md:py-16">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-center leading-tight">Live AI Business Report</h1>
+      <p class="text-gray-500 text-center mt-3 md:mt-4">Search a company and the full report appears below.</p>
+
+      <div class="widget-card p-3 md:p-4 mt-6">
+        <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
+          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
+                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
+          <button id="generate-report-btn" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
+            </svg>
+            Generate
+          </button>
+        </form>
+        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS &amp; public‑records matching.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
+    <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
+      <!-- LOADER -->
+      <div id="report-loader" style="display:none;"
+           class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
+        <div class="flex items-center gap-5">
+          <div class="radar" aria-hidden="true"></div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <div class="font-heading font-semibold">Building your report…</div>
+              <div id="loader-timer" class="text-xs text-gray-500">00:00</div>
             </div>
-            
-            <!-- Members Button: sets page to 'login' --><a href="#" @click.prevent="page = 'login'" class="hidden md:inline-block bg-white border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">
-                Members
-            </a>
-
-            <!-- Mobile Menu Button --><button class="md:hidden" @click="open = !open">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
-
-            <!-- Mobile Menu --><div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute top-full right-0 mt-2 w-full p-4 md:hidden" @click.away="open = false" x-cloak>
-                <div class="bg-white rounded-lg shadow-xl border border-brand-border p-5 space-y-4">
-                    <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Platform</a>
-                    <a href="#process" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Process</a>
-                    <a href="#pricing" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Pricing</a>
-                    <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Developers</a>
-                    <!-- Mobile Members Button: sets page to 'login' and closes menu -->
-                    <a href="#" @click.prevent="page = 'login'; open = false" class="block w-full text-center bg-white border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">
-                        Members
-                    </a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content --><main>
-
-        <!-- [START] HOME PAGE CONTENT -->
-        <!-- This div wraps all homepage content and only shows when page === 'home' -->
-        <div x-show="page === 'home'">
-            <section class="bg-white py-24 md:py-36">
-                <div class="container mx-auto px-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                        <!-- Hero Text --><div class="text-center lg:text-left">
-                            <h1 class="text-5xl md:text-7xl font-heading font-extrabold text-brand-dark leading-tight mb-6">
-                                The <span class="yellow-gradient-text">Gold Standard</span> of
-                                <span class="text-brand-dark">AI</span> <span class="text-brand-green">Underwriting</span>
-                            </h1>
-                            <p class="text-lg md:text-xl text-brand-gray max-w-xl mx-auto lg:mx-0 mb-10">
-                                The AI underwriting tool for advanced decision-making in seconds. Our platform validates, analyzes, and reports on business health to ensure your decisions are fast, fair, and compliant.
-                            </p>
-                            <div class="flex justify-center lg:justify-start items-center space-x-4">
-                                <!-- Request Demo Button: sets page to 'demo' --><a href="#" @click.prevent="page = 'demo'" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-lg text-lg cta-button">
-                                    Request Demo
-                                </a>
-                                <!-- Read Docs Button: scrolls to platform -->
-                                <a href="#platform" @click="page = 'home'" class="bg-white border border-brand-border text-brand-dark font-medium py-3.5 px-8 rounded-lg text-lg hover:border-brand-gray transition-colors">
-                                    Read Docs
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <!-- Hero Visual (Mock UI) --><div class="hero-visual">
-                            <div class="bg-brand-light border-b border-brand-border px-4 py-3">
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                    <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                    <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                </div>
-                            </div>
-                            <div class="p-6 space-y-5">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-heading font-bold text-lg">Model: FinCredit v2.1</span>
-                                    <span class="bg-yellow-100 text-yellow-700 text-sm font-medium px-3 py-1 rounded-full">Scanning...</span>
-                                </div>
-                                <div class="space-y-4">
-                                    <!-- Item 1 --><div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-brand-dark font-medium">Fairness & Bias Audit</span>
-                                        <span class="ml-auto text-green-700 font-medium">Passed</span>
-                                    </div>
-                                    <!-- Item 2 --><div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-brand-dark font-medium">Security & Robustness</span>
-                                        <span class="ml-auto text-green-700 font-medium">Passed</span>
-                                    </div>
-                                    <!-- Item 3 --><div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-red-100 text-red-700 rounded-full flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-brand-dark font-medium">EU AI Act Compliance</span>
-                                        <span class="ml-auto text-red-700 font-medium">Failed</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CTA Section (No Button) --><section id="demo-top" class="bg-brand-dark">
-                <div class="container mx-auto px-6 py-16 text-center">
-                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mb-6">
-                        Make Decisions in Seconds.
-                    </h2>
-                    <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">
-                        See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.
-                    </p>
-                </div>
-            </section>
-
-            <!-- Your Verification Report Section --><section id="report-mockup" class="py-24 bg-white">
-                <div class="container mx-auto px-6">
-
-                    <!-- [START] GEMINI API LIVE DEMO GRID -->
-                    <div class="text-center max-w-3xl mx-auto mb-16">
-                        <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">Live AI Demos</span>
-                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">
-                            See Our AI in Action
-                        </h2>
-                        <p class="text-lg text-brand-gray">
-                            Use our AI tools below to generate live, comprehensive business reports or get fictional pre-approval terms based on real underwriting logic.
-                        </p>
-                    </div>
-
-                    <!-- [START] COMBINED WIDGET -->
-                    <div class="max-w-4xl mx-auto mb-16">
-                        <div class="bg-white border border-brand-border rounded-lg shadow-lg p-6 flex flex-col">
-                            <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">
-                                Live AI Business Report
-                            </h3>
-                            <div class="space-y-4 max-w-xl mx-auto w-full">
-                                <div>
-                                    <label for="business-name" class="block text-sm font-medium text-brand-dark">Enter any Business Name</label>
-                                    <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="e.g., Tesla, Inc. or Apex Innovations">
-                                </div>
-                                <button id="generate-report-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button disabled:opacity-50 disabled:cursor-wait">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-                                    </svg>
-                                    <span>Generate Full Report</span>
-                                </button>
-                            </div>
-                            
-                            <!-- Results Container -->
-                            <div id="report-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
-                                <!-- Loader -->
-                                <div id="report-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box">
-                                    <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span class="text-sm text-brand-gray">Searching live web and generating AI analysis...</span>
-                                </div>
-
-                                <!-- Error -->
-                                <div id="report-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
-                                    <p class="text-sm text-red-600" id="report-error-message"></p>
-                                </div>
-                                
-                                <!-- Content -->
-                                <div id="report-content" class="w-full" style="display: none;">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <!-- Left Column: Score -->
-                                        <div class="md:col-span-1">
-                                            <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
-                                            <div class="flex flex-col items-center p-4 border border-brand-border rounded-lg bg-brand-light">
-                                                <div id="report-score-circle" class="score-circle mb-4">
-                                                    <span id="report-score-digit">...</span>
-                                                </div>
-                                                <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic"></p>
-                                                
-                                                <div class="w-full text-left">
-                                                    <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
-                                                    <ul id="report-score-positives" class="space-y-1.5 mb-3">
-                                                    </ul>
-                                                    <ul id="report-score-negatives" class="space-y-1.5">
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Right Column: Details -->
-                                        <div class="md:col-span-2 space-y-6">
-                                            <!-- Summary -->
-                                            <div>
-                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Business Summary</h4>
-                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                                                    <h5 id="report-title" class="font-heading font-bold text-lg mb-2 text-brand-dark"></h5>
-                                                    <p id="report-summary" class="text-sm text-brand-gray"></p>
-                                                </div>
-                                            </div>
-
-                                            <!-- Corporate Filings -->
-                                            <div>
-                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
-                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                                                    <ul class="space-y-2 text-sm text-brand-gray">
-                                                        <li class="flex justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark text-right"></span></li>
-                                                        <li class="flex justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark text-right"></span></li>
-                                                        <li class="flex justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark text-right"></span></li>
-                                                        <li class="flex justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark text-right"></span></li>
-                                                        <li class="flex justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark text-right"></span></li>
-                                                        <li class="flex justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark text-right"></span></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Public Records -->
-                                            <div>
-                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Records</h4>
-                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                                                    <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
-                                                        <!-- Items will be injected by JS -->
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                            <!-- [START] NEW: Customer Reviews -->
-                                            <div>
-                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Customer Reviews</h4>
-                                                <div id="report-reviews-list" class="space-y-4">
-                                                    <!-- Reviews will be injected by JS -->
-                                                </div>
-                                            </div>
-                                            <!-- [END] NEW: Customer Reviews -->
-
-                                            <!-- [START] NEW: Financial Charts -->
-                                            <div>
-                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Charts (Fictional)</h4>
-                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                                                        <h5 class="text-sm font-medium text-brand-dark mb-2">Revenue Trend</h5>
-                                                        <div id="report-chart-revenue" class="h-24">
-                                                            <!-- SVG will be injected by JS -->
-                                                        </div>
-                                                    </div>
-                                                    <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                                                        <h5 class="text-sm font-medium text-brand-dark mb-2">Cash Flow</h5>
-                                                        <div id="report-chart-cashflow" class="h-24">
-                                                            <!-- SVG will be injected by JS -->
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- [END] NEW: Financial Charts -->
-                                        </div>
-                                    </div>
-
-                                    <!-- Sources -->
-                                    <div id="report-sources-container" class="mt-6 border-t border-brand-border pt-4" style="display: none;">
-                                        <h5 class="text-xs font-semibold text-brand-gray uppercase mb-2">Sources Used:</h5>
-                                        <ul id="report-sources" class="space-y-1 list-disc list-inside"></ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- [END] COMBINED WIDGET -->
-
-                    <!-- [START] NEW PRE-APPROVAL WIDGET -->
-                    <div class="max-w-4xl mx-auto mb-16">
-                        <div class="bg-white border border-brand-border rounded-lg shadow-lg p-6 flex flex-col">
-                            <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">
-                                Live AI Pre-Approval Generator (Fictional)
-                            </h3>
-                            <div class="space-y-5 max-w-xl mx-auto w-full" x-data="{ monthlyRevenue: 10000, ficoScore: 680 }">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
-                                    <div>
-                                        <label for="pre-approval-name" class="block text-sm font-medium text-brand-dark">Business Name</label>
-                                        <input type="text" id="pre-approval-name" value="Apex Innovations" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
-                                    </div>
-                                    <div>
-                                        <label for="pre-approval-time" class="block text-sm font-medium text-brand-dark">Time in Business (months)</label>
-                                        <input type="number" id="pre-approval-time" value="12" min="0" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
-                                    </div>
-                                    <div class="sm:col-span-2">
-                                        <label for="pre-approval-industry" class="block text-sm font-medium text-brand-dark">Industry</label>
-                                        <select id="pre-approval-industry" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-white">
-                                            <option>Retail</option>
-                                            <option>Restaurant / Food Service</option>
-                                            <option>SaaS / Tech</option>
-                                            <option>Construction</option>
-                                            <option>Healthcare</option>
-                                            <option>Services (e.g., Salon, Legal)</option>
-                                            <option>Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="sm:col-span-2">
-                                        <div class="flex justify-between items-center">
-                                            <label for="pre-approval-monthly-revenue" class="block text-sm font-medium text-brand-dark">Monthly Gross Revenue</label>
-                                            <span class="font-bold text-brand-green bg-green-50 px-3 py-1 rounded-md text-sm" x-text="`$${parseInt(monthlyRevenue).toLocaleString()}`"></span>
-                                        </div>
-                                        <input type="range" id="pre-approval-monthly-revenue" x-model="monthlyRevenue" min="0" max="100000" step="1000" class="mt-2 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-brand-green">
-                                    </div>
-                                    <div class="sm:col-span-2">
-                                        <div class="flex justify-between items-center">
-                                            <label for="pre-approval-fico" class="block text-sm font-medium text-brand-dark">Owner FICO Score</label>
-                                            <span class="font-bold text-brand-green bg-green-50 px-3 py-1 rounded-md text-sm" x-text="ficoScore"></span>
-                                        </div>
-                                        <input type="range" id="pre-approval-fico" x-model="ficoScore" min="450" max="850" step="1" class="mt-2 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-brand-green">
-                                    </div>
-                                </div>
-                                <button id="generate-pre-approval-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-dark hover:bg-brand-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button disabled:opacity-50 disabled:cursor-wait mt-40">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M11.49 3.17c.12-.22.36-.3.59-.18.23.12.3.36.18.59l-3.5 6.5A.996.996 0 008 10.5H5a1 1 0 00-1 1v3a1 1 0 001 1h3.5a.996.996 0 00.92-.62l3.5-6.5c.12-.22.04-.47-.18-.59zM5 12.5a.5.5 0 01.5-.5H8a.5.5 0 01.46.31l3.5 6.5c.12.22.04-.47-.18.59a.498.498 0 01-.59-.18L7.69 13H5.5a.5.5 0 01-.5-.5v-3z" clip-rule="evenodd" />
-                                        <path d="M15.5 10.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM14 12.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM15.5 14.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01z" />
-                                    </svg>
-                                    <span>Generate Pre-Approval Terms</span>
-                                </button>
-                            </div>
-                            
-                            <!-- Pre-Approval Results Container -->
-                            <div id="pre-approval-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
-                                <!-- Loader -->
-                                <div id="pre-approval-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box">
-                                    <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span class="text-sm text-brand-gray">Generating fictional pre-approval...</span>
-                                </div>
-
-                                <!-- Error -->
-                                <div id="pre-approval-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
-                                    <p class="text-sm text-red-600" id="pre-approval-error-message"></p>
-                                </div>
-                                
-                                <!-- Content -->
-                                <div id="pre-approval-content" class="w-full" style="display: none;">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        
-                                        <!-- Term Loan -->
-                                        <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
-                                            <span id="loan-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
-                                            <!-- Product and Amount -->
-                                            <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Term Loan</h4>
-                                            <p id="loan-amount" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
-                                            <!-- Terms Table -->
-                                            <table id="loan-terms-table" class="w-full text-sm text-left">
-                                                <tbody>
-                                                    <tr class="border-b border-brand-border/50">
-                                                        <td class="py-1.5 text-brand-gray">Term</td>
-                                                        <td id="loan-term" class="py-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                    <tr class="border-b border-brand-border/50">
-                                                        <td class="py-1.5 text-brand-gray">Est. Rate</td>
-                                                        <td id="loan-rate" class="py-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                    <tr class="border-b border-brand-border/50">
-                                                        <td class="py-1.5 text-brand-gray">Payback</td>
-                                                        <td id="loan-payback" class="py-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                    <tr> <!-- No border on last item -->
-                                                        <td class="pt-1.5 text-brand-gray">Est. Payment</td>
-                                                        <td id="loan-payment" class="pt-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <p id="loan-note" class="text-xs text-brand-gray italic mt-4"></p>
-                                        </div>
-                                        
-                                        <!-- Line of Credit (LOC) -->
-                                        <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
-                                            <span id="loc-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
-                                            <!-- Product and Amount -->
-                                            <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Line of Credit</h4>
-                                            <p id="loc-limit" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
-                                            <!-- Terms Table -->
-                                            <table id="loc-terms-table" class="w-full text-sm text-left">
-                                                <tbody>
-                                                    <tr> <!-- No border on last item -->
-                                                        <td class="pt-1.5 text-brand-gray">Rate</td>
-                                                        <td id="loc-rate" class="pt-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <p id="loc-note" class="text-xs text-brand-gray italic mt-4"></p>
-                                        </div>
-                                        
-                                        <!-- Merchant Cash Advance (MCA) -->
-                                        <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
-                                            <span id="mca-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
-                                            <!-- Product and Amount -->
-                                            <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Merchant Cash Advance</h4>
-                                            <p id="mca-amount" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
-                                            <!-- Terms Table -->
-                                            <table id="mca-terms-table" class="w-full text-sm text-left">
-                                                <tbody>
-                                                    <tr class="border-b border-brand-border/50">
-                                                        <td class="py-1.5 text-brand-gray">Factor Rate</td>
-                                                        <td id="mca-factor" class="py-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                    <tr class="border-b border-brand-border/50">
-                                                        <td class="py-1.5 text-brand-gray">Payback</td>
-                                                        <td id="mca-payback" class="py-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                    <tr> <!-- No border on last item -->
-                                                        <td class="pt-1.5 text-brand-gray">Est. Daily Remittance</td>
-                                                        <td id="mca-remittance" class="pt-1.5 text-right font-medium text-brand-dark"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <p id="mca-note" class="text-xs text-brand-gray italic mt-4"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- [END] NEW PRE-APPROVAL WIDGET -->
-
-
-                    <!-- Section Header --><div class="text-center max-w-3xl mx-auto mb-16">
-                        <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">Static Report Mockup</span>
-                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">
-                            Your Verification Report
-                        </h2>
-                        <p class="text-lg text-brand-gray">
-                            Below is a static mockup of a final, comprehensive report. All interactive demos are in the section above.
-                        </p>
-                    </div>
-
-                    <!-- Report Mockup --><div class="max-w-7xl mx-auto bg-white border border-brand-border rounded-lg shadow-xl overflow-hidden">
-                        <!-- Report Header --><div class="p-6 border-b border-brand-border">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h3 class="font-heading text-2xl font-bold text-brand-green">Business Verification Report</h3>
-                                    <p class="text-sm text-gray-500">Business — Report ID: TRUST-88A42F / Generated: Nov 08, 2025 • 23:03 UTC</p>
-                                </div>
-                                <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">The AI Verification Standard</span>
-                            </div>
-                        </div>
-
-                        <!-- Report Body --><div class="p-6">
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <!-- Left Column: Status --><div class="lg:col-span-1 space-y-6">
-                                    <div>
-                                        <h4 class="font-semibold text-brand-dark mb-3">Overall Status</h4>
-                                        <div class="p-4 border border-brand-border rounded-lg">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="relative w-24 h-24">
-                                                    <svg class="w-full h-full" viewBox="0 0 100 100">
-                                                        <!-- Background circle --><circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50"></circle>
-                                                        <!-- Progress circle --><circle class="text-brand-green" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="39.6" stroke-linecap="round" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" style="--tw-stroke-dashoffset: calc(264 - (264 * 87.5) / 100); transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
-                                                    </svg>
-                                                    <div class="absolute inset-0 flex items-center justify-center">
-                                                        <span class="text-3xl font-bold text-brand-dark">875</span>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <span class="text-2xl font-bold text-brand-green">Verified</span>
-                                                    <p class="text-sm text-gray-500">Strong financial health</p>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4 space-y-2 text-sm">
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Health: <span class="font-medium text-green-600">87.5 / 100</span></span>
-                                                    <span class="text-gray-500">Risk: <span class="font-medium text-green-600">Low</span></span>
-                                                </div>
-                                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                                    <div class="bg-brand-green h-2 rounded-full" style="width: 87.5%"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-4 p-4 border border-brand-border rounded-lg text-sm space-y-2">
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-500">NMLS</span>
-                                                <span class="font-medium text-brand-dark">#1234567</span>
-                                            </div>
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-500">Status</span>
-                                                <span class="font-medium text-green-600">Active</span>
-                                            </div>
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-500">Entity</span>
-                                                <span class="font-medium text-brand-dark">QuantumLeap AI LLC</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- [START] Removed AI Summary widget from here -->
-                                    <!-- ... -->
-                                    <!-- [END] Removed AI Summary widget from here -->
-
-                                </div>
-
-                                <!-- Right Column: Metrics --><div class="lg:col-span-2">
-                                    <h4 class="font-semibold text-brand-dark mb-3">Key Metrics</h4>
-                                    <div class="border border-brand-border rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500">Current Ratio</td>
-                                                    <td class="px-4 py-3 text-right font-medium text-green-600">1.88</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500">Quick Ratio</td>
-                                                    <td class="px-4 py-3 text-right font-medium text-green-600">1.21</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500">Debt Service Coverage</td>
-                                                    <td class="px-4 py-3 text-right font-medium text-green-600">1.45</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500">Cash-Flow to Debt Ratio</td>
-                                                    <td class="px-4 py-3 text-right font-medium text-green-600">0.95</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500">Revenue Trend</td>
-                                                    <td class="px-4 py-3 text-right font-medium text-red-600">-12.1%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500">Cash-Flow Volatility</td>
-                                                    <td class="px-4 py-3 text-right font-medium text-brand-dark">28.0%</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- MoneyThumb & Charts --><div class="mt-6">
-                                <h4 class="font-semibold text-brand-dark mb-3">Financial Snapshot</h4>
-                                <!-- MoneyThumb Table --><div class="border border-brand-border rounded-lg mb-6 overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Deposits</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"># Deposits</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Withdrawals</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg AOB</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg NSFs</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ending Bal</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">T'humpdri Score</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">Chase, Bank of America</td>
-                                                <td class="px-4 py-3 text-gray-500">$180,277</td>
-                                                <td class="px-4 py-3 text-gray-500">41</td>
-                                                <td class="px-4 py-3 text-gray-500">$95,845</td>
-                                                <td class="px-4 py-3 text-gray-500">$450,705</td>
-                                                <td class="px-4 py-3 font-medium text-green-600">0.1</td>
-                                                <td class="px-4 py-3 text-gray-500">$215,848</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 font-medium text-green-600">820</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- Charts --><div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <h5 class="font-medium text-brand-dark mb-2">Revenue Trend</h5>
-                                        <div class="p-4 border border-brand-border rounded-lg h-48">
-                                            <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-                                                <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,40 10,35 20,30 30,25 40,20 50,22 60,15 70,10 80,12 90,5 100,10" />
-                                                <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h5 class="font-medium text-brand-dark mb-2">Ending Balance</h5>
-                                        <div class="p-4 border border-brand-border rounded-lg h-48">
-                                            <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-                                                <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,30 10,28 20,35 30,30 40,25 50,20 60,25 70,15 80,18 90,10 100,15" />
-                                                <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h5 class="font-medium text-brand-dark mb-2">NSF / OVD Events</h5>
-                                        <div class="p-4 border border-brand-border rounded-lg h-48 flex items-end space-x-2">
-                                            <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none" class="flex items-end">
-                                                <rect x="5" y="45" width="10" height="3" fill="#00C09A" />
-                                                <rect x="20" y="48" width="10" height="0" fill="#00C09A" />
-                                                <rect x="35" y="48" width="10" height="0" fill="#00C09A" />
-                                                <rect x="50" y="40" width="10" height="8" fill="#FBBF24" />
-                                                <rect x="65" y="35" width="10" height="13" fill="#EF4444" />
-                                                <rect x="80" y="48" width="10" height="0" fill="#00C09A" />
-                                                <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Banking Activity --><div class="mt-6">
-                                <h4 class="font-semibold text-brand-dark mb-3">Monthly Banking Activity</h4>
-                                <div class="border border-brand-border rounded-lg overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Credits</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Num Credits</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">True Revenue</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Balance</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NSF/OVD</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">Oct 2025</td>
-                                                <td class="px-4 py-3 text-gray-500">190,277</td>
-                                                <td class="px-4 py-3 text-gray-500">41</td>
-                                                <td class="px-4 py-3 text-gray-500">185,845</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 text-gray-500">450,705</td>
-                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
-                                                <td class="px-4 py-3 text-gray-500">215,848</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">Sep 2025</td>
-                                                <td class="px-4 py-3 text-gray-500">215,802</td>
-                                                <td class="px-4 py-3 text-gray-500">47</td>
-                                                <td class="px-4 py-3 text-gray-500">210,000</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 text-gray-500">420,112</td>
-                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
-                                                <td class="px-4 py-3 text-gray-500">190,211</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">Aug 2025</td>
-                                                <td class="px-4 py-3 text-gray-500">199,212</td>
-                                                <td class="px-4 py-3 text-gray-500">38</td>
-                                                <td class="px-4 py-3 text-gray-500">199,212</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 text-gray-500">380,920</td>
-                                                <td class="px-4 py-3 font-medium text-red-600">3</td>
-                                                <td class="px-4 py-3 text-gray-500">180,450</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">Jul 2025</td>
-                                                <td class="px-4 py-3 text-gray-500">230,100</td>
-                                                <td class="px-4 py-3 text-gray-500">42</td>
-                                                <td class="px-4 py-3 text-gray-500">225,000</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 text-gray-500">350,000</td>
-                                                <td class="px-4 py-3 font-medium text-yellow-600">1</td>
-                                                <td class="px-4 py-3 text-gray-500">205,112</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">Jun 2025</td>
-                                                <td class="px-4 py-3 text-gray-500">210,500</td>
-                                                <td class="px-4 py-3 text-gray-500">35</td>
-                                                <td class="px-4 py-3 text-gray-500">210,500</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 text-gray-500">310,200</td>
-                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
-                                                <td class="px-4 py-3 text-gray-500">190,888</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-gray-500">May 2025</td>
-                                                <td class="px-4 py-3 text-gray-500">205,123</td>
-                                                <td class="px-4 py-3 text-gray-500">40</td>
-                                                <td class="px-4 py-3 text-gray-500">200,000</td>
-                                                <td class="px-4 py-3 text-gray-500">0</td>
-                                                <td class="px-4 py-3 text-gray-500">290,000</td>
-                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
-                                                <td class="px-4 py-3 text-gray-500">170,123</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Public Records --><div class="mt-6">
-                                <h4 class="font-semibold text-brand-dark mb-3">Public Records</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <!-- UCC Filings --><div class="border border-brand-border rounded-lg">
-                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">UCC Filings</h5>
-                                        <div class="p-4 text-sm">
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-500">Bank of America, N.A.</span>
-                                                <span class="font-medium text-brand-dark">UCC-1</span>
-                                            </div>
-                                            <p class="text-xs text-gray-400">Filed: 2024-01-15 | All Assets</p>
-                                        </div>
-                                    </div>
-                                    <!-- Liens & Judgments --><div class="border border-brand-border rounded-lg">
-                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Liens & Judgments</h5>
-                                        <div class="p-4 text-sm">
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-500">State Tax Lien</span>
-                                                <span class="font-medium text-yellow-600">$5,210.00</span>
-                                            </div>
-                                            <p class="text-xs text-gray-400">Filed: 2025-06-30 | Case #12345</p>
-                                        </div>
-                                    </div>
-                                    <!-- Court Filings --><div class="border border-brand-border rounded-lg">
-                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Court Filings</h5>
-                                        <div class="p-4 text-sm">
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-500">Civil Lawsuit</span>
-                                                <span class="font-medium text-yellow-600">Pending</span>
-                                            </div>
-                                            <p class="text-xs text-gray-400">Filed: 2025-09-10 | Case #C-56789</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- SOS & Recommendations --><div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <!-- SOS Records --><div class="border border-brand-border rounded-lg">
-                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">SOS / Secretary of State Records</h5>
-                                    <div class="p-4 overflow-x-auto">
-                                        <table class="min-w-full text-sm">
-                                            <thead>
-                                                <tr class="border-b border-brand-border">
-                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Name</th>
-                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Type</th>
-                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Formation Date</th>
-                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity ID</th>
-                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered Agent</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="py-3 text-gray-500">QUANTUMLEAP AI LLC</td>
-                                                    <td class="py-3 text-gray-500">Domestic Limited Liability Company (LLC)</td>
-                                                    <td class="py-3 text-gray-500">2023-01-15</td>
-                                                    <td class="py-3 text-gray-500">5567890-0142</td>
-                                                    <td class="py-3 font-medium text-green-600">Active</td>
-                                                    <td class="py-3 text-gray-500">A Registered Agent Inc.</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Recommendations --><div class="border border-brand-border rounded-lg">
-                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Recommendations</h5>
-                                    <ul class="p-6 space-y-2 list-disc list-inside text-sm text-gray-500">
-                                        <li class="font-medium text-green-600">Excellent financial health and low risk profile.</li>
-                                        <li>Address negative revenue trend observed in Key Metrics.</li>
-                                        <li>Investigate NSF events in Aug/Jul to prevent recurrence.</li>
-                                        <li>Review public records (UCC, liens) despite strong financials.</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- "Trusted By" Section --><section class="py-16 bg-brand-light">
-                <div class="container mx-auto px-6">
-                    <h3 class="text-center text-sm font-semibold text-brand-gray tracking-wider uppercase mb-8">
-                        Certified by TrustBureau.ai
-                    </h3>
-                    <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-70">
-                        <!-- Placeholder logos --><span class="text-2xl font-bold text-brand-green">FutureTech</span>
-                        <span class="text-2xl font-bold text-brand-green">QuantumLeap</span>
-                        <span class="text-2xl font-bold text-brand-green">Axiom Inc.</span>
-                        <span class="text-2xl font-bold text-brand-green">CodeGenius</span>
-                        <span class="text-2xl font-bold text-brand-green">SynthData</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- "How it Works" Section --><section id="process" class="py-24 bg-white">
-                <div class="container mx-auto px-6 max-w-4xl">
-                    <div class="text-center max-w-2xl mx-auto mb-16">
-                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">
-                            A Simple, Verifiable Process
-                        </h2>
-                        <p class="text-lg text-brand-gray">
-                            Our streamlined process makes AI governance simple, fast, and transparent.
-                        </p>
-                    </div>
-                    
-                    <div class="space-y-16">
-                        <!-- Step 1 --><div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
-                            <div class="font-heading font-bold text-7xl text-brand-dark">01</div>
-                            <div>
-                                <h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Connect & Scan</h3>
-                                <p class="text-lg text-brand-gray">
-                                    Securely connect your models, data, or platform via our API. Our scanner auto-detects vulnerabilities, biases, and compliance gaps.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <!-- Step 2 --><div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
-                            <div class="font-heading font-bold text-7xl yellow-gradient-text">02</div>
-                            <div>
-                                <h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Analyze & Remediate</h3>
-                                <p class="text-lg text-brand-gray">
-                                    Receive a detailed risk dashboard with scorable, actionable insights. Use our tools and recommendations to fix issues before they become a problem.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <!-- Step 3 --><div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
-                            <div class="font-heading font-bold text-7xl text-brand-green">03</div>
-                            <div>
-                                <h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Certify & Monitor</h3>
-                                <p class="text-lg text-brand-gray">
-                                    Issue a "TrustBureau Certified" seal to display on your products. Our platform continuously monitors your models in production to prevent trust drift.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Platform Features Section --><section id="platform" class="py-24 bg-brand-light">
-                <div class="container mx-auto px-6">
-                    <div class="text-center max-w-3xl mx-auto mb-16">
-                        <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">The Platform</span>
-                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mt-6 mb-4">
-                            One Solution for AI Governance
-                        </h2>
-                        <p class="text-lg text-brand-gray">
-                            Our platform provides a complete, end-to-end solution for AI governance, risk, and compliance (GRC).
-                        </p>
-                    </div>
-                    
-                    <!-- Features Grid --><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        
-                        <!-- Feature Card 1 --><div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-green mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                            <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Model Auditing</h3>
-                            <p class="text-brand-gray">
-                                Generate independent audit reports for performance, safety, and security.
-                            </p>
-                        </div>
-
-                        <!-- Feature Card 2 --><div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 0010 0l-3-9m0 0l3-1m-3 1v11m0-11l3 9m-3-9l-3 9M12 6l3 1m0 0l-3 9a5.002 5.002 0 0010 0l-3-9m0 0l3-1m-3 1v11m0-11l3 9m-3-9l-3 9" />
-                            </svg>
-                            <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Bias & Fairness</h3>
-                            <p class="text-brand-gray">
-                                Identify and mitigate algorithmic bias across all protected classes.
-                            </p>
-                        </div>
-                        
-                        <!-- Feature Card 3 --><div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                            <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Security & Robustness</h3>
-                            <p class="text-brand-gray">
-                                Test for adversarial attacks, data poisoning, and other vulnerabilities.
-                            </p>
-                        </div>
-
-                        <!-- Feature Card 4 --><div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-green mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4-4m-4 0l4 4" />
-                            </svg>
-                            <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Compliance Hub</h3>
-                            <p class="text-brand-gray">
-                                Automate monitoring and reporting for EU AI Act, GDPR, HIPAA, and more.
-                            </p>
-                        </div>
-
-                        <!-- Feature Card 5 --><div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16v4m-2-2h4m5 16v4m-2-2h4M17 3v4m-2-2h4M3 11h18M3 7v8M21 7v8" />
-                            </svg>
-                            <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Explainable AI (XAI)</h3>
-                            <p class="text-brand-gray">
-                                Generate human-readable explanations for complex model decisions.
-                            </p>
-                        </div>
-
-                        <!-- Feature Card 6 --><div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" />
-                            </svg>
-                            <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Real-time Monitoring</h3>
-                            <p class="text-brand-gray">
-                                Get alerts on model drift, data integrity issues, and new threats.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Pricing Section --><section id="pricing" class="py-24 bg-white">
-                <div class="container mx-auto px-6">
-                    <div class="text-center max-w-3xl mx-auto mb-16">
-                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">
-                            Pricing for Underwriting Teams
-                        </h2>
-                        <p class="text-lg text-brand-gray">
-                            Choose a plan that scales with your team's decision-making volume.
-                        </p>
-                    </div>
-                    
-                    <!-- Pricing Grid --><div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        
-                        <!-- Plan 1: Pro --><div class="bg-white rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
-                            <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Pro</h3>
-                            <p class="text-brand-gray mb-6 h-12">For small teams and regional banks.</p>
-                            <div class="my-4">
-                                <span class="text-5xl font-heading font-extrabold text-brand-dark">$499</span>
-                                <span class="text-brand-gray"> / mo</span>
-                            </div>
-                            <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>5 User Seats</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 250 Reports / mo</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Standard AI Analysis</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Email Support</li>
-                            </ul>
-                            <!-- Button sets page to 'demo' --><a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-light text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-brand-border transition-colors">
-                                Get Started
-                            </a>
-                        </div>
-                        
-                        <!-- Plan 2: Business (Featured) --><div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col relative scale-105 border-2 border-brand-green">
-                            <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full">
-                                Most Popular
-                            </div>
-                            <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Business</h3>
-                            <p class="text-brand-gray mb-6 h-12">For established teams and underwriting departments.</p>
-                            <div class="my-4">
-                                <span class="text-5xl font-heading font-extrabold text-brand-dark">$1,999</span>
-                                <span class="text-brand-gray"> / mo</span>
-                            </div>
-                            <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>20 User Seats</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 1,500 Reports / mo</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Analysis & XAI</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Compliance Modules (EU, GDPR)</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority Support</li>
-                            </ul>
-                            <!-- Button sets page to 'demo' --><a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-lg cta-button">
-                                Start Free Trial
-                            </a>
-                        </div>
-                        
-                        <!-- Plan 3: Enterprise --><div class="bg-white rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
-                            <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Enterprise</h3>
-                            <p class="text-brand-gray mb-6 h-12">For large-scale, automated, or on-premise deployments.</p>
-                            <div class="my-4">
-                                <span class="text-5xl font-heading font-extrabold text-brand-dark">Custom</span>
-                            </div>
-                            <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited Users & Reports</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Full API & Integration Access</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>On-Premise & VPC Deployment</li>
-                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Dedicated Account Manager & SLAs</li>
-                            </ul>
-                            <!-- Button sets page to 'demo' --><a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-dark text-white font-bold py-3 px-6 rounded-lg hover:bg-brand-green transition-colors">
-                                Contact Sales
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Final CTA Section (MOVED) --><section id="demo-bottom" class="bg-brand-dark">
-                <div class="container mx-auto px-6 py-24 text-center">
-                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
-                        Make Decisions in Seconds
-                    </h2>
-                    <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">
-                        See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.
-                    </p>
-                    <!-- Button sets page to 'demo' --><a href="#" @click.prevent="page = 'demo'" class="bg-brand-green text-white font-bold py-3.5 px-10 rounded-lg text-lg cta-button">
-                        Request Your Demo
-                    </a>
-                </div>
-            </section>
+            <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
+            <p class="text-xs text-gray-500 mt-2">Usually 10–30s — scanning SOS, public records, reviews and recent headlines.</p>
+          </div>
         </div>
-        <!-- [END] HOME PAGE CONTENT -->
-
-
-        <!-- [START] LOGIN PAGE -->
-        <!-- This div only shows when page === 'login' -->
-        <div x-show="page === 'login'" x-cloak>
-            <div class="flex items-center justify-center min-h-screen bg-brand-light py-12 px-4 sm:px-6 lg:px-8">
-                <div class="max-w-md w-full space-y-8">
-                    <div>
-                        <!-- Logo (links back home) --><a href="#" @click.prevent="page = 'home'" class="flex justify-center items-center space-x-2.5">
-                            <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-                                <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
-                        </a>
-                        <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">
-                            Member Login
-                        </h2>
-                    </div>
-                    <form class="mt-8 space-y-6" action="#" method="POST">
-                        <input type="hidden" name="remember" value="true">
-                        <div class="rounded-md shadow-sm -space-y-px">
-                            <div>
-                                <label for="email-address" class="sr-only">Email address</label>
-                                <input id="email-address" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-brand-border placeholder-brand-gray text-brand-dark rounded-t-md focus:outline-none focus:ring-brand-green focus:border-brand-green focus:z-10 sm:text-sm" placeholder="Email address">
-                            </div>
-                            <div>
-                                <label for="password" class="sr-only">Password</label>
-                                <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-brand-border placeholder-brand-gray text-brand-dark rounded-b-md focus:outline-none focus:ring-brand-green focus:border-brand-green focus:z-10 sm:text-sm" placeholder="Password">
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="text-sm">
-                                <a href="#" class="font-medium text-brand-green hover:text-green-700">
-                                    Forgot your password?
-                                </a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button">
-                                Sign in
-                            </button>
-                        </div>
-                    </form>
-                    <div class="text-center">
-                        <a href="#" @click.prevent="page = 'home'" class="font-medium text-brand-green hover:text-green-700">
-                            &larr; Back to Home
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="skeleton-card space-y-3">
+            <div class="w-28 skel-line shimmer"></div>
+            <div class="w-full h-20 shimmer rounded-md"></div>
+            <div class="w-3/4 skel-line shimmer"></div>
+            <div class="w-1/2 skel-line shimmer"></div>
+          </div>
+          <div class="skeleton-card space-y-3">
+            <div class="w-32 skel-line shimmer"></div>
+            <div class="w-full h-20 shimmer rounded-md"></div>
+            <div class="w-2/3 skel-line shimmer"></div>
+            <div class="w-1/3 skel-line shimmer"></div>
+          </div>
+          <div class="skeleton-card space-y-3">
+            <div class="w-36 skel-line shimmer"></div>
+            <div class="w-full h-20 shimmer rounded-md"></div>
+            <div class="w-5/6 skel-line shimmer"></div>
+            <div class="w-1/2 skel-line shimmer"></div>
+          </div>
         </div>
-        <!-- [END] LOGIN PAGE -->
+      </div>
+      <!-- /LOADER -->
 
+      <!-- Error -->
+      <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
+        <p id="report-error-message" class="text-sm text-red-700"></p>
+      </div>
 
-        <!-- [START] DEMO REQUEST PAGE -->
-        <!-- This div only shows when page === 'demo' -->
-        <div x-show="page === 'demo'" x-cloak>
-            <div class="min-h-screen bg-brand-light py-12 px-4 sm:px-6 lg:px-8">
-                <div class="max-w-xl mx-auto">
-                    <div>
-                        <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">
-                            Request a Demo
-                        </h2>
-                        <p class="mt-2 text-center text-lg text-brand-gray">
-                            See our AI underwriting platform in action. Fill out the form below to schedule a call.
-                        </p>
-                    </div>
-                    
-                    <form class="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-md border border-brand-border" action="#" method="POST">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="first-name" class="block text-sm font-medium text-brand-dark">First Name</label>
-                                <input type="text" name="first-name" id="first-name" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
-                            </div>
-                            <div>
-                                <label for="last-name" class="block text-sm font-medium text-brand-dark">Last Name</label>
-                                <input type="text" name="last-name" id="last-name" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
-                            </div>
-                        </div>
-                        <div>
-                            <label for="demo-email" class="block text-sm font-medium text-brand-dark">Work Email</label>
-                            <input type="email" name="demo-email" id="demo-email" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="you@company.com">
-                        </div>
-                        <div>
-                            <label for="company" class="block text-sm font-medium text-brand-dark">Company</label>
-                            <input type="text" name="company" id="company" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="message" class="block text-sm font-medium text-brand-dark">Message (Optional)</label>
-                            <textarea id="message" name="message" rows="4" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="Tell us a bit about your needs..."></textarea>
-                        </div>
-
-                        <div>
-                            <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button">
-                                Submit Request
-                            </button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-6">
-                        <a href="#" @click.prevent="page = 'home'" class="font-medium text-brand-green hover:text-green-700">
-                            &larr; Back to Home
-                        </a>
-                    </div>
-                </div>
-            </div>
+      <!-- Content -->
+      <div id="report-content" style="display:none;" class="space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
+            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
+          </div>
         </div>
-        <!-- [END] DEMO REQUEST PAGE -->
 
-
-    </main>
-
-    <footer class="bg-white border-t border-brand-border">
-        <div class="container mx-auto px-6 py-16">
-            <div class="flex flex-col md:flex-row justify-between">
-                <!-- Logo and Copyright --><div class="mb-8 md:mb-0 max-w-sm">
-                    <!-- Logo links home --><a href="#" @click.prevent="page = 'home'" class="flex items-center space-x-2.5 mb-4">
-                        <!-- Solid Green Shield with White Check --><svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-                            <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
-                    </a>
-                    <p class="text-sm text-brand-gray">
-                        The AI Verification Standard.
-                        <br>&copy; 2025 TrustBureau.ai, Inc. All rights reserved.
-                    </p>
-                </div>
-                
-                <!-- Footer Navigation --><div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <div>
-                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Product</h4>
-                        <ul class="space-y-2">
-                            <!-- Links set page to 'home' before scrolling -->
-                            <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Platform</a></li>
-                            <li><a href="#process" @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Process</a></li>
-                            <li><a href="#pricing" @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Pricing</a></li>
-                            <li><a href="#" @click.prevent="page = 'demo'" class="text-brand-gray hover:text-brand-dark">Book a Demo</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Resources</h4>
-                        <ul class="space-y-2">
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Blog</a></li>
-                            <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Documentation</a></li>
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Whitepapers</a></li>
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">EU AI Act</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Company</h4>
-                        <ul class="space-y-2">
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">About Us</a></li>
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Careers</a></li>
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Legal</h4>
-                        <ul class="space-y-2">
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Privacy Policy</a></li>
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Terms of Service</a></li>
-                            <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">DPA</a></li>
-                        </ul>
-                    </div>
-                </div>
+        <!-- Score + Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
+            <div class="flex flex-col items-center">
+              <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">…</span></div>
+              <p id="report-score-justification" class="text-center text-gray-500 text-sm mb-4 italic"></p>
+              <div class="w-full text-left">
+                <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Factors</h4>
+                <ul id="report-score-positives" class="space-y-1.5 mb-2"></ul>
+                <ul id="report-score-negatives" class="space-y-1.5"></ul>
+              </div>
             </div>
+          </div>
+
+          <div class="md:col-span-2 widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
+            <p id="report-summary" class="text-sm text-gray-700 leading-relaxed"></p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                <h4 class="text-sm font-semibold text-brand-dark mb-3">Company Facts</h4>
+                <ul class="text-sm text-gray-700 space-y-1">
+                  <li><span class="text-gray-500">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Website:</span> <span id="facts-website" class="ml-1"></span></li>
+                </ul>
+              </div>
+
+              <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                <h4 class="text-sm font-semibold text-brand-dark mb-3">Recent Headlines</h4>
+                <ul id="report-news-list" class="space-y-2"></ul>
+              </div>
+            </div>
+          </div>
         </div>
-    </footer>
 
+        <!-- Filings + Public Records -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Corporate Filings</h3>
+            <ul class="text-sm text-gray-700 space-y-1">
+              <li><span class="text-gray-500">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Status:</span> <span id="report-sos-status" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Jurisdiction:</span> <span id="report-sos-jurisdiction" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Formation Date:</span> <span id="report-sos-date" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
+            </ul>
+          </div>
 
-    <!-- [START] GEMINI API SCRIPT -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Public Records</h3>
+            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-700 leading-relaxed"></ul>
+          </div>
+        </div>
 
-            // --- UI Elements for Combined Widget ---
-            const generateReportBtn = document.getElementById('generate-report-btn');
-            const businessNameInput = document.getElementById('business-name');
-            
-            // Result containers
-            const resultsContainer = document.getElementById('report-results-container');
-            const loader = document.getElementById('report-loader');
-            const errorContainer = document.getElementById('report-error-container');
-            const errorMessage = document.getElementById('report-error-message');
-            const contentContainer = document.getElementById('report-content');
-            
-            // Content fields
-            const reportTitle = document.getElementById('report-title');
-            const reportSummary = document.getElementById('report-summary');
-            
-            const scoreCircle = document.getElementById('report-score-circle');
-            const scoreDigit = document.getElementById('report-score-digit');
-            const scoreJustification = document.getElementById('report-score-justification');
-            const positiveList = document.getElementById('report-score-positives');
-            const negativeList = document.getElementById('report-score-negatives');
-            
-            const sosStatus = document.getElementById('report-sos-status');
-            const sosEntity = document.getElementById('report-sos-entity');
-            const sosJurisdiction = document.getElementById('report-sos-jurisdiction');
-            const sosDate = document.getElementById('report-sos-date');
-            const sosAgent = document.getElementById('report-sos-agent');
-            const sosName = document.getElementById('report-sos-name');
-            
-            const recordsList = document.getElementById('report-records-list');
-            
-            // [START] NEW: Get new element IDs
-            const reviewsList = document.getElementById('report-reviews-list');
-            const chartRevenue = document.getElementById('report-chart-revenue');
-            const chartCashflow = document.getElementById('report-chart-cashflow');
-            
-            // --- UI Elements for Pre-Approval Widget ---
-            const preApprovalBtn = document.getElementById('generate-pre-approval-btn');
-            const preApprovalName = document.getElementById('pre-approval-name');
-            const preApprovalIndustry = document.getElementById('pre-approval-industry');
-            const preApprovalMonthlyRevenue = document.getElementById('pre-approval-monthly-revenue'); // Changed ID
-            const preApprovalTime = document.getElementById('pre-approval-time');
-            const preApprovalFico = document.getElementById('pre-approval-fico'); // Added FICO
-            
-            const preApprovalResultsContainer = document.getElementById('pre-approval-results-container');
-            const preApprovalLoader = document.getElementById('pre-approval-loader');
-            const preApprovalErrorContainer = document.getElementById('pre-approval-error-container');
-            const preApprovalErrorMessage = document.getElementById('pre-approval-error-message');
-            const preApprovalContent = document.getElementById('pre-approval-content');
+        <!-- Leadership / Products / Competitors / Web Signals -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Leadership</h3>
+            <ul id="report-leadership-list" class="space-y-2 text-sm text-gray-700"></ul>
+          </div>
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Products &amp; Services</h3>
+            <ul id="report-products-list" class="space-y-2 text-sm text-gray-700"></ul>
+          </div>
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Competitors</h3>
+            <ul id="report-competitors-list" class="space-y-2 text-sm text-gray-700"></ul>
+          </div>
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Web &amp; Social Signals</h3>
+            <ul id="report-social-list" class="space-y-1.5 text-sm text-gray-700"></ul>
+          </div>
+        </div>
 
-            const loanStatus = document.getElementById('loan-status');
-            const loanAmount = document.getElementById('loan-amount');
-            const loanTerm = document.getElementById('loan-term');
-            const loanRate = document.getElementById('loan-rate');
-            const loanNote = document.getElementById('loan-note');
-            const loanPayback = document.getElementById('loan-payback');
-            const loanPayment = document.getElementById('loan-payment');
-            const loanTermsTable = document.getElementById('loan-terms-table'); // Changed from Dl
+        <!-- Reviews + Charts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Customer Reviews</h3>
+            <div id="report-reviews-list" class="space-y-3"></div>
+          </div>
 
-            const locStatus = document.getElementById('loc-status');
-            const locLimit = document.getElementById('loc-limit');
-            const locRate = document.getElementById('loc-rate');
-            const locNote = document.getElementById('loc-note');
-            const locTermsTable = document.getElementById('loc-terms-table'); // Changed from Dl
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Financial Charts (Fictional)</h3>
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <h5 class="text-sm font-medium text-brand-dark mb-1">Revenue Trend</h5>
+                <div id="report-chart-revenue" class="h-24"></div>
+              </div>
+              <div>
+                <h5 class="text-sm font-medium text-brand-dark mb-1">Cash Flow</h5>
+                <div id="report-chart-cashflow" class="h-24"></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            const mcaStatus = document.getElementById('mca-status');
-            const mcaAmount = document.getElementById('mca-amount');
-            const mcaFactor = document.getElementById('mca-factor');
-            const mcaNote = document.getElementById('mca-note');
-            const mcaPayback = document.getElementById('mca-payback');
-            const mcaRemittance = document.getElementById('mca-remittance');
-            const mcaTermsTable = document.getElementById('mca-terms-table'); // Changed from Dl
-            // [END] NEW
-            
-            const sourcesContainer = document.getElementById('report-sources-container');
-            const sourcesList = document.getElementById('report-sources');
+        <!-- Sources -->
+        <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources &amp; Links</h4>
+            <button id="toggle-sources" type="button" class="text-xs text-brand-green hover:underline">Show list</button>
+          </div>
+          <div id="report-sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
+          <ul id="report-sources" class="mt-4 space-y-1 list-disc list-inside hidden"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <footer class="border-top border-brand-border">
+    <div class="container mx-auto px-4 md:px-6 py-10 text-center text-sm text-gray-500">
+      &copy; 2025 TrustBureau.ai — Live AI Business Report
+    </div>
+  </footer>
 
-            // --- Helper Function: Show/Hide Report State ---
-            function showReportState(state, message = '') {
-                // Hide all sections first
-                loader.style.display = 'none';
-                errorContainer.style.display = 'none';
-                contentContainer.style.display = 'none';
-                sourcesContainer.style.display = 'none';
+  <script>
+    /* ===================== Config ===================== */
+    const MODEL_CANDIDATES = [
+      'gemini-2.5-flash',                // your requested model (first)
+      'gemini-2.5-flash-preview-09-2025',// fallback if preview name is required in your project
+      'gemini-2.0-flash',                // extra fallback
+      'gemini-1.5-flash-002'             // extra fallback
+    ];
+    const USE_SEARCH_TOOL = true;           // per your request
+    const MAX_OUTPUT_TOKENS = 8192;         // safe cap to avoid payload errors
 
-                // Show the main results container
-                resultsContainer.style.display = 'block';
+    /* ===================== Utilities ===================== */
+    function getApiKey() {
+      const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+      const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
+      return fromWindow || fromConst;
+    }
+    function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
+    function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
+    function linkifyMaybe(v) {
+      if (!v) return 'N/A';
+      const s = String(v).trim();
+      if (/^https?:\/\//i.test(s)) {
+        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      }
+      return s;
+    }
+    function renderLineChart(container, values, color) {
+      if (!Array.isArray(values) || values.length < 2) {
+        container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
+        return;
+      }
+      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
+      const min = Math.min(...nums), max = Math.max(...nums);
+      const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
+      const step = 100 / (norm.length - 1);
+      const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
+      container.innerHTML =
+        `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+          <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+          <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+        </svg>`;
+    }
 
-                if (state === 'loading') {
-                    loader.style.display = 'flex';
-                } else if (state === 'error') {
-                    errorContainer.style.display = 'flex';
-                    errorMessage.innerText = message;
-                } else if (state === 'content') {
-                    contentContainer.style.display = 'block';
-                }
+    /* ===================== Loader UI ===================== */
+    let __loaderCtl = null;
+    function startLoadingAnimation() {
+      const steps = [
+        'Matching business identity','Searching the web','Pulling SOS / corporate filings',
+        'Parsing entity metadata','Checking public records','Gathering leadership',
+        'Mapping products & services','Finding competitors','Collecting web & social signals',
+        'Crawling recent headlines','Reading customer reviews','Synthesizing risk score'
+      ];
+      const stepsOl = document.getElementById('loader-steps');
+      const barEl   = document.getElementById('loader-bar');
+      const timerEl = document.getElementById('loader-timer');
+
+      stepsOl.innerHTML = steps.map((s,i) => `
+        <li class="flex items-start gap-2">
+          <span class="step-icon" id="ld_${i}">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </span>
+          <span>${s}</span>
+        </li>`).join('');
+
+      let elapsed = 0;
+      const tTimer = setInterval(() => {
+        elapsed += 200;
+        const m = Math.floor(elapsed/1000/60);
+        const s = Math.floor((elapsed/1000)%60);
+        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }, 200);
+
+      let idx = 0;
+      const stepMs = Math.max(900, Math.floor(25000 / steps.length));
+      const tSteps = setInterval(() => {
+        if (idx < steps.length) {
+          document.getElementById(`ld_${idx}`)?.classList.add('done');
+          idx++;
+          const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
+          barEl.style.width = pct + '%';
+        } else {
+          const cur = parseFloat(barEl.style.width) || 98;
+          barEl.style.width = Math.min(99, cur + 0.2) + '%';
+        }
+      }, stepMs);
+
+      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
+    }
+
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
+
+    function showState(state, message = '') {
+      loader.style.display = 'none';
+      errBox.style.display = 'none';
+      content.style.display = 'none';
+      results.style.display = 'block';
+
+      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+
+      if (state === 'loading') {
+        loader.style.display = 'block';
+        __loaderCtl = startLoadingAnimation();
+      } else if (state === 'error') {
+        errBox.style.display = 'block';
+        errMsg.textContent = message || 'Something went wrong.';
+      } else if (state === 'content') {
+        content.style.display = 'block';
+      }
+    }
+
+    /* ===================== Robust JSON parsing ===================== */
+    function parseCandidateJSON(candidate) {
+      const parts = candidate?.content?.parts || [];
+
+      // Try inline_data JSON first
+      for (const p of parts) {
+        if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
+          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
+        }
+      }
+      // Then try text parts
+      for (const p of parts) {
+        if (typeof p?.text === 'string' && p.text.trim()) {
+          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
+          try { return JSON.parse(raw); } catch {}
+          const lastCurly  = raw.lastIndexOf('}');
+          const lastSquare = raw.lastIndexOf(']');
+          const cut = Math.max(lastCurly, lastSquare);
+          if (cut > 0) {
+            const maybe = raw.slice(0, cut + 1);
+            try { return JSON.parse(maybe); } catch {}
+          }
+          const preview = raw.slice(0, 400).replace(/\s+/g,' ');
+          throw new Error(`Model returned non‑JSON (preview): ${preview}`);
+        }
+      }
+      throw new Error('Model returned no JSON content.');
+    }
+
+    /* ===================== Sources helpers ===================== */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      let open = false;
+      document.getElementById('toggle-sources').onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+      };
+    }
+
+    /* ===================== Fetch helper ===================== */
+    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
+      let lastError;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try { body = await res.json(); } catch {}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+        }
+      }
+      throw lastError || new Error('API request failed.');
+    }
+
+    /* ===================== API (v1beta, snake_case, google_search) ===================== */
+    function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
+      const payload = {
+        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+        system_instruction: { role: 'system', parts: [{ text: systemPrompt }] },
+        generation_config: {
+          max_output_tokens: MAX_OUTPUT_TOKENS,
+          temperature: 0.2,
+          top_p: 0.95,
+          response_mime_type: "application/json"
+        }
+      };
+      if (withSearch) payload.tools = [{ google_search: {} }];
+      return payload;
+    }
+
+    async function callReportAPI(systemPrompt, userQuery) {
+      const key = getApiKey();
+      if (!key) throw new Error('Missing API key (zakk).');
+
+      const base = 'https://generativelanguage.googleapis.com/v1beta/models';
+      let lastErr;
+
+      for (const model of MODEL_CANDIDATES) {
+        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
+
+        // Two attempts: normal → stricter JSON-only
+        let payload = makeV1betaPayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const data = await fetchWithBackoff(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const cand = data?.candidates?.[0];
+            if (!cand) throw new Error('No candidates in response.');
+
+            const json = parseCandidateJSON(cand);
+
+            const atts = cand?.groundingMetadata?.groundingAttributions || [];
+            const sources = atts
+              .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+              .filter(s => s.uri);
+
+            return { json, sources };
+          } catch (e) {
+            lastErr = e;
+            const parseIssue = /non‑JSON|no JSON|Unexpected end of JSON input|Empty model response/i.test(e.message || '');
+            if (attempt === 1 && parseIssue) {
+              const stricter = `${systemPrompt}
+
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
+              payload = makeV1betaPayload(stricter, userQuery, USE_SEARCH_TOOL);
+              continue;
             }
+            break; // next model
+          }
+        }
+      }
+      throw lastErr || new Error('All model attempts failed.');
+    }
 
-            // --- Helper Function: Show/Hide Pre-Approval State ---
-            function showPreApprovalState(state, message = '') {
-                preApprovalLoader.style.display = 'none';
-                preApprovalErrorContainer.style.display = 'none';
-                preApprovalContent.style.display = 'none';
+    /* ===================== System prompt ===================== */
+    function buildSystemPrompt() {
+      return `
+You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
+Include:
+1) summary: { companyName, summary }
+2) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
+3) publicRecords: { findings: [{ type, details }] }
+4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
+5) reviews: [{ snippet, source, url }]
+6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
+7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+8) news: [{ title, date, source, url }]
+9) leadership: [{ name, title }]
+10) products: [string]
+11) competitors: [string]
+12) webPresence: { twitter, linkedin, youtube, traffic }
+13) citations: [{ title, url }]
+If unknown, use "N/A" or [].
+Respond ONLY with valid JSON. No markdown fences.
+      `.trim();
+    }
 
-                preApprovalResultsContainer.style.display = 'block';
+    /* ===================== DOM refs ===================== */
+    const titleEl = document.getElementById('report-title');
+    const summaryEl = document.getElementById('report-summary');
+    const scoreCircle = document.getElementById('report-score-circle');
+    const scoreDigit  = document.getElementById('report-score-digit');
+    const scoreJust   = document.getElementById('report-score-justification');
+    const posList     = document.getElementById('report-score-positives');
+    const negList     = document.getElementById('report-score-negatives');
 
-                if (state === 'loading') {
-                    preApprovalLoader.style.display = 'flex';
-                } else if (state === 'error') {
-                    preApprovalErrorContainer.style.display = 'flex';
-                    preApprovalErrorMessage.innerText = message;
-                } else if (state === 'content') {
-                    preApprovalContent.style.display = 'block';
-                }
-            }
-            
-            // --- Helper Function: Populate Sources ---
-            function populateSources(sources) {
-                sourcesList.innerHTML = ''; // Clear old sources
-                if (sources && sources.length > 0) {
-                    sources.forEach(source => {
-                        const li = document.createElement('li');
-                        li.className = 'text-xs truncate';
-                        li.innerHTML = `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-green hover:text-green-700">${source.title || source.uri}</a>`;
-                        sourcesList.appendChild(li);
-                    });
-                    sourcesContainer.style.display = 'block';
-                } else {
-                    sourcesContainer.style.display = 'none';
-                }
-            }
-            
-            // --- Helper Function: Populate Report Content ---
-            function populateReport(data) {
-                // 1. Business Summary
-                reportTitle.innerText = data.summary?.companyName || 'N/A';
-                reportSummary.innerText = data.summary?.summary || 'No summary could be found.';
+    const sosName = document.getElementById('report-sos-name');
+    const sosStatus = document.getElementById('report-sos-status');
+    const sosEntity = document.getElementById('report-sos-entity');
+    const sosJuris  = document.getElementById('report-sos-jurisdiction');
+    const sosDate   = document.getElementById('report-sos-date');
+    const sosAgent  = document.getElementById('report-sos-agent');
 
-                // 2. AI Risk Score
-                const score = data.riskScore?.score || 0;
-                scoreDigit.innerText = score;
-                scoreJustification.innerText = data.riskScore?.justification || 'No justification provided.';
-                
-                scoreCircle.className = "score-circle mb-4"; // reset classes
-                if (score < 550) scoreCircle.classList.add('score-red');
-                else if (score < 700) scoreCircle.classList.add('score-yellow');
-                else scoreCircle.classList.add('score-green');
+    const factsFounded   = document.getElementById('facts-founded');
+    const factsHQ        = document.getElementById('facts-hq');
+    const factsEmployees = document.getElementById('facts-employees');
+    const factsIndustry  = document.getElementById('facts-industry');
+    const factsTicker    = document.getElementById('facts-ticker');
+    const factsWebsite   = document.getElementById('facts-website');
 
-                positiveList.innerHTML = '';
-                if (data.riskScore?.positiveFactors?.length > 0) {
-                    const checkIcon = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
-                    data.riskScore.positiveFactors.forEach(factor => {
-                        const li = document.createElement('li');
-                        li.className = "flex items-start";
-                        li.innerHTML = `${checkIcon}<span class="text-sm text-brand-dark">${factor}</span>`;
-                        positiveList.appendChild(li);
-                    });
-                }
+    const newsList   = document.getElementById('report-news-list');
+    const recList    = document.getElementById('report-records-list');
+    const reviewsList= document.getElementById('report-reviews-list');
+    const leaderList = document.getElementById('report-leadership-list');
+    const productsList = document.getElementById('report-products-list');
+    const compList   = document.getElementById('report-competitors-list');
+    const socialList = document.getElementById('report-social-list');
 
-                negativeList.innerHTML = '';
-                if (data.riskScore?.negativeFactors?.length > 0) {
-                    const xIcon = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
-                    data.riskScore.negativeFactors.forEach(factor => {
-                        const li = document.createElement('li');
-                        li.className = "flex items-start";
-                        li.innerHTML = `${xIcon}<span class="text-sm text-brand-dark">${factor}</span>`;
-                        negativeList.appendChild(li);
-                    });
-                }
-                
-                // 3. Corporate Filings
-                sosName.innerText = data.sos?.entityName || 'N/A';
-                sosStatus.innerText = data.sos?.status || 'N/A';
-                sosEntity.innerText = data.sos?.entityType || 'N/A';
-                sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
-                sosDate.innerText = data.sos?.formationDate || 'N/A';
-                sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
+    const chartRevenue = document.getElementById('report-chart-revenue');
+    const chartCash    = document.getElementById('report-chart-cashflow');
 
-                sosStatus.className = "font-medium text-brand-dark text-right"; // reset
-                if (data.sos?.status?.toLowerCase() === 'active') {
-                    sosStatus.classList.add('text-green-600');
-                } else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') {
-                    sosStatus.classList.add('text-red-600');
-                }
+    /* ===================== Populate Report ===================== */
+    function populateReport(data) {
+      setText(titleEl, data?.summary?.companyName);
+      summaryEl.textContent = data?.summary?.summary || 'No summary could be found.';
 
-                // 4. Public Records
-                recordsList.innerHTML = '';
-                if (data.publicRecords?.findings?.length > 0) {
-                    data.publicRecords.findings.forEach(finding => {
-                        const li = document.createElement('li');
-                        if (finding.type.toLowerCase() === 'no records found') {
-                            li.className = "text-green-600";
-                            li.innerHTML = `<strong>${finding.type}:</strong> ${finding.details}`;
-                        } else {
-                            li.className = "text-red-600";
-                            li.innerHTML = `<strong>${finding.type}:</strong> <span class="text-brand-gray">${finding.details}</span>`;
-                        }
-                        recordsList.appendChild(li);
-                    });
-                } else {
-                    const li = document.createElement('li');
-                    li.className = "text-green-600";
-                    li.innerHTML = "<strong>No Records Found:</strong> No significant public records were found.";
-                    recordsList.appendChild(li);
-                }
+      const score = data?.riskScore?.score || 0;
+      scoreDigit.textContent = score;
+      scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
+      scoreCircle.className = 'score-circle mb-4';
+      if (score < 550) scoreCircle.classList.add('score-red');
+      else if (score < 700) scoreCircle.classList.add('score-yellow');
+      else scoreCircle.classList.add('score-green');
 
-                // [START] NEW: 5. Customer Reviews
-                reviewsList.innerHTML = ''; // Clear old reviews
-                if (data.reviews?.length > 0) {
-                    data.reviews.forEach(review => {
-                        const reviewEl = document.createElement('blockquote');
-                        reviewEl.className = "p-4 border-l-4 border-brand-border bg-brand-light";
-                        reviewEl.innerHTML = `
-                            <p class"text-sm italic text-brand-gray">"${review.snippet || 'No snippet provided.'}"</p>
-                            <footer class="mt-2 text-xs text-brand-dark font-medium">${review.source || 'Unknown Source'}</footer>
-                        `;
-                        reviewsList.appendChild(reviewEl);
-                    });
-                } else {
-                    reviewsList.innerHTML = `<p class="text-sm text-brand-gray p-4 bg-brand-light rounded-lg">No recent customer reviews found.</p>`;
-                }
-                // [END] NEW
+      posList.innerHTML = '';
+      (data?.riskScore?.positiveFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
+                        `<span class="text-sm text-brand-dark">${f}</span>`;
+        posList.appendChild(li);
+      });
+      negList.innerHTML = '';
+      (data?.riskScore?.negativeFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
+                        `<span class="text-sm text-brand-dark">${f}</span>`;
+        negList.appendChild(li);
+      });
 
-                // [START] NEW: 6. Financial Charts
-                chartRevenue.innerHTML = '';
-                if (data.charts?.revenueTrend) {
-                    chartRevenue.innerHTML = data.charts.revenueTrend;
-                } else {
-                    chartRevenue.innerHTML = `<p class="text-sm text-brand-gray">Chart not available.</p>`;
-                }
+      const sos = data?.sos || {};
+      setText(sosName,  sos.entityName);
+      setText(sosEntity,sos.entityType);
+      setText(sosStatus,sos.status);
+      setText(sosJuris, sos.jurisdiction);
+      setText(sosDate,  sos.formationDate);
+      setText(sosAgent, sos.registeredAgent);
+      sosStatus.className = '';
+      if ((sos.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
+      else if (sos.status && sos.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
 
-                chartCashflow.innerHTML = '';
-                if (data.charts?.cashFlow) {
-                    chartCashflow.innerHTML = data.charts.cashFlow;
-                } else {
-                    chartCashflow.innerHTML = `<p class="text-sm text-brand-gray">Chart not available.</p>`;
-                }
-                // [END] NEW
-            }
+      const p = data?.profile || {};
+      setText(factsFounded, p.founded);
+      setText(factsHQ, p.headquarters || p.hq);
+      setText(factsEmployees, p.employees);
+      setText(factsIndustry, p.industry || p.subindustry);
+      setText(factsTicker, p.ticker);
+      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
 
-            // --- Helper Function: Populate Pre-Approval Content ---
-            function populatePreApproval(data) {
-                // Helper to format currency
-                const formatCurrency = (num) => {
-                    if (num === null || num === undefined || isNaN(num)) return 'N/A';
-                    return num.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
-                }
+      newsList.innerHTML = '';
+      (data?.news || []).slice(0,6).forEach(n => {
+        const li = document.createElement('li');
+        li.innerHTML =
+          `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+           <div class="text-xs text-gray-500">${n.source || 'Source'}${n.date ? ' • ' + n.date : ''}</div>`;
+        newsList.appendChild(li);
+      });
+      if (!newsList.children.length) newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
 
-                // 1. Term Loan
-                if (data.loan?.approved) {
-                    loanStatus.innerText = 'Pre-Approved';
-                    loanStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-green-100 text-green-700';
-                    loanAmount.innerText = formatCurrency(data.loan.amount);
-                    loanAmount.className = 'text-3xl font-heading font-bold text-brand-green mt-3 mb-3';
-                    loanTermsTable.style.display = 'table';
-                    // Populate terms
-                    loanTerm.innerText = data.loan.term || 'N/A';
-                    loanRate.innerText = data.loan.estRate || 'N/A';
-                    loanPayback.innerText = formatCurrency(data.loan.paybackAmount);
-                    loanPayment.innerText = data.loan.estPayment || 'N/A';
-                    loanNote.innerText = data.loan.note || '';
-                } else {
-                    loanStatus.innerText = 'Declined';
-                    loanStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-red-100 text-red-700';
-                    loanAmount.innerText = '---';
-                    loanAmount.className = 'text-3xl font-heading font-bold text-brand-gray mt-3 mb-3';
-                    loanTermsTable.style.display = 'none'; // Hide terms
-                    loanNote.innerText = data.loan?.note || 'Does not meet minimum requirements.';
-                }
+      leaderList.innerHTML = '';
+      (data?.leadership || []).slice(0,8).forEach(l => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
+        leaderList.appendChild(li);
+      });
+      if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
 
-                // 2. Line of Credit
-                if (data.loc?.approved) {
-                    locStatus.innerText = 'Pre-Approved';
-                    locStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-green-100 text-green-700';
-                    locLimit.innerText = formatCurrency(data.loc.limit);
-                    locLimit.className = 'text-3xl font-heading font-bold text-brand-green mt-3 mb-3';
-                    locTermsTable.style.display = 'table';
-                    // Populate terms
-                    locRate.innerText = data.loc.rate || 'N/A';
-                    locNote.innerText = data.loc.note || '';
-                } else {
-                    locStatus.innerText = 'Declined';
-                    locStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-red-100 text-red-700';
-                    locLimit.innerText = '---';
-                    locLimit.className = 'text-3xl font-heading font-bold text-brand-gray mt-3 mb-3';
-                    locTermsTable.style.display = 'none'; // Hide terms
-                    locNote.innerText = data.loc?.note || 'Does not meet minimum requirements.';
-                }
+      productsList.innerHTML = '';
+      (data?.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
+      if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
 
-                // 3. Merchant Cash Advance
-                if (data.mca?.approved) {
-                    mcaStatus.innerText = 'Pre-Approved';
-                    mcaStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-green-100 text-green-700';
-                    mcaAmount.innerText = formatCurrency(data.mca.amount);
-                    mcaAmount.className = 'text-3xl font-heading font-bold text-brand-green mt-3 mb-3';
-                    mcaTermsTable.style.display = 'table';
-                    // Populate terms
-                    mcaFactor.innerText = data.mca.factorRate || 'N/A';
-                    mcaPayback.innerText = formatCurrency(data.mca.paybackAmount);
-                    mcaRemittance.innerText = data.mca.estDailyRemittance || 'N/A';
-                    mcaNote.innerText = data.mca.note || '';
-                } else {
-                    mcaStatus.innerText = 'Declined';
-                    mcaStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-red-100 text-red-700';
-                    mcaAmount.innerText = '---';
-                    mcaAmount.className = 'text-3xl font-heading font-bold text-brand-gray mt-3 mb-3';
-                    mcaTermsTable.style.display = 'none'; // Hide terms
-                    mcaNote.innerText = data.mca?.note || 'Does not meet minimum requirements.';
-                }
-            }
+      compList.innerHTML = '';
+      (data?.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
 
-            // --- Main Event Listener for Combined Widget ---
-            if (generateReportBtn) {
-                generateReportBtn.addEventListener('click', async () => {
-                    const businessName = businessNameInput.value.trim();
-                    if (!businessName) {
-                        showReportState('error', 'Please enter a business name.');
-                        return;
-                    }
-                    
-                    showReportState('loading');
-                    generateReportBtn.disabled = true;
+      socialList.innerHTML = '';
+      const w = data?.webPresence || {};
+      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
+        if (!v) return;
+        const li = document.createElement('li');
+        let valueHtml = v;
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
+          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
+        }
+        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
+        socialList.appendChild(li);
+      });
+      if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
 
-                    const systemPrompt = "You are an AI business analyst. A user is requesting a full report on a company. Perform a Google search to find: 1. A brief summary. 2. Corporate filing info (entity name, status, entity type, jurisdiction, formation date, registered agent). 3. Public records (UCC, liens, judgments, court filings, debt). 4. 2-3 recent customer review snippets. THEN, generate: 5. A fictional AI risk score (300-850) with justification, 2-3 positive factors, and 1-2 negative factors. 6. Two fictional, simple, minimalist SVG line charts as text strings (viewBox='0 0 100 50', use polyline, one green (#00C09A) for 'revenueTrend', one blue (#3B82F6) for 'cashFlow'). Respond *only* with a valid JSON object matching this exact structure: {\"summary\": {\"companyName\": \"string\", \"summary\": \"string\"}, \"sos\": {\"entityName\": \"string\", \"status\": \"string\", \"entityType\": \"string\", \"jurisdiction\": \"string\", \"formationDate\": \"string\", \"registeredAgent\": \"string\"}, \"publicRecords\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\"}]}, \"riskScore\": {\"score\": 0, \"justification\": \"string\", \"positiveFactors\": [\"string\"], \"negativeFactors\": [\"string\"]}, \"reviews\": [{\"snippet\": \"string\", \"source\": \"string\"}], \"charts\": {\"revenueTrend\": \"string\", \"cashFlow\": \"string\"}}. If info isn't found, use 'N/A' or an empty array.";
-                    const userQuery = `Generate a full AI business report for: "${businessName}"`;
+      const points = data?.chartPoints || {};
+      if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
+      else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
 
-                    try {
-                        const { json, sources } = await callReportAPI(systemPrompt, userQuery, 'full-report');
-                        populateReport(json);
-                        populateSources(sources);
-                        showReportState('content');
-                    } catch (error) {
-                        console.error("Full Report Error:", error);
-                        showReportState('error', error.message);
-                    } finally {
-                        generateReportBtn.disabled = false;
-                    }
-                });
-            }
+      if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
+      else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+    }
 
-            // --- Main Event Listener for Pre-Approval Widget ---
-            if (preApprovalBtn) {
-                preApprovalBtn.addEventListener('click', async () => {
-                    const businessName = preApprovalName.value.trim();
-                    const industry = preApprovalIndustry.value.trim();
-                    const monthlyRevenueStr = preApprovalMonthlyRevenue.value.trim(); // Get value from slider
-                    const timeStr = preApprovalTime.value.trim();
-                    const ficoStr = preApprovalFico.value.trim(); // Get value from FICO slider
+    /* ===================== Wire up UI ===================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('business-name');
+      const btn = document.getElementById('generate-report-btn');
+      const rerunBtn = document.getElementById('rerun');
 
-                    if (!businessName || !monthlyRevenueStr || !timeStr || !ficoStr) {
-                        showPreApprovalState('error', 'Please fill in all fields.');
-                        return;
-                    }
+      async function runReport(query) {
+        document.getElementById('report-results-container').style.display = 'block';
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+        showState('loading');
+        btn.classList.add('cta-disabled'); btn.disabled = true;
 
-                    const monthlyRevenue = parseFloat(monthlyRevenueStr); // No need to replace, it's a number
-                    const timeInBusinessMonths = parseInt(timeStr.replace(/[^0-9]/g, ''));
-                    const ficoScore = parseInt(ficoStr); // It's a number
+        const systemPrompt = buildSystemPrompt();
+        const userQuery = `Generate a comprehensive AI business report for: "${query}"`;
 
-                    if (isNaN(monthlyRevenue) || isNaN(timeInBusinessMonths) || isNaN(ficoScore)) {
-                        showPreApprovalState('error', 'Please enter valid numbers for Time in Business.');
-                        return;
-                    }
-                    
-                    // No more annual revenue calculation
-                    
-                    showPreApprovalState('loading');
-                    preApprovalBtn.disabled = true;
+        try {
+          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
+          populateReport(json);
+          const links = collectSources(json, sources);
+          populateSources(links);
+          showState('content');
+        } catch (e) {
+          console.error(e);
+          showState('error', e.message || 'Failed to generate report.');
+        } finally {
+          btn.disabled = false; btn.classList.remove('cta-disabled');
+        }
+      }
 
-                    const systemPrompt = "You are an AI underwriting engine simulating the 'Enhanced Underwriting Model v3.5'. Your hard policy gates are: 6 months minimum time in business (TIB), $8,000 minimum *monthly* revenue, and a minimum FICO score of 580. Your risk tiers based on a composite score (0-100) are: Decline (<55), Enhanced (55-70), Standard (70-85), Auto-Approval (>85). For the user's inputs, first check the hard gates (TIB, monthly revenue, FICO). If they fail, decline all and state the gate failure in the 'note'. If they pass, calculate a fictional composite score based on their revenue, TIB, and FICO (e.g., $10k/mo, 12mo, 600 FICO = 60; $20k/mo, 36mo, 720 FICO = 80). Then, generate fictional terms for a Term Loan, LOC, and MCA based on their tier. Use the model's logic: 'Auto-Approval' gets a ~1.1x *monthly* revenue multiplier and ~1.24 factor. 'Standard' gets ~0.9x and ~1.32 factor. 'Enhanced' gets ~0.65x and ~1.40 factor. 'Decline' gets 0. Provide a reason in the 'note' field for all decisions (e.g., 'Approved under Standard risk tier due to solid TIB and FICO history.'). Respond *only* with the valid JSON schema.";
-                    
-                    const userQuery = `Generate pre-approval terms for: Business: "${businessName}", Industry: "${industry}", Monthly Revenue: "${monthlyRevenue.toFixed(2)}", Time in Business (Months): "${timeInBusinessMonths}", Owner FICO Score: ${ficoScore}`;
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const q = (input.value || '').trim();
+        if (!q) { showState('error', 'Please enter a business name.'); return; }
+        runReport(q);
+      });
 
-                    const generationConfig = {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "OBJECT",
-                            properties: {
-                                "loan": {
-                                    type: "OBJECT",
-                                    properties: {
-                                        "approved": { "type": "BOOLEAN" },
-                                        "amount": { "type": "NUMBER" },
-                                        "term": { "type": "STRING" },
-                                        "estRate": { "type": "STRING" },
-                                        "paybackAmount": { "type": "NUMBER" },
-                                        "estPayment": { "type": "STRING" },
-                                        "note": { "type": "STRING" }
-                                    },
-                                    required: ["approved", "note"]
-                                },
-                                "loc": {
-                                    type: "OBJECT",
-                                    properties: {
-                                        "approved": { "type": "BOOLEAN" },
-                                        "limit": { "type": "NUMBER" },
-                                        "rate": { "type": "STRING" },
-                                        "note": { "type": "STRING" }
-                                    },
-                                    required: ["approved", "note"]
-                                },
-                                "mca": {
-                                    type: "OBJECT",
-                                    properties: {
-                                        "approved": { "type": "BOOLEAN" },
-                                        "amount": { "type": "NUMBER" },
-                                        "factorRate": { "type": "STRING" },
-                                        "paybackAmount": { "type": "NUMBER" },
-                                        "estDailyRemittance": { "type": "STRING" },
-                                        "note": { "type": "STRING" }
-                                    },
-                                    required: ["approved", "note"]
-                                }
-                            },
-                            required: ["loan", "loc", "mca"]
-                        }
-                    };
-
-                    try {
-                        const json = await callPreApprovalAPI(systemPrompt, userQuery, generationConfig, 'pre-approval');
-                        populatePreApproval(json);
-                        showPreApprovalState('content');
-                    } catch (error) {
-                        console.error("Pre-Approval Error:", error);
-                        showPreApprovalState('error', error.message);
-                    } finally {
-                        preApprovalBtn.disabled = false;
-                    }
-                });
-            }
-
-            
-            /**
-             * -----------------------------------------------------------------
-             * API & Audio Helper Functions
-             * -----------------------------------------------------------------
-             */
-
-            /**
-             * A simple fetch wrapper with basic retry and error logging.
-             */
-            async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
-                let lastError;
-                for (let i = 0; i < retries; i++) {
-                    try {
-                        // console.log(`[Fetch] Attempt ${i+1} for ${url}`); // No console logs
-                        const response = await fetch(url, options);
-
-                        if (!response.ok) {
-                            let errorBody;
-                            try {
-                                errorBody = await response.json();
-                            } catch (e) {
-                                errorBody = null; // Response wasn't JSON
-                            }
-                            
-                            const errorMessage = errorBody?.error?.message || response.statusText;
-                            lastError = new Error(`API Error: ${errorMessage} (Status: ${response.status})`);
-                            // console.error(lastError); // No console logs
-
-                            // Only retry on 429 (Too Many Requests) or 5xx (Server Error)
-                            if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
-                                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-                                continue; // Retry
-                            } else {
-                                throw lastError; // Don't retry on 400 or other client errors
-                            }
-                        }
-
-                        // Success
-                        return await response.json();
-
-                    } catch (error) { // Network errors
-                        // console.error("[Fetch] Network error:", error); // No console logs
-                        lastError = error;
-                        if (i < retries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-                        }
-                    }
-                }
-                throw lastError || new Error("API request failed after all retries.");
-            }
-
-            /**
-             * Asynchronous function to call the Gemini text generation API with Search.
-             * This function expects the model to return a JSON string in its text response.
-             */
-            async function callReportAPI(systemPrompt, userQuery, logId = 'api') {
-                const apiKey = "AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU"; // Leave empty, handled by environment
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    tools: [{ "google_search": {} }],
-                    systemInstruction: {
-                        parts: [{ text: systemPrompt }]
-                    },
-                };
-
-                // [REMOVED] generationConfig 
-
-                // console.log(`[${logId}] Making API call...`); // Don't log to console
-                const result = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                // console.log(`[${logId}] API response received:`, result); // Don't log to console
-
-                const candidate = result.candidates?.[0];
-                const text = candidate?.content?.parts?.[0]?.text;
-
-                if (!text) {
-                    // console.error(`[${logId}] Invalid API response structure:`, result); // Don't log to console
-                    throw new Error("No content received from API. The model may be adjusting.");
-                }
-                
-                // [START] NEW: Manually parse the text response as JSON
-                let json = null;
-                try {
-                    // Clean the text response in case the model adds markdown
-                    const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                    json = JSON.parse(jsonString); 
-                } catch (e) {
-                    // console.error(`[${logId}] Failed to parse JSON response:`, text); // Don't log to console
-                    // Fallback: If parsing fails, use the raw text as the detail/summary
-                    throw new Error("Received an invalid JSON response from the API. Please try again.");
-                }
-                // [END] NEW
-
-                // Extract grounding sources
-                let sources = [];
-                const groundingMetadata = candidate.groundingMetadata;
-                if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                    sources = groundingMetadata.groundingAttributions
-                        .map(attribution => ({
-                            uri: attribution.web?.uri,
-                            title: attribution.web?.title,
-                        }))
-                        .filter(source => source.uri); // Ensure sources are valid
-                }
-
-                return { text, json, sources };
-            }
-
-            /**
-             * Asynchronous function to call the Gemini API for *fictional*, non-search JSON.
-             */
-            async function callPreApprovalAPI(systemPrompt, userQuery, generationConfig, logId = 'api') {
-                const apiKey = "AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU"; // Leave empty
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    systemInstruction: {
-                        parts: [{ text: systemPrompt }]
-                    },
-                    generationConfig: generationConfig
-                };
-
-                // console.log(`[${logId}] Making API call...`); // Don't log to console
-                const result = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                // console.log(`[${logId}] API response received:`, result); // Don't log to console
-
-                const candidate = result.candidates?.[0];
-                const text = candidate?.content?.parts?.[0]?.text;
-
-                if (!text) {
-                    // console.error(`[${logId}] Invalid API response structure:`, result); // Don't log to console
-                    throw new Error("No JSON content received from API.");
-                }
-
-                try {
-                    // The API returns the JSON as a string, so we need to parse it
-                    const parsedJson = JSON.parse(text);
-                    return parsedJson;
-                } catch (e) {
-                    // console.error(`[${logId}] Failed to parse JSON response:`, text); // Don't log to console
-                    throw new Error("Invalid JSON format received from API.");
-                }
-            }
-
-
-            /**
-             * -----------------------------------------------------------------
-             * Audio Helper Functions (No longer used, but kept for reference)
-             * -----------------------------------------------------------------
-             */
-
-            /**
-             * Converts Base64 string to ArrayBuffer.
-             */
-            function base64ToArrayBuffer(base64) {
-                const binaryString = window.atob(base64);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                return bytes.buffer;
-            }
-
-            /**
-             * Converts raw PCM16 audio data to a WAV file Blob.
-             */
-            function pcmToWav(pcmData, sampleRate) {
-                const numChannels = 1;
-                const bitsPerSample = 16;
-                const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-                const blockAlign = numChannels * (bitsPerSample / 8);
-                const dataSize = pcmData.length * (bitsPerSample / 8);
-                const buffer = new ArrayBuffer(44 + dataSize);
-                const view = new DataView(buffer);
-
-                // RIFF header
-                writeString(view, 0, 'RIFF');
-                view.setUint32(4, 36 + dataSize, true);
-                writeString(view, 8, 'WAVE');
-                
-                // fmt chunk
-                writeString(view, 12, 'fmt ');
-                view.setUint32(16, 16, true); // chunk size
-                view.setUint16(20, 1, true); // audio format (1 = PCM)
-                view.setUint16(22, numChannels, true);
-                view.setUint32(24, sampleRate, true);
-                view.setUint32(28, byteRate, true);
-                view.setUint16(32, blockAlign, true);
-                view.setUint16(34, bitsPerSample, true);
-                
-                // data chunk
-                writeString(view, 36, 'data');
-                view.setUint32(40, dataSize, true);
-
-                // Write PCM data
-                let offset = 44;
-                for (let i = 0; i < pcmData.length; i++, offset += 2) {
-                    view.setInt16(offset, pcmData[i], true);
-                }
-
-                return new Blob([view], { type: 'audio/wav' });
-            }
-
-            function writeString(view, offset, string) {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
-                }
-            }
-        });
-    </script>
-    <!-- [END] GEMINI API SCRIPT -->
-
+      rerunBtn?.addEventListener('click', () => {
+        const q = (input.value || '').trim();
+        if (!q) { showState('error', 'Please enter a business name.'); return; }
+        runReport(q);
+      });
+    });
+  </script>
 </body>
 </html>
-
