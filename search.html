@@ -32,10 +32,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- *** Set your Gemini API key here *** -->
+  <!--
   <script>
-    // Make the key globally visible to all scripts regardless of scope.
-    // Replace the value below with your real key (keep the quotes).
+    //
     window.zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
   </script>
 
@@ -47,13 +46,12 @@
 
     .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 
-    /* CTA (matches main site) */
+    /* CTA */
     .cta-button { transition: all 0.3s ease; }
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15); }
     .cta-button:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,192,154,.35), 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* Base button */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid transparent;font-weight:700;border-radius:.5rem}
     .btn--lg{padding:.875rem 1rem;font-size:1.125rem}
     .btn-primary{background:#00C09A;color:#fff}
@@ -83,8 +81,26 @@
     .chip  { border:1px solid #E5E7EB; border-radius:9999px; background:#F8F9FA; padding:.375rem .625rem; font-size:.80rem; line-height:1; }
     .chip a{ color:#00C09A; font-weight:600; }
 
-    /* long URLs wrap cleanly inside lists */
     .link-wrap { word-break: break-word; overflow-wrap: anywhere; }
+
+    /* --------- Skeleton + loader (new) --------- */
+    .skeleton{position:relative;overflow:hidden;background:#f3f4f6;border-radius:.5rem}
+    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+      background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.6) 50%,rgba(255,255,255,0) 100%);
+      animation:shimmer 1.25s infinite}
+    @keyframes shimmer{100%{transform:translateX(100%)}}
+
+    .loader-bar{height:.6rem;background:#ecfdf5;border-radius:9999px;overflow:hidden}
+    .loader-bar__fill{height:100%;width:0%;background:#00C09A;transition:width .25s ease}
+    .step{display:flex;align-items:center;gap:.5rem;font-size:.875rem;color:#6b7280}
+    .step svg{width:16px;height:16px}
+    .step--active{color:#374151}
+    .step--done{color:#059669}
+
+    @media (prefers-reduced-motion: reduce){
+      .skeleton::after{animation:none}
+      .loader-bar__fill{transition:none}
+    }
   </style>
 </head>
 
@@ -130,13 +146,65 @@
   <!-- Results -->
   <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
-      <!-- Loader -->
-      <div id="report-loader" style="display:none;" class="widget-card p-8 flex flex-col items-center justify-center space-y-3">
-        <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <div class="text-sm text-gray-500 text-center">Generating your report…</div>
+
+      <!-- NEW: Fancy Loader (progress + steps + skeleton) -->
+      <div id="report-loader" class="widget-card p-6 space-y-5" style="display:none;">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+              <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+              <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="font-heading font-semibold">Building your report…</span>
+          </div>
+          <span id="loader-timer" class="text-xs text-gray-500">0s</span>
+        </div>
+
+        <div class="loader-bar" role="progressbar" aria-label="Loading report" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="loader-bar-fill" class="loader-bar__fill"></div>
+        </div>
+
+        <ul id="loader-steps" class="space-y-2">
+          <li class="step" data-step="0"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Initializing</span></li>
+          <li class="step" data-step="1"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Searching the web</span></li>
+          <li class="step" data-step="2"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Finding SOS filings</span></li>
+          <li class="step" data-step="3"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Checking public records</span></li>
+          <li class="step" data-step="4"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Summarizing reviews</span></li>
+          <li class="step" data-step="5"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Generating charts</span></li>
+          <li class="step" data-step="6"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="6" class="text-gray-300"/></svg><span>Compiling sources</span></li>
+        </ul>
+
+        <!-- Skeleton preview -->
+        <div id="report-skeleton" class="mt-2 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="widget-card p-4 space-y-3">
+              <div class="skeleton h-5 w-1/3"></div>
+              <div class="skeleton h-24 w-24 rounded-full mx-auto"></div>
+              <div class="skeleton h-3 w-full"></div>
+              <div class="skeleton h-3 w-10/12"></div>
+            </div>
+            <div class="md:col-span-2 widget-card p-4 space-y-3">
+              <div class="skeleton h-5 w-1/4"></div>
+              <div class="skeleton h-3 w-full"></div>
+              <div class="skeleton h-3 w-11/12"></div>
+              <div class="skeleton h-3 w-8/12"></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="skeleton h-24 w-full"></div>
+                <div class="skeleton h-24 w-full"></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="widget-card p-4 space-y-3">
+              <div class="skeleton h-5 w-1/3"></div>
+              <div class="skeleton h-36 w-full"></div>
+            </div>
+            <div class="widget-card p-4 space-y-3">
+              <div class="skeleton h-5 w-1/3"></div>
+              <div class="skeleton h-36 w-full"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Error -->
@@ -173,13 +241,12 @@
             </div>
           </div>
 
-          <!-- Summary (Facts + Headlines) -->
+          <!-- Summary -->
           <div class="md:col-span-2 widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
             <p id="report-summary" class="text-sm text-gray-700 leading-relaxed"></p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <!-- Company Facts -->
               <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
                 <h4 class="text-sm font-semibold text-brand-dark mb-3">Company Facts</h4>
                 <ul class="text-sm text-gray-700 space-y-1">
@@ -191,8 +258,6 @@
                   <li class="kv-grid"><span class="kv-term">Website</span><span id="facts-website" class="kv-val link-wrap"></span></li>
                 </ul>
               </div>
-
-              <!-- Recent Headlines -->
               <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
                 <h4 class="text-sm font-semibold text-brand-dark mb-3">Recent Headlines</h4>
                 <ul id="report-news-list" class="space-y-2"></ul>
@@ -286,13 +351,12 @@
   <script>
     /* ========= Key loader ========= */
     function getApiKey() {
-      const fromGlobal = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      return fromGlobal; // single source of truth; easy to maintain
+      return (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
     }
 
     /* ========= Model + token strategy ========= */
     const MODEL_CANDIDATES = [
-      'gemini-2.5-pro',   // start here
+      'gemini-2.5-pro',
       'gemini-2.0-pro',
       'gemini-2.0-flash',
       'gemini-1.5-pro',
@@ -353,49 +417,89 @@
       const sourcesToggle = document.getElementById('toggle-sources');
 
       // ----- UI helpers
-      function showState(state, msg='') {
+      function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
+      function toDomain(url) { try{ const u=new URL(url); return u.hostname.replace(/^www\./,''); }catch{ return url; } }
+      function linkifyMaybe(v) {
+        if (!v) return 'N/A';
+        const s = String(v).trim();
+        if (/^https?:\/\//i.test(s)) return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline link-wrap">${toDomain(s)}</a>`;
+        return s;
+      }
+
+      function normalizeUrl(u){ try{const url=new URL(u);url.search='';if(url.pathname!=='/'&&url.pathname.endsWith('/'))url.pathname=url.pathname.slice(0,-1);return url.toString();}catch{return null;} }
+      function prettyUrl(u){ try{const url=new URL(u);let out=url.hostname.replace(/^www\./,'');if(url.pathname&&url.pathname!=='/')out+=url.pathname;return out.length>60?out.slice(0,57)+'…':out;}catch{return u;} }
+
+      // ====== FANCY LOADER ======
+      let __loaderInterval=null, __elapsedInterval=null, __progress=0, __startTime=0;
+      const STEPS=[
+        {pct:0,label:'Initializing'},
+        {pct:15,label:'Searching the web'},
+        {pct:30,label:'Finding SOS filings'},
+        {pct:45,label:'Checking public records'},
+        {pct:60,label:'Summarizing reviews'},
+        {pct:75,label:'Generating charts'},
+        {pct:90,label:'Compiling sources'}
+      ];
+      const barFill=document.getElementById('loader-bar-fill');
+      const stepItems=Array.from(document.querySelectorAll('#loader-steps .step'));
+      const timerEl=document.getElementById('loader-timer');
+
+      function updateProgress(pct){
+        __progress=Math.max(0,Math.min(100,pct));
+        if(barFill){
+          barFill.style.width=__progress+'%';
+          const pb=barFill.parentElement; if(pb) pb.setAttribute('aria-valuenow',Math.round(__progress));
+        }
+        stepItems.forEach((el,i)=>{
+          const here=STEPS[i].pct, next=STEPS[i+1]?.pct??100;
+          el.classList.remove('step--active','step--done');
+          const icon=el.querySelector('svg');
+          if(__progress>=next){
+            el.classList.add('step--done');
+            if(icon) icon.innerHTML='<path d="M8 10.5l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+          } else if(__progress>=here){
+            el.classList.add('step--active');
+            if(icon) icon.innerHTML='<circle cx="10" cy="10" r="6" class="text-yellow-500"/>';
+          } else {
+            if(icon) icon.innerHTML='<circle cx="10" cy="10" r="6" class="text-gray-300"/>';
+          }
+        });
+      }
+      function startFancyLoader(){
+        __progress=0; updateProgress(0);
+        __startTime=Date.now();
+        if(timerEl){ clearInterval(__elapsedInterval); __elapsedInterval=setInterval(()=>{ timerEl.textContent=`${Math.floor((Date.now()-__startTime)/1000)}s`; },300); }
+        clearInterval(__loaderInterval);
+        __loaderInterval=setInterval(()=>{
+          const cap=92;
+          if(__progress<cap){ updateProgress(__progress+(Math.random()*2+.6)); }
+        },120);
+      }
+      function finishFancyLoader(){
+        clearInterval(__loaderInterval); clearInterval(__elapsedInterval);
+        updateProgress(100);
+      }
+
+      // ----- STATE (replaces your old showState)
+      function showState(state, message=''){
         loader.style.display = 'none';
         errBox.style.display = 'none';
         content.style.display = 'none';
         results.style.display = 'block';
-        if (state === 'loading') loader.style.display = 'flex';
-        else if (state === 'error') { errBox.style.display = 'block'; errMsg.textContent = msg; }
-        else if (state === 'content') content.style.display = 'block';
-      }
-      function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
 
-      function toDomain(url) {
-        try {
-          const u = new URL(url);
-          return u.hostname.replace(/^www\./,'');
-        } catch { return url; }
-      }
-      function linkifyMaybe(v) {
-        if (!v) return 'N/A';
-        const s = String(v).trim();
-        if (/^https?:\/\//i.test(s)) {
-          return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline link-wrap">${toDomain(s)}</a>`;
+        if (state === 'loading'){
+          loader.style.display = 'block';
+          startFancyLoader();
+        } else if (state === 'error'){
+          errBox.style.display = 'block';
+          errMsg.textContent = message || 'Something went wrong.';
+          finishFancyLoader();
+        } else if (state === 'content'){
+          content.style.display = 'block';
+          finishFancyLoader();
         }
-        return s;
       }
-
-      // ----- URL helpers for sources
-      function normalizeUrl(u) {
-        try {
-          const url = new URL(u);
-          url.search = '';
-          if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1);
-          return url.toString();
-        } catch { return null; }
-      }
-      function prettyUrl(u) {
-        try {
-          const url = new URL(u);
-          let out = url.hostname.replace(/^www\./, '');
-          if (url.pathname && url.pathname !== '/') out += url.pathname;
-          return out.length > 60 ? out.slice(0, 57) + '…' : out;
-        } catch { return u; }
-      }
+      window.showState = showState; // (optional) expose for debugging
 
       // ----- Chart utilities
       function renderLineChart(container, values, color) {
@@ -407,11 +511,7 @@
         const min = Math.min(...nums), max = Math.max(...nums);
         const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(_ => 50);
         const step = 100 / (norm.length - 1);
-        const pts = norm.map((v,i) => {
-          const x = (i * step).toFixed(2);
-          const y = (50 - (v/100)*44 - 3).toFixed(2);
-          return `${x},${y}`;
-        }).join(' ');
+        const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
         container.innerHTML = `
           <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
             <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
@@ -426,9 +526,7 @@
         s = s.replace(/stroke="[^"]*"/g, '').replace(/fill="[^"]*"/g, 'fill="none"');
         s = s.replace(/<polyline/gi, `<polyline stroke="${color}" stroke-width="2"`);
         s = s.replace(/<path/gi, `<path stroke="${color}" stroke-width="2" fill="none"`);
-        if (!/line\s+.*y1="48"/.test(s)) {
-          s = s.replace('</svg>', `<line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" /></svg>`);
-        }
+        if (!/line\s+.*y1="48"/.test(s)) s = s.replace('</svg>', `<line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" /></svg>`);
         return s;
       }
       function renderChartsFromData(data) {
@@ -440,7 +538,6 @@
         } else {
           renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
         }
-
         if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) {
           renderLineChart(chartCash, points.cashFlow, '#3B82F6');
         } else if (data.charts?.cashFlow) {
@@ -452,11 +549,9 @@
 
       // ----- Render report
       function populateReport(data) {
-        // Summary
         setText(titleEl, data.summary?.companyName);
         summaryEl.textContent = data.summary?.summary || 'No summary could be found.';
 
-        // Score
         const score = data.riskScore?.score || 0;
         scoreDigit.textContent = score;
         scoreJust.textContent = data.riskScore?.justification || 'No justification provided.';
@@ -482,7 +577,6 @@
           negList.appendChild(li);
         });
 
-        // Filings
         setText(sosName,  data.sos?.entityName);
         setText(sosEntity,data.sos?.entityType);
         setText(sosStatus,data.sos?.status);
@@ -493,20 +587,15 @@
         if ((data.sos?.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
         else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
 
-        // Facts
         const p = data.profile || {};
         setText(factsFounded, p.founded);
         setText(factsHQ, p.headquarters || p.hq);
         setText(factsEmployees, p.employees);
         setText(factsIndustry, p.industry || p.subindustry);
         setText(factsTicker, p.ticker);
-        if (p.website && /^https?:\/\//.test(p.website)) {
-          factsWebsite.innerHTML = linkifyMaybe(p.website);
-        } else {
-          setText(factsWebsite, p.website);
-        }
+        if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website);
+        else setText(factsWebsite, p.website);
 
-        // News
         newsList.innerHTML = '';
         if (data.news?.length) {
           data.news.slice(0,6).forEach(n => {
@@ -516,11 +605,8 @@
                <div class="text-xs text-gray-500">${n.source || 'Source'} ${n.date ? '• ' + n.date : ''}</div>`;
             newsList.appendChild(li);
           });
-        } else {
-          newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
-        }
+        } else newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
 
-        // Leadership
         leaderList.innerHTML = '';
         if (data.leadership?.length) {
           data.leadership.slice(0,8).forEach(l => {
@@ -528,31 +614,18 @@
             li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
             leaderList.appendChild(li);
           });
-        } else {
-          leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data found.</li>';
-        }
+        } else leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data found.</li>';
 
-        // Products
         productsList.innerHTML = '';
         if (data.products?.length) {
-          data.products.slice(0,12).forEach(t => {
-            const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li);
-          });
-        } else {
-          productsList.innerHTML = '<li class="text-sm text-gray-600">No products/services listed.</li>';
-        }
+          data.products.slice(0,12).forEach(t => { const li=document.createElement('li'); li.textContent=t; productsList.appendChild(li); });
+        } else productsList.innerHTML = '<li class="text-sm text-gray-600">No products/services listed.</li>';
 
-        // Competitors
         compList.innerHTML = '';
         if (data.competitors?.length) {
-          data.competitors.slice(0,12).forEach(c => {
-            const li = document.createElement('li'); li.textContent = c; compList.appendChild(li);
-          });
-        } else {
-          compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
-        }
+          data.competitors.slice(0,12).forEach(c => { const li=document.createElement('li'); li.textContent=c; compList.appendChild(li); });
+        } else compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
 
-        // Social signals (linkified)
         socialList.innerHTML = '';
         const w = data.webPresence || {};
         [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]]
@@ -560,111 +633,62 @@
             if (!v) return;
             const li = document.createElement('li');
             let valueHtml = v;
-            if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-              valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline link-wrap">${toDomain(v)}</a>`;
-            }
+            if (typeof v === 'string' && /^https?:\/\//.test(v)) valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline link-wrap">${toDomain(v)}</a>`;
             li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
             socialList.appendChild(li);
           });
-        if (!socialList.children.length) {
-          socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals detected.</li>';
-        }
+        if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals detected.</li>';
 
-        // Charts
         renderChartsFromData(data);
-
-        // Reviews
-        reviewsList.innerHTML = '';
-        if (data.reviews?.length) {
-          data.reviews.slice(0,3).forEach(r => {
-            const el = document.createElement('blockquote');
-            el.className = 'p-4 border-l-4 border-brand-border bg-brand-light';
-            const src = r.source || 'Source';
-            const source = r.url ? `<a class="text-brand-green hover:underline" href="${r.url}" target="_blank" rel="noopener">${toDomain(r.url)}</a>` : src;
-            el.innerHTML = `<p class="text-sm italic text-brand-gray">"${r.snippet || ''}"</p><footer class="mt-2 text-xs text-brand-dark font-medium">${source}</footer>`;
-            reviewsList.appendChild(el);
+        // Public records
+        recList.innerHTML = '';
+        if (data.publicRecords?.findings?.length) {
+          data.publicRecords.findings.forEach(f => {
+            const li=document.createElement('li');
+            if ((f.type||'').toLowerCase()==='no records found'){
+              li.className='text-green-600'; li.innerHTML=`<strong>${f.type}:</strong> ${f.details}`;
+            } else {
+              li.className='text-red-600'; li.innerHTML=`<strong>${f.type}:</strong> <span class="text-brand-gray">${f.details}</span>`;
+            }
+            recList.appendChild(li);
           });
-        } else {
-          reviewsList.innerHTML = '<p class="text-sm text-gray-600">No recent customer reviews found.</p>';
-        }
+        } else recList.innerHTML = '<li class="text-green-600"><strong>No Records Found:</strong> No significant public records were found.</li>';
       }
 
-      // ----- Sources collection + rendering
+      // ----- Sources
       function collectSources(json, modelSources) {
         const out = [];
-        const push = (title, url, kind) => {
-          const norm = normalizeUrl(url);
-          if (!norm) return;
-          out.push({ title: title || prettyUrl(norm), url: norm, kind });
-        };
-
-        // 1) Explicit citations from the model
+        const push = (title, url, kind) => { const norm=normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
         (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-
-        // 2) Grounding attributions from the API
         (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-
-        // 3) Company website
         if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-
-        // 4) Social / web presence
         const w = json?.webPresence || {};
         if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
         if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
         if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-
-        // 5) News items
         (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-
-        // 6) Review pages
         (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-
-        // Deduplicate by URL
-        const seen = new Set();
-        return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+        const seen=new Set(); return out.filter(({url})=>!seen.has(url)&&seen.add(url));
       }
-
       function populateSources(links) {
-        sourcesUl.innerHTML = '';
-        sourcesChips.innerHTML = '';
-        if (!Array.isArray(links) || links.length === 0) {
-          sourcesBox.style.display = 'none';
-          return;
-        }
-        sourcesBox.style.display = 'block';
-
-        // chips
+        sourcesUl.innerHTML = ''; sourcesChips.innerHTML = '';
+        if (!Array.isArray(links) || links.length === 0){ sourcesBox.style.display='none'; return; }
+        sourcesBox.style.display='block';
         links.forEach(({ url, title, kind }) => {
-          const emoji =
-            kind === 'news'   ? '📰' :
-            kind === 'review' ? '⭐' :
-            kind === 'social' ? '🔗' :
-            kind === 'site'   ? '🏢' :
-            kind === 'citation' ? '📚' : '🔗';
-          const chip = document.createElement('span');
-          chip.className = 'chip';
-          chip.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener">${title || toDomain(url)}</a>`;
+          const emoji = kind==='news'?'📰':kind==='review'?'⭐':kind==='social'?'🔗':kind==='site'?'🏢':kind==='citation'?'📚':'🔗';
+          const chip=document.createElement('span'); chip.className='chip'; chip.innerHTML=`${emoji} <a href="${url}" target="_blank" rel="noopener">${title || toDomain(url)}</a>`;
           sourcesChips.appendChild(chip);
         });
-
-        // full list (toggle)
         links.forEach(({ url, title }) => {
-          const li = document.createElement('li');
-          li.className = 'text-sm';
+          const li=document.createElement('li'); li.className='text-sm';
           li.innerHTML = `<a class="text-brand-green hover:underline link-wrap" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
                           <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
           sourcesUl.appendChild(li);
         });
-
-        let open = false;
-        sourcesToggle.onclick = () => {
-          open = !open;
-          sourcesUl.classList.toggle('hidden', !open);
-          sourcesToggle.textContent = open ? 'Hide list' : 'Show list';
-        };
+        let open=false; sourcesToggle.onclick=()=>{ open=!open; sourcesUl.classList.toggle('hidden',!open); sourcesToggle.textContent=open?'Hide list':'Show list'; };
       }
 
-      // ----- Networking with backoff
+      // ----- Networking
       async function fetchWithBackoff(url, options, retries=3, delay=800) {
         let lastError;
         for (let i=0;i<retries;i++) {
@@ -674,8 +698,7 @@
               let body=null; try{ body = await res.json(); }catch{}
               const msg = body?.error?.message || res.statusText || 'Request failed';
               const err = new Error(`${msg} (HTTP ${res.status})`);
-              err.code = body?.error?.status;
-              throw err;
+              err.code = body?.error?.status; throw err;
             }
             return await res.json();
           } catch (e) {
@@ -688,15 +711,9 @@
 
       async function callReportAPI(systemPrompt, userQuery) {
         const apiKey = getApiKey();
-        if (!apiKey) {
-          throw new Error("Missing API key (zakk). Set it near the top of the file.");
-        }
+        if (!apiKey) throw new Error("Missing API key (zakk). Set it near the top of the file.");
 
-        const payloadBase = {
-          contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] }
-        };
-
+        const payloadBase = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
         let lastErr;
 
         for (const model of MODEL_CANDIDATES) {
@@ -704,32 +721,18 @@
 
           for (const maxTokens of TOKEN_TRIES) {
             try {
-              // Try WITH google_search tool first
               const withTool = {
                 ...payloadBase,
                 tools: [{ google_search: {} }],
-                generationConfig: {
-                  maxOutputTokens: maxTokens,
-                  temperature: 0.2,
-                  topP: 0.95,
-                  responseMimeType: "application/json"
-                }
+                generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2, topP: 0.95, responseMimeType: "application/json" }
               };
-
-              const result = await fetchWithBackoff(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(withTool)
-              });
-
+              const result = await fetchWithBackoff(apiUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(withTool) });
               const cand = result?.candidates?.[0];
               const text = cand?.content?.parts?.[0]?.text;
               if (!text) throw new Error('Empty response from model.');
               const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
-
               const atts = cand?.groundingMetadata?.groundingAttributions || [];
-              const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
-
+              const sources = atts.map(a => ({ uri:a.web?.uri, title:a.web?.title })).filter(s=>s.uri);
               return { json, sources };
             } catch (e) {
               lastErr = e;
@@ -737,43 +740,28 @@
               const isToolProblem  = msg.includes('tool') || msg.includes('invalid_argument') || msg.includes('unsupported');
               const isTokenProblem = msg.includes('token') || msg.includes('max') || msg.includes('length');
 
-              // Retry WITHOUT the tool if tool not allowed, same token cap
               if (isToolProblem) {
                 try {
                   const noTool = {
                     ...payloadBase,
-                    generationConfig: {
-                      maxOutputTokens: maxTokens,
-                      temperature: 0.2,
-                      topP: 0.95,
-                      responseMimeType: "application/json"
-                    }
+                    generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2, topP: 0.95, responseMimeType: "application/json" }
                   };
-
-                  const result = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(noTool)
-                  });
-
+                  const result = await fetchWithBackoff(apiUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(noTool) });
                   const cand = result?.candidates?.[0];
                   const text = cand?.content?.parts?.[0]?.text;
                   if (!text) throw new Error('Empty response from model.');
                   const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
-
                   return { json, sources: [] };
                 } catch (e2) {
                   lastErr = e2;
-                  if (!isTokenProblem) break; // try next model
+                  if (!isTokenProblem) break;
                 }
               }
-
-              if (isTokenProblem) continue; // try smaller token cap
-              break; // try next model
+              if (isTokenProblem) continue;
+              break;
             }
           }
         }
-
         throw lastErr || new Error('All model attempts failed.');
       }
 
@@ -789,15 +777,14 @@ Include:
    - Prefer sources from Google Reviews and Trustpilot when available; include the review page URL.
    - Keep each snippet brief (≤2 sentences).
 6) charts: { revenueTrend (SVG string), cashFlow (SVG string) }
-7) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each, normalized 0..100
+7) chartPoints: { revenue: [number], cashFlow: [number] }
 8) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
 9) news: [{ title, date, source, url }]
 10) leadership: [{ name, title }]
 11) products: [string]
 12) competitors: [string]
 13) webPresence: { twitter, linkedin, youtube, traffic }
-14) citations: [{ title, url }]  // authoritative links used (official site, filings, major press, review pages)
-
+14) citations: [{ title, url }]
 Rules:
 - If unknown, use "N/A" or [].
 - You may return both "charts" (SVG) and "chartPoints".
@@ -809,8 +796,7 @@ Rules:
         results.style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
         showState('loading');
-        btn.classList.add('cta-disabled');
-        btn.disabled = true;
+        btn.classList.add('cta-disabled'); btn.disabled = true;
 
         const systemPrompt = buildSystemPrompt();
         const userQuery = `Generate a comprehensive AI business report for: "${query}"`;
@@ -830,15 +816,13 @@ Rules:
         }
       }
 
-      // Submit
+      // Submit + Re-run
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
       });
-
-      // Re-run
       rerunBtn?.addEventListener('click', () => {
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
