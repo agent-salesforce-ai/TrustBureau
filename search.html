@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Live AI Business Report – TrustBureau.ai</title>
 
-  <!-- Tailwind config MUST come before the CDN script -->
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind = window.tailwind || {};
     tailwind.config = {
       theme: {
-        container: { center: true, padding: '1rem' },
         extend: {
           fontFamily: {
             heading: ['Plus Jakarta Sans', 'sans-serif'],
@@ -27,7 +26,6 @@
       }
     }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,6 +39,8 @@
       -moz-osx-font-smoothing: grayscale;
       background:#fff;
     }
+    section[id]{scroll-margin-top:84px}
+    @media (min-width:768px){section[id]{scroll-margin-top:96px}}
 
     /* Brand fallbacks */
     .text-brand-dark{color:#1A1A1A!important}
@@ -51,7 +51,10 @@
     .bg-brand-light{background:#F8F9FA!important}
     .border-brand-border{border-color:#E5E7EB!important}
 
-    /* CTA / buttons (match "Request Demo" look) */
+    /* Header blur (Safari too) */
+    .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+
+    /* CTA / buttons (match Request Demo look) */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid transparent;font-weight:700;border-radius:.5rem;transition:all .2s ease}
     .btn--lg{padding:.875rem 1rem;font-size:1.125rem}
     .btn-primary{background:#00C09A;color:#fff}
@@ -59,7 +62,7 @@
     .btn:focus{outline:none;box-shadow:0 0 0 3px rgba(0,192,154,.35),0 10px 20px rgba(0,192,154,.15)}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-    /* Card look for widgets/results */
+    /* Widget card look */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
     .widget-card:hover{transform:translateY(-2px);box-shadow:0 18px 32px rgba(0,192,154,.15);border-color:#d1d5db}
     .widget-card:focus-within{box-shadow:0 0 0 3px rgba(0,192,154,.15),0 18px 32px rgba(0,192,154,.15)}
@@ -86,7 +89,7 @@
     </nav>
   </header>
 
-  <!-- Hero / search -->
+  <!-- Hero search -->
   <section class="container mx-auto px-4 md:px-6 py-10 md:py-16">
     <div class="max-w-3xl mx-auto">
       <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-center leading-tight">
@@ -96,7 +99,7 @@
         Search a company and the full report appears below. Powered by Gemini.
       </p>
 
-      <!-- Chat-style input -->
+      <!-- Chat-like input -->
       <div class="widget-card p-3 md:p-4 mt-6">
         <div class="flex flex-col sm:flex-row gap-3">
           <input id="business-name" type="text" placeholder="e.g., Tesla, Inc. or Apex Innovations"
@@ -109,7 +112,7 @@
           </button>
         </div>
         <p class="text-xs text-brand-gray mt-2">
-          Tip: Use the legal name for better SOS & public-records matching.
+          Tip: Use the legal name for better SOS & public‑records matching.
         </p>
       </div>
     </div>
@@ -141,7 +144,7 @@
             <p class="text-xs text-brand-gray mt-1">Live business verification snapshot</p>
           </div>
           <div class="flex items-center gap-3">
-            <button id="rerun" class="btn btn-primary">Re-run</button>
+            <button id="rerun" class="btn btn-primary">Re‑run</button>
           </div>
         </div>
 
@@ -220,19 +223,19 @@
   </section>
 
   <!-- Footer -->
-  <footer class="border-top border-brand-border">
+  <footer class="border-t border-brand-border">
     <div class="container mx-auto px-4 md:px-6 py-10 text-center text-sm text-brand-gray">
       &copy; 2025 TrustBureau.ai — Live AI Business Report
     </div>
   </footer>
 
-  <!-- Script (paste your key into zakk) -->
+  <!-- Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      /* ---
-      const zakk = "AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM"; 
+      /* ======= HARD-CODED API KEY (named `zakk`) ======= */
+      const zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
 
-      /* ---------- 2) UI refs ---------- */
+      /* ---------- Report UI refs ---------- */
       const businessNameInput = document.getElementById('business-name');
       const generateBtn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
@@ -267,7 +270,7 @@
       const sourcesContainer = document.getElementById('report-sources-container');
       const sourcesList = document.getElementById('report-sources');
 
-      /* ---------- 3) Small helpers ---------- */
+      /* ---------- UI helpers ---------- */
       function showState(state, message='') {
         loader.style.display = 'none';
         errorContainer.style.display = 'none';
@@ -370,6 +373,7 @@
         chartCashflow.innerHTML  = data.charts?.cashFlow     || '<p class="text-sm text-brand-gray">Chart not available.</p>';
       }
 
+      /* ---------- Network helper ---------- */
       async function fetchWithBackoff(url, options, retries=3, delay=1000) {
         let lastError;
         for (let i=0;i<retries;i++) {
@@ -393,10 +397,10 @@
         throw lastError || new Error('API request failed after retries.');
       }
 
-      /* ---------- 4) Gemini call (uses zakk) ---------- */
+      /* ---------- Gemini call ---------- */
       async function callReportAPI(systemPrompt, userQuery) {
-        if (!zakk || zakk === 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM') {
-          throw new Error("Missing Zak key (zakk). Open the HTML and set const zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM'.");
+        if (!zakk || zakk === 'REPLACE_WITH_YOUR_GEMINI_KEY') {
+          throw new Error("Missing API key (zakk). Open the file and set the 'zakk' constant.");
         }
 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/` +
@@ -438,12 +442,13 @@
         return { json, sources };
       }
 
-      /* ---------- 5) Generate handlers ---------- */
+      /* ---------- Generate handlers ---------- */
       async function runReport(query) {
-        // Bring results into view the first time
+        // Show results container and scroll into view the first time
+        resultsContainer.style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
 
-        // Reset state
+        // Reset
         showState('loading');
         generateBtn.disabled = true;
 
@@ -464,15 +469,22 @@
         }
       }
 
-      if (generateBtn) {
-        generateBtn.addEventListener('click', () => {
-          const val = (businessNameInput.value || '').trim();
-          if (!val) { showState('error', 'Please enter a business name.'); return; }
-          resultsContainer.style.display = 'block';
-          runReport(val);
-        });
-      }
+      // Button click
+      generateBtn.addEventListener('click', () => {
+        const val = (businessNameInput.value || '').trim();
+        if (!val) { showState('error', 'Please enter a business name.'); return; }
+        runReport(val);
+      });
 
+      // Enter key in input
+      businessNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          generateBtn.click();
+        }
+      });
+
+      // Rerun button
       if (rerunBtn) {
         rerunBtn.addEventListener('click', () => {
           const val = (businessNameInput.value || '').trim();
