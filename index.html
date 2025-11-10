@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrustBureau.ai - The AI Verification Standard</title>
     
-    <!-- Tailwind CSS CDN (with Typography plugin) --><script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts: Plus Jakarta Sans (headings) & Inter (body) --><link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     
-    <!-- 
-      *** FIX: Removed Alpine.js from here. It is now at the end of the <body> ***
-    -->
+    <!-- Alpine.js for mobile menu & page state --><script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Custom Tailwind Configuration --><script>
         tailwind.config = {
@@ -29,10 +27,9 @@
                         'brand-gray': '#666666',   // Secondary/muted text
                         'brand-light': '#F8F9FA',  // Very light grey background
                         'brand-border': '#E5E7EB', // Subtle border color (Tailwind gray-200)
-                    },
-                },
-            },
-            // The typography plugin is correctly loaded via the CDN script tag: ?plugins=typography
+                    }
+                }
+            }
         }
     </script>
     <style>
@@ -70,36 +67,43 @@
         }
         [x-cloak] { display: none !important; }
 
-        /* Simple loading spinner */
-        .loader {
-            border: 4px solid #f3f3f3; /* Light grey */
-            border-top: 4px solid #00C09A; /* Brand Green */
+        /* Styles for the new score gauge */
+        .score-circle {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            animation: spin 1s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            border: 8px solid;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .score-red {
+            border-color: #FECACA; /* red-200 */
+            color: #DC2626; /* red-600 */
+            background-color: #FEF2F2; /* red-50 */
+        }
+        .score-yellow {
+            border-color: #FDE68A; /* yellow-200 */
+            color: #D97706; /* yellow-600 */
+            background-color: #FFFBEB; /* yellow-50 */
+        }
+        .score-green {
+            border-color: #A7F3D0; /* green-200 */
+            color: #059669; /* green-600 */
+            background-color: #ECFDF5; /* green-50 */
         }
     </style>
 </head>
-
-<!-- 
-    GEMINI API INTEGRATION:
-    Alpine.js data is now defined in a script tag at the end of the <body>
-    and wrapped in an 'alpine:init' listener to prevent load-order errors.
--->
-<body 
-    class="font-sans text-brand-dark" 
-    x-data="appState()"
->
+<!-- Initializing Alpine.js state for mobile menu (open) and page navigation (page) -->
+<body class="font-sans text-brand-dark" x-data="{ open: false, page: 'home' }">
 
     <!-- Header / Navigation --><header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
-        <!-- Logo now resets page to 'home' and clears the report -->
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center" x-data="{ open: false }">
-            <!-- Logo --><a href="#" @click.prevent="page = 'home'; reportData = null" class="flex items-center space-x-2.5">
+        <!-- Logo now resets page to 'home' -->
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo --><a href="#" @click.prevent="page = 'home'" class="flex items-center space-x-2.5">
                 <!-- Solid Green Shield with White Check --><svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
                     <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -153,7 +157,7 @@
                         <!-- Hero Text --><div class="text-center lg:text-left">
                             <h1 class="text-5xl md:text-7xl font-heading font-extrabold text-brand-dark leading-tight mb-6">
                                 The <span class="yellow-gradient-text">Gold Standard</span> of
-                                <span class="text-brand-green">AI Underwriting</span>
+                                <span class="text-brand-dark">AI</span> <span class="text-brand-green">Underwriting</span>
                             </h1>
                             <p class="text-lg md:text-xl text-brand-gray max-w-xl mx-auto lg:mx-0 mb-10">
                                 The AI underwriting tool for advanced decision-making in seconds. Our platform validates, analyzes, and reports on business health to ensure your decisions are fast, fair, and compliant.
@@ -218,8 +222,7 @@
             </section>
 
             <!-- CTA Section (No Button) --><section id="demo-top" class="bg-brand-dark">
-                <!-- MOBILE: py-12, text-4xl -->
-                <div class="container mx-auto px-6 py-12 md:py-16 text-center">
+                <div class="container mx-auto px-6 py-16 text-center">
                     <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mb-6">
                         Make Decisions in Seconds.
                     </h2>
@@ -229,393 +232,651 @@
                 </div>
             </section>
 
-            <!-- New "Generate Report" Section -->
-            <!-- MOBILE: py-12, text-2xl -->
-            <section class="bg-brand-light py-12 md:py-16">
-                <div class="container mx-auto px-6 max-w-3xl text-center">
-                    <h2 class="text-2xl md:text-3xl font-heading font-bold text-brand-dark mb-4">
-                        Generate a Live Report
-                    </h2>
-                    <p class="text-lg text-brand-gray mb-6">
-                        Enter any business name to generate a simulated underwriting report using the Gemini API.
-                    </p>
-                    <div class="flex flex-col md:flex-row gap-2 max-w-lg mx-auto">
-                        <input type="text" x-model="businessName" class="flex-grow appearance-none block w-full px-4 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="e.g., QuantumLeap AI LLC">
-                        <button @click="generateReport()" :disabled="isLoading" class="bg-brand-green text-white font-bold py-3 px-8 rounded-lg text-lg cta-button flex items-center justify-center disabled:opacity-50">
-                            <svg x-show="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span x-show="!isLoading">Generate Report</span>
-                            <span x-show="isLoading">Generating...</span>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
             <!-- Your Verification Report Section --><section id="report-mockup" class="py-24 bg-white">
                 <div class="container mx-auto px-6">
-                    <!-- Section Header --><div class="text-center max-w-3xl mx-auto mb-16">
-                        <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">See The Output</span>
+
+                    <!-- [START] GEMINI API LIVE DEMO GRID -->
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">Live AI Demos</span>
                         <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">
-                            Your Verification Report
+                            See Our AI in Action
                         </h2>
-                        <p class="text-lg text-brand-gray" x-show="!reportData && !isLoading">
-                            Click "Generate Report" above to see a live example.
+                        <p class="text-lg text-brand-gray">
+                            Use our AI tools below to generate live, comprehensive business reports or get fictional pre-approval terms based on real underwriting logic.
                         </p>
                     </div>
 
-                    <!-- Loading State -->
-                    <div x-show="isLoading" class="flex justify-center items-center h-64">
-                        <div class="loader"></div>
-                    </div>
-
-                    <!-- Error State -->
-                    <div x-show="errorMessage" class="max-w-3xl mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" x-cloak>
-                        <strong class="font-bold">Error:</strong>
-                        <span class="block sm:inline" x-text="errorMessage"></span>
-                    </div>
-
-                    <!-- 
-                        *** FIX ***
-                        Wrap the entire report display in a <template x-if="reportData">
-                        This prevents Alpine from trying to read properties of 'null' before the API call finishes.
-                    -->
-                    <template x-if="reportData && !isLoading">
-                        <div class="max-w-7xl mx-auto bg-white border border-brand-border rounded-lg shadow-xl overflow-hidden" x-cloak>
-                            <!-- Report Header --><div class="p-4 md:p-6 border-b border-brand-border">
-                                <div class="flex flex-col md:flex-row justify-between md:items-center space-y-2 md:space-y-0">
-                                    <div>
-                                        <h3 class="font-heading text-xl md:text-2xl font-bold text-brand-green">Business Verification Report</h3>
-                                        <p class="text-xs md:text-sm text-gray-500">Business — Report ID: TRUST-88A42F / Generated: <span x-text="new Date().toLocaleDateString()"></span></p>
-                                    </div>
-                                    <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full self-start md:self-center">The AI Verification Standard</span>
+                    <!-- [START] COMBINED WIDGET -->
+                    <div class="max-w-4xl mx-auto mb-16">
+                        <div class="bg-white border border-brand-border rounded-lg shadow-lg p-6 flex flex-col">
+                            <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">
+                                Live AI Business Report
+                            </h3>
+                            <div class="space-y-4 max-w-xl mx-auto w-full">
+                                <div>
+                                    <label for="business-name" class="block text-sm font-medium text-brand-dark">Enter any Business Name</label>
+                                    <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="e.g., Tesla, Inc. or Apex Innovations">
                                 </div>
+                                <button id="generate-report-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button disabled:opacity-50 disabled:cursor-wait">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
+                                    </svg>
+                                    <span>Generate Full Report</span>
+                                </button>
                             </div>
-
-                            <!-- Report Body --><div class="p-4 md:p-6">
-                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    <!-- Left Column: Status --><div class="lg:col-span-1 space-y-6">
-                                        <div>
-                                            <h4 class="font-semibold text-brand-dark mb-3">Overall Status</h4>
-                                            <div class="p-4 border border-brand-border rounded-lg">
-                                                <div class="flex items-center space-x-4">
-                                                    <div class="relative w-24 h-24">
-                                                        <svg class="w-full h-full" viewBox="0 0 100 100">
-                                                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50"></circle>
-                                                            <circle :class="{
-                                                                'text-brand-green': reportData.overallStatus.scoreSentiment === 'positive',
-                                                                'text-yellow-500': reportData.overallStatus.scoreSentiment === 'neutral',
-                                                                'text-red-600': reportData.overallStatus.scoreSentiment === 'negative'
-                                                            }" stroke-width="8" stroke-dasharray="264" :stroke-dashoffset="`calc(264 - (264 * reportData.overallStatus.score) / 10)`" stroke-linecap="round" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" style="transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
-                                                        </svg>
-                                                        <div class="absolute inset-0 flex items-center justify-center">
-                                                            <span class="text-3xl font-bold text-brand-dark" x-text="reportData.overallStatus.score * 100"></span>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <span class="text-2xl font-bold" :class="{
-                                                            'text-brand-green': reportData.overallStatus.scoreSentiment === 'positive',
-                                                            'text-yellow-600': reportData.overallStatus.scoreSentiment === 'neutral',
-                                                            'text-red-600': reportData.overallStatus.scoreSentiment === 'negative'
-                                                        }" x-text="reportData.overallStatus.statusText"></span>
-                                                        <p class="text-sm text-gray-500">Simulated financial health</p>
-                                                    </div>
-                                                </div>
-                                                <div class="mt-4 space-y-2 text-sm">
-                                                    <div class="flex justify-between">
-                                                        <span class="text-gray-500">Health: <span class="font-medium" :class="{
-                                                            'text-green-600': reportData.overallStatus.scoreSentiment === 'positive',
-                                                            'text-yellow-600': reportData.overallStatus.scoreSentiment === 'neutral',
-                                                            'text-red-600': reportData.overallStatus.scoreSentiment === 'negative'
-                                                        }" x-text="reportData.overallStatus.health"></span></span>
-                                                        <span class="text-gray-500">Risk: <span class="font-medium" :class="{
-                                                            'text-green-600': reportData.overallStatus.scoreSentiment === 'positive',
-                                                            'text-yellow-600': reportData.overallStatus.scoreSentiment === 'neutral',
-                                                            'text-red-600': reportData.overallStatus.scoreSentiment === 'negative'
-                                                        }" x-text="reportData.overallStatus.risk"></span></span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                                        <div :class="{
-                                                            'bg-brand-green': reportData.overallStatus.scoreSentiment === 'positive',
-                                                            'bg-yellow-500': reportData.overallStatus.scoreSentiment === 'neutral',
-                                                            'bg-red-600': reportData.overallStatus.scoreSentiment === 'negative'
-                                                        }" class="h-2 rounded-full" :style="`width: ${reportData.overallStatus.score * 10}%`"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4 p-4 border border-brand-border rounded-lg text-sm space-y-2">
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">NMLS</span>
-                                                    <span class="font-medium text-brand-dark" x-text="reportData.entityDetails.nmls"></span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Status</span>
-                                                    <span class="font-medium" :class="{
-                                                        'text-green-600': reportData.entityDetails.statusSentiment === 'positive',
-                                                        'text-yellow-600': reportData.entityDetails.statusSentiment === 'neutral',
-                                                        'text-red-600': reportData.entityDetails.statusSentiment === 'negative'
-                                                    }" x-text="reportData.entityDetails.nmlsStatus"></span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Entity</span>
-                                                    <span class="font-medium text-brand-dark" x-text="reportData.entityDetails.entity"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Right Column: Metrics --><div class="lg:col-span-2">
-                                        <h4 class="font-semibold text-brand-dark mb-3">Key Metrics</h4>
-                                        <!-- MOBILE: Add overflow-x-auto for responsive table -->
-                                        <div class="border border-brand-border rounded-lg overflow-x-auto">
-                                            <table class="min-w-full divide-y divide-gray-200">
-                                                <thead class="bg-gray-50">
-                                                    <tr>
-                                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                                                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                                                    <template x-for="metric in reportData.keyMetrics" :key="metric.metric">
-                                                        <tr>
-                                                            <td class="px-4 py-3 text-gray-500 whitespace-nowrap" x-text="metric.metric"></td>
-                                                            <td class="px-4 py-3 text-right font-medium" :class="{
-                                                                'text-green-600': metric.sentiment === 'positive',
-                                                                'text-red-600': metric.sentiment === 'negative',
-                                                                'text-brand-dark': metric.sentiment === 'neutral'
-                                                            }" x-text="metric.value"></td>
-                                                        </tr>
-                                                    </template>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                            
+                            <!-- Results Container -->
+                            <div id="report-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
+                                <!-- Loader -->
+                                <div id="report-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box">
+                                    <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-sm text-brand-gray">Searching live web and generating AI analysis...</span>
                                 </div>
 
-                                <!-- MoneyThumb & Charts --><div class="mt-6">
-                                    <h4 class="font-semibold text-brand-dark mb-3">Financial Snapshot</h4>
-                                    <!-- MoneyThumb Table -->
-                                    <!-- MOBILE: Add overflow-x-auto for responsive table -->
-                                    <div class="border border-brand-border rounded-lg mb-6 overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Deposits</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"># Deposits</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Withdrawals</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg AOB</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg NSFs</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ending Bal</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">T'humpdri Score</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200 text-sm whitespace-nowrap">
-                                                <tr>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.bank"></td>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.avgDeposits"></td>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.numDeposits"></td>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.avgWithdrawals"></td>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.avgAOB"></td>
-                                                    <td class="px-4 py-3 font-medium" :class="{
-                                                        'text-green-600': reportData.financialSnapshot.nsfSentiment === 'positive',
-                                                        'text-red-600': reportData.financialSnapshot.nsfSentiment === 'negative',
-                                                        'text-yellow-600': reportData.financialSnapshot.nsfSentiment === 'neutral'
-                                                    }" x-text="reportData.financialSnapshot.avgNSFs"></td>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.endingBal"></td>
-                                                    <td class="px-4 py-3 text-gray-500" x-text="reportData.financialSnapshot.transfersIn"></td>
-                                                    <td class="px-4 py-3 font-medium" :class="{
-                                                        'text-green-600': reportData.financialSnapshot.scoreSentiment === 'positive',
-                                                        'text-red-600': reportData.financialSnapshot.scoreSentiment === 'negative',
-                                                        'text-yellow-600': reportData.financialSnapshot.scoreSentiment === 'neutral'
-                                                    }" x-text="reportData.financialSnapshot.thumpdriScore"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!-- Charts (Static) --><div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div>
-                                            <h5 class="font-medium text-brand-dark mb-2">Revenue Trend</h5>
-                                            <div class="p-4 border border-brand-border rounded-lg h-48">
-                                                <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-                                                    <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,40 10,35 20,30 30,25 40,20 50,22 60,15 70,10 80,12 90,5 100,10" />
-                                                    <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h5 class="font-medium text-brand-dark mb-2">Ending Balance</h5>
-                                            <div class="p-4 border border-brand-border rounded-lg h-48">
-                                                <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-                                                    <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,30 10,28 20,35 30,30 40,25 50,20 60,25 70,15 80,18 90,10 100,15" />
-                                                    <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h5 class="font-medium text-brand-dark mb-2">NSF / OVD Events</h5>
-                                            <div class="p-4 border border-brand-border rounded-lg h-48 flex items-end space-x-2">
-                                                <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none" class="flex items-end">
-                                                    <rect x="5" y="45" width="10" height="3" fill="#00C09A" />
-                                                    <rect x="20" y="48" width="10" height="0" fill="#00C09A" />
-                                                    <rect x="35" y="48" width="10" height="0" fill="#00C09A" />
-                                                    <rect x="50" y="40" width="10" height="8" fill="#FBBF24" />
-                                                    <rect x="65" y="35" width="10" height="13" fill="#EF4444" />
-                                                    <rect x="80" y="48" width="10" height="0" fill="#00C09A" />
-                                                    <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Error -->
+                                <div id="report-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
+                                    <p class="text-sm text-red-600" id="report-error-message"></p>
                                 </div>
                                 
-                                <!-- Banking Activity --><div class="mt-6">
-                                    <h4 class="font-semibold text-brand-dark mb-3">Monthly Banking Activity</h4>
-                                    <div class="border border-brand-border rounded-lg overflow-x-auto">
+                                <!-- Content -->
+                                <div id="report-content" class="w-full" style="display: none;">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <!-- Left Column: Score -->
+                                        <div class="md:col-span-1">
+                                            <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
+                                            <div class="flex flex-col items-center p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                <div id="report-score-circle" class="score-circle mb-4">
+                                                    <span id="report-score-digit">...</span>
+                                                </div>
+                                                <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic"></p>
+                                                
+                                                <div class="w-full text-left">
+                                                    <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                                                    <ul id="report-score-positives" class="space-y-1.5 mb-3">
+                                                    </ul>
+                                                    <ul id="report-score-negatives" class="space-y-1.5">
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Column: Details -->
+                                        <div class="md:col-span-2 space-y-6">
+                                            <!-- Summary -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Business Summary</h4>
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <h5 id="report-title" class="font-heading font-bold text-lg mb-2 text-brand-dark"></h5>
+                                                    <p id="report-summary" class="text-sm text-brand-gray"></p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Corporate Filings -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul class="space-y-2 text-sm text-brand-gray">
+                                                        <li class="flex justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark text-right"></span></li>
+                                                        <li class="flex justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark text-right"></span></li>
+                                                        <li class="flex justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark text-right"></span></li>
+                                                        <li class="flex justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark text-right"></span></li>
+                                                        <li class="flex justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark text-right"></span></li>
+                                                        <li class="flex justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark text-right"></span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Public Records -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Records</h4>
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
+                                                        <!-- Items will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- [START] NEW: Customer Reviews -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Customer Reviews</h4>
+                                                <div id="report-reviews-list" class="space-y-4">
+                                                    <!-- Reviews will be injected by JS -->
+                                                </div>
+                                            </div>
+                                            <!-- [END] NEW: Customer Reviews -->
+
+                                            <!-- [START] NEW: Financial Charts -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Charts (Fictional)</h4>
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                        <h5 class="text-sm font-medium text-brand-dark mb-2">Revenue Trend</h5>
+                                                        <div id="report-chart-revenue" class="h-24">
+                                                            <!-- SVG will be injected by JS -->
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                        <h5 class="text-sm font-medium text-brand-dark mb-2">Cash Flow</h5>
+                                                        <div id="report-chart-cashflow" class="h-24">
+                                                            <!-- SVG will be injected by JS -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- [END] NEW: Financial Charts -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Sources -->
+                                    <div id="report-sources-container" class="mt-6 border-t border-brand-border pt-4" style="display: none;">
+                                        <h5 class="text-xs font-semibold text-brand-gray uppercase mb-2">Sources Used:</h5>
+                                        <ul id="report-sources" class="space-y-1 list-disc list-inside"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [END] COMBINED WIDGET -->
+
+                    <!-- [START] NEW PRE-APPROVAL WIDGET -->
+                    <div class="max-w-4xl mx-auto mb-16">
+                        <div class="bg-white border border-brand-border rounded-lg shadow-lg p-6 flex flex-col">
+                            <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">
+                                Live AI Pre-Approval Generator (Fictional)
+                            </h3>
+                            <div class="space-y-5 max-w-xl mx-auto w-full" x-data="{ monthlyRevenue: 10000, ficoScore: 680 }">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
+                                    <div>
+                                        <label for="pre-approval-name" class="block text-sm font-medium text-brand-dark">Business Name</label>
+                                        <input type="text" id="pre-approval-name" value="Apex Innovations" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="pre-approval-time" class="block text-sm font-medium text-brand-dark">Time in Business (months)</label>
+                                        <input type="number" id="pre-approval-time" value="12" min="0" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label for="pre-approval-industry" class="block text-sm font-medium text-brand-dark">Industry</label>
+                                        <select id="pre-approval-industry" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-white">
+                                            <option>Retail</option>
+                                            <option>Restaurant / Food Service</option>
+                                            <option>SaaS / Tech</option>
+                                            <option>Construction</option>
+                                            <option>Healthcare</option>
+                                            <option>Services (e.g., Salon, Legal)</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <div class="flex justify-between items-center">
+                                            <label for="pre-approval-monthly-revenue" class="block text-sm font-medium text-brand-dark">Monthly Gross Revenue</label>
+                                            <span class="font-bold text-brand-green bg-green-50 px-3 py-1 rounded-md text-sm" x-text="`$${parseInt(monthlyRevenue).toLocaleString()}`"></span>
+                                        </div>
+                                        <input type="range" id="pre-approval-monthly-revenue" x-model="monthlyRevenue" min="0" max="100000" step="1000" class="mt-2 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-brand-green">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <div class="flex justify-between items-center">
+                                            <label for="pre-approval-fico" class="block text-sm font-medium text-brand-dark">Owner FICO Score</label>
+                                            <span class="font-bold text-brand-green bg-green-50 px-3 py-1 rounded-md text-sm" x-text="ficoScore"></span>
+                                        </div>
+                                        <input type="range" id="pre-approval-fico" x-model="ficoScore" min="450" max="850" step="1" class="mt-2 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-brand-green">
+                                    </div>
+                                </div>
+                                <button id="generate-pre-approval-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-dark hover:bg-brand-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button disabled:opacity-50 disabled:cursor-wait mt-40">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c.12-.22.36-.3.59-.18.23.12.3.36.18.59l-3.5 6.5A.996.996 0 008 10.5H5a1 1 0 00-1 1v3a1 1 0 001 1h3.5a.996.996 0 00.92-.62l3.5-6.5c.12-.22.04-.47-.18-.59zM5 12.5a.5.5 0 01.5-.5H8a.5.5 0 01.46.31l3.5 6.5c.12.22.04-.47-.18.59a.498.498 0 01-.59-.18L7.69 13H5.5a.5.5 0 01-.5-.5v-3z" clip-rule="evenodd" />
+                                        <path d="M15.5 10.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM14 12.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM15.5 14.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01z" />
+                                    </svg>
+                                    <span>Generate Pre-Approval Terms</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Pre-Approval Results Container -->
+                            <div id="pre-approval-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
+                                <!-- Loader -->
+                                <div id="pre-approval-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box">
+                                    <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-sm text-brand-gray">Generating fictional pre-approval...</span>
+                                </div>
+
+                                <!-- Error -->
+                                <div id="pre-approval-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
+                                    <p class="text-sm text-red-600" id="pre-approval-error-message"></p>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div id="pre-approval-content" class="w-full" style="display: none;">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        
+                                        <!-- Term Loan -->
+                                        <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
+                                            <span id="loan-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
+                                            <!-- Product and Amount -->
+                                            <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Term Loan</h4>
+                                            <p id="loan-amount" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
+                                            <!-- Terms Table -->
+                                            <table id="loan-terms-table" class="w-full text-sm text-left">
+                                                <tbody>
+                                                    <tr class="border-b border-brand-border/50">
+                                                        <td class="py-1.5 text-brand-gray">Term</td>
+                                                        <td id="loan-term" class="py-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                    <tr class="border-b border-brand-border/50">
+                                                        <td class="py-1.5 text-brand-gray">Est. Rate</td>
+                                                        <td id="loan-rate" class="py-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                    <tr class="border-b border-brand-border/50">
+                                                        <td class="py-1.5 text-brand-gray">Payback</td>
+                                                        <td id="loan-payback" class="py-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                    <tr> <!-- No border on last item -->
+                                                        <td class="pt-1.5 text-brand-gray">Est. Payment</td>
+                                                        <td id="loan-payment" class="pt-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <p id="loan-note" class="text-xs text-brand-gray italic mt-4"></p>
+                                        </div>
+                                        
+                                        <!-- Line of Credit (LOC) -->
+                                        <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
+                                            <span id="loc-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
+                                            <!-- Product and Amount -->
+                                            <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Line of Credit</h4>
+                                            <p id="loc-limit" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
+                                            <!-- Terms Table -->
+                                            <table id="loc-terms-table" class="w-full text-sm text-left">
+                                                <tbody>
+                                                    <tr> <!-- No border on last item -->
+                                                        <td class="pt-1.5 text-brand-gray">Rate</td>
+                                                        <td id="loc-rate" class="pt-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <p id="loc-note" class="text-xs text-brand-gray italic mt-4"></p>
+                                        </div>
+                                        
+                                        <!-- Merchant Cash Advance (MCA) -->
+                                        <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
+                                            <span id="mca-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
+                                            <!-- Product and Amount -->
+                                            <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Merchant Cash Advance</h4>
+                                            <p id="mca-amount" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
+                                            <!-- Terms Table -->
+                                            <table id="mca-terms-table" class="w-full text-sm text-left">
+                                                <tbody>
+                                                    <tr class="border-b border-brand-border/50">
+                                                        <td class="py-1.5 text-brand-gray">Factor Rate</td>
+                                                        <td id="mca-factor" class="py-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                    <tr class="border-b border-brand-border/50">
+                                                        <td class="py-1.5 text-brand-gray">Payback</td>
+                                                        <td id="mca-payback" class="py-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                    <tr> <!-- No border on last item -->
+                                                        <td class="pt-1.5 text-brand-gray">Est. Daily Remittance</td>
+                                                        <td id="mca-remittance" class="pt-1.5 text-right font-medium text-brand-dark"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <p id="mca-note" class="text-xs text-brand-gray italic mt-4"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [END] NEW PRE-APPROVAL WIDGET -->
+
+
+                    <!-- Section Header --><div class="text-center max-w-3xl mx-auto mb-16">
+                        <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">Static Report Mockup</span>
+                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">
+                            Your Verification Report
+                        </h2>
+                        <p class="text-lg text-brand-gray">
+                            Below is a static mockup of a final, comprehensive report. All interactive demos are in the section above.
+                        </p>
+                    </div>
+
+                    <!-- Report Mockup --><div class="max-w-7xl mx-auto bg-white border border-brand-border rounded-lg shadow-xl overflow-hidden">
+                        <!-- Report Header --><div class="p-6 border-b border-brand-border">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-heading text-2xl font-bold text-brand-green">Business Verification Report</h3>
+                                    <p class="text-sm text-gray-500">Business — Report ID: TRUST-88A42F / Generated: Nov 08, 2025 • 23:03 UTC</p>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">The AI Verification Standard</span>
+                            </div>
+                        </div>
+
+                        <!-- Report Body --><div class="p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <!-- Left Column: Status --><div class="lg:col-span-1 space-y-6">
+                                    <div>
+                                        <h4 class="font-semibold text-brand-dark mb-3">Overall Status</h4>
+                                        <div class="p-4 border border-brand-border rounded-lg">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="relative w-24 h-24">
+                                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                                        <!-- Background circle --><circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50"></circle>
+                                                        <!-- Progress circle --><circle class="text-brand-green" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="39.6" stroke-linecap="round" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" style="--tw-stroke-dashoffset: calc(264 - (264 * 87.5) / 100); transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
+                                                    </svg>
+                                                    <div class="absolute inset-0 flex items-center justify-center">
+                                                        <span class="text-3xl font-bold text-brand-dark">875</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span class="text-2xl font-bold text-brand-green">Verified</span>
+                                                    <p class="text-sm text-gray-500">Strong financial health</p>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 space-y-2 text-sm">
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-500">Health: <span class="font-medium text-green-600">87.5 / 100</span></span>
+                                                    <span class="text-gray-500">Risk: <span class="font-medium text-green-600">Low</span></span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-brand-green h-2 rounded-full" style="width: 87.5%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 p-4 border border-brand-border rounded-lg text-sm space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">NMLS</span>
+                                                <span class="font-medium text-brand-dark">#1234567</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Status</span>
+                                                <span class="font-medium text-green-600">Active</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Entity</span>
+                                                <span class="font-medium text-brand-dark">QuantumLeap AI LLC</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- [START] Removed AI Summary widget from here -->
+                                    <!-- ... -->
+                                    <!-- [END] Removed AI Summary widget from here -->
+
+                                </div>
+
+                                <!-- Right Column: Metrics --><div class="lg:col-span-2">
+                                    <h4 class="font-semibold text-brand-dark mb-3">Key Metrics</h4>
+                                    <div class="border border-brand-border rounded-lg">
                                         <table class="min-w-full divide-y divide-gray-200">
                                             <thead class="bg-gray-50">
                                                 <tr>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Credits</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Num Credits</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">True Revenue</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Balance</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NSF/OVD</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
+                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200 text-sm whitespace-nowrap">
-                                                <template x-for="row in reportData.monthlyBanking" :key="row.month">
-                                                    <tr>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.month"></td>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.totalCredits"></td>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.numCredits"></td>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.trueRevenue"></td>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.transfersIn"></td>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.avgBalance"></td>
-                                                        <td class="px-4 py-3 font-medium" :class="{
-                                                            'text-green-600': row.nsfSentiment === 'positive',
-                                                            'text-red-600': row.nsfSentiment === 'negative',
-                                                            'text-yellow-600': row.nsfSentiment === 'neutral'
-                                                        }" x-text="row.nsfOvd"></td>
-                                                        <td class="px-4 py-3 text-gray-500" x-text="row.endBalance"></td>
-                                                    </tr>
-                                                </template>
+                                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                                <tr>
+                                                    <td class="px-4 py-3 text-gray-500">Current Ratio</td>
+                                                    <td class="px-4 py-3 text-right font-medium text-green-600">1.88</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3 text-gray-500">Quick Ratio</td>
+                                                    <td class="px-4 py-3 text-right font-medium text-green-600">1.21</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3 text-gray-500">Debt Service Coverage</td>
+                                                    <td class="px-4 py-3 text-right font-medium text-green-600">1.45</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3 text-gray-500">Cash-Flow to Debt Ratio</td>
+                                                    <td class="px-4 py-3 text-right font-medium text-green-600">0.95</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3 text-gray-500">Revenue Trend</td>
+                                                    <td class="px-4 py-3 text-right font-medium text-red-600">-12.1%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3 text-gray-500">Cash-Flow Volatility</td>
+                                                    <td class="px-4 py-3 text-right font-medium text-brand-dark">28.0%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MoneyThumb & Charts --><div class="mt-6">
+                                <h4 class="font-semibold text-brand-dark mb-3">Financial Snapshot</h4>
+                                <!-- MoneyThumb Table --><div class="border border-brand-border rounded-lg mb-6">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Deposits</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"># Deposits</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Withdrawals</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg AOB</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg NSFs</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ending Bal</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">T'humpdri Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Chase, Bank of America</td>
+                                                <td class="px-4 py-3 text-gray-500">$180,277</td>
+                                                <td class="px-4 py-3 text-gray-500">41</td>
+                                                <td class="px-4 py-3 text-gray-500">$95,845</td>
+                                                <td class="px-4 py-3 text-gray-500">$450,705</td>
+                                                <td class="px-4 py-3 font-medium text-green-600">0.1</td>
+                                                <td class="px-4 py-3 text-gray-500">$215,848</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 font-medium text-green-600">820</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Charts --><div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <h5 class="font-medium text-brand-dark mb-2">Revenue Trend</h5>
+                                        <div class="p-4 border border-brand-border rounded-lg h-48">
+                                            <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                                                <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,40 10,35 20,30 30,25 40,20 50,22 60,15 70,10 80,12 90,5 100,10" />
+                                                <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium text-brand-dark mb-2">Ending Balance</h5>
+                                        <div class="p-4 border border-brand-border rounded-lg h-48">
+                                            <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                                                <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,30 10,28 20,35 30,30 40,25 50,20 60,25 70,15 80,18 90,10 100,15" />
+                                                <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-medium text-brand-dark mb-2">NSF / OVD Events</h5>
+                                        <div class="p-4 border border-brand-border rounded-lg h-48 flex items-end space-x-2">
+                                            <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none" class="flex items-end">
+                                                <rect x="5" y="45" width="10" height="3" fill="#00C09A" />
+                                                <rect x="20" y="48" width="10" height="0" fill="#00C09A" />
+                                                <rect x="35" y="48" width="10" height="0" fill="#00C09A" />
+                                                <rect x="50" y="40" width="10" height="8" fill="#FBBF24" />
+                                                <rect x="65" y="35" width="10" height="13" fill="#EF4444" />
+                                                <rect x="80" y="48" width="10" height="0" fill="#00C09A" />
+                                                <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Banking Activity --><div class="mt-6">
+                                <h4 class="font-semibold text-brand-dark mb-3">Monthly Banking Activity</h4>
+                                <div class="border border-brand-border rounded-lg overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Credits</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Num Credits</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">True Revenue</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Balance</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NSF/OVD</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Oct 2025</td>
+                                                <td class="px-4 py-3 text-gray-500">190,277</td>
+                                                <td class="px-4 py-3 text-gray-500">41</td>
+                                                <td class="px-4 py-3 text-gray-500">185,845</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 text-gray-500">450,705</td>
+                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                                <td class="px-4 py-3 text-gray-500">215,848</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Sep 2025</td>
+                                                <td class="px-4 py-3 text-gray-500">215,802</td>
+                                                <td class="px-4 py-3 text-gray-500">47</td>
+                                                <td class="px-4 py-3 text-gray-500">210,000</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 text-gray-500">420,112</td>
+                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                                <td class="px-4 py-3 text-gray-500">190,211</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Aug 2025</td>
+                                                <td class="px-4 py-3 text-gray-500">199,212</td>
+                                                <td class="px-4 py-3 text-gray-500">38</td>
+                                                <td class="px-4 py-3 text-gray-500">199,212</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 text-gray-500">380,920</td>
+                                                <td class="px-4 py-3 font-medium text-red-600">3</td>
+                                                <td class="px-4 py-3 text-gray-500">180,450</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Jul 2025</td>
+                                                <td class="px-4 py-3 text-gray-500">230,100</td>
+                                                <td class="px-4 py-3 text-gray-500">42</td>
+                                                <td class="px-4 py-3 text-gray-500">225,000</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 text-gray-500">350,000</td>
+                                                <td class="px-4 py-3 font-medium text-yellow-600">1</td>
+                                                <td class="px-4 py-3 text-gray-500">205,112</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">Jun 2025</td>
+                                                <td class="px-4 py-3 text-gray-500">210,500</td>
+                                                <td class="px-4 py-3 text-gray-500">35</td>
+                                                <td class="px-4 py-3 text-gray-500">210,500</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 text-gray-500">310,200</td>
+                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                                <td class="px-4 py-3 text-gray-500">190,888</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 text-gray-500">May 2025</td>
+                                                <td class="px-4 py-3 text-gray-500">205,123</td>
+                                                <td class="px-4 py-3 text-gray-500">40</td>
+                                                <td class="px-4 py-3 text-gray-500">200,000</td>
+                                                <td class="px-4 py-3 text-gray-500">0</td>
+                                                <td class="px-4 py-3 text-gray-500">290,000</td>
+                                                <td class="px-4 py-3 font-medium text-green-600">0</td>
+                                                <td class="px-4 py-3 text-gray-500">170,123</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Public Records --><div class="mt-6">
+                                <h4 class="font-semibold text-brand-dark mb-3">Public Records</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <!-- UCC Filings --><div class="border border-brand-border rounded-lg">
+                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">UCC Filings</h5>
+                                        <div class="p-4 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Bank of America, N.A.</span>
+                                                <span class="font-medium text-brand-dark">UCC-1</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400">Filed: 2024-01-15 | All Assets</p>
+                                        </div>
+                                    </div>
+                                    <!-- Liens & Judgments --><div class="border border-brand-border rounded-lg">
+                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Liens & Judgments</h5>
+                                        <div class="p-4 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">State Tax Lien</span>
+                                                <span class="font-medium text-yellow-600">$5,210.00</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400">Filed: 2025-06-30 | Case #12345</p>
+                                        </div>
+                                    </div>
+                                    <!-- Court Filings --><div class="border border-brand-border rounded-lg">
+                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Court Filings</h5>
+                                        <div class="p-4 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Civil Lawsuit</span>
+                                                <span class="font-medium text-yellow-600">Pending</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400">Filed: 2025-09-10 | Case #C-56789</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SOS & Recommendations --><div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- SOS Records --><div class="border border-brand-border rounded-lg">
+                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">SOS / Secretary of State Records</h5>
+                                    <div class="p-4 overflow-x-auto">
+                                        <table class="min-w-full text-sm">
+                                            <thead>
+                                                <tr class="border-b border-brand-border">
+                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Name</th>
+                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Type</th>
+                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Formation Date</th>
+                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity ID</th>
+                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                    <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered Agent</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="py-3 text-gray-500">QUANTUMLEAP AI LLC</td>
+                                                    <td class="py-3 text-gray-500">Domestic Limited Liability Company (LLC)</td>
+                                                    <td class="py-3 text-gray-500">2023-01-15</td>
+                                                    <td class="py-3 text-gray-500">5567890-0142</td>
+                                                    <td class="py-3 font-medium text-green-600">Active</td>
+                                                    <td class="py-3 text-gray-500">A Registered Agent Inc.</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
 
-                                <!-- Public Records --><div class="mt-6">
-                                    <h4 class="font-semibold text-brand-dark mb-3">Public Records</h4>
-                                    <!-- MOBILE: Stacks to single column -->
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <!-- UCC Filings --><div class="border border-brand-border rounded-lg">
-                                            <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">UCC Filings</h5>
-                                            <div class="p-4 text-sm space-y-2">
-                                                <template x-if="reportData.publicRecords.uccFilings.length === 0">
-                                                    <p class="text-gray-500">None reported</p>
-                                                </template>
-                                                <template x-for="item in reportData.publicRecords.uccFilings">
-                                                    <div>
-                                                        <div class="flex justify-between">
-                                                            <span class="text-gray-500" x-text="item.party"></span>
-                                                            <span class="font-medium text-brand-dark" x-text="item.type"></span>
-                                                        </div>
-                                                        <p class="text-xs text-gray-400" x-text="item.details"></p>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
-                                        <!-- Liens & Judgments --><div class="border border-brand-border rounded-lg">
-                                            <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Liens & Judgments</h5>
-                                            <div class="p-4 text-sm space-y-2">
-                                                <template x-if="reportData.publicRecords.liens.length === 0">
-                                                    <p class="text-gray-500">None reported</p>
-                                                </template>
-                                                <template x-for="item in reportData.publicRecords.liens">
-                                                    <div>
-                                                        <div class="flex justify-between">
-                                                            <span class="text-gray-500" x-text="item.type"></span>
-                                                            <span class="font-medium text-yellow-600" x-text="item.amount"></span>
-                                                        </div>
-                                                        <p class="text-xs text-gray-400" x-text="item.details"></p>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
-                                        <!-- Court Filings --><div class="border border-brand-border rounded-lg">
-                                            <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Court Filings</h5>
-                                            <div class="p-4 text-sm space-y-2">
-                                                <template x-if="reportData.publicRecords.courts.length === 0">
-                                                    <p class="text-gray-500">None reported</p>
-                                                </template>
-                                                <template x-for="item in reportData.publicRecords.courts">
-                                                    <div>
-                                                        <div class="flex justify-between">
-                                                            <span class="text-gray-500" x-text="item.type"></span>
-                                                            <span class="font-medium text-yellow-600" x-text="item.status"></span>
-                                                        </div>
-                                                        <p class="text-xs text-gray-400" x-text="item.details"></p>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Recommendations --><div class="border border-brand-border rounded-lg">
+                                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Recommendations</h5>
+                                    <ul class="p-6 space-y-2 list-disc list-inside text-sm text-gray-500">
+                                        <li class="font-medium text-green-600">Excellent financial health and low risk profile.</li>
+                                        <li>Address negative revenue trend observed in Key Metrics.</li>
+                                        <li>Investigate NSF events in Aug/Jul to prevent recurrence.</li>
+                                        <li>Review public records (UCC, liens) despite strong financials.</li>
+                                    </ul>
                                 </div>
-
-                                <!-- SOS & AI Summary --><div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <!-- SOS Records --><div class="border border-brand-border rounded-lg">
-                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">SOS / Secretary of State Records</h5>
-                                        <div class="p-4 overflow-x-auto">
-                                            <table class="min-w-full text-sm">
-                                                <thead>
-                                                    <tr class="border-b border-brand-border">
-                                                        <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Name</th>
-                                                        <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Type</th>
-                                                        <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Formation Date</th>
-                                                        <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity ID</th>
-                                                        <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                        <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered Agent</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="whitespace-nowrap">
-                                                    <template x-for="item in reportData.sosRecords">
-                                                        <tr>
-                                                            <td class="py-3 text-gray-500" x-text="item.entityName"></td>
-                                                            <td class="py-3 text-gray-500" x-text="item.entityType"></td>
-                                                            <td class="py-3 text-gray-500" x-text="item.formationDate"></td>
-                                                            <td class="py-3 text-gray-500" x-text="item.entityId"></td>
-                                                            <td class="py-3 font-medium" :class="{
-                                                                'text-green-600': item.statusSentiment === 'positive',
-                                                                'text-red-600': item.statusSentiment === 'negative',
-                                                                'text-yellow-600': item.statusSentiment === 'neutral'
-                                                            }" x-text="item.status"></td>
-                                                            <td class="py-3 text-gray-500" x-text="item.agent"></td>
-                                                        </tr>
-                                                    </template>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- AI Summary --><div class="border border-brand-border rounded-lg">
-                                        <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">AI Summary & Recommendations</h5>
-                                        <!-- 
-                                            *** FIX: Corrected typo 'classin' to 'class' ***
-                                            Use prose to style the markdown-like bullet points from the AI 
-                                        -->
-                                        <div class="p-6 text-sm text-gray-600 space-y-2 prose prose-sm" x-html="reportData.aiSummary.replace(/- /g, '<li>').replace(/\\n/g, '')">
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
+
                         </div>
-                    </template> <!-- End of x-if="reportData" -->
+                    </div>
                 </div>
             </section>
 
@@ -647,8 +908,7 @@
                     
                     <div class="space-y-16">
                         <!-- Step 1 --><div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
-                            <!-- MOBILE: text-6xl -->
-                            <div class="font-heading font-bold text-6xl md:text-7xl text-brand-dark">01</div>
+                            <div class="font-heading font-bold text-7xl text-brand-dark">01</div>
                             <div>
                                 <h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Connect & Scan</h3>
                                 <p class="text-lg text-brand-gray">
@@ -658,8 +918,7 @@
                         </div>
                         
                         <!-- Step 2 --><div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
-                            <!-- MOBILE: text-6xl -->
-                            <div class="font-heading font-bold text-6xl md:text-7xl yellow-gradient-text">02</div>
+                            <div class="font-heading font-bold text-7xl yellow-gradient-text">02</div>
                             <div>
                                 <h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Analyze & Remediate</h3>
                                 <p class="text-lg text-brand-gray">
@@ -669,10 +928,9 @@
                         </div>
                         
                         <!-- Step 3 --><div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
-                            <!-- MOBILE: text-6xl -->
-                            <div class="font-heading font-bold text-6xl md:text-7xl text-brand-green">03</div>
+                            <div class="font-heading font-bold text-7xl text-brand-green">03</div>
                             <div>
-                                <h3 class="font-heading text-xl md:text-2xl font-bold text-brand-dark mb-3">Certify & Monitor</h3>
+                                <h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Certify & Monitor</h3>
                                 <p class="text-lg text-brand-gray">
                                     Issue a "TrustBureau Certified" seal to display on your products. Our platform continuously monitors your models in production to prevent trust drift.
                                 </p>
@@ -790,7 +1048,7 @@
                             </a>
                         </div>
                         
-                        <!-- Plan 2: Business (Featured) --><div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col relative lg:scale-105 border-2 border-brand-green"> <!-- MOBILE: Removed scale-105 -->
+                        <!-- Plan 2: Business (Featured) --><div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col relative scale-105 border-2 border-brand-green">
                             <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full">
                                 Most Popular
                             </div>
@@ -804,7 +1062,6 @@
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>20 User Seats</li>
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 1,500 Reports / mo</li>
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Analysis & XAI</li>
-                                <!-- *** FIX: Corrected typo class_name to class *** -->
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Compliance Modules (EU, GDPR)</li>
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority Support</li>
                             </ul>
@@ -822,7 +1079,7 @@
                             <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited Users & Reports</li>
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Full API & Integration Access</li>
-                                <li class="flex items-center"><svg classs="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>On-Premise & VPC Deployment</li>
+                                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>On-Premise & VPC Deployment</li>
                                 <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Dedicated Account Manager & SLAs</li>
                             </ul>
                             <!-- Button sets page to 'demo' --><a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-dark text-white font-bold py-3 px-6 rounded-lg hover:bg-brand-green transition-colors">
@@ -834,8 +1091,7 @@
             </section>
 
             <!-- Final CTA Section (MOVED) --><section id="demo-bottom" class="bg-brand-dark">
-                <!-- MOBILE: py-16 -->
-                <div class="container mx-auto px-6 py-16 md:py-24 text-center">
+                <div class="container mx-auto px-6 py-24 text-center">
                     <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
                         Make Decisions in Seconds
                     </h2>
@@ -912,7 +1168,6 @@
             <div class="min-h-screen bg-brand-light py-12 px-4 sm:px-6 lg:px-8">
                 <div class="max-w-xl mx-auto">
                     <div>
-                        <!-- Logo (links back home) - REMOVED per request -->
                         <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">
                             Request a Demo
                         </h2>
@@ -921,7 +1176,7 @@
                         </p>
                     </div>
                     
-                    <form class="mt-8 space-y-6 bg-white p-6 md:p-8 rounded-lg shadow-md border border-brand-border" action="#" method="POST">
+                    <form class="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-md border border-brand-border" action="#" method="POST">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="first-name" class="block text-sm font-medium text-brand-dark">First Name</label>
@@ -1022,247 +1277,665 @@
         </div>
     </footer>
 
-    <!-- 
-      *** FIX: Moved Alpine.js definition and script tag to the end of the body ***
-      and wrapped the definition in the 'alpine:init' event listener
-      to ensure appState is registered correctly.
-    -->
+
+    <!-- [START] GEMINI API SCRIPT -->
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('appState', () => ({
-                open: false, 
-                page: 'home',
-                businessName: 'QuantumLeap AI LLC',
-                isLoading: false,
-                errorMessage: '',
-                reportData: null, // This will hold the JSON response from Gemini
+        document.addEventListener('DOMContentLoaded', () => {
 
-                // This function calls the Gemini API to populate the report
-                async generateReport() {
-                    this.isLoading = true;
-                    this.errorMessage = '';
-                    this.reportData = null;
+            // --- UI Elements for Combined Widget ---
+            const generateReportBtn = document.getElementById('generate-report-btn');
+            const businessNameInput = document.getElementById('business-name');
+            
+            // Result containers
+            const resultsContainer = document.getElementById('report-results-container');
+            const loader = document.getElementById('report-loader');
+            const errorContainer = document.getElementById('report-error-container');
+            const errorMessage = document.getElementById('report-error-message');
+            const contentContainer = document.getElementById('report-content');
+            
+            // Content fields
+            const reportTitle = document.getElementById('report-title');
+            const reportSummary = document.getElementById('report-summary');
+            
+            const scoreCircle = document.getElementById('report-score-circle');
+            const scoreDigit = document.getElementById('report-score-digit');
+            const scoreJustification = document.getElementById('report-score-justification');
+            const positiveList = document.getElementById('report-score-positives');
+            const negativeList = document.getElementById('report-score-negatives');
+            
+            const sosStatus = document.getElementById('report-sos-status');
+            const sosEntity = document.getElementById('report-sos-entity');
+            const sosJurisdiction = document.getElementById('report-sos-jurisdiction');
+            const sosDate = document.getElementById('report-sos-date');
+            const sosAgent = document.getElementById('report-sos-agent');
+            const sosName = document.getElementById('report-sos-name');
+            
+            const recordsList = document.getElementById('report-records-list');
+            
+            // [START] NEW: Get new element IDs
+            const reviewsList = document.getElementById('report-reviews-list');
+            const chartRevenue = document.getElementById('report-chart-revenue');
+            const chartCashflow = document.getElementById('report-chart-cashflow');
+            
+            // --- UI Elements for Pre-Approval Widget ---
+            const preApprovalBtn = document.getElementById('generate-pre-approval-btn');
+            const preApprovalName = document.getElementById('pre-approval-name');
+            const preApprovalIndustry = document.getElementById('pre-approval-industry');
+            const preApprovalMonthlyRevenue = document.getElementById('pre-approval-monthly-revenue'); // Changed ID
+            const preApprovalTime = document.getElementById('pre-approval-time');
+            const preApprovalFico = document.getElementById('pre-approval-fico'); // Added FICO
+            
+            const preApprovalResultsContainer = document.getElementById('pre-approval-results-container');
+            const preApprovalLoader = document.getElementById('pre-approval-loader');
+            const preApprovalErrorContainer = document.getElementById('pre-approval-error-container');
+            const preApprovalErrorMessage = document.getElementById('pre-approval-error-message');
+            const preApprovalContent = document.getElementById('pre-approval-content');
 
-                    // This is the JSON structure we demand from the Gemini API
-                    const reportSchema = {
-                        type: 'OBJECT',
-                        properties: {
-                            'overallStatus': {
-                                type: 'OBJECT',
-                                properties: {
-                                    'score': { type: 'NUMBER' },
-                                    'statusText': { type: 'STRING' },
-                                    'health': { type: 'STRING' },
-                                    'risk': { type: 'STRING' },
-                                    'scoreSentiment': { type: 'STRING' }
-                                }
-                            },
-                            'entityDetails': {
-                                type: 'OBJECT',
-                                properties: {
-                                    'nmls': { type: 'STRING' },
-                                    'nmlsStatus': { type: 'STRING' },
-                                    'entity': { type: 'STRING' },
-                                    'statusSentiment': { type: 'STRING' }
-                                }
-                            },
-                            'keyMetrics': {
-                                type: 'ARRAY',
-                                items: {
-                                    type: 'OBJECT',
+            const loanStatus = document.getElementById('loan-status');
+            const loanAmount = document.getElementById('loan-amount');
+            const loanTerm = document.getElementById('loan-term');
+            const loanRate = document.getElementById('loan-rate');
+            const loanNote = document.getElementById('loan-note');
+            const loanPayback = document.getElementById('loan-payback');
+            const loanPayment = document.getElementById('loan-payment');
+            const loanTermsTable = document.getElementById('loan-terms-table'); // Changed from Dl
+
+            const locStatus = document.getElementById('loc-status');
+            const locLimit = document.getElementById('loc-limit');
+            const locRate = document.getElementById('loc-rate');
+            const locNote = document.getElementById('loc-note');
+            const locTermsTable = document.getElementById('loc-terms-table'); // Changed from Dl
+
+            const mcaStatus = document.getElementById('mca-status');
+            const mcaAmount = document.getElementById('mca-amount');
+            const mcaFactor = document.getElementById('mca-factor');
+            const mcaNote = document.getElementById('mca-note');
+            const mcaPayback = document.getElementById('mca-payback');
+            const mcaRemittance = document.getElementById('mca-remittance');
+            const mcaTermsTable = document.getElementById('mca-terms-table'); // Changed from Dl
+            // [END] NEW
+            
+            const sourcesContainer = document.getElementById('report-sources-container');
+            const sourcesList = document.getElementById('report-sources');
+
+
+            // --- Helper Function: Show/Hide Report State ---
+            function showReportState(state, message = '') {
+                // Hide all sections first
+                loader.style.display = 'none';
+                errorContainer.style.display = 'none';
+                contentContainer.style.display = 'none';
+                sourcesContainer.style.display = 'none';
+
+                // Show the main results container
+                resultsContainer.style.display = 'block';
+
+                if (state === 'loading') {
+                    loader.style.display = 'flex';
+                } else if (state === 'error') {
+                    errorContainer.style.display = 'flex';
+                    errorMessage.innerText = message;
+                } else if (state === 'content') {
+                    contentContainer.style.display = 'block';
+                }
+            }
+
+            // --- Helper Function: Show/Hide Pre-Approval State ---
+            function showPreApprovalState(state, message = '') {
+                preApprovalLoader.style.display = 'none';
+                preApprovalErrorContainer.style.display = 'none';
+                preApprovalContent.style.display = 'none';
+
+                preApprovalResultsContainer.style.display = 'block';
+
+                if (state === 'loading') {
+                    preApprovalLoader.style.display = 'flex';
+                } else if (state === 'error') {
+                    preApprovalErrorContainer.style.display = 'flex';
+                    preApprovalErrorMessage.innerText = message;
+                } else if (state === 'content') {
+                    preApprovalContent.style.display = 'block';
+                }
+            }
+            
+            // --- Helper Function: Populate Sources ---
+            function populateSources(sources) {
+                sourcesList.innerHTML = ''; // Clear old sources
+                if (sources && sources.length > 0) {
+                    sources.forEach(source => {
+                        const li = document.createElement('li');
+                        li.className = 'text-xs truncate';
+                        li.innerHTML = `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-green hover:text-green-700">${source.title || source.uri}</a>`;
+                        sourcesList.appendChild(li);
+                    });
+                    sourcesContainer.style.display = 'block';
+                } else {
+                    sourcesContainer.style.display = 'none';
+                }
+            }
+            
+            // --- Helper Function: Populate Report Content ---
+            function populateReport(data) {
+                // 1. Business Summary
+                reportTitle.innerText = data.summary?.companyName || 'N/A';
+                reportSummary.innerText = data.summary?.summary || 'No summary could be found.';
+
+                // 2. AI Risk Score
+                const score = data.riskScore?.score || 0;
+                scoreDigit.innerText = score;
+                scoreJustification.innerText = data.riskScore?.justification || 'No justification provided.';
+                
+                scoreCircle.className = "score-circle mb-4"; // reset classes
+                if (score < 550) scoreCircle.classList.add('score-red');
+                else if (score < 700) scoreCircle.classList.add('score-yellow');
+                else scoreCircle.classList.add('score-green');
+
+                positiveList.innerHTML = '';
+                if (data.riskScore?.positiveFactors?.length > 0) {
+                    const checkIcon = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+                    data.riskScore.positiveFactors.forEach(factor => {
+                        const li = document.createElement('li');
+                        li.className = "flex items-start";
+                        li.innerHTML = `${checkIcon}<span class="text-sm text-brand-dark">${factor}</span>`;
+                        positiveList.appendChild(li);
+                    });
+                }
+
+                negativeList.innerHTML = '';
+                if (data.riskScore?.negativeFactors?.length > 0) {
+                    const xIcon = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+                    data.riskScore.negativeFactors.forEach(factor => {
+                        const li = document.createElement('li');
+                        li.className = "flex items-start";
+                        li.innerHTML = `${xIcon}<span class="text-sm text-brand-dark">${factor}</span>`;
+                        negativeList.appendChild(li);
+                    });
+                }
+                
+                // 3. Corporate Filings
+                sosName.innerText = data.sos?.entityName || 'N/A';
+                sosStatus.innerText = data.sos?.status || 'N/A';
+                sosEntity.innerText = data.sos?.entityType || 'N/A';
+                sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
+                sosDate.innerText = data.sos?.formationDate || 'N/A';
+                sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
+
+                sosStatus.className = "font-medium text-brand-dark text-right"; // reset
+                if (data.sos?.status?.toLowerCase() === 'active') {
+                    sosStatus.classList.add('text-green-600');
+                } else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') {
+                    sosStatus.classList.add('text-red-600');
+                }
+
+                // 4. Public Records
+                recordsList.innerHTML = '';
+                if (data.publicRecords?.findings?.length > 0) {
+                    data.publicRecords.findings.forEach(finding => {
+                        const li = document.createElement('li');
+                        if (finding.type.toLowerCase() === 'no records found') {
+                            li.className = "text-green-600";
+                            li.innerHTML = `<strong>${finding.type}:</strong> ${finding.details}`;
+                        } else {
+                            li.className = "text-red-600";
+                            li.innerHTML = `<strong>${finding.type}:</strong> <span class="text-brand-gray">${finding.details}</span>`;
+                        }
+                        recordsList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.className = "text-green-600";
+                    li.innerHTML = "<strong>No Records Found:</strong> No significant public records were found.";
+                    recordsList.appendChild(li);
+                }
+
+                // [START] NEW: 5. Customer Reviews
+                reviewsList.innerHTML = ''; // Clear old reviews
+                if (data.reviews?.length > 0) {
+                    data.reviews.forEach(review => {
+                        const reviewEl = document.createElement('blockquote');
+                        reviewEl.className = "p-4 border-l-4 border-brand-border bg-brand-light";
+                        reviewEl.innerHTML = `
+                            <p class"text-sm italic text-brand-gray">"${review.snippet || 'No snippet provided.'}"</p>
+                            <footer class="mt-2 text-xs text-brand-dark font-medium">${review.source || 'Unknown Source'}</footer>
+                        `;
+                        reviewsList.appendChild(reviewEl);
+                    });
+                } else {
+                    reviewsList.innerHTML = `<p class="text-sm text-brand-gray p-4 bg-brand-light rounded-lg">No recent customer reviews found.</p>`;
+                }
+                // [END] NEW
+
+                // [START] NEW: 6. Financial Charts
+                chartRevenue.innerHTML = '';
+                if (data.charts?.revenueTrend) {
+                    chartRevenue.innerHTML = data.charts.revenueTrend;
+                } else {
+                    chartRevenue.innerHTML = `<p class="text-sm text-brand-gray">Chart not available.</p>`;
+                }
+
+                chartCashflow.innerHTML = '';
+                if (data.charts?.cashFlow) {
+                    chartCashflow.innerHTML = data.charts.cashFlow;
+                } else {
+                    chartCashflow.innerHTML = `<p class="text-sm text-brand-gray">Chart not available.</p>`;
+                }
+                // [END] NEW
+            }
+
+            // --- Helper Function: Populate Pre-Approval Content ---
+            function populatePreApproval(data) {
+                // Helper to format currency
+                const formatCurrency = (num) => {
+                    if (num === null || num === undefined || isNaN(num)) return 'N/A';
+                    return num.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                }
+
+                // 1. Term Loan
+                if (data.loan?.approved) {
+                    loanStatus.innerText = 'Pre-Approved';
+                    loanStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-green-100 text-green-700';
+                    loanAmount.innerText = formatCurrency(data.loan.amount);
+                    loanAmount.className = 'text-3xl font-heading font-bold text-brand-green mt-3 mb-3';
+                    loanTermsTable.style.display = 'table';
+                    // Populate terms
+                    loanTerm.innerText = data.loan.term || 'N/A';
+                    loanRate.innerText = data.loan.estRate || 'N/A';
+                    loanPayback.innerText = formatCurrency(data.loan.paybackAmount);
+                    loanPayment.innerText = data.loan.estPayment || 'N/A';
+                    loanNote.innerText = data.loan.note || '';
+                } else {
+                    loanStatus.innerText = 'Declined';
+                    loanStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-red-100 text-red-700';
+                    loanAmount.innerText = '---';
+                    loanAmount.className = 'text-3xl font-heading font-bold text-brand-gray mt-3 mb-3';
+                    loanTermsTable.style.display = 'none'; // Hide terms
+                    loanNote.innerText = data.loan?.note || 'Does not meet minimum requirements.';
+                }
+
+                // 2. Line of Credit
+                if (data.loc?.approved) {
+                    locStatus.innerText = 'Pre-Approved';
+                    locStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-green-100 text-green-700';
+                    locLimit.innerText = formatCurrency(data.loc.limit);
+                    locLimit.className = 'text-3xl font-heading font-bold text-brand-green mt-3 mb-3';
+                    locTermsTable.style.display = 'table';
+                    // Populate terms
+                    locRate.innerText = data.loc.rate || 'N/A';
+                    locNote.innerText = data.loc.note || '';
+                } else {
+                    locStatus.innerText = 'Declined';
+                    locStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-red-100 text-red-700';
+                    locLimit.innerText = '---';
+                    locLimit.className = 'text-3xl font-heading font-bold text-brand-gray mt-3 mb-3';
+                    locTermsTable.style.display = 'none'; // Hide terms
+                    locNote.innerText = data.loc?.note || 'Does not meet minimum requirements.';
+                }
+
+                // 3. Merchant Cash Advance
+                if (data.mca?.approved) {
+                    mcaStatus.innerText = 'Pre-Approved';
+                    mcaStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-green-100 text-green-700';
+                    mcaAmount.innerText = formatCurrency(data.mca.amount);
+                    mcaAmount.className = 'text-3xl font-heading font-bold text-brand-green mt-3 mb-3';
+                    mcaTermsTable.style.display = 'table';
+                    // Populate terms
+                    mcaFactor.innerText = data.mca.factorRate || 'N/A';
+                    mcaPayback.innerText = formatCurrency(data.mca.paybackAmount);
+                    mcaRemittance.innerText = data.mca.estDailyRemittance || 'N/A';
+                    mcaNote.innerText = data.mca.note || '';
+                } else {
+                    mcaStatus.innerText = 'Declined';
+                    mcaStatus.className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-red-100 text-red-700';
+                    mcaAmount.innerText = '---';
+                    mcaAmount.className = 'text-3xl font-heading font-bold text-brand-gray mt-3 mb-3';
+                    mcaTermsTable.style.display = 'none'; // Hide terms
+                    mcaNote.innerText = data.mca?.note || 'Does not meet minimum requirements.';
+                }
+            }
+
+            // --- Main Event Listener for Combined Widget ---
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', async () => {
+                    const businessName = businessNameInput.value.trim();
+                    if (!businessName) {
+                        showReportState('error', 'Please enter a business name.');
+                        return;
+                    }
+                    
+                    showReportState('loading');
+                    generateReportBtn.disabled = true;
+
+                    const systemPrompt = "You are an AI business analyst. A user is requesting a full report on a company. Perform a Google search to find: 1. A brief summary. 2. Corporate filing info (entity name, status, entity type, jurisdiction, formation date, registered agent). 3. Public records (UCC, liens, judgments, court filings, debt). 4. 2-3 recent customer review snippets. THEN, generate: 5. A fictional AI risk score (300-850) with justification, 2-3 positive factors, and 1-2 negative factors. 6. Two fictional, simple, minimalist SVG line charts as text strings (viewBox='0 0 100 50', use polyline, one green (#00C09A) for 'revenueTrend', one blue (#3B82F6) for 'cashFlow'). Respond *only* with a valid JSON object matching this exact structure: {\"summary\": {\"companyName\": \"string\", \"summary\": \"string\"}, \"sos\": {\"entityName\": \"string\", \"status\": \"string\", \"entityType\": \"string\", \"jurisdiction\": \"string\", \"formationDate\": \"string\", \"registeredAgent\": \"string\"}, \"publicRecords\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\"}]}, \"riskScore\": {\"score\": 0, \"justification\": \"string\", \"positiveFactors\": [\"string\"], \"negativeFactors\": [\"string\"]}, \"reviews\": [{\"snippet\": \"string\", \"source\": \"string\"}], \"charts\": {\"revenueTrend\": \"string\", \"cashFlow\": \"string\"}}. If info isn't found, use 'N/A' or an empty array.";
+                    const userQuery = `Generate a full AI business report for: "${businessName}"`;
+
+                    try {
+                        const { json, sources } = await callReportAPI(systemPrompt, userQuery, 'full-report');
+                        populateReport(json);
+                        populateSources(sources);
+                        showReportState('content');
+                    } catch (error) {
+                        console.error("Full Report Error:", error);
+                        showReportState('error', error.message);
+                    } finally {
+                        generateReportBtn.disabled = false;
+                    }
+                });
+            }
+
+            // --- Main Event Listener for Pre-Approval Widget ---
+            if (preApprovalBtn) {
+                preApprovalBtn.addEventListener('click', async () => {
+                    const businessName = preApprovalName.value.trim();
+                    const industry = preApprovalIndustry.value.trim();
+                    const monthlyRevenueStr = preApprovalMonthlyRevenue.value.trim(); // Get value from slider
+                    const timeStr = preApprovalTime.value.trim();
+                    const ficoStr = preApprovalFico.value.trim(); // Get value from FICO slider
+
+                    if (!businessName || !monthlyRevenueStr || !timeStr || !ficoStr) {
+                        showPreApprovalState('error', 'Please fill in all fields.');
+                        return;
+                    }
+
+                    const monthlyRevenue = parseFloat(monthlyRevenueStr); // No need to replace, it's a number
+                    const timeInBusinessMonths = parseInt(timeStr.replace(/[^0-9]/g, ''));
+                    const ficoScore = parseInt(ficoStr); // It's a number
+
+                    if (isNaN(monthlyRevenue) || isNaN(timeInBusinessMonths) || isNaN(ficoScore)) {
+                        showPreApprovalState('error', 'Please enter valid numbers for Time in Business.');
+                        return;
+                    }
+                    
+                    // No more annual revenue calculation
+                    
+                    showPreApprovalState('loading');
+                    preApprovalBtn.disabled = true;
+
+                    const systemPrompt = "You are an AI underwriting engine simulating the 'Enhanced Underwriting Model v3.5'. Your hard policy gates are: 6 months minimum time in business (TIB), $8,000 minimum *monthly* revenue, and a minimum FICO score of 580. Your risk tiers based on a composite score (0-100) are: Decline (<55), Enhanced (55-70), Standard (70-85), Auto-Approval (>85). For the user's inputs, first check the hard gates (TIB, monthly revenue, FICO). If they fail, decline all and state the gate failure in the 'note'. If they pass, calculate a fictional composite score based on their revenue, TIB, and FICO (e.g., $10k/mo, 12mo, 600 FICO = 60; $20k/mo, 36mo, 720 FICO = 80). Then, generate fictional terms for a Term Loan, LOC, and MCA based on their tier. Use the model's logic: 'Auto-Approval' gets a ~1.1x *monthly* revenue multiplier and ~1.24 factor. 'Standard' gets ~0.9x and ~1.32 factor. 'Enhanced' gets ~0.65x and ~1.40 factor. 'Decline' gets 0. Provide a reason in the 'note' field for all decisions (e.g., 'Approved under Standard risk tier due to solid TIB and FICO history.'). Respond *only* with the valid JSON schema.";
+                    
+                    const userQuery = `Generate pre-approval terms for: Business: "${businessName}", Industry: "${industry}", Monthly Revenue: "${monthlyRevenue.toFixed(2)}", Time in Business (Months): "${timeInBusinessMonths}", Owner FICO Score: ${ficoScore}`;
+
+                    const generationConfig = {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "loan": {
+                                    type: "OBJECT",
                                     properties: {
-                                        'metric': { type: 'STRING' },
-                                        'value': { type: 'STRING' },
-                                        'sentiment': { type: 'STRING' }
-                                    }
-                                }
-                            },
-                            'financialSnapshot': {
-                                type: 'OBJECT',
-                                properties: {
-                                    'bank': { type: 'STRING' },
-                                    'avgDeposits': { type: 'STRING' },
-                                    'numDeposits': { type: 'NUMBER' },
-                                    'avgWithdrawals': { type: 'STRING' },
-                                    'avgAOB': { type: 'STRING' },
-                                    'avgNSFs': { type: 'NUMBER' },
-                                    'endingBal': { type: 'STRING' },
-                                    'transfersIn': { type: 'NUMBER' },
-                                    'thumpdriScore': { type: 'NUMBER' },
-                                    'nsfSentiment': { type: 'STRING' },
-                                    'scoreSentiment': { type: 'STRING' }
-                                }
-                            },
-                            'monthlyBanking': {
-                                type: 'ARRAY',
-                                items: {
-                                    type: 'OBJECT',
-                                    properties: {
-                                        'month': { type: 'STRING' },
-                                        'totalCredits': { type: 'STRING' },
-                                        'numCredits': { type: 'NUMBER' },
-                                        'trueRevenue': { type: 'STRING' },
-                                        'transfersIn': { type: 'NUMBER' },
-                                        'avgBalance': { type: 'STRING' },
-                                        'nsfOvd': { type: 'NUMBER' },
-                                        'endBalance': { type: 'STRING' },
-                                        'nsfSentiment': { type: 'STRING' }
-                                    }
-                                }
-                            },
-                            'publicRecords': {
-                                type: 'OBJECT',
-                                properties: {
-                                    'uccFilings': {
-                                        type: 'ARRAY',
-                                        items: {
-                                            type: 'OBJECT',
-                                            properties: {
-                                                'party': { type: 'STRING' },
-                                                'type': { type: 'STRING' },
-                                                'details': { type: 'STRING' }
-                                            }
-                                        }
+                                        "approved": { "type": "BOOLEAN" },
+                                        "amount": { "type": "NUMBER" },
+                                        "term": { "type": "STRING" },
+                                        "estRate": { "type": "STRING" },
+                                        "paybackAmount": { "type": "NUMBER" },
+                                        "estPayment": { "type": "STRING" },
+                                        "note": { "type": "STRING" }
                                     },
-                                    'liens': {
-                                        type: 'ARRAY',
-                                        items: {
-                                            type: 'OBJECT',
-                                            properties: {
-                                                'type': { type: 'STRING' },
-                                                'amount': { type: 'STRING' },
-                                                'details': { type: 'STRING' }
-                                            }
-                                        }
-                                    },
-                                    'courts': {
-                                        type: 'ARRAY',
-                                        items: {
-                                            type: 'OBJECT',
-                                            properties: {
-                                                'type': { type: 'STRING' },
-                                                'status': { type: 'STRING' },
-                                                'details': { type: 'STRING' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            'sosRecords': {
-                                type: 'ARRAY',
-                                items: {
-                                    type: 'OBJECT',
+                                    required: ["approved", "note"]
+                                },
+                                "loc": {
+                                    type: "OBJECT",
                                     properties: {
-                                        'entityName': { type: 'STRING' },
-                                        'entityType': { type: 'STRING' },
-                                        'formationDate': { type: 'STRING' },
-                                        'entityId': { type: 'STRING' },
-                                        'status': { type: 'STRING' },
-                                        'agent': { type: 'STRING' },
-                                        'statusSentiment': { type: 'STRING' }
-                                    }
+                                        "approved": { "type": "BOOLEAN" },
+                                        "limit": { "type": "NUMBER" },
+                                        "rate": { "type": "STRING" },
+                                        "note": { "type": "STRING" }
+                                    },
+                                    required: ["approved", "note"]
+                                },
+                                "mca": {
+                                    type: "OBJECT",
+                                    properties: {
+                                        "approved": { "type": "BOOLEAN" },
+                                        "amount": { "type": "NUMBER" },
+                                        "factorRate": { "type": "STRING" },
+                                        "paybackAmount": { "type": "NUMBER" },
+                                        "estDailyRemittance": { "type": "STRING" },
+                                        "note": { "type": "STRING" }
+                                    },
+                                    required: ["approved", "note"]
                                 }
                             },
-                            'aiSummary': { type: 'STRING' }
+                            required: ["loan", "loc", "mca"]
                         }
                     };
 
-                    // This is the prompt we send to the Gemini API
-                    const systemPrompt = 'You are an expert AI underwriting analyst. Your task is to generate a plausible, simulated business verification report for a given company name.\n\nYou must analyze the name and generate realistic-sounding financial data, public records, and an overall underwriting summary.\n- The data must be simulated and plausible.\n- \'sentiment\' fields must be \'positive\', \'negative\', or \'neutral\'.\n- You MUST return the data ONLY in the provided JSON schema. Do not output any text outside the JSON structure.\n- Populate all fields, including realistic arrays for \'monthlyBanking\', \'publicRecords\', and \'sosRecords\'. Make \'aiSummary\' a bulleted list of recommendations as a single string with \\n for new lines.';
-                    
-                    // Correctly escaped string concatenation for the user prompt
-                    const userPrompt = 'Generate a complete, simulated underwriting report for the business: "' + this.businessName + '"';
-
                     try {
-                        const apiKey = ''; // API key is handled by the environment
-                        const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=' + apiKey;
-
-                        const payload = {
-                            contents: [{ parts: [{ text: userPrompt }] }],
-                            systemInstruction: {
-                                parts: [{ text: systemPrompt }]
-                            },
-                            generationConfig: {
-                                responseMimeType: 'application/json',
-                                responseSchema: reportSchema,
-                                temperature: 0.7
-                            },
-                            // We add Google Search grounding to try and find real public records
-                            tools: [{ 'google_search': {} }]
-                        };
-
-                        // Exponential backoff for retries
-                        let response;
-                        let retries = 0;
-                        const maxRetries = 5;
-                        let delay = 1000;
-
-                        while (retries < maxRetries) {
-                            try {
-                                response = await fetch(apiUrl, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(payload)
-                                });
-
-                                if (response.ok) {
-                                    break; // Success
-                                }
-
-                                // Handle rate limiting (429) and server errors (5xx)
-                                if (response.status === 429 || response.status >= 500) {
-                                    retries++;
-                                    await new Promise(resolve => setTimeout(resolve, delay));
-                                    delay *= 2; // Double the delay
-                                } else {
-                                    // Don't retry for other client-side errors (e.g., 400 Bad Request)
-                                    const errorBody = await response.json();
-                                    console.error('API Error Body:', errorBody);
-                                    throw new Error('API request failed with status: ' + response.status);
-                                }
-                            } catch (fetchError) {
-                                // Handle network errors
-                                console.error('Fetch Error:', fetchError);
-                                retries++;
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                delay *= 2;
-                                if (retries >= maxRetries) {
-                                    throw fetchError; // Rethrow after max retries
-                                }
-                            }
-                        }
-
-
-                        if (!response || !response.ok) {
-                            throw new Error('API request failed after retries.');
-                        }
-
-                        const result = await response.json();
-
-                        if (result.candidates && result.candidates.length > 0 &&
-                            result.candidates[0].content && result.candidates[0].content.parts &&
-                            result.candidates[0].content.parts.length > 0) {
-                            
-                            const jsonText = result.candidates[0].content.parts[0].text;
-                            this.reportData = JSON.parse(jsonText);
-                        } else {
-                            console.error('Invalid API response structure:', result);
-                            if (result.promptFeedback) {
-                                console.error('Prompt Feedback:', result.promptFeedback);
-                                throw new Error('API request blocked. Reason: ' + result.promptFeedback.blockReason);
-                            }
-                            throw new Error('No valid response from API.');
-                        }
-
+                        const json = await callPreApprovalAPI(systemPrompt, userQuery, generationConfig, 'pre-approval');
+                        populatePreApproval(json);
+                        showPreApprovalState('content');
                     } catch (error) {
-                        console.error('Error generating report:', error);
-                        this.errorMessage = 'Failed to generate AI summary. Please try again. ' + error.message;
+                        console.error("Pre-Approval Error:", error);
+                        showPreApprovalState('error', error.message);
                     } finally {
-                        this.isLoading = false;
+                        preApprovalBtn.disabled = false;
+                    }
+                });
+            }
+
+            
+            /**
+             * -----------------------------------------------------------------
+             * API & Audio Helper Functions
+             * -----------------------------------------------------------------
+             */
+
+            /**
+             * A simple fetch wrapper with basic retry and error logging.
+             */
+            async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+                let lastError;
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        // console.log(`[Fetch] Attempt ${i+1} for ${url}`); // No console logs
+                        const response = await fetch(url, options);
+
+                        if (!response.ok) {
+                            let errorBody;
+                            try {
+                                errorBody = await response.json();
+                            } catch (e) {
+                                errorBody = null; // Response wasn't JSON
+                            }
+                            
+                            const errorMessage = errorBody?.error?.message || response.statusText;
+                            lastError = new Error(`API Error: ${errorMessage} (Status: ${response.status})`);
+                            // console.error(lastError); // No console logs
+
+                            // Only retry on 429 (Too Many Requests) or 5xx (Server Error)
+                            if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
+                                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                                continue; // Retry
+                            } else {
+                                throw lastError; // Don't retry on 400 or other client errors
+                            }
+                        }
+
+                        // Success
+                        return await response.json();
+
+                    } catch (error) { // Network errors
+                        // console.error("[Fetch] Network error:", error); // No console logs
+                        lastError = error;
+                        if (i < retries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                        }
                     }
                 }
-            }));
+                throw lastError || new Error("API request failed after all retries.");
+            }
+
+            /**
+             * Asynchronous function to call the Gemini text generation API with Search.
+             * This function expects the model to return a JSON string in its text response.
+             */
+            async function callReportAPI(systemPrompt, userQuery, logId = 'api') {
+                const apiKey = "AIzaSyC3dVwcpEDau2T0cYq0aOigZcpvQ6TzhWU"; // Leave empty, handled by environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                // [REMOVED] generationConfig 
+
+                // console.log(`[${logId}] Making API call...`); // Don't log to console
+                const result = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                // console.log(`[${logId}] API response received:`, result); // Don't log to console
+
+                const candidate = result.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                    // console.error(`[${logId}] Invalid API response structure:`, result); // Don't log to console
+                    throw new Error("No content received from API. The model may be adjusting.");
+                }
+                
+                // [START] NEW: Manually parse the text response as JSON
+                let json = null;
+                try {
+                    // Clean the text response in case the model adds markdown
+                    const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    json = JSON.parse(jsonString); 
+                } catch (e) {
+                    // console.error(`[${logId}] Failed to parse JSON response:`, text); // Don't log to console
+                    // Fallback: If parsing fails, use the raw text as the detail/summary
+                    throw new Error("Received an invalid JSON response from the API. Please try again.");
+                }
+                // [END] NEW
+
+                // Extract grounding sources
+                let sources = [];
+                const groundingMetadata = candidate.groundingMetadata;
+                if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                    sources = groundingMetadata.groundingAttributions
+                        .map(attribution => ({
+                            uri: attribution.web?.uri,
+                            title: attribution.web?.title,
+                        }))
+                        .filter(source => source.uri); // Ensure sources are valid
+                }
+
+                return { text, json, sources };
+            }
+
+            /**
+             * Asynchronous function to call the Gemini API for *fictional*, non-search JSON.
+             */
+            async function callPreApprovalAPI(systemPrompt, userQuery, generationConfig, logId = 'api') {
+                const apiKey = "AIzaSyC3dVwcpEDau2T0cYq0aOigZcpvQ6TzhWU"; // Leave empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    generationConfig: generationConfig
+                };
+
+                // console.log(`[${logId}] Making API call...`); // Don't log to console
+                const result = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                // console.log(`[${logId}] API response received:`, result); // Don't log to console
+
+                const candidate = result.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                    // console.error(`[${logId}] Invalid API response structure:`, result); // Don't log to console
+                    throw new Error("No JSON content received from API.");
+                }
+
+                try {
+                    // The API returns the JSON as a string, so we need to parse it
+                    const parsedJson = JSON.parse(text);
+                    return parsedJson;
+                } catch (e) {
+                    // console.error(`[${logId}] Failed to parse JSON response:`, text); // Don't log to console
+                    throw new Error("Invalid JSON format received from API.");
+                }
+            }
+
+
+            /**
+             * -----------------------------------------------------------------
+             * Audio Helper Functions (No longer used, but kept for reference)
+             * -----------------------------------------------------------------
+             */
+
+            /**
+             * Converts Base64 string to ArrayBuffer.
+             */
+            function base64ToArrayBuffer(base64) {
+                const binaryString = window.atob(base64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                return bytes.buffer;
+            }
+
+            /**
+             * Converts raw PCM16 audio data to a WAV file Blob.
+             */
+            function pcmToWav(pcmData, sampleRate) {
+                const numChannels = 1;
+                const bitsPerSample = 16;
+                const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+                const blockAlign = numChannels * (bitsPerSample / 8);
+                const dataSize = pcmData.length * (bitsPerSample / 8);
+                const buffer = new ArrayBuffer(44 + dataSize);
+                const view = new DataView(buffer);
+
+                // RIFF header
+                writeString(view, 0, 'RIFF');
+                view.setUint32(4, 36 + dataSize, true);
+                writeString(view, 8, 'WAVE');
+                
+                // fmt chunk
+                writeString(view, 12, 'fmt ');
+                view.setUint32(16, 16, true); // chunk size
+                view.setUint16(20, 1, true); // audio format (1 = PCM)
+                view.setUint16(22, numChannels, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, byteRate, true);
+                view.setUint16(32, blockAlign, true);
+                view.setUint16(34, bitsPerSample, true);
+                
+                // data chunk
+                writeString(view, 36, 'data');
+                view.setUint32(40, dataSize, true);
+
+                // Write PCM data
+                let offset = 44;
+                for (let i = 0; i < pcmData.length; i++, offset += 2) {
+                    view.setInt16(offset, pcmData[i], true);
+                }
+
+                return new Blob([view], { type: 'audio/wav' });
+            }
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
         });
     </script>
+    <!-- [END] GEMINI API SCRIPT -->
+
 </body>
 </html>
+
