@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Live AI Business Report — TrustBureau.ai</title>
+  <title>Live AI Business Report – TrustBureau.ai</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,15 +27,14 @@
     }
   </script>
 
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
 
   <!-- *** Set your Gemini API key here *** -->
   <script>
-    // Replace the value below with your real key (keep the quotes).
-    // This is the variable name you asked for.
+    // Replace with your real key (keep quotes)
     window.zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
   </script>
 
@@ -49,17 +48,18 @@
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
-    /* Cards */
+    /* Card */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
 
-    /* Score chip */
+    /* Score */
     .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
-    /* Loader: radar + stepper + skeleton */
-    .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
+    /* ========= Loader: radar + stepper + skeleton ========= */
+    .radar {
+      width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
       background:
         radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
         conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
@@ -126,7 +126,8 @@
   <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
       <!-- LOADER -->
-      <div id="report-loader" style="display:none;" class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
+      <div id="report-loader" style="display:none;"
+           class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
         <div class="flex items-center gap-5">
           <div class="radar" aria-hidden="true"></div>
           <div class="flex-1">
@@ -138,9 +139,7 @@
             <p class="text-xs text-gray-500 mt-2">Usually 10–30s — scanning SOS, public records, reviews and recent headlines.</p>
           </div>
         </div>
-
         <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="skeleton-card space-y-3">
             <div class="w-28 skel-line shimmer"></div>
@@ -171,7 +170,6 @@
 
       <!-- Content -->
       <div id="report-content" style="display:none;" class="space-y-8">
-        <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
@@ -304,23 +302,24 @@
   </footer>
 
   <script>
-    /* =========================================
-       API helpers (v1, model discovery, retries)
-       ========================================= */
-    const API_VERSION = 'v1';
+    /* ========= Config ========= */
+    const MODEL_PRIMARY  = 'gemini-2.5-pro';
+    const MODEL_FALLBACK = 'gemini-2.0-pro';
+    const MAX_OUTPUT_TOKENS = 8192;   // <— recommended default
 
     function getApiKey() {
       const k = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
       return k;
     }
 
-    async function fetchWithBackoff(url, options, retries=3, delay=800) {
+    /* ========= Helpers ========= */
+    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
       let lastError;
-      for (let i=0;i<retries;i++) {
+      for (let i = 0; i < retries; i++) {
         try {
           const res = await fetch(url, options);
           if (!res.ok) {
-            let body=null; try{ body = await res.json(); }catch{}
+            let body = null; try { body = await res.json(); } catch {}
             const msg = body?.error?.message || res.statusText || 'Request failed';
             const err = new Error(`${msg} (HTTP ${res.status})`);
             err.code = body?.error?.status;
@@ -329,420 +328,389 @@
           return await res.json();
         } catch (e) {
           lastError = e;
-          if (i < retries - 1) await new Promise(r=>setTimeout(r, delay * Math.pow(2,i)));
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
         }
       }
       throw lastError || new Error('API request failed after retries.');
     }
 
-    async function listModels(apiKey) {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/${API_VERSION}/models?key=${encodeURIComponent(apiKey)}`
-      );
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.message || 'ListModels failed.');
-      return data.models || [];
-    }
-
-    function rankModel(name) {
-      const n = (name || '').toLowerCase();
-      let s = 0;
-      if (n.includes('2.5')) s += 1000;
-      if (n.includes('2.0')) s += 500;
-      if (n.includes('1.5')) s += 100;
-      if (n.includes('pro')) s += 50;
-      if (n.includes('flash')) s += 10;
+    function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
+    function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
+    function linkifyMaybe(v) {
+      if (!v) return 'N/A';
+      const s = String(v).trim();
+      if (/^https?:\/\//i.test(s)) {
+        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      }
       return s;
     }
-
-    async function chooseModel(apiKey) {
-      const models = await listModels(apiKey);
-      const eligible = models.filter(m =>
-        (m.supportedGenerationMethods || []).includes('generateContent')
-      );
-      if (!eligible.length) {
-        throw new Error('No models available for generateContent with this key/project.');
+    function renderLineChart(container, values, color) {
+      if (!Array.isArray(values) || values.length < 2) {
+        container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
+        return;
       }
-      eligible.sort((a, b) => rankModel(b.name) - rankModel(a.name));
-      return eligible[0]; // best one
+      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
+      const min = Math.min(...nums), max = Math.max(...nums);
+      const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
+      const step = 100 / (norm.length - 1);
+      const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
+      container.innerHTML = `
+        <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+          <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+          <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+        </svg>`;
+    }
+
+    /* ========= Loader ========= */
+    let __loaderCtl = null;
+    function startLoadingAnimation() {
+      const steps = [
+        'Matching business identity','Searching the web','Pulling SOS / corporate filings',
+        'Parsing entity metadata','Checking public records','Gathering leadership',
+        'Mapping products & services','Finding competitors','Collecting web & social signals',
+        'Crawling recent headlines','Reading customer reviews','Synthesizing risk score'
+      ];
+      const stepsOl = document.getElementById('loader-steps');
+      const barEl   = document.getElementById('loader-bar');
+      const timerEl = document.getElementById('loader-timer');
+
+      stepsOl.innerHTML = steps.map((s,i) => `
+        <li class="flex items-start gap-2">
+          <span class="step-icon" id="ld_${i}">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </span>
+          <span>${s}</span>
+        </li>`).join('');
+
+      let elapsed = 0;
+      const tTimer = setInterval(() => {
+        elapsed += 200;
+        const m = Math.floor(elapsed/1000/60);
+        const s = Math.floor((elapsed/1000)%60);
+        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }, 200);
+
+      let idx = 0;
+      const stepMs = Math.max(900, Math.floor(25000 / steps.length));
+      const tSteps = setInterval(() => {
+        if (idx < steps.length) {
+          document.getElementById(`ld_${idx}`)?.classList.add('done');
+          idx++;
+          const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
+          barEl.style.width = pct + '%';
+        } else {
+          const cur = parseFloat(barEl.style.width) || 98;
+          barEl.style.width = Math.min(99, cur + 0.2) + '%';
+        }
+      }, stepMs);
+
+      return { stop() { clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
+    }
+
+    /* ========= UI state ========= */
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
+
+    function showState(state, message = '') {
+      loader.style.display = 'none';
+      errBox.style.display = 'none';
+      content.style.display = 'none';
+      results.style.display = 'block';
+
+      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+
+      if (state === 'loading') {
+        loader.style.display = 'block';
+        __loaderCtl = startLoadingAnimation();
+      } else if (state === 'error') {
+        errBox.style.display = 'block';
+        errMsg.textContent = message || 'Something went wrong.';
+      } else if (state === 'content') {
+        content.style.display = 'block';
+      }
+    }
+
+    /* ========= Populate ========= */
+    const titleEl = document.getElementById('report-title');
+    const summaryEl = document.getElementById('report-summary');
+    const scoreCircle = document.getElementById('report-score-circle');
+    const scoreDigit  = document.getElementById('report-score-digit');
+    const scoreJust   = document.getElementById('report-score-justification');
+    const posList     = document.getElementById('report-score-positives');
+    const negList     = document.getElementById('report-score-negatives');
+
+    const sosName = document.getElementById('report-sos-name');
+    const sosStatus = document.getElementById('report-sos-status');
+    const sosEntity = document.getElementById('report-sos-entity');
+    const sosJuris  = document.getElementById('report-sos-jurisdiction');
+    const sosDate   = document.getElementById('report-sos-date');
+    const sosAgent  = document.getElementById('report-sos-agent');
+
+    const recList = document.getElementById('report-records-list');
+    const reviewsList = document.getElementById('report-reviews-list');
+    const chartRevenue = document.getElementById('report-chart-revenue');
+    const chartCash    = document.getElementById('report-chart-cashflow');
+
+    const factsFounded   = document.getElementById('facts-founded');
+    const factsHQ        = document.getElementById('facts-hq');
+    const factsEmployees = document.getElementById('facts-employees');
+    const factsIndustry  = document.getElementById('facts-industry');
+    const factsTicker    = document.getElementById('facts-ticker');
+    const factsWebsite   = document.getElementById('facts-website');
+    const newsList = document.getElementById('report-news-list');
+    const leaderList = document.getElementById('report-leadership-list');
+    const productsList = document.getElementById('report-products-list');
+    const compList = document.getElementById('report-competitors-list');
+    const socialList = document.getElementById('report-social-list');
+
+    const sourcesBox = document.getElementById('report-sources-container');
+    const sourcesUl  = document.getElementById('report-sources');
+    const sourcesChips = document.getElementById('report-sources-chips');
+    const sourcesToggle = document.getElementById('toggle-sources');
+
+    function populateReport(data) {
+      setText(titleEl, data.summary?.companyName);
+      summaryEl.textContent = data.summary?.summary || 'No summary could be found.';
+
+      const score = data.riskScore?.score || 0;
+      scoreDigit.textContent = score;
+      scoreJust.textContent = data.riskScore?.justification || 'No justification provided.';
+      scoreCircle.className = 'score-circle mb-4';
+      if (score < 550) scoreCircle.classList.add('score-red');
+      else if (score < 700) scoreCircle.classList.add('score-yellow');
+      else scoreCircle.classList.add('score-green');
+
+      posList.innerHTML = '';
+      (data.riskScore?.positiveFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
+                        `<span class="text-sm text-brand-dark">${f}</span>`;
+        posList.appendChild(li);
+      });
+      negList.innerHTML = '';
+      (data.riskScore?.negativeFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
+                        `<span class="text-sm text-brand-dark">${f}</span>`;
+        negList.appendChild(li);
+      });
+
+      setText(sosName,  data.sos?.entityName);
+      setText(sosEntity,data.sos?.entityType);
+      setText(sosStatus,data.sos?.status);
+      setText(sosJuris, data.sos?.jurisdiction);
+      setText(sosDate,  data.sos?.formationDate);
+      setText(sosAgent, data.sos?.registeredAgent);
+      sosStatus.className = '';
+      if ((data.sos?.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
+      else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
+
+      const p = data.profile || {};
+      setText(factsFounded, p.founded);
+      setText(factsHQ, p.headquarters || p.hq);
+      setText(factsEmployees, p.employees);
+      setText(factsIndustry, p.industry || p.subindustry);
+      setText(factsTicker, p.ticker);
+      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
+
+      newsList.innerHTML = '';
+      if (data.news?.length) {
+        data.news.slice(0,6).forEach(n => {
+          const li = document.createElement('li');
+          li.innerHTML =
+            `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+             <div class="text-xs text-gray-500">${n.source || 'Source'} ${n.date ? '• ' + n.date : ''}</div>`;
+          newsList.appendChild(li);
+        });
+      } else {
+        newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
+      }
+
+      leaderList.innerHTML = '';
+      (data.leadership || []).slice(0,8).forEach(l => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
+        leaderList.appendChild(li);
+      });
+      if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
+
+      productsList.innerHTML = '';
+      (data.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
+      if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
+
+      compList.innerHTML = '';
+      (data.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
+
+      socialList.innerHTML = '';
+      const w = data.webPresence || {};
+      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
+        if (!v) return;
+        const li = document.createElement('li');
+        let valueHtml = v;
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
+          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
+        }
+        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
+        socialList.appendChild(li);
+      });
+      if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
+
+      const points = data.chartPoints || {};
+      if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
+      else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
+
+      if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
+      else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+    }
+
+    /* ========= Sources ========= */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search = ''; if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      let open = false;
+      document.getElementById('toggle-sources').onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+      };
+    }
+
+    /* ========= API calls (v1 → v1beta; tool → no tool) ========= */
+    async function tryEndpoint({ endpoint, model, apiKey, payload, allowTool }) {
+      const toolObj = endpoint === 'v1' ? { googleSearchRetrieval: {} } : { google_search: {} };
+      const apiUrl = `https://generativelanguage.googleapis.com/${endpoint}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+      if (allowTool) {
+        try {
+          const withTool = {
+            ...payload,
+            tools: [toolObj],
+            generationConfig: {
+              maxOutputTokens: MAX_OUTPUT_TOKENS,
+              temperature: 0.2,
+              topP: 0.95
+            }
+          };
+          const r1 = await fetchWithBackoff(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(withTool)
+          });
+          const cand = r1?.candidates?.[0];
+          const text = cand?.content?.parts?.[0]?.text;
+          if (!text) throw new Error('Empty response from model.');
+          const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
+          const atts = cand?.groundingMetadata?.groundingAttributions || [];
+          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+          return { json, sources, endpointUsed: endpoint, modelUsed: model };
+        } catch (e) {
+          const m = String(e?.message || '').toLowerCase();
+          const unsupportedTool = m.includes('unsupported') || m.includes('not found') || m.includes('unknown name') || m.includes('tool');
+          if (!unsupportedTool) throw e;
+        }
+      }
+
+      // Retry without tools
+      const noTool = {
+        ...payload,
+        generationConfig: {
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          temperature: 0.2,
+          topP: 0.95
+        }
+      };
+      const r2 = await fetchWithBackoff(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(noTool)
+      });
+      const cand2 = r2?.candidates?.[0];
+      const text2 = cand2?.content?.parts?.[0]?.text;
+      if (!text2) throw new Error('Empty response from model.');
+      const json2 = JSON.parse(text2.replace(/```json/g,'').replace(/```/g,'').trim());
+      return { json: json2, sources: [], endpointUsed: endpoint, modelUsed: model };
     }
 
     async function callReportAPI(systemPrompt, userQuery) {
       const apiKey = getApiKey();
       if (!apiKey) throw new Error('Missing API key (zakk). Set it near the top of the file.');
 
-      const modelInfo = await chooseModel(apiKey);               // discover best model
-      const modelName = modelInfo.name.startsWith('models/') ? modelInfo.name : `models/${modelInfo.name}`;
-      const apiUrl = `https://generativelanguage.googleapis.com/${API_VERSION}/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-      const desiredOut = 40000;
-      const maxOut = Math.max(1024, Math.min(desiredOut, Number(modelInfo.outputTokenLimit || desiredOut)));
-
-      const basePayload = {
+      const payload = {
         contents: [{ parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        generationConfig: {
-          maxOutputTokens: maxOut,
-          temperature: 0.2,
-          topP: 0.95,
-          responseMimeType: 'application/json'
-        }
+        systemInstruction: { parts: [{ text: systemPrompt }] }
       };
 
-      const attempts = [
-        { ...basePayload, tools: [{ googleSearchRetrieval: {} }] },  // with search tool
-        { ...basePayload }                                            // fallback without tool
+      const tries = [
+        { endpoint: 'v1',     model: MODEL_PRIMARY,  allowTool: true },
+        { endpoint: 'v1',     model: MODEL_FALLBACK, allowTool: true },
+        { endpoint: 'v1',     model: MODEL_PRIMARY,  allowTool: false },
+        { endpoint: 'v1',     model: MODEL_FALLBACK, allowTool: false },
+        { endpoint: 'v1beta', model: MODEL_PRIMARY,  allowTool: true },
+        { endpoint: 'v1beta', model: MODEL_FALLBACK, allowTool: true },
+        { endpoint: 'v1beta', model: MODEL_PRIMARY,  allowTool: false },
+        { endpoint: 'v1beta', model: MODEL_FALLBACK, allowTool: false },
       ];
 
       let lastErr;
-      for (const payload of attempts) {
+      for (const t of tries) {
         try {
-          const result = await fetchWithBackoff(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
-          const cand = result?.candidates?.[0];
-          const text = cand?.content?.parts?.[0]?.text;
-          if (!text) throw new Error('No JSON content received from API.');
-
-          const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
-
-          const atts = cand?.groundingMetadata?.groundingAttributions || [];
-          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
-
-          console.info('Using model:', modelInfo.name, '| maxOutputTokens:', maxOut);
-          return { json, sources, modelUsed: modelInfo.name, maxOut };
+          const out = await tryEndpoint({ ...t, apiKey, payload });
+          console.info('Using', out.modelUsed, 'on', out.endpointUsed, 'maxOutputTokens:', MAX_OUTPUT_TOKENS);
+          return out;
         } catch (e) {
-          lastErr = e; // try next attempt
+          lastErr = e;
+          const msg = String(e?.message || '').toLowerCase();
+          const notFoundOrUnsupported = msg.includes('http 404') || msg.includes('not found') || msg.includes('unsupported') || msg.includes('unknown name') || msg.includes('permission');
+          if (!notFoundOrUnsupported) break;
         }
       }
-      throw lastErr || new Error('Model call failed.');
+      throw lastErr || new Error('All model attempts failed.');
     }
 
-    /* =========================================
-       UI state + loader
-       ========================================= */
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('search-form');
-      const input = document.getElementById('business-name');
-      const btn = document.getElementById('generate-report-btn');
-      const rerunBtn = document.getElementById('rerun');
-
-      const results = document.getElementById('report-results-container');
-      const loader  = document.getElementById('report-loader');
-      const errBox  = document.getElementById('report-error-container');
-      const errMsg  = document.getElementById('report-error-message');
-      const content = document.getElementById('report-content');
-
-      const titleEl = document.getElementById('report-title');
-      const summaryEl = document.getElementById('report-summary');
-
-      const scoreCircle = document.getElementById('report-score-circle');
-      const scoreDigit  = document.getElementById('report-score-digit');
-      const scoreJust   = document.getElementById('report-score-justification');
-      const posList     = document.getElementById('report-score-positives');
-      const negList     = document.getElementById('report-score-negatives');
-
-      const sosName = document.getElementById('report-sos-name');
-      const sosStatus = document.getElementById('report-sos-status');
-      const sosEntity = document.getElementById('report-sos-entity');
-      const sosJuris = document.getElementById('report-sos-jurisdiction');
-      const sosDate  = document.getElementById('report-sos-date');
-      const sosAgent = document.getElementById('report-sos-agent');
-
-      const recList = document.getElementById('report-records-list');
-      const reviewsList = document.getElementById('report-reviews-list');
-      const chartRevenue = document.getElementById('report-chart-revenue');
-      const chartCash    = document.getElementById('report-chart-cashflow');
-
-      const factsFounded   = document.getElementById('facts-founded');
-      const factsHQ        = document.getElementById('facts-hq');
-      const factsEmployees = document.getElementById('facts-employees');
-      const factsIndustry  = document.getElementById('facts-industry');
-      const factsTicker    = document.getElementById('facts-ticker');
-      const factsWebsite   = document.getElementById('facts-website');
-
-      const newsList = document.getElementById('report-news-list');
-      const leaderList = document.getElementById('report-leadership-list');
-      const productsList = document.getElementById('report-products-list');
-      const compList = document.getElementById('report-competitors-list');
-      const socialList = document.getElementById('report-social-list');
-
-      const sourcesBox = document.getElementById('report-sources-container');
-      const sourcesUl  = document.getElementById('report-sources');
-      const sourcesChips = document.getElementById('report-sources-chips');
-      const sourcesToggle = document.getElementById('toggle-sources');
-
-      let __loaderCtl = null;
-      function startLoadingAnimation() {
-        const steps = [
-          'Matching business identity',
-          'Searching the web',
-          'Pulling SOS / corporate filings',
-          'Parsing entity metadata',
-          'Checking public records',
-          'Gathering leadership',
-          'Mapping products & services',
-          'Finding competitors',
-          'Collecting web & social signals',
-          'Crawling recent headlines',
-          'Reading customer reviews',
-          'Synthesizing risk score'
-        ];
-
-        const stepsOl = document.getElementById('loader-steps');
-        const barEl   = document.getElementById('loader-bar');
-        const timerEl = document.getElementById('loader-timer');
-
-        stepsOl.innerHTML = steps.map((s,i) => `
-          <li class="flex items-start gap-2">
-            <span class="step-icon" id="ld_${i}">
-              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clip-rule="evenodd"/>
-              </svg>
-            </span>
-            <span>${s}</span>
-          </li>
-        `).join('');
-
-        let elapsed = 0;
-        const tTimer = setInterval(() => {
-          elapsed += 200;
-          const m = Math.floor(elapsed/1000/60);
-          const s = Math.floor((elapsed/1000)%60);
-          timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }, 200);
-
-        let idx = 0;
-        const stepMs = Math.max(900, Math.floor(25000 / steps.length));
-        const tSteps = setInterval(() => {
-          if (idx < steps.length) {
-            document.getElementById(`ld_${idx}`)?.classList.add('done');
-            idx++;
-            const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
-            barEl.style.width = pct + '%';
-          } else {
-            const cur = parseFloat(barEl.style.width) || 98;
-            barEl.style.width = Math.min(99, cur + 0.2) + '%';
-          }
-        }, stepMs);
-
-        return { stop(){ clearInterval(tSteps); clearInterval(tTimer); for(let i=idx;i<steps.length;i++){document.getElementById(`ld_${i}`)?.classList.add('done')} barEl.style.width='100%'; } };
-      }
-
-      function showState(state, message = '') {
-        loader.style.display = 'none';
-        errBox.style.display = 'none';
-        content.style.display = 'none';
-        results.style.display = 'block';
-
-        if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
-
-        if (state === 'loading') {
-          loader.style.display = 'block';
-          __loaderCtl = startLoadingAnimation();
-        } else if (state === 'error') {
-          errBox.style.display = 'block';
-          errMsg.textContent = message || 'Something went wrong.';
-        } else if (state === 'content') {
-          content.style.display = 'block';
-        }
-      }
-
-      // Helpers
-      function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
-      function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
-      function linkifyMaybe(v) {
-        if (!v) return 'N/A';
-        const s = String(v).trim();
-        if (/^https?:\/\//i.test(s)) {
-          return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
-        }
-        return s;
-      }
-      function renderLineChart(container, values, color) {
-        if (!Array.isArray(values) || values.length < 2) {
-          container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
-          return;
-        }
-        const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
-        const min = Math.min(...nums), max = Math.max(...nums);
-        const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(_ => 50);
-        const step = 100 / (norm.length - 1);
-        const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
-        container.innerHTML = `
-          <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-            <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
-            <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-          </svg>
-        `;
-      }
-
-      function prettyUrl(u) {
-        try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; }
-        catch { return u; }
-      }
-      function normalizeUrl(u) {
-        try { const url = new URL(u); url.search = ''; if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1); return url.toString(); }
-        catch { return null; }
-      }
-      function collectSources(json, modelSources) {
-        const out = [];
-        const push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-        (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-        (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-        if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-        const w = json?.webPresence || {};
-        if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-        if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-        if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-        (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-        (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-        const seen = new Set();
-        return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-      }
-      function populateSources(links) {
-        const chips = document.getElementById('report-sources-chips');
-        const ul = document.getElementById('report-sources');
-        const box = document.getElementById('report-sources-container');
-        chips.innerHTML = ''; ul.innerHTML = '';
-        if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-        box.style.display = 'block';
-        links.forEach(({ url, title, kind }) => {
-          const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-          const span = document.createElement('span');
-          span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-          span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-          chips.appendChild(span);
-        });
-        links.forEach(({ url, title }) => {
-          const li = document.createElement('li');
-          li.className = 'text-sm';
-          li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                          <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-          ul.appendChild(li);
-        });
-        let open = false;
-        document.getElementById('toggle-sources').onclick = () => {
-          open = !open;
-          ul.classList.toggle('hidden', !open);
-          document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
-        };
-      }
-
-      function populateReport(data) {
-        setText(titleEl, data.summary?.companyName);
-        summaryEl.textContent = data.summary?.summary || 'No summary could be found.';
-
-        const score = data.riskScore?.score || 0;
-        scoreDigit.textContent = score;
-        scoreJust.textContent = data.riskScore?.justification || 'No justification provided.';
-        scoreCircle.className = 'score-circle mb-4';
-        if (score < 550) scoreCircle.classList.add('score-red');
-        else if (score < 700) scoreCircle.classList.add('score-yellow');
-        else scoreCircle.classList.add('score-green');
-
-        posList.innerHTML = '';
-        (data.riskScore?.positiveFactors || []).forEach(f => {
-          const li = document.createElement('li');
-          li.className = 'flex items-start';
-          li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
-                          `<span class="text-sm text-brand-dark">${f}</span>`;
-          posList.appendChild(li);
-        });
-        negList.innerHTML = '';
-        (data.riskScore?.negativeFactors || []).forEach(f => {
-          const li = document.createElement('li');
-          li.className = 'flex items-start';
-          li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
-                          `<span class="text-sm text-brand-dark">${f}</span>`;
-          negList.appendChild(li);
-        });
-
-        setText(sosName,  data.sos?.entityName);
-        setText(sosEntity,data.sos?.entityType);
-        setText(sosStatus,data.sos?.status);
-        setText(sosJuris, data.sos?.jurisdiction);
-        setText(sosDate,  data.sos?.formationDate);
-        setText(sosAgent, data.sos?.registeredAgent);
-        sosStatus.className = '';
-        if ((data.sos?.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
-        else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
-
-        const p = data.profile || {};
-        setText(factsFounded, p.founded);
-        setText(factsHQ, p.headquarters || p.hq);
-        setText(factsEmployees, p.employees);
-        setText(factsIndustry, p.industry || p.subindustry);
-        setText(factsTicker, p.ticker);
-        if (p.website && /^https?:\/\//.test(p.website)) {
-          factsWebsite.innerHTML = linkifyMaybe(p.website);
-        } else {
-          setText(factsWebsite, p.website);
-        }
-
-        newsList.innerHTML = '';
-        if (data.news?.length) {
-          data.news.slice(0,6).forEach(n => {
-            const li = document.createElement('li');
-            li.innerHTML =
-              `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
-               <div class="text-xs text-gray-500">${n.source || 'Source'} ${n.date ? '• ' + n.date : ''}</div>`;
-            newsList.appendChild(li);
-          });
-        } else {
-          newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
-        }
-
-        leaderList.innerHTML = '';
-        (data.leadership || []).slice(0,8).forEach(l => {
-          const li = document.createElement('li');
-          li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
-          leaderList.appendChild(li);
-        });
-        if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
-
-        productsList.innerHTML = '';
-        (data.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
-        if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
-
-        compList.innerHTML = '';
-        (data.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
-        if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
-
-        socialList.innerHTML = '';
-        const w = data.webPresence || {};
-        [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
-          if (!v) return;
-          const li = document.createElement('li');
-          let valueHtml = v;
-          if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-            valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-          }
-          li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
-          socialList.appendChild(li);
-        });
-        if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
-
-        const points = data.chartPoints || {};
-        if (Array.isArray(points.revenue) && points.revenue.length > 1) {
-          renderLineChart(chartRevenue, points.revenue, '#00C09A');
-        } else {
-          renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
-        }
-        if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) {
-          renderLineChart(chartCash, points.cashFlow, '#3B82F6');
-        } else {
-          renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
-        }
-      }
-
-      async function runReport(query) {
-        const systemPrompt = `
+    function buildSystemPrompt() {
+      return `
 You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
 Include:
 1) summary: { companyName, summary }
@@ -750,26 +718,40 @@ Include:
 3) publicRecords: { findings: [{ type, details }] }
 4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
 5) reviews: [{ snippet, source, url }]
-6) charts: { revenueTrend (SVG), cashFlow (SVG) }
-7) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
-8) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
-9) news: [{ title, date, source, url }]
-10) leadership: [{ name, title }]
-11) products: [string]
-12) competitors: [string]
-13) webPresence: { twitter, linkedin, youtube, traffic }
-14) citations: [{ title, url }]
+6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
+7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+8) news: [{ title, date, source, url }]
+9) leadership: [{ name, title }]
+10) products: [string]
+11) competitors: [string]
+12) webPresence: { twitter, linkedin, youtube, traffic }
+13) citations: [{ title, url }]
 If unknown, use "N/A" or [].
 Respond ONLY with valid JSON. No markdown fences.
-        `.trim();
+      `.trim();
+    }
 
+    /* ========= Wire up UI ========= */
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('business-name');
+      const btn = document.getElementById('generate-report-btn');
+      const rerunBtn = document.getElementById('rerun');
+
+      // UI refs
+      const results = document.getElementById('report-results-container');
+
+      async function runReport(query) {
         results.style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
         showState('loading');
         btn.classList.add('cta-disabled'); btn.disabled = true;
 
+        const systemPrompt = buildSystemPrompt();
+        const userQuery = `Generate a comprehensive AI business report for: "${query}"`;
+
         try {
-          const { json, sources } = await callReportAPI(systemPrompt, `Generate a comprehensive AI business report for: "${query}"`);
+          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
           populateReport(json);
           const links = collectSources(json, sources);
           populateSources(links);
