@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Live AI Business Report – TrustBureau.ai</title>
+  <title>Live AI Business Report — TrustBureau.ai</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -17,8 +17,8 @@
           },
           colors: {
             'brand-green': '#00C09A',
-            'brand-dark':  '#1A1A1A',
-            'brand-gray':  '#666666',
+            'brand-dark' : '#1A1A1A',
+            'brand-gray' : '#666666',
             'brand-light': '#F8F9FA',
             'brand-border':'#E5E7EB',
           }
@@ -32,6 +32,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
+  <!-- === Dev API key (client-side, per your request) === -->
+  <script>
+    // You can override at runtime with either:
+    //  1) URL param:  /live-report.html?zakk=YOUR_KEY
+    //  2) window.zakk = 'YOUR_KEY' in the console (before submitting)
+    const zakk = 'AIzaSyDxnqLqMuQQhZvfadTJn5BGwujFu7mXoXo';
+    (function ensureApiKey(){
+      const qs = new URLSearchParams(location.search).get('zakk') || '';
+      const win = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk) : '';
+      const picked = (qs || win || zakk || '').trim();
+      if (typeof window !== 'undefined') window.zakk = picked;
+    })();
+  </script>
+
   <style>
     html { scroll-behavior: smooth; }
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
@@ -42,21 +56,20 @@
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
+    /* Cards */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
-    .yellow-gradient-text{background:linear-gradient(90deg,#FACC15 0%,#EAB308 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
-    /* Score */
+    /* Score badge */
     .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
-    /* ===== Loader: radar + stepper + skeleton ===== */
+    /* Loader: radar + stepper + skeleton */
     .radar {
       width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
-      background:
-        radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
-        conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
+      background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
+                 conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
       animation: radar-spin 1.6s linear infinite;
     }
     .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
@@ -74,6 +87,10 @@
 
     .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
     .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
+
+    /* Scrollable financial table */
+    .table-scroll { overflow:auto; max-height:18rem; }
+    .nowrap { white-space:nowrap; }
   </style>
 </head>
 
@@ -82,8 +99,8 @@
   <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
     <nav class="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
       <a href="/" class="flex items-center gap-2.5">
-        <svg width="36" height="36" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+        <svg width="36" height="36" viewBox="0 0 50 50" fill="#00C09A" aria-hidden="true">
+          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z"/>
           <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
@@ -98,11 +115,11 @@
   <section class="container mx-auto px-4 md:px-6 py-10 md:py-16">
     <div class="max-w-3xl mx-auto">
       <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-center leading-tight">Live AI Business Report</h1>
-      <p class="text-gray-500 text-center mt-3 md:mt-4">Search a company and the full report appears below.</p>
+      <p class="text-gray-500 text-center mt-3 md:mt-4">Search a US company. The full report renders below.</p>
 
       <div class="widget-card p-3 md:p-4 mt-6">
         <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
+          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., The Home Depot, Inc."
                  class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
           <button id="generate-report-btn" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -111,7 +128,7 @@
             Generate
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS &amp; public‑records matching.</p>
+        <p class="text-xs text-gray-500 mt-2">Tip: use the legal name for better Secretary‑of‑State matching.</p>
       </div>
     </div>
   </section>
@@ -119,6 +136,7 @@
   <!-- Results -->
   <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
+
       <!-- LOADER -->
       <div id="report-loader" style="display:none;"
            class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
@@ -130,7 +148,7 @@
               <div id="loader-timer" class="text-xs text-gray-500">00:00</div>
             </div>
             <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
-            <p class="text-xs text-gray-500 mt-2">Usually 10–30s — scanning SOS, public records, reviews and recent headlines.</p>
+            <p class="text-xs text-gray-500 mt-2">Usually 10–30s — scanning SOS, public records, LinkedIn, reviews & headlines.</p>
           </div>
         </div>
         <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
@@ -164,18 +182,20 @@
 
       <!-- Content -->
       <div id="report-content" style="display:none;" class="space-y-8">
+
+        <!-- Title + actions -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
+            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot (US)</p>
           </div>
           <div class="flex items-center gap-3">
             <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
           </div>
         </div>
 
-        <!-- Score + Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Score + Summary + Facts -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
             <div class="flex flex-col items-center">
@@ -189,7 +209,7 @@
             </div>
           </div>
 
-          <div class="md:col-span-2 widget-card p-5 md:p-6">
+          <div class="lg:col-span-2 widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
             <p id="report-summary" class="text-sm text-gray-700 leading-relaxed"></p>
 
@@ -214,10 +234,29 @@
           </div>
         </div>
 
-        <!-- Filings + Public Records -->
+        <!-- Contact + Map + LinkedIn / Social -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
+            <div class="space-y-2 text-sm">
+              <div><span class="text-gray-500">Address:</span> <span id="contact-address" class="ml-1"></span></div>
+              <div><span class="text-gray-500">Phone:</span> <span id="contact-phone" class="ml-1"></span></div>
+              <div><span class="text-gray-500">Email:</span> <span id="contact-email" class="ml-1"></span></div>
+              <div><span class="text-gray-500">Website:</span> <span id="contact-website" class="ml-1"></span></div>
+              <div id="contact-directions" class="text-xs"></div>
+            </div>
+          </div>
+          <div class="lg:col-span-2 widget-card p-2 md:p-3">
+            <div id="map-embed" class="aspect-[16/9] w-full overflow-hidden rounded-lg bg-brand-light flex items-center justify-center text-gray-500 text-sm">
+              Map preview will appear here…
+            </div>
+          </div>
+        </div>
+
+        <!-- SOS + Public Records -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Corporate Filings</h3>
+            <h3 class="font-heading font-semibold mb-3">Corporate Filings (SOS)</h3>
             <ul class="text-sm text-gray-700 space-y-1">
               <li><span class="text-gray-500">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
               <li><span class="text-gray-500">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
@@ -234,7 +273,7 @@
           </div>
         </div>
 
-        <!-- Leadership / Products / Competitors / Web Signals -->
+        <!-- Leadership / Products / Competitors / Social -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Leadership</h3>
@@ -249,7 +288,7 @@
             <ul id="report-competitors-list" class="space-y-2 text-sm text-gray-700"></ul>
           </div>
           <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Web &amp; Social Signals</h3>
+            <h3 class="font-heading font-semibold mb-3">Web &amp; Social</h3>
             <ul id="report-social-list" class="space-y-1.5 text-sm text-gray-700"></ul>
           </div>
         </div>
@@ -276,6 +315,39 @@
           </div>
         </div>
 
+        <!-- Financial Snapshot (scrollable) -->
+        <div class="widget-card p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Financial Snapshot</h3>
+          <div class="table-scroll border border-brand-border rounded-lg">
+            <table class="min-w-full text-sm">
+              <thead class="bg-brand-light sticky top-0">
+                <tr class="text-left">
+                  <th class="px-3 py-2 font-semibold">Metric</th>
+                  <th class="px-3 py-2 font-semibold">Value</th>
+                  <th class="px-3 py-2 font-semibold">Notes</th>
+                </tr>
+              </thead>
+              <tbody id="financials-body" class="divide-y divide-brand-border"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ownership + Tech + Compliance -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Ownership & Structure</h3>
+            <ul id="ownership-list" class="space-y-2 text-sm text-gray-700"></ul>
+          </div>
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Tech Stack</h3>
+            <ul id="techstack-list" class="space-y-2 text-sm text-gray-700"></ul>
+          </div>
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Licenses & Compliance</h3>
+            <ul id="licenses-list" class="space-y-2 text-sm text-gray-700"></ul>
+          </div>
+        </div>
+
         <!-- Sources -->
         <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
           <div class="flex items-center justify-between">
@@ -297,38 +369,49 @@
 
   <script>
     /* ===================== Config ===================== */
-    const MODEL_CANDIDATES = [
-      'gemini-2.5-flash-preview-09-2025',// Use the standard, compatible model
-      'gemini-2.5-flash'                // Fallback
-      // 'gemini-2.0-pro', // <-- This was causing a "Not Found" error
-      // 'gemini-2.0-flash', // <-- This was also incompatible
-    ];
-    const USE_SEARCH_TOOL = true;          // per your request
-    const MAX_OUTPUT_TOKENS = 8192;        // safe cap to avoid payload errors
+    const MAX_OUTPUT_TOKENS = 8192;
+    const USE_SEARCH_TOOL = true;
 
-    // *** API key moved here to fix scope issue ***
-    const zakk = 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
-    function getApiKey() {
-      // Use the 'zakk' constant defined right above.
-      return (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-    }
+    // Only the two models you specified; still verified by ListModels to avoid 404.
+    const PREFERRED_MODELS = [
+      'gemini-2.5-flash-preview-09-2025',
+      'gemini-2.5-flash',
+    ];
 
     /* ===================== Utilities ===================== */
+    function getApiKey() {
+      try {
+        const qs = new URLSearchParams(location.search).get('zakk') || '';
+        const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+        const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
+        return (qs || fromWindow || fromConst || '').trim();
+      } catch { return (typeof zakk !== 'undefined' ? String(zakk).trim() : ''); }
+    }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
     function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
     function linkifyMaybe(v) {
-      if (!v) return 'NIA';
+      if (!v) return 'N/A';
       const s = String(v).trim();
-      if (/^https?:\/\//i.test(s)) {
-        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
-      }
-      return s;
+      return /^https?:\/\//i.test(s)
+        ? `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`
+        : s;
+    }
+    function telifyMaybe(v) {
+      if (!v) return 'N/A';
+      const s = String(v).trim();
+      return /^(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(s)
+        ? `<a href="tel:${s.replace(/[^\d+]/g,'')}" class="text-brand-green hover:underline">${s}</a>`
+        : s;
+    }
+    function mailifyMaybe(v) {
+      if (!v) return 'N/A';
+      const s = String(v).trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
+        ? `<a href="mailto:${s}" class="text-brand-green hover:underline">${s}</a>`
+        : s;
     }
     function renderLineChart(container, values, color) {
-      if (!Array.isArray(values) || values.length < 2) {
-        container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
-        return;
-      }
+      if (!Array.isArray(values) || values.length < 2) { container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>'; return; }
       const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
       const min = Math.min(...nums), max = Math.max(...nums);
       const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
@@ -341,14 +424,302 @@
         </svg>`;
     }
 
-    /* ===================== Loader UI ===================== */
+    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
+      let lastError;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try { body = await res.json(); } catch {}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status || body?.error?.code;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+        }
+      }
+      throw lastError || new Error('API request failed.');
+    }
+
+    /* ===================== Model discovery (v1beta only) ===================== */
+    let __modelsCache = null;
+    async function listModelsV1beta(key) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`;
+      const data = await fetchWithBackoff(url, { method:'GET' });
+      const models = (data.models || []).filter(m =>
+        (!m.state || m.state === 'DEPLOYED') &&
+        Array.isArray(m.supportedGenerationMethods) &&
+        m.supportedGenerationMethods.includes('generateContent')
+      );
+      return models.map(m => m.name);
+    }
+
+    async function pickModel() {
+      if (__modelsCache) return __modelsCache;
+      const key = getApiKey();
+      if (!key) throw new Error('Missing API key (zakk).');
+
+      let names = [];
+      try { names = await listModelsV1beta(key); } catch { names = []; }
+      if (!names.length) {
+        throw new Error('No v1beta models returned by ListModels; enable Generative Language API and your target models.');
+      }
+
+      // Strictly prefer your two, then any other 2.5 flash variants if names differ by suffix
+      let chosen = null;
+      for (const wanted of PREFERRED_MODELS) {
+        const hit = names.find(n => n === wanted || n.startsWith(wanted));
+        if (hit) { chosen = hit; break; }
+      }
+      if (!chosen) {
+        chosen = names.find(n => /^models\/?/.test(n) ? /gemini-2\.5.*flash/i.test(n) : /gemini-2\.5.*flash/i.test(n)) || names[0];
+      }
+
+      __modelsCache = { version:'v1beta', modelName: chosen, supportsSearchTool: true };
+      console.info('[Model chosen]', __modelsCache);
+      return __modelsCache;
+    }
+
+    /* ===================== Prompt ===================== */
+    function buildSystemPrompt() {
+      return `
+You are an AI business analyst. **US-based companies only**. If the query isn’t US, return the closest US entity or "N/A".
+Return **ONE JSON object only** (no prose or code fences). Use the following shape:
+
+{
+  "summary": { "companyName": "", "summary": "" },
+  "profile": {
+    "founded": "", "headquarters": "", "employees": "", "website": "",
+    "industry": "", "subindustry": "", "ticker": "",
+    "naics": "", "sic": "", "phone": "", "email": "", "address": ""
+  },
+  "sos": {
+    "entityName": "", "status": "", "entityType": "", "jurisdiction": "",
+    "formationDate": "", "registeredAgent": ""
+  },
+  "publicRecords": { "findings": [ { "type": "", "details": "" } ] },
+  "riskScore": {
+    "score": 300, "justification": "",
+    "positiveFactors": [""], "negativeFactors": [""]
+  },
+  "leadership": [ { "name": "", "title": "", "linkedinUrl": "" } ],
+  "products": [""],
+  "competitors": [""],
+  "news": [ { "title": "", "date": "", "source": "", "url": "" } ],
+  "reviews": [ { "snippet": "", "source": "", "url": "" } ],
+  "webPresence": { "twitter": "", "linkedin": "", "youtube": "", "facebook": "", "traffic": "" },
+  "chartPoints": { "revenue": [0], "cashFlow": [0] },
+  "financials": [
+    { "metric": "Revenue (TTM)", "value": "", "notes": "" },
+    { "metric": "Gross Margin", "value": "", "notes": "" },
+    { "metric": "Net Margin", "value": "", "notes": "" },
+    { "metric": "Debt", "value": "", "notes": "" },
+    { "metric": "Cash", "value": "", "notes": "" },
+    { "metric": "Altman Z", "value": "", "notes": "" },
+    { "metric": "Piotroski F", "value": "", "notes": "" }
+  ],
+  "ownership": [ "Detail" ],
+  "techStack": [ "Technology / provider" ],
+  "licenses": [ "License / compliance item" ],
+  "citations": [ { "title": "", "url": "" } ]
+}
+
+Enrichment:
+- Prefer US sources; include 6–10 distinct news items with URLs (recent if possible).
+- Include LinkedIn company page and CEO/founder LinkedIn URLs where possible.
+- If any field unknown, use "N/A" or [].
+- Ensure "riskScore.score" is an integer between 300 and 850.
+- Chart arrays should contain 10–24 numeric points each.
+Respond **only** with valid JSON.`
+      .trim();
+    }
+
+    /* ===================== Payload & API ===================== */
+    function makePayload(systemPrompt, userQuery, withSearch) {
+      const payload = {
+        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          temperature: 0.2,
+          topP: 0.95,
+          responseMimeType: 'application/json'
+        }
+      };
+      if (withSearch) payload.tools = [{ googleSearch: {} }];
+      return payload;
+    }
+
+    function parseCandidateJSON(candidate) {
+      const parts = candidate?.content?.parts || [];
+      for (const p of parts) if (typeof p?.text === 'string' && p.text.trim()) {
+        const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
+        try { return JSON.parse(raw); } catch {}
+        const lastCurly  = raw.lastIndexOf('}');
+        const lastSquare = raw.lastIndexOf(']');
+        const cut = Math.max(lastCurly, lastSquare);
+        if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
+      }
+      for (const p of parts) if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
+        try { return JSON.parse(atob(p.inline_data.data)); } catch {}
+      }
+      const preview = parts.find(p => p.text)?.text?.slice(0, 300)?.replace(/\s+/g,' ') || 'No text content';
+      throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
+    }
+
+    async function callReportAPI(systemPrompt, userQuery) {
+      const key = getApiKey();
+      if (!key) throw new Error('Missing API key (zakk).');
+
+      const { version, modelName, supportsSearchTool } = await pickModel();
+      const base = `https://generativelanguage.googleapis.com/${version}`;
+      const url  = `${base}/${modelName}:generateContent?key=${encodeURIComponent(key)}`;
+
+      // Two attempts: normal → stricter JSON only
+      let payload = makePayload(systemPrompt, userQuery, supportsSearchTool);
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const data = await fetchWithBackoff(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const cand = data?.candidates?.[0];
+          if (!cand) throw new Error('No candidates in response.');
+
+          const result = parseCandidateJSON(cand);
+          const atts = cand?.groundingMetadata?.groundingAttributions || [];
+          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+
+          return { json: result, sources };
+        } catch (e) {
+          const msg = (e.message || '').toLowerCase();
+          if (msg.includes('api key') || msg.includes('permission')) {
+            throw new Error('API key invalid or the selected model is not enabled for this project.');
+          }
+          const parseIssue = /non-?json|no json|unexpected end of json|parseable json|no candidates/i.test(e.message || '');
+          if (attempt === 1 && parseIssue) {
+            const stricter = `${systemPrompt}
+
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [].`;
+            payload = makePayload(stricter, userQuery, supportsSearchTool);
+            continue;
+          }
+          throw e;
+        }
+      }
+    }
+
+    /* ===================== Sources helpers ===================== */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set(); return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      let open = false;
+      document.getElementById('toggle-sources').onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+      };
+    }
+
+    /* ===================== DOM refs ===================== */
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
+
+    const titleEl = document.getElementById('report-title');
+    const summaryEl = document.getElementById('report-summary');
+    const scoreCircle = document.getElementById('report-score-circle');
+    const scoreDigit  = document.getElementById('report-score-digit');
+    const scoreJust   = document.getElementById('report-score-justification');
+    const posList     = document.getElementById('report-score-positives');
+    const negList     = document.getElementById('report-score-negatives');
+
+    const sosName = document.getElementById('report-sos-name');
+    const sosStatus = document.getElementById('report-sos-status');
+    const sosEntity = document.getElementById('report-sos-entity');
+    const sosJuris  = document.getElementById('report-sos-jurisdiction');
+    const sosDate   = document.getElementById('report-sos-date');
+    const sosAgent  = document.getElementById('report-sos-agent');
+
+    const factsFounded   = document.getElementById('facts-founded');
+    const factsHQ        = document.getElementById('facts-hq');
+    const factsEmployees = document.getElementById('facts-employees');
+    const factsIndustry  = document.getElementById('facts-industry');
+    const factsTicker    = document.getElementById('facts-ticker');
+    const factsWebsite   = document.getElementById('facts-website');
+
+    const contactAddress = document.getElementById('contact-address');
+    const contactPhone   = document.getElementById('contact-phone');
+    const contactEmail   = document.getElementById('contact-email');
+    const contactWebsite = document.getElementById('contact-website');
+    const directionsEl   = document.getElementById('contact-directions');
+    const mapEmbed       = document.getElementById('map-embed');
+
+    const newsList   = document.getElementById('report-news-list');
+    const recList    = document.getElementById('report-records-list');
+    const reviewsList= document.getElementById('report-reviews-list');
+    const leaderList = document.getElementById('report-leadership-list');
+    const productsList = document.getElementById('report-products-list');
+    const compList   = document.getElementById('report-competitors-list');
+    const socialList = document.getElementById('report-social-list');
+
+    const chartRevenue = document.getElementById('report-chart-revenue');
+    const chartCash    = document.getElementById('report-chart-cashflow');
+
+    const financialsBody = document.getElementById('financials-body');
+    const ownershipList  = document.getElementById('ownership-list');
+    const techList       = document.getElementById('techstack-list');
+    const licensesList   = document.getElementById('licenses-list');
+
+    /* ===================== Loader state ===================== */
     let __loaderCtl = null;
     function startLoadingAnimation() {
       const steps = [
-        'Matching business identity','Searching the web','Pulling SOS / corporate filings',
-        'Parsing entity metadata','Checking public records','Gathering leadership',
-        'Mapping products & services','Finding competitors','Collecting web & social signals',
-        'Crawling recent headlines','Reading customer reviews','Synthesizing risk score'
+        'Matching business identity','US company check','Searching the web',
+        'Pulling SOS / corporate filings','Parsing entity metadata','Checking public records',
+        'Gathering leadership','Mapping products & services','Finding competitors',
+        'Collecting web & social signals','Crawling recent headlines','Synthesizing risk score'
       ];
       const stepsOl = document.getElementById('loader-steps');
       const barEl   = document.getElementById('loader-bar');
@@ -388,264 +759,25 @@
 
       return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
     }
-
-    /* ===================== Robust JSON parsing ===================== */
-    function parseCandidateJSON(candidate) {
-      const parts = candidate?.content?.parts || [];
-
-      // Try text parts first (standard for application/json responseMimeType)
-      for (const p of parts) {
-        if (typeof p?.text === 'string' && p.text.trim()) {
-          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
-          try { return JSON.parse(raw); } catch {}
-          // Truncated JSON fallback
-          const lastCurly  = raw.lastIndexOf('}');
-          const lastSquare = raw.lastIndexOf(']');
-          const cut = Math.max(lastCurly, lastSquare);
-          if (cut > 0) {
-            const maybe = raw.slice(0, cut + 1);
-            try { return JSON.parse(maybe); } catch {}
-          }
-        }
-      }
-
-      // Fallback: Try inline_data JSON
-      for (const p of parts) {
-        if (p?.inlineData?.data && String(p.inlineData.mimeType || '').toLowerCase().includes('json')) {
-          try { return JSON.parse(atob(p.inlineData.data)); } catch {}
-        }
-      }
-
-      // If all else fails, throw an error
-      const firstPart = parts[0]?.text || '';
-      const preview = firstPart.slice(0, 400).replace(/\s+/g,' ');
-      throw new Error(`Model returned non‑JSON (preview): ${preview}`);
+    function showState(state, message = '') {
+      loader.style.display = 'none';
+      errBox.style.display = 'none';
+      content.style.display = 'none';
+      results.style.display = 'block';
+      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+      if (state === 'loading') { loader.style.display = 'block'; __loaderCtl = startLoadingAnimation(); }
+      else if (state === 'error') { errBox.style.display = 'block'; errMsg.textContent = message || 'Something went wrong.'; }
+      else if (state === 'content') { content.style.display = 'block'; }
     }
 
-    /* ===================== Sources helpers ===================== */
-    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
-    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
-    function collectSources(json, modelSources) {
-      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w = json?.webPresence || {};
-      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-      const seen = new Set();
-      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-    }
-    function populateSources(links) {
-      const chips = document.getElementById('report-sources-chips');
-      const ul = document.getElementById('report-sources');
-      const box = document.getElementById('report-sources-container');
-      chips.innerHTML = ''; ul.innerHTML = '';
-      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-      box.style.display = 'block';
-      links.forEach(({ url, title, kind }) => {
-        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-        const span = document.createElement('span');
-        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({ url, title }) => {
-        const li = document.createElement('li');
-        li.className = 'text-sm';
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                           <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      let open = false;
-      document.getElementById('toggle-sources').onclick = () => {
-        open = !open;
-        ul.classList.toggle('hidden', !open);
-        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
-      };
-    }
-
-    /* ===================== Fetch helper ===================== */
-    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
-      let lastError;
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body=null; try { body = await res.json(); } catch {}
-            const msg = body?.error?.message || res.statusText || 'Request failed';
-            const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status;
-            throw err;
-          }
-          return await res.json();
-        } catch (e) {
-          lastError = e;
-          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
-        }
-      }
-      throw lastError || new Error('API request failed.');
-    }
-
-    /* ===================== API (v1beta, camelCase) ===================== */
-    function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
-      const payload = {
-        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        systemInstruction: { role: 'system', parts: [{ text: systemPrompt }] },
-        generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.2,
-          topP: 0.95,
-          // responseMimeType: "application/json" // <-- REMOVED THIS LINE TO FIX 400 ERROR
-        }
-      };
-      if (withSearch) payload.tools = [{ "googleSearch": {} }]; // Use camelCase
-      return payload;
-    }
-
-    async function callReportAPI(systemPrompt, userQuery) {
-      const key = getApiKey();
-      if (!key) throw new Error('Missing API key (zakk).');
-
-      const base = 'https://generativelanguage.googleapis.com/v1beta/models';
-      let lastErr;
-
-      for (const model of MODEL_CANDIDATES) {
-        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-
-        // Two attempts: normal → stricter JSON-only
-        let payload = makeV1betaPayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
-        for (let attempt = 1; attempt <= 2; attempt++) {
-          try {
-            const data = await fetchWithBackoff(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
-
-            const cand = data?.candidates?.[0];
-            if (!cand) throw new Error('No candidates in response.');
-
-            const json = parseCandidateJSON(cand);
-
-            // === VALIDATION STEP (Stricter, per user request) ===
-            const missing = [];
-            if (!json.summary?.companyName || json.summary.companyName === 'N/A') missing.push('summary.companyName');
-            if (!json.sos?.entityName || json.sos.entityName === 'N/A') missing.push('sos.entityName');
-            if (!json.riskScore?.score) missing.push('riskScore.score');
-            // Check for minimum counts
-            if (!Array.isArray(json.news) || json.news.length < 3) missing.push('news (min 3)');
-            if (!Array.isArray(json.reviews) || json.reviews.length < 3) missing.push('reviews (min 3)');
-            if (!Array.isArray(json.leadership) || json.leadership.length < 3) missing.push('leadership (min 3)');
-            if (!Array.isArray(json.products) || json.products.length < 3) missing.push('products (min 3)');
-            if (!Array.isArray(json.competitors) || json.competitors.length < 3) missing.push('competitors (min 3)');
-            if (!Array.isArray(json.publicRecords?.findings)) missing.push('publicRecords.findings');
-            // === END VALIDATION ===
-
-            if (missing.length > 0) { // Check if any validation failed
-              throw new Error(`Model JSON missing/short keys: ${missing.join(', ')}`);
-            }
-            // === END VALIDATION ===
-
-            const atts = cand?.groundingMetadata?.groundingAttributions || [];
-            const sources = atts
-              .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-              .filter(s => s.uri);
-
-            return { json, sources };
-          } catch (e) {
-            lastErr = e;
-            const msg = e.message || '';
-            const parseIssue = /non‑JSON|no JSON|Unexpected end of JSON input|Empty model response/i.test(msg);
-            const missingKeysIssue = /missing\/short keys/i.test(msg); // Check for our new error
-
-            if (attempt === 1 && (parseIssue || missingKeysIssue)) { // Trigger retry on missing/short keys
-              const stricter = `${systemPrompt}
-
-IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). You MUST include all 13 top-level keys. You MUST return at least 3 items for news, reviews, leadership, products, and competitors, even if you have to search harder. If you cannot find data, use "N/A" or [].`;
-              payload = makeV1betaPayload(stricter, userQuery, USE_SEARCH_TOOL);
-              continue;
-            }
-            break; // next model
-          }
-        }
-      }
-      throw lastErr || new Error('All model attempts failed.');
-    }
-
-    /* ===================== System prompt ===================== */
-    function buildSystemPrompt() {
-      return `
-You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
-Include:
-1) summary: { companyName, summary }
-2) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
-3) publicRecords: { findings: [{ type, details }] }
-4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
-5) reviews: [{ snippet, source, url }] // (at least 3)
-6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
-7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
-8) news: [{ title, date, source, url }] // (at* least 3)
-9) leadership: [{ name, title }] // (at least 3)
-10) products: [string] // (at least 3)
-11) competitors: [string] // (at least 3)
-12) webPresence: { twitter, linkedin, youtube, traffic }
-13) citations: [{ title, url }]
-If unknown, use "N/A" or [].
-Respond ONLY with valid JSON. No markdown fences.
-      `.trim();
-    }
-
-    /* ===================== DOM refs ===================== */
-    // Moved these 5 to the top to fix hoisting/scope issues
-    const results = document.getElementById('report-results-container');
-    const loader  = document.getElementById('report-loader');
-    const errBox  = document.getElementById('report-error-container');
-    const errMsg  = document.getElementById('report-error-message');
-    const content = document.getElementById('report-content');
-
-    const titleEl = document.getElementById('report-title');
-    const summaryEl = document.getElementById('report-summary');
-    const scoreCircle = document.getElementById('report-score-circle');
-    const scoreDigit  = document.getElementById('report-score-digit');
-    const scoreJust   = document.getElementById('report-score-justification');
-    const posList     = document.getElementById('report-score-positives');
-    const negList     = document.getElementById('report-score-negatives');
-
-    const sosName = document.getElementById('report-sos-name');
-    const sosStatus = document.getElementById('report-sos-status');
-    const sosEntity = document.getElementById('report-sos-entity');
-    const sosJuris  = document.getElementById('report-sos-jurisdiction');
-    const sosDate   = document.getElementById('report-sos-date');
-    const sosAgent  = document.getElementById('report-sos-agent');
-
-    const factsFounded   = document.getElementById('facts-founded');
-    const factsHQ        = document.getElementById('facts-hq');
-    const factsEmployees = document.getElementById('facts-employees');
-    const factsIndustry  = document.getElementById('facts-industry');
-    const factsTicker    = document.getElementById('facts-ticker');
-    const factsWebsite   = document.getElementById('facts-website');
-
-    const newsList   = document.getElementById('report-news-list');
-    const recList    = document.getElementById('report-records-list');
-    const reviewsList= document.getElementById('report-reviews-list');
-    const leaderList = document.getElementById('report-leadership-list');
-    const productsList = document.getElementById('report-products-list');
-    const compList   = document.getElementById('report-competitors-list');
-    const socialList = document.getElementById('report-social-list');
-
-    const chartRevenue = document.getElementById('report-chart-revenue');
-    const chartCash    = document.getElementById('report-chart-cashflow');
-
-    /* ===================== Populate Report ===================== */
+    /* ===================== Populate UI ===================== */
     function populateReport(data) {
+      // Title + summary
       setText(titleEl, data?.summary?.companyName);
       summaryEl.textContent = data?.summary?.summary || 'No summary could be found.';
 
-      const score = data?.riskScore?.score || 0;
+      // Score
+      const score = Math.max(300, Math.min(850, Math.round(+data?.riskScore?.score || 0)));
       scoreDigit.textContent = score;
       scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
       scoreCircle.className = 'score-circle mb-4';
@@ -670,6 +802,7 @@ Respond ONLY with valid JSON. No markdown fences.
         negList.appendChild(li);
       });
 
+      // SOS
       const sos = data?.sos || {};
       setText(sosName,  sos.entityName);
       setText(sosEntity,sos.entityType);
@@ -681,16 +814,33 @@ Respond ONLY with valid JSON. No markdown fences.
       if ((sos.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
       else if (sos.status && sos.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
 
+      // Facts & contact
       const p = data?.profile || {};
       setText(factsFounded, p.founded);
       setText(factsHQ, p.headquarters || p.hq);
       setText(factsEmployees, p.employees);
       setText(factsIndustry, p.industry || p.subindustry);
       setText(factsTicker, p.ticker);
-      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
+      factsWebsite.innerHTML = p.website ? linkifyMaybe(p.website) : 'N/A';
 
+      contactAddress.textContent = p.address || 'N/A';
+      contactPhone.innerHTML = telifyMaybe(p.phone);
+      contactEmail.innerHTML = mailifyMaybe(p.email);
+      contactWebsite.innerHTML = p.website ? linkifyMaybe(p.website) : 'N/A';
+
+      // Map embed if we have an address
+      if (p.address && p.address.trim().length > 4) {
+        const q = encodeURIComponent(p.address);
+        mapEmbed.innerHTML = `<iframe class="w-full h-full" style="min-height:340px" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${q}&output=embed"></iframe>`;
+        directionsEl.innerHTML = `<a class="text-xs text-brand-green hover:underline" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${q}">Open in Google Maps</a>`;
+      } else {
+        mapEmbed.textContent = 'Address not available.';
+        directionsEl.textContent = '';
+      }
+
+      // News
       newsList.innerHTML = '';
-      (data?.news || []).slice(0,6).forEach(n => {
+      (data?.news || []).slice(0,10).forEach(n => {
         const li = document.createElement('li');
         li.innerHTML =
           `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
@@ -699,94 +849,101 @@ Respond ONLY with valid JSON. No markdown fences.
       });
       if (!newsList.children.length) newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
 
-      // --- POPULATE PUBLIC RECORDS ---
-      recList.innerHTML = '';
-      (data?.publicRecords?.findings || []).slice(0, 8).forEach(r => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span class="font-medium text-brand-dark">${r.type || 'Record'}:</span> ${r.details || 'N/A'}`;
-        recList.appendChild(li);
-      });
-      if (!recList.children.length) recList.innerHTML = '<li class="text-sm text-gray-600 list-none">No public records found.</li>';
-      // --- END ---
-
+      // Leadership (include LinkedIn links if present)
       leaderList.innerHTML = '';
-      (data?.leadership || []).slice(0,8).forEach(l => {
+      (data?.leadership || []).slice(0,12).forEach(l => {
         const li = document.createElement('li');
-        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
+        const ln = l.linkedinUrl ? ` — <a class="text-brand-green hover:underline" href="${l.linkedinUrl}" target="_blank" rel="noopener">LinkedIn</a>` : '';
+        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>${ln}`;
         leaderList.appendChild(li);
       });
       if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
 
+      // Products, competitors
       productsList.innerHTML = '';
-      (data?.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
+      (data?.products || []).slice(0,18).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
       if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
 
       compList.innerHTML = '';
-      (data?.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      (data?.competitors || []).slice(0,18).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
       if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
 
+      // Social
       socialList.innerHTML = '';
       const w = data?.webPresence || {};
-      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
+      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube], ['Facebook', w.facebook]].forEach(([k,v]) => {
         if (!v) return;
         const li = document.createElement('li');
         let valueHtml = v;
-        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-        }
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
         li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
         socialList.appendChild(li);
       });
       if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
 
-      // --- POPULATE REVIEWS ---
-      reviewsList.innerHTML = '';
-      (data?.reviews || []).slice(0, 5).forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'border border-brand-border rounded-lg bg-brand-light p-3';
-        div.innerHTML =
-          `<p class="text-sm text-brand-dark italic">"${r.snippet || 'N/A'}"</p>` +
-          `<div class="text-xs text-gray-500 mt-1.5">${r.source || 'Source'}${r.url ? ' • <a href="'+r.url+'" target="_blank" rel="noopener" class="text-brand-green hover:underline">Link</a>' : ''}</div>`;
-        reviewsList.appendChild(div);
-
-      });
-      if (!reviewsList.children.length) reviewsList.innerHTML = '<p class="text-sm text-gray-600">No customer reviews found.</p>';
-      // --- END ---
-
+      // Charts
       const points = data?.chartPoints || {};
       if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
       else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
 
       if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
       else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+
+      // Financial snapshot (scrollable)
+      financialsBody.innerHTML = '';
+      (data?.financials || []).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="px-3 py-2 font-medium nowrap">${row.metric || '—'}</td>
+          <td class="px-3 py-2 nowrap">${row.value || 'N/A'}</td>
+          <td class="px-3 py-2">${row.notes || ''}</td>`;
+        financialsBody.appendChild(tr);
+      });
+      if (!financialsBody.children.length) {
+        financialsBody.innerHTML = `<tr><td class="px-3 py-2 text-gray-600" colspan="3">No financial snapshot provided.</td></tr>`;
+      }
+
+      // Ownership / Tech / Licenses
+      ownershipList.innerHTML = '';
+      (data?.ownership || []).forEach(item => {
+        const li = document.createElement('li'); li.textContent = item; ownershipList.appendChild(li);
+      });
+      if (!ownershipList.children.length) ownershipList.innerHTML = '<li class="text-sm text-gray-600">No ownership details.</li>';
+
+      techList.innerHTML = '';
+      (data?.techStack || []).forEach(item => {
+        const li = document.createElement('li'); li.textContent = item; techList.appendChild(li);
+      });
+      if (!techList.children.length) techList.innerHTML = '<li class="text-sm text-gray-600">No tech stack details.</li>';
+
+      licensesList.innerHTML = '';
+      (data?.licenses || []).forEach(item => {
+        const li = document.createElement('li'); li.textContent = item; licensesList.appendChild(li);
+      });
+      if (!licensesList.children.length) licensesList.innerHTML = '<li class="text-sm text-gray-600">No license/compliance items.</li>';
     }
 
-    /* ===================== Wire up UI ===================== */
+    /* ===================== UI wiring ===================== */
+    function collectSourcesAndPopulate(json, sources) {
+      const links = (function collectSources(json, modelSources) {
+        const out = [], push = (title, url, kind) => { try { const u = new URL(url); u.search=''; if (u.pathname!== '/' && u.pathname.endsWith('/')) u.pathname=u.pathname.slice(0,-1); const norm = u.toString(); out.push({ title: title || (u.hostname + u.pathname), url: norm, kind }); } catch {} };
+        (json?.citations || []).forEach(c => c?.url && push(c.title || c.url, c.url, 'citation'));
+        (modelSources || []).forEach(s => s?.uri && push(s.title || s.uri, s.uri, 'source'));
+        if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+        const w = json?.webPresence || {};
+        [['Twitter / X', w.twitter, 'social'], ['LinkedIn', w.linkedin, 'social'], ['YouTube', w.youtube, 'social']].forEach(([t,u,k]) => { if (u && /^https?:\/\//.test(u)) push(t,u,k); });
+        (json?.news || []).forEach(n => n?.url && push(n.title || n.source || 'News', n.url, 'news'));
+        (json?.reviews || []).forEach(r => r?.url && push(r.source || 'Review', r.url, 'review'));
+        const seen = new Set(); return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+      })(json, sources);
+      populateSources(links);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('search-form');
-      const input = document.getElementById('business-name');
-      const btn = document.getElementById('generate-report-btn');
-      const rerunBtn = document.getElementById('rerun');
-
-      // Use the 'results' var defined in "DOM refs"
-      function showState(state, message = '') {
-        loader.style.display = 'none';
-        errBox.style.display = 'none';
-        content.style.display = 'none';
-        results.style.display = 'block';
-
-        if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
-
-        if (state === 'loading') {
-          loader.style.display = 'block';
-          __loaderCtl = startLoadingAnimation();
-        } else if (state === 'error') {
-          errBox.style.display = 'block';
-          errMsg.textContent = message || 'Something went wrong.';
-        } else if (state === 'content') {
-          content.style.display = 'block';
-        }
-      }
+      const form    = document.getElementById('search-form');
+      const input   = document.getElementById('business-name');
+      const btn     = document.getElementById('generate-report-btn');
+      const rerunBtn= document.getElementById('rerun');
 
       async function runReport(query) {
         document.getElementById('report-results-container').style.display = 'block';
@@ -795,14 +952,12 @@ Respond ONLY with valid JSON. No markdown fences.
         btn.classList.add('cta-disabled'); btn.disabled = true;
 
         const systemPrompt = buildSystemPrompt();
-        // Updated query to be more explicit, per user request
-        const userQuery = `Generate an in-depth, comprehensive AI business report for: "${query}". Search public records, UCC filings, recent news (last 12 months), and LinkedIn for leadership profiles.`;
+        const userQuery = `Generate a comprehensive, US‑focused AI business report for: "${query}". Include LinkedIn company/owner URLs if possible.`;
 
         try {
           const { json, sources } = await callReportAPI(systemPrompt, userQuery);
           populateReport(json);
-          const links = collectSources(json, sources);
-          populateSources(links);
+          collectSourcesAndPopulate(json, sources);
           showState('content');
         } catch (e) {
           console.error(e);
@@ -820,7 +975,7 @@ Respond ONLY with valid JSON. No markdown fences.
       });
 
       rerunBtn?.addEventListener('click', () => {
-        const q = (input.value || '').trim();
+        const q = (document.getElementById('business-name').value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
       });
