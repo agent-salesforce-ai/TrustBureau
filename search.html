@@ -28,14 +28,15 @@
   </script>
 
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- *** Set your Gemini API key here *** -->
+  <!-- *** Set your Gemini API key here (string). You can also set window.zakk at runtime. *** -->
   <script>
-    // Replace with your actual key (keep quotes)
-    window.zakk = 'AIzaSyBeGaDqrfd4On7s1AD7kMLnlkawax4havw';
+    /* You can hardcode here OR set `window.zakk = 'KEY'` later in the console. */
+    const zakk = 'YOUR_REAL_GEMINI_KEY_HERE'; /* ← replace or leave blank and set window.zakk */
+    if (typeof window !== 'undefined' && window.zakk == null) window.zakk = zakk;
   </script>
 
   <style>
@@ -49,6 +50,7 @@
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
+    .yellow-gradient-text{background:linear-gradient(90deg,#FACC15 0%,#EAB308 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
     /* Score */
     .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
@@ -301,37 +303,23 @@
   </footer>
 
   <script>
-    /* ========= Key & constants ========= */
-    function getApiKey() {
-      const k = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      return k;
-    }
-
-    // Output token target (practical & fast; adjust if you really need more)
+    /* ===================== Constants ===================== */
+    const MODEL_CANDIDATES = [
+      'gemini-1.5-pro-002',
+      'gemini-1.5-flash-002',
+      'gemini-2.0-pro',
+      'gemini-2.0-flash'
+    ];
     const MAX_OUTPUT_TOKENS = 12000;
+    const USE_SEARCH_TOOL = true; // flip to false if your key doesn't have google_search access
 
-    /* ========= Helpers ========= */
-    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
-      let lastError;
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body = null; try { body = await res.json(); } catch {}
-            const msg = body?.error?.message || res.statusText || 'Request failed';
-            const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status;
-            throw err;
-          }
-          return await res.json();
-        } catch (e) {
-          lastError = e;
-          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
-        }
-      }
-      throw lastError || new Error('API request failed after retries.');
+    /* ===================== Utilities ===================== */
+    function getApiKey() {
+      // Read the most current value at call time
+      const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+      const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
+      return fromWindow || fromConst;
     }
-
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
     function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
     function linkifyMaybe(v) {
@@ -359,8 +347,7 @@
         </svg>`;
     }
 
-    /* ========= Loader ========= */
-    let __loaderCtl = null;
+    /* ===================== Loader UI ===================== */
     function startLoadingAnimation() {
       const steps = [
         'Matching business identity','Searching the web','Pulling SOS / corporate filings',
@@ -404,16 +391,16 @@
         }
       }, stepMs);
 
-      return { stop() { clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
+      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
     }
 
-    /* ========= UI state ========= */
     const results = document.getElementById('report-results-container');
     const loader  = document.getElementById('report-loader');
     const errBox  = document.getElementById('report-error-container');
     const errMsg  = document.getElementById('report-error-message');
     const content = document.getElementById('report-content');
 
+    let __loaderCtl = null;
     function showState(state, message = '') {
       loader.style.display = 'none';
       errBox.style.display = 'none';
@@ -433,147 +420,11 @@
       }
     }
 
-    /* ========= Populate Report ========= */
-    const titleEl = document.getElementById('report-title');
-    const summaryEl = document.getElementById('report-summary');
-    const scoreCircle = document.getElementById('report-score-circle');
-    const scoreDigit  = document.getElementById('report-score-digit');
-    const scoreJust   = document.getElementById('report-score-justification');
-    const posList     = document.getElementById('report-score-positives');
-    const negList     = document.getElementById('report-score-negatives');
-
-    const sosName = document.getElementById('report-sos-name');
-    const sosStatus = document.getElementById('report-sos-status');
-    const sosEntity = document.getElementById('report-sos-entity');
-    const sosJuris  = document.getElementById('report-sos-jurisdiction');
-    const sosDate   = document.getElementById('report-sos-date');
-    const sosAgent  = document.getElementById('report-sos-agent');
-
-    const recList = document.getElementById('report-records-list');
-    const reviewsList = document.getElementById('report-reviews-list');
-    const chartRevenue = document.getElementById('report-chart-revenue');
-    const chartCash    = document.getElementById('report-chart-cashflow');
-
-    const factsFounded   = document.getElementById('facts-founded');
-    const factsHQ        = document.getElementById('facts-hq');
-    const factsEmployees = document.getElementById('facts-employees');
-    const factsIndustry  = document.getElementById('facts-industry');
-    const factsTicker    = document.getElementById('facts-ticker');
-    const factsWebsite   = document.getElementById('facts-website');
-    const newsList = document.getElementById('report-news-list');
-    const leaderList = document.getElementById('report-leadership-list');
-    const productsList = document.getElementById('report-products-list');
-    const compList = document.getElementById('report-competitors-list');
-    const socialList = document.getElementById('report-social-list');
-
-    const sourcesBox = document.getElementById('report-sources-container');
-    const sourcesUl  = document.getElementById('report-sources');
-    const sourcesChips = document.getElementById('report-sources-chips');
-    const sourcesToggle = document.getElementById('toggle-sources');
-
-    function populateReport(data) {
-      setText(titleEl, data.summary?.companyName);
-      summaryEl.textContent = data.summary?.summary || 'No summary could be found.';
-
-      const score = data.riskScore?.score || 0;
-      scoreDigit.textContent = score;
-      scoreJust.textContent = data.riskScore?.justification || 'No justification provided.';
-      scoreCircle.className = 'score-circle mb-4';
-      if (score < 550) scoreCircle.classList.add('score-red');
-      else if (score < 700) scoreCircle.classList.add('score-yellow');
-      else scoreCircle.classList.add('score-green');
-
-      posList.innerHTML = '';
-      (data.riskScore?.positiveFactors || []).forEach(f => {
-        const li = document.createElement('li');
-        li.className = 'flex items-start';
-        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
-                        `<span class="text-sm text-brand-dark">${f}</span>`;
-        posList.appendChild(li);
-      });
-      negList.innerHTML = '';
-      (data.riskScore?.negativeFactors || []).forEach(f => {
-        const li = document.createElement('li');
-        li.className = 'flex items-start';
-        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
-                        `<span class="text-sm text-brand-dark">${f}</span>`;
-        negList.appendChild(li);
-      });
-
-      setText(sosName,  data.sos?.entityName);
-      setText(sosEntity,data.sos?.entityType);
-      setText(sosStatus,data.sos?.status);
-      setText(sosJuris, data.sos?.jurisdiction);
-      setText(sosDate,  data.sos?.formationDate);
-      setText(sosAgent, data.sos?.registeredAgent);
-      sosStatus.className = '';
-      if ((data.sos?.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
-      else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
-
-      const p = data.profile || {};
-      setText(factsFounded, p.founded);
-      setText(factsHQ, p.headquarters || p.hq);
-      setText(factsEmployees, p.employees);
-      setText(factsIndustry, p.industry || p.subindustry);
-      setText(factsTicker, p.ticker);
-      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
-
-      newsList.innerHTML = '';
-      if (data.news?.length) {
-        data.news.slice(0,6).forEach(n => {
-          const li = document.createElement('li');
-          li.innerHTML =
-            `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
-             <div class="text-xs text-gray-500">${n.source || 'Source'} ${n.date ? '• ' + n.date : ''}</div>`;
-          newsList.appendChild(li);
-        });
-      } else {
-        newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
-      }
-
-      leaderList.innerHTML = '';
-      (data.leadership || []).slice(0,8).forEach(l => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
-        leaderList.appendChild(li);
-      });
-      if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
-
-      productsList.innerHTML = '';
-      (data.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
-      if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
-
-      compList.innerHTML = '';
-      (data.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
-      if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
-
-      socialList.innerHTML = '';
-      const w = data.webPresence || {};
-      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
-        if (!v) return;
-        const li = document.createElement('li');
-        let valueHtml = v;
-        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-        }
-        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
-        socialList.appendChild(li);
-      });
-      if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
-
-      const points = data.chartPoints || {};
-      if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
-      else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
-
-      if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
-      else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
-    }
-
-    /* ========= Sources ========= */
+    /* ===================== Sources helpers ===================== */
     function normalizeUrl(u) { try { const url = new URL(u); url.search = ''; if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
     function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
     function collectSources(json, modelSources) {
-      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      const out = []; const push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
       (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
       (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
       if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
@@ -615,54 +466,118 @@
       };
     }
 
-    /* ========= API call (reverted to the previous working v1beta style) ========= */
-    async function callReportAPI(systemPrompt, userQuery) {
-      const apiKey = getApiKey();
-      if (!apiKey) throw new Error('Missing API key (zakk). Set it near the top of the file.');
+    /* ===================== Robust JSON parsing ===================== */
+    function parseCandidateJSON(candidate) {
+      const parts = candidate && candidate.content ? (candidate.content.parts || []) : [];
 
-      // v1beta payload format (snake_case) + google_search tool
-      const makePayload = (sys, user) => ({
-        contents: [
-          { role: 'user', parts: [{ text: user }] }
-        ],
-        system_instruction: { role: 'system', parts: [{ text: sys }] },
+      // Try inline_data JSON (base64) first
+      for (const p of parts) {
+        if (p && p.inline_data && typeof p.inline_data.data === 'string' &&
+            String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
+          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
+        }
+      }
+      // Then try text parts
+      for (const p of parts) {
+        if (p && typeof p.text === 'string' && p.text.trim()) {
+          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
+          try { return JSON.parse(raw); } catch {}
+          const lastCurly  = raw.lastIndexOf('}');
+          const lastSquare = raw.lastIndexOf(']');
+          const cut = Math.max(lastCurly, lastSquare);
+          if (cut > 0) {
+            const maybe = raw.slice(0, cut + 1);
+            try { return JSON.parse(maybe); } catch {}
+          }
+          const preview = raw.slice(0, 400).replace(/\s+/g,' ');
+          throw new Error(`Model returned non-JSON (preview): ${preview}`);
+        }
+      }
+      throw new Error('Model returned no JSON content.');
+    }
+
+    /* ===================== Fetch with backoff ===================== */
+    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
+      let lastError;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body = null; try { body = await res.json(); } catch {}
+            const msg = body && body.error && body.error.message ? body.error.message : (res.statusText || 'Request failed');
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body && body.error ? body.error.status : undefined;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+        }
+      }
+      throw lastError || new Error('API request failed.');
+    }
+
+    /* ===================== API (v1beta, snake_case, google_search) ===================== */
+    function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
+      const payload = {
+        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+        system_instruction: { role: 'system', parts: [{ text: systemPrompt }] },
         generation_config: {
           max_output_tokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
           top_p: 0.95,
           response_mime_type: "application/json"
-        },
-        tools: [{ google_search: {} }]
-      });
+        }
+      };
+      if (withSearch) payload.tools = [{ google_search: {} }];
+      return payload;
+    }
 
-      const models = ['gemini-2.0-pro', 'gemini-2.0-flash'];
+    async function callReportAPI(systemPrompt, userQuery) {
+      const key = getApiKey();
+      if (!key) throw new Error('Missing API key (zakk). Set it in the file or via window.zakk.');
+
       const base = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const payload = makePayload(systemPrompt, userQuery);
-
+      const withSearch = !!USE_SEARCH_TOOL;
       let lastErr;
-      for (const model of models) {
-        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-        try {
-          const data = await fetchWithBackoff(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
 
-          const cand = data?.candidates?.[0];
-          const text = cand?.content?.parts?.[0]?.text;
-          if (!text) throw new Error('Empty response from model.');
+      for (const model of MODEL_CANDIDATES) {
+        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
-          // Parse strict JSON (strip accidental fences)
-          const json = JSON.parse(text.replace(/```json/g, '').replace(/```/g, '').trim());
+        // Two attempts per model: normal → stricter JSON‑only
+        let payload = makeV1betaPayload(systemPrompt, userQuery, withSearch);
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const data = await fetchWithBackoff(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
 
-          // Optional grounded sources
-          const atts = cand?.groundingMetadata?.groundingAttributions || [];
-          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+            const cand = data && data.candidates && data.candidates[0];
+            if (!cand) throw new Error('No candidates in response.');
 
-          return { json, sources, endpointUsed: 'v1beta', modelUsed: model };
-        } catch (e) {
-          lastErr = e; // try next model
+            const json = parseCandidateJSON(cand);
+
+            const atts = (cand.groundingMetadata && cand.groundingMetadata.groundingAttributions) || [];
+            const sources = atts
+              .map(a => ({ uri: a.web && a.web.uri, title: a.web && a.web.title }))
+              .filter(s => s.uri);
+
+            return { json, sources };
+          } catch (e) {
+            lastErr = e;
+            const parseIssue = /non-JSON|no JSON|Unexpected end of JSON input|Empty model response/i.test(e.message || '');
+            if (attempt === 1 && parseIssue) {
+              const stricter = `${systemPrompt}
+
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
+              payload = makeV1betaPayload(stricter, userQuery, withSearch);
+              continue; // retry once with stricter prompt
+            }
+            break; // try next model
+          }
         }
       }
       throw lastErr || new Error('All model attempts failed.');
@@ -677,21 +592,161 @@ Include:
 3) publicRecords: { findings: [{ type, details }] }
 4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
 5) reviews: [{ snippet, source, url }]
-6) charts: { revenueTrend (SVG), cashFlow (SVG) }   // optional; chartPoints is preferred
-7) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
-8) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
-9) news: [{ title, date, source, url }]
-10) leadership: [{ name, title }]
-11) products: [string]
-12) competitors: [string]
-13) webPresence: { twitter, linkedin, youtube, traffic }
-14) citations: [{ title, url }]
+6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
+7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+8) news: [{ title, date, source, url }]
+9) leadership: [{ name, title }]
+10) products: [string]
+11) competitors: [string]
+12) webPresence: { twitter, linkedin, youtube, traffic }
+13) citations: [{ title, url }]
 If unknown, use "N/A" or [].
 Respond ONLY with valid JSON. No markdown fences.
       `.trim();
     }
 
-    /* ========= Wire up UI ========= */
+    /* ===================== DOM handles ===================== */
+    const titleEl = document.getElementById('report-title');
+    const summaryEl = document.getElementById('report-summary');
+    const scoreCircle = document.getElementById('report-score-circle');
+    const scoreDigit  = document.getElementById('report-score-digit');
+    const scoreJust   = document.getElementById('report-score-justification');
+    const posList     = document.getElementById('report-score-positives');
+    const negList     = document.getElementById('report-score-negatives');
+
+    const sosName = document.getElementById('report-sos-name');
+    const sosStatus = document.getElementById('report-sos-status');
+    const sosEntity = document.getElementById('report-sos-entity');
+    const sosJuris  = document.getElementById('report-sos-jurisdiction');
+    const sosDate   = document.getElementById('report-sos-date');
+    const sosAgent  = document.getElementById('report-sos-agent');
+
+    const factsFounded   = document.getElementById('facts-founded');
+    const factsHQ        = document.getElementById('facts-hq');
+    const factsEmployees = document.getElementById('facts-employees');
+    const factsIndustry  = document.getElementById('facts-industry');
+    const factsTicker    = document.getElementById('facts-ticker');
+    const factsWebsite   = document.getElementById('facts-website');
+
+    const newsList   = document.getElementById('report-news-list');
+    const recList    = document.getElementById('report-records-list');
+    const reviewsList= document.getElementById('report-reviews-list');
+    const leaderList = document.getElementById('report-leadership-list');
+    const productsList = document.getElementById('report-products-list');
+    const compList   = document.getElementById('report-competitors-list');
+    const socialList = document.getElementById('report-social-list');
+
+    const chartRevenue = document.getElementById('report-chart-revenue');
+    const chartCash    = document.getElementById('report-chart-cashflow');
+
+    /* ===================== Populate Report ===================== */
+    function populateReport(data) {
+      setText(titleEl, (data.summary && data.summary.companyName));
+      summaryEl.textContent = (data.summary && data.summary.summary) || 'No summary could be found.';
+
+      const score = (data.riskScore && data.riskScore.score) || 0;
+      scoreDigit.textContent = score;
+      scoreJust.textContent = (data.riskScore && data.riskScore.justification) || 'No justification provided.';
+      scoreCircle.className = 'score-circle mb-4';
+      if (score < 550) scoreCircle.classList.add('score-red');
+      else if (score < 700) scoreCircle.classList.add('score-yellow');
+      else scoreCircle.classList.add('score-green');
+
+      posList.innerHTML = '';
+      const pos = (data.riskScore && data.riskScore.positiveFactors) || [];
+      pos.forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
+                        `<span class="text-sm text-brand-dark">${f}</span>`;
+        posList.appendChild(li);
+      });
+      negList.innerHTML = '';
+      const neg = (data.riskScore && data.riskScore.negativeFactors) || [];
+      neg.forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
+                        `<span class="text-sm text-brand-dark">${f}</span>`;
+        negList.appendChild(li);
+      });
+
+      // Filings
+      const sos = data.sos || {};
+      setText(sosName,  sos.entityName);
+      setText(sosEntity,sos.entityType);
+      setText(sosStatus,sos.status);
+      setText(sosJuris, sos.jurisdiction);
+      setText(sosDate,  sos.formationDate);
+      setText(sosAgent, sos.registeredAgent);
+      sosStatus.className = '';
+      if ((sos.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
+      else if (sos.status && sos.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
+
+      const p = data.profile || {};
+      setText(factsFounded, p.founded);
+      setText(factsHQ, p.headquarters || p.hq);
+      setText(factsEmployees, p.employees);
+      setText(factsIndustry, p.industry || p.subindustry);
+      setText(factsTicker, p.ticker);
+      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
+
+      newsList.innerHTML = '';
+      const news = data.news || [];
+      if (news.length) {
+        news.slice(0,6).forEach(n => {
+          const li = document.createElement('li');
+          li.innerHTML =
+            `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+             <div class="text-xs text-gray-500">${n.source || 'Source'}${n.date ? ' • ' + n.date : ''}</div>`;
+          newsList.appendChild(li);
+        });
+      } else {
+        newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
+      }
+
+      leaderList.innerHTML = '';
+      const leaders = data.leadership || [];
+      (leaders.slice(0,8)).forEach(l => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
+        leaderList.appendChild(li);
+      });
+      if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
+
+      productsList.innerHTML = '';
+      const prods = data.products || [];
+      prods.slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
+      if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
+
+      compList.innerHTML = '';
+      const comps = data.competitors || [];
+      comps.slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
+
+      socialList.innerHTML = '';
+      const w = data.webPresence || {};
+      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
+        if (!v) return;
+        const li = document.createElement('li');
+        let valueHtml = v;
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
+          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
+        }
+        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
+        socialList.appendChild(li);
+      });
+      if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
+
+      const points = data.chartPoints || {};
+      if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
+      else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
+
+      if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
+      else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+    }
+
+    /* ===================== Wire up UI ===================== */
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
