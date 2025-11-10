@@ -1,1020 +1,836 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
 
-  <!-- Tailwind -->
+  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            heading: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            heading: ['Plus Jakarta Sans','system-ui','-apple-system','Segoe UI','Inter','sans-serif'],
+            sans: ['Inter','system-ui','-apple-system','Segoe UI','sans-serif']
           },
           colors: {
-            'brand-green': '#00C09A',
-            'brand-dark':  '#1A1A1A',
-            'brand-gray':  '#666666',
-            'brand-light': '#F8F9FA',
+            'brand-green':'#00C09A',
+            'brand-dark':'#1A1A1A',
+            'brand-gray':'#6B7280',
             'brand-border':'#E5E7EB',
+            'brand-light':'#F9FAFB'
+          },
+          boxShadow: {
+            soft: '0 10px 35px rgba(2,8,23,.06)'
           }
         }
       }
     }
   </script>
 
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
 
-  <!-- Dev API key (per your request). Override at runtime with: window.zakk = 'KEY' -->
+  <!-- DEV API KEY (you said this is safe for development) -->
   <script>
+    // You can override at runtime with:  window.zakk = 'YOUR_KEY'
     const zakk = 'AIzaSyDxnqLqMuQQhZvfadTJn5BGwujFu7mXoXo';
     if (typeof window !== 'undefined' && (!window.zakk || !String(window.zakk).trim())) window.zakk = zakk;
   </script>
 
   <style>
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
-    .widget-card { border:1px solid #E5E7EB; border-radius:.75rem; background:#fff; box-shadow:0 10px 20px rgba(0,0,0,.06); }
-    .cta-button { transition: all .3s ease; }
-    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
-    .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
-
-    /* Score badge */
-    .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
-    .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
-    .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
-    .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
-
-    /* Loader: radar + stepper + skeleton */
-    .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
-      background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
-                  conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
-      animation: radar-spin 1.6s linear infinite; }
-    .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
-    @keyframes radar-spin{to{transform:rotate(360deg)}}
+    html{scroll-behavior:smooth}
+    body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#fff}
+    .cta{transition:all .25s ease}
+    .cta:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(0,192,154,.14)}
+    .widget{border:1px solid #E5E7EB;border-radius:.85rem;background:#fff;box-shadow:0 10px 28px rgba(2,8,23,.05)}
+    .score{width:118px;height:118px;border-radius:9999px;border:8px solid #A7F3D0;background:#ECFDF5;color:#059669;font-weight:800;font-size:2.4rem;display:flex;align-items:center;justify-content:center}
+    .score.mid{border-color:#FDE68A;background:#FFFBEB;color:#B45309}
+    .score.low{border-color:#FECACA;background:#FEF2F2;color:#DC2626}
+    /* Loader radar */
+    .radar{width:72px;height:72px;border-radius:9999px;border:2px solid #E5E7EB;position:relative;overflow:hidden;background:radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%), conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg); animation:spin 1.6s linear infinite}
+    .radar::before{content:"";position:absolute;inset:12%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
+    @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
     .shimmer{background:linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%);background-size:200% 100%;animation:shimmer 1.15s ease-in-out infinite}
-    .skeleton-card{border:1px solid #E5E7EB;border-radius:.75rem;padding:1rem;background:#fff}
-    .skel-line{height:.7rem;border-radius:.35rem}
-    .step-icon{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border-radius:9999px;background:#E5E7EB;color:#fff;flex:none;margin-top:2px}
-    .step-icon.done{background:#059669}
-    .step-icon>svg{width:.7rem;height:.7rem;display:none}
-    .step-icon.done>svg{display:block}
-    .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
-    .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
-
+    .skel{height:.72rem;border-radius:.35rem}
     /* Map placeholder */
-    .map-dots { background-image: radial-gradient(#E5E7EB 1px, transparent 1px); background-size: 10px 10px; }
-
-    /* Scrollable KPI table */
-    .kpi-table { min-width: 720px; }
+    .mapgrid{background-image: radial-gradient(#E5E7EB 1px, transparent 1px);background-size:16px 16px;background-position:-8px -8px}
   </style>
 </head>
 
 <body class="font-sans text-brand-dark">
   <!-- Header -->
-  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
-    <nav class="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2.5">
-        <svg width="36" height="36" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-brand-border">
+    <nav class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <svg width="34" height="34" viewBox="0 0 50 50" fill="none" aria-hidden="true">
           <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
           <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
+        <span class="font-heading font-extrabold text-xl">TrustBureau.ai</span>
       </a>
-      <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
-        <span aria-hidden="true">←</span> Back to Main
-      </a>
+
+      <a href="/index.html" class="text-brand-dark hover:text-brand-green transition text-sm md:text-base">← Back to main</a>
     </nav>
   </header>
 
-  <!-- Search (centered) -->
-  <section class="container mx-auto px-4 md:px-6 py-10 md:py-16">
+  <!-- Title + Search (centered) -->
+  <section class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-14">
     <div class="max-w-3xl mx-auto text-center">
-      <h1 class="font-heading text-3xl md:text-5xl font-extrabold leading-tight">Live AI Business Report</h1>
-      <p class="text-gray-500 mt-3 md:mt-4">Search a US company. The full report renders below.</p>
+      <h1 class="font-heading font-extrabold text-3xl md:text-5xl leading-tight">Live AI Business Report</h1>
+      <p class="text-brand-gray mt-3">Search a <span class="font-medium">US company</span>. The full report renders below.</p>
 
-      <div class="widget-card p-3 md:p-4 mt-6">
-        <form id="search-form"
-              class="mx-auto max-w-2xl w-full flex flex-col sm:flex-row items-center justify-center gap-3"
-              autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
-                 class="w-full sm:max-w-[640px] px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500
-                        focus:outline-none focus:ring-brand-green focus:border-brand-green" />
-          <button id="generate-report-btn" type="submit"
-                  class="shrink-0 inline-flex items-center justify-center gap-2 bg-brand-green text-white
-                         font-bold rounded-lg px-5 py-3 text-lg cta-button">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-            </svg>
+      <div class="widget mt-6 p-3 md:p-4">
+        <form id="search-form" class="w-full flex flex-col sm:flex-row items-stretch gap-3 justify-center" autocomplete="off">
+          <input id="business-name" type="text" placeholder="e.g., Aquamark.io, Costco Wholesale Corp., 'Tesla, Inc.'"
+            class="flex-1 min-w-0 px-4 py-3 rounded-lg border border-brand-border placeholder-brand-gray focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green"/>
+          <button id="generate-btn" type="submit"
+            class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-semibold rounded-lg px-5 py-3 cta">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
             Generate
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2 text-center">
-          Tip: Use the legal name for better Secretary‑of‑State matching.
-        </p>
+        <p class="text-xs text-brand-gray mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
       </div>
     </div>
   </section>
 
-  <!-- Results -->
-  <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
-    <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
+  <!-- Results container -->
+  <section id="results" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pb-16" style="display:none;">
+    <!-- Loader -->
+    <div id="loader" class="widget p-6 md:p-8 space-y-6" style="display:none;" role="status" aria-live="polite" aria-busy="true">
+      <div class="flex items-center gap-5">
+        <div class="radar" aria-hidden="true"></div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <p class="font-semibold">Building your report…</p>
+            <span id="ld-time" class="text-xs text-brand-gray">00:00</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-brand-border overflow-hidden mt-2">
+            <div id="ld-bar" class="h-full bg-brand-green" style="width:8%"></div>
+          </div>
+          <p class="text-xs text-brand-gray mt-2">Usually 10–30s — scanning US SoS filings, public records, news, reviews and web signals.</p>
+        </div>
+      </div>
+      <ol id="ld-steps" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm"></ol>
 
-      <!-- Loader -->
-      <div id="report-loader" class="widget-card p-6 md:p-8 space-y-6" style="display:none;" role="status" aria-live="polite" aria-busy="true">
-        <div class="flex items-center gap-5">
-          <div class="radar" aria-hidden="true"></div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-2">
-              <div class="font-heading font-semibold">Building your report…</div>
-              <div id="loader-timer" class="text-xs text-gray-500">00:00</div>
-            </div>
-            <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
-            <p class="text-xs text-gray-500 mt-2">Usually 10–30s — web search, SOS filings, public records, reviews & headlines.</p>
+      <!-- Skeletons -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="widget p-4 space-y-3">
+          <div class="w-28 skel shimmer"></div>
+          <div class="h-20 shimmer rounded-md"></div>
+          <div class="w-3/4 skel shimmer"></div>
+          <div class="w-1/2 skel shimmer"></div>
+        </div>
+        <div class="widget p-4 space-y-3">
+          <div class="w-32 skel shimmer"></div>
+          <div class="h-20 shimmer rounded-md"></div>
+          <div class="w-2/3 skel shimmer"></div>
+          <div class="w-1/3 skel shimmer"></div>
+        </div>
+        <div class="widget p-4 space-y-3">
+          <div class="w-36 skel shimmer"></div>
+          <div class="h-20 shimmer rounded-md"></div>
+          <div class="w-5/6 skel shimmer"></div>
+          <div class="w-1/2 skel shimmer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="widget p-6 border-red-200 bg-red-50" style="display:none;">
+      <p id="err-msg" class="text-sm text-red-700"></p>
+    </div>
+
+    <!-- Report content -->
+    <div id="content" class="space-y-8" style="display:none;">
+      <!-- Title & controls -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="min-w-0">
+          <h2 id="report-title" class="font-heading font-extrabold text-2xl md:text-3xl truncate">—</h2>
+          <div class="flex items-center gap-2 mt-1">
+            <span id="us-pill" class="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">US‑preferred</span>
+            <span class="text-xs text-brand-gray">Live business verification snapshot</span>
           </div>
         </div>
-        <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="skeleton-card space-y-3">
-            <div class="w-28 skel-line shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-3/4 skel-line shimmer"></div>
-            <div class="w-1/2 skel-line shimmer"></div>
+        <div class="flex items-center gap-3">
+          <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-semibold rounded-lg px-4 py-2 cta">Re‑run</button>
+        </div>
+      </div>
+
+      <!-- Score + Summary + Headlines/Highlights -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
+          <div class="flex flex-col items-center">
+            <div id="score-circle" class="score"><span id="score-num">—</span></div>
+            <p id="score-why" class="text-center text-sm text-brand-gray mt-4 italic"></p>
+            <div class="w-full mt-4">
+              <h4 class="text-xs font-semibold uppercase text-brand-gray mb-2">Key factors</h4>
+              <ul id="score-pos" class="space-y-1.5 mb-2"></ul>
+              <ul id="score-neg" class="space-y-1.5"></ul>
+            </div>
           </div>
-          <div class="skeleton-card space-y-3">
-            <div class="w-32 skel-line shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-2/3 skel-line shimmer"></div>
-            <div class="w-1/3 skel-line shimmer"></div>
-          </div>
-          <div class="skeleton-card space-y-3">
-            <div class="w-36 skel-line shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-5/6 skel-line shimmer"></div>
-            <div class="w-1/2 skel-line shimmer"></div>
+        </div>
+
+        <div class="widget p-5 md:p-6 md:col-span-2">
+          <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
+          <p id="summary" class="text-sm leading-relaxed text-brand-dark"></p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- Facts -->
+            <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+              <h4 class="text-sm font-semibold mb-2">Company Facts</h4>
+              <ul class="text-sm space-y-1">
+                <li><span class="text-brand-gray">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
+                <li><span class="text-brand-gray">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
+                <li><span class="text-brand-gray">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
+                <li><span class="text-brand-gray">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
+                <li><span class="text-brand-gray">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
+                <li><span class="text-brand-gray">Website:</span> <span id="facts-website" class="ml-1"></span></li>
+              </ul>
+            </div>
+
+            <!-- Headlines / Highlights fills the previous blank area -->
+            <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+              <h4 class="text-sm font-semibold mb-2">Recent Headlines</h4>
+              <ul id="news-list" class="space-y-2"></ul>
+              <div class="mt-4">
+                <h4 class="text-sm font-semibold mb-2">Highlights</h4>
+                <ul id="highlights-list" class="list-disc list-inside text-sm text-brand-dark space-y-1"></ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Error -->
-      <div id="report-error-container" class="widget-card p-6 border-red-200 bg-red-50" style="display:none;">
-        <p id="report-error-message" class="text-sm text-red-700"></p>
-      </div>
-
-      <!-- Content -->
-      <div id="report-content" style="display:none;" class="space-y-8">
-        <!-- Title Row -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-              <span class="text-[10px] px-2 py-0.5 rounded-full border border-emerald-200 text-emerald-700 bg-emerald-50">US‑preferred</span>
-            </div>
-            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
-          </div>
+      <!-- Contact & Location -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
+          <ul class="text-sm space-y-1">
+            <li><span class="text-brand-gray">Phone:</span> <span id="contact-phone" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Email:</span> <span id="contact-email" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Address:</span> <span id="contact-address" class="ml-1"></span></li>
+          </ul>
+          <a id="contact-maplink" class="inline-flex items-center gap-1 text-brand-green hover:underline text-sm mt-3" href="#" target="_blank" rel="noopener">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19.5V5.118a1 1 0 0 1 1.447-.894L15 5.5l4.553-2.276A1 1 0 0 1 21 4.118V18.5a1 1 0 0 1-1.447.894L15 17.118l-4.553 2.276A1 1 0 0 1 9 19.5z"/></svg>
+            Open in Google Maps
+          </a>
         </div>
-
-        <!-- Score + Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Score -->
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
-            <div class="flex flex-col items-center">
-              <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">…</span></div>
-              <p id="report-score-justification" class="text-center text-gray-600 text-sm mb-4 italic"></p>
-              <div class="w-full text-left">
-                <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Factors</h4>
-                <ul id="report-score-positives" class="space-y-1.5 mb-2"></ul>
-                <ul id="report-score-negatives" class="space-y-1.5"></ul>
-              </div>
-            </div>
-          </div>
-
-          <!-- Summary + Facts + Headlines -->
-          <div class="md:col-span-2 widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
-            <p id="report-summary" class="text-sm text-gray-700 leading-relaxed"></p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Company Facts</h4>
-                <ul class="text-sm text-gray-700 space-y-1">
-                  <li><span class="text-gray-500">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Website:</span> <span id="facts-website" class="ml-1"></span></li>
-                </ul>
-              </div>
-
-              <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Recent Headlines</h4>
-                <ul id="report-news-list" class="space-y-2"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contact & Map (fills the old blank area) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
-            <ul class="text-sm text-gray-700 space-y-1">
-              <li><span class="text-gray-500">Phone:</span> <span id="contact-phone" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Email:</span> <span id="contact-email" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Address:</span> <span id="contact-address" class="ml-1"></span></li>
-              <li id="maps-link-row" class="hidden">
-                <a id="maps-link" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-brand-green hover:underline text-sm">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>
-                  Open in Google Maps
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div class="widget-card p-0 overflow-hidden">
-            <div class="h-56 md:h-64 w-full map-dots relative flex items-center justify-center">
-              <svg id="map-pin" class="w-7 h-7 text-rose-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
+        <div class="widget p-0 overflow-hidden">
+          <div class="h-60 mapgrid relative">
+            <!-- Google‑maps style pin -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="#EF4444">
+                <path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 12 6 12s6-6.75 6-12c0-3.314-2.686-6-6-6zm0 8.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
               </svg>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Corporate Filings + Public Records -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Corporate Filings (US)</h3>
-            <ul class="text-sm text-gray-700 space-y-1">
-              <li><span class="text-gray-500">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Status:</span> <span id="report-sos-status" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Jurisdiction:</span> <span id="report-sos-jurisdiction" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Formation Date:</span> <span id="report-sos-date" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
-            </ul>
-          </div>
-
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Public Records</h3>
-            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-700 leading-relaxed"></ul>
-          </div>
+      <!-- SoS + Public records -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Corporate Filings</h3>
+          <ul class="text-sm space-y-1">
+            <li><span class="text-brand-gray">Entity Name:</span> <span id="sos-name" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Entity Type:</span> <span id="sos-type" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Status:</span> <span id="sos-status" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Jurisdiction:</span> <span id="sos-juris" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Formation Date:</span> <span id="sos-date" class="ml-1"></span></li>
+            <li><span class="text-brand-gray">Registered Agent:</span> <span id="sos-agent" class="ml-1"></span></li>
+          </ul>
         </div>
-
-        <!-- Leadership / Products / Competitors / Social -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Leadership</h3>
-            <ul id="report-leadership-list" class="space-y-2 text-sm text-gray-700"></ul>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Products & Services</h3>
-            <ul id="report-products-list" class="space-y-2 text-sm text-gray-700"></ul>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Competitors</h3>
-            <ul id="report-competitors-list" class="space-y-2 text-sm text-gray-700"></ul>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Web & Social Signals</h3>
-            <ul id="report-social-list" class="space-y-1.5 text-sm text-gray-700"></ul>
-          </div>
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Public Records</h3>
+          <ul id="records-list" class="text-sm leading-relaxed list-disc list-inside space-y-1"></ul>
         </div>
+      </div>
 
-        <!-- KPI Snapshot (scrollable) + Reviews + Charts -->
-        <div class="grid grid-cols-1 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <div class="flex items-center justify-between">
-              <h3 class="font-heading font-semibold mb-3">Financial Snapshot (Fictional / Estimated)</h3>
-              <span class="text-xs text-gray-400">Scroll →</span>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="kpi-table w-full text-sm">
-                <thead class="text-left text-gray-500">
-                  <tr>
-                    <th class="py-2 pr-6">Metric</th>
-                    <th class="py-2 pr-6">Value</th>
-                    <th class="py-2 pr-6">Metric</th>
-                    <th class="py-2 pr-6">Value</th>
-                    <th class="py-2 pr-6">Metric</th>
-                    <th class="py-2 pr-6">Value</th>
-                  </tr>
-                </thead>
-                <tbody id="kpi-rows" class="align-top"></tbody>
-              </table>
-            </div>
-          </div>
+      <!-- Leadership / Products / Competitors / Web & Social -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Leadership</h3>
+          <ul id="leaders" class="text-sm space-y-2"></ul>
+        </div>
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Products & Services</h3>
+          <ul id="products" class="text-sm space-y-2"></ul>
+        </div>
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Competitors</h3>
+          <ul id="competitors" class="text-sm space-y-2"></ul>
+        </div>
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Web & Social Signals</h3>
+          <ul id="social" class="text-sm space-y-2"></ul>
+        </div>
+      </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="widget-card p-5 md:p-6">
-              <h3 class="font-heading font-semibold mb-3">Customer Reviews</h3>
-              <div id="report-reviews-list" class="space-y-3"></div>
+      <!-- Reviews + Charts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Customer Reviews</h3>
+          <div id="reviews" class="space-y-3"></div>
+        </div>
+        <div class="widget p-5 md:p-6">
+          <h3 class="font-heading font-semibold mb-3">Financial Charts (Fictional)</h3>
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <h5 class="text-sm font-medium mb-1">Revenue Trend</h5>
+              <div id="chart-revenue" class="h-24"></div>
             </div>
-
-            <div class="widget-card p-5 md:p-6">
-              <h3 class="font-heading font-semibold mb-3">Financial Charts (Fictional)</h3>
-              <div class="grid grid-cols-1 gap-4">
-                <div>
-                  <h5 class="text-sm font-medium text-brand-dark mb-1">Revenue Trend</h5>
-                  <div id="report-chart-revenue" class="h-24"></div>
-                </div>
-                <div>
-                  <h5 class="text-sm font-medium text-brand-dark mb-1">Cash Flow</h5>
-                  <div id="report-chart-cashflow" class="h-24"></div>
-                </div>
-              </div>
+            <div>
+              <h5 class="text-sm font-medium mb-1">Cash Flow</h5>
+              <div id="chart-cash" class="h-24"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- SWOT / Risks & Opportunities -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">SWOT Summary</h3>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div class="font-semibold text-emerald-700">Strengths</div>
-                <ul id="swot-strengths" class="list-disc list-inside space-y-1 mt-1"></ul>
-              </div>
-              <div>
-                <div class="font-semibold text-amber-700">Weaknesses</div>
-                <ul id="swot-weaknesses" class="list-disc list-inside space-y-1 mt-1"></ul>
-              </div>
-              <div>
-                <div class="font-semibold text-sky-700">Opportunities</div>
-                <ul id="swot-opportunities" class="list-disc list-inside space-y-1 mt-1"></ul>
-              </div>
-              <div>
-                <div class="font-semibold text-rose-700">Threats</div>
-                <ul id="swot-threats" class="list-disc list-inside space-y-1 mt-1"></ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Risks & Mitigations</h3>
-            <ul id="risks-list" class="list-disc list-inside space-y-1 text-sm"></ul>
-          </div>
+      <!-- Sources -->
+      <div id="sources-wrap" class="widget p-5 md:p-6" style="display:none;">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-semibold uppercase text-brand-gray">Sources & Links</h4>
+          <button id="sources-toggle" class="text-xs text-brand-green hover:underline">Show list</button>
         </div>
-
-        <!-- Sources -->
-        <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources & Links</h4>
-            <button id="toggle-sources" type="button" class="text-xs text-brand-green hover:underline">Show list</button>
-          </div>
-          <div id="report-sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
-          <ul id="report-sources" class="mt-4 space-y-1 list-disc list-inside hidden"></ul>
-        </div>
+        <div id="sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
+        <ul id="sources" class="mt-3 hidden space-y-1 list-disc list-inside"></ul>
       </div>
     </div>
   </section>
 
   <footer class="border-t border-brand-border">
-    <div class="container mx-auto px-4 md:px-6 py-10 text-center text-sm text-gray-500">
-      &copy; 2025 TrustBureau.ai — Live AI Business Report
+    <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-10 text-center text-sm text-brand-gray">
+      © 2025 TrustBureau.ai — Live AI Business Report
     </div>
   </footer>
 
+  <!-- ================= SCRIPT ================= -->
   <script>
-    /**********************
-     * CONFIG
-     **********************/
+    /* ---------- Config ---------- */
     const MODEL_PRIORITY = [
       'models/gemini-2.5-flash',
-      'models/gemini-2.5-flash-preview-09-2025',
-      'models/gemini-2.0-flash'
+      'models/gemini-2.5-flash-preview-09-2025'
     ];
-    const MAX_OUTPUT_TOKENS = 8192; // safe cap
-    const USE_SEARCH_TOOL = true;    // enables googleSearch tool for enrichment
+    const USE_SEARCH_TOOL = true;         // Enable googleSearch tool for enrichment
+    const MAX_OUTPUT_TOKENS = 8192;
 
-    /**********************
-     * DOM REFS
-     **********************/
-    const resultsWrap = document.getElementById('report-results-container');
-    const loader = document.getElementById('report-loader');
-    const errorBox = document.getElementById('report-error-container');
-    const errorMsg = document.getElementById('report-error-message');
-    const content = document.getElementById('report-content');
-    const btn = document.getElementById('generate-report-btn');
+    // Optional proxy (leave empty to call Google directly)
+    const PROXY_BASE = ""; // e.g., 'https://your-worker.workers.dev'
 
-    const titleEl = document.getElementById('report-title');
-    const summaryEl = document.getElementById('report-summary');
-    const scoreCircle = document.getElementById('report-score-circle');
-    const scoreDigit  = document.getElementById('report-score-digit');
-    const scoreJust   = document.getElementById('report-score-justification');
-    const posList     = document.getElementById('report-score-positives');
-    const negList     = document.getElementById('report-score-negatives');
+    /* ---------- DOM ---------- */
+    const elResults = document.getElementById('results');
+    const elLoader  = document.getElementById('loader');
+    const elError   = document.getElementById('error');
+    const elErrMsg  = document.getElementById('err-msg');
+    const elContent = document.getElementById('content');
 
-    const newsList = document.getElementById('report-news-list');
+    const elReportTitle = document.getElementById('report-title');
+    const elSummary = document.getElementById('summary');
 
-    const sosName = document.getElementById('report-sos-name');
-    const sosEntity = document.getElementById('report-sos-entity');
-    const sosStatus = document.getElementById('report-sos-status');
-    const sosJuris  = document.getElementById('report-sos-jurisdiction');
-    const sosDate   = document.getElementById('report-sos-date');
-    const sosAgent  = document.getElementById('report-sos-agent');
+    const elScoreCircle = document.getElementById('score-circle');
+    const elScoreNum    = document.getElementById('score-num');
+    const elScoreWhy    = document.getElementById('score-why');
+    const elScorePos    = document.getElementById('score-pos');
+    const elScoreNeg    = document.getElementById('score-neg');
 
-    const factsFounded   = document.getElementById('facts-founded');
-    const factsHQ        = document.getElementById('facts-hq');
-    const factsEmployees = document.getElementById('facts-employees');
-    const factsIndustry  = document.getElementById('facts-industry');
-    const factsTicker    = document.getElementById('facts-ticker');
-    const factsWebsite   = document.getElementById('facts-website');
+    const elFactsFounded   = document.getElementById('facts-founded');
+    const elFactsHQ        = document.getElementById('facts-hq');
+    const elFactsEmployees = document.getElementById('facts-employees');
+    const elFactsIndustry  = document.getElementById('facts-industry');
+    const elFactsTicker    = document.getElementById('facts-ticker');
+    const elFactsWebsite   = document.getElementById('facts-website');
 
-    const phoneEl   = document.getElementById('contact-phone');
-    const emailEl   = document.getElementById('contact-email');
-    const addressEl = document.getElementById('contact-address');
-    const mapsRow   = document.getElementById('maps-link-row');
-    const mapsLink  = document.getElementById('maps-link');
+    const elNewsList     = document.getElementById('news-list');
+    const elHighlights   = document.getElementById('highlights-list');
 
-    const recList   = document.getElementById('report-records-list');
-    const leaderList= document.getElementById('report-leadership-list');
-    const productsList = document.getElementById('report-products-list');
-    const compList  = document.getElementById('report-competitors-list');
-    const socialList= document.getElementById('report-social-list');
-    const reviewsList = document.getElementById('report-reviews-list');
+    const elContactPhone = document.getElementById('contact-phone');
+    const elContactEmail = document.getElementById('contact-email');
+    const elContactAddr  = document.getElementById('contact-address');
+    const elMapLink      = document.getElementById('contact-maplink');
 
-    const kpiRows   = document.getElementById('kpi-rows');
-    const chartRevenue = document.getElementById('report-chart-revenue');
-    const chartCash    = document.getElementById('report-chart-cashflow');
+    const elSosName  = document.getElementById('sos-name');
+    const elSosType  = document.getElementById('sos-type');
+    const elSosStat  = document.getElementById('sos-status');
+    const elSosJuris = document.getElementById('sos-juris');
+    const elSosDate  = document.getElementById('sos-date');
+    const elSosAgent = document.getElementById('sos-agent');
 
-    const swotS = document.getElementById('swot-strengths');
-    const swotW = document.getElementById('swot-weaknesses');
-    const swotO = document.getElementById('swot-opportunities');
-    const swotT = document.getElementById('swot-threats');
-    const risksList = document.getElementById('risks-list');
+    const elLeaders = document.getElementById('leaders');
+    const elProds   = document.getElementById('products');
+    const elComps   = document.getElementById('competitors');
+    const elSocial  = document.getElementById('social');
+    const elRecords = document.getElementById('records-list');
 
-    const sourcesWrap  = document.getElementById('report-sources-container');
-    const sourcesChips = document.getElementById('report-sources-chips');
-    const sourcesList  = document.getElementById('report-sources');
-    const toggleSources= document.getElementById('toggle-sources');
+    const elChartRev = document.getElementById('chart-revenue');
+    const elChartCash= document.getElementById('chart-cash');
 
-    /**********************
-     * UI UTILITIES
-     **********************/
-    function setText(el, v){ el.textContent = v && String(v).trim() ? v : 'N/A'; }
-    function toDomain(u){ try { return new URL(u).hostname.replace(/^www\./,''); } catch { return u; } }
-    function linkifyMaybe(v) {
+    const elSourcesWrap  = document.getElementById('sources-wrap');
+    const elSourcesChips = document.getElementById('sources-chips');
+    const elSourcesList  = document.getElementById('sources');
+    const elSourcesToggle= document.getElementById('sources-toggle');
+
+    const elUSpill = document.getElementById('us-pill');
+
+    /* ---------- Small helpers ---------- */
+    function getApiKey(){ return (window.zakk && String(window.zakk).trim()) || ''; }
+    function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
+    function linkify(v, text){
       if (!v) return 'N/A';
       const s = String(v).trim();
-      if (/^https?:\/\//i.test(s)) {
-        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
-      }
-      return s;
+      if (!/^https?:\/\//i.test(s)) return s;
+      const t = text || s.replace(/^https?:\/\/(www\.)?/,'');
+      return `<a class="text-brand-green hover:underline" target="_blank" rel="noopener" href="${s}">${t}</a>`;
     }
+    function mapUrlFromAddress(addr){ return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr||'')}`; }
+    function toDomain(url){ try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
+
     function renderLineChart(container, values, color) {
-      if (!Array.isArray(values) || values.length < 2) {
-        container.innerHTML = '<p class="text-sm text-gray-700">Chart unavailable.</p>';
-        return;
-      }
-      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
+      const nums = (values||[]).map(v=>+v).filter(n=>Number.isFinite(n));
+      if (nums.length < 2) { container.innerHTML = '<div class="text-sm text-brand-gray">Not enough data.</div>'; return; }
       const min = Math.min(...nums), max = Math.max(...nums);
-      const norm = (max-min)>0 ? nums.map(n => (100*(n-min))/(max-min)) : nums.map(() => 50);
-      const step = 100 / (norm.length-1);
-      const pts = norm.map((v,i)=>`${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
-      container.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-        <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}"/>
-        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1"/>
-      </svg>`;
-    }
-    function gmapsLinkFromAddress(addr) {
-      if (!addr || !String(addr).trim()) return null;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+      const norm = (max-min)>0 ? nums.map(n=>(100*(n-min))/(max-min)) : nums.map(()=>50);
+      const step = 100/(norm.length-1);
+      const pts  = norm.map((v,i)=>`${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
+      container.innerHTML =
+        `<svg viewBox="0 0 100 50" preserveAspectRatio="none" width="100%" height="100%">
+           <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+           <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1"/>
+         </svg>`;
     }
 
-    /**********************
-     * LOADER
-     **********************/
-    let __loaderCtl = null;
-    function startLoadingAnimation() {
+    /* ---------- Loader ---------- */
+    let timerInt=null, stepsInt=null;
+    function startLoader(){
+      elResults.style.display='block';
+      elLoader.style.display='block';
+      elError.style.display='none';
+      elContent.style.display='none';
+
+      // steps
       const steps = [
-        'Matching US company identity','Searching the web','Pulling SOS filings',
-        'Parsing entity metadata','Checking public records','Gathering leadership',
-        'Mapping products & services','Finding competitors','Collecting web & social signals',
-        'Crawling recent headlines','Reading customer reviews','Synthesizing risk score & KPIs'
+        'Matching business identity (US‑only)',
+        'Searching the web & SoS',
+        'Parsing entity metadata',
+        'Checking public records',
+        'Gathering leadership',
+        'Mapping products & services',
+        'Finding competitors',
+        'Collecting web & social signals',
+        'Crawling recent headlines',
+        'Reading customer reviews',
+        'Synthesizing score & highlights'
       ];
-      const stepsOl = document.getElementById('loader-steps');
-      const barEl   = document.getElementById('loader-bar');
-      const timerEl = document.getElementById('loader-timer');
+      const ol = document.getElementById('ld-steps');
+      ol.innerHTML = steps.map((s,i)=>`<li class="flex gap-2 items-start">
+        <span id="st_${i}" class="mt-1 inline-block w-2.5 h-2.5 rounded-full bg-brand-border"></span>
+        <span>${s}</span></li>`).join('');
 
-      stepsOl.innerHTML = steps.map((s,i)=>`
-        <li class="flex items-start gap-2">
-          <span class="step-icon" id="ld_${i}">
-            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
-          </span>
-          <span>${s}</span>
-        </li>`).join('');
-
-      let elapsed = 0;
-      const tTimer = setInterval(()=>{
-        elapsed += 200;
-        const m = Math.floor(elapsed/1000/60);
-        const s = Math.floor((elapsed/1000)%60);
-        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      },200);
-
-      let idx=0;
-      const stepMs = Math.max(900, Math.floor(25000/steps.length));
-      const tSteps = setInterval(()=>{
-        if (idx < steps.length) {
-          document.getElementById(`ld_${idx}`)?.classList.add('done');
-          idx++;
-          const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
-          barEl.style.width = pct + '%';
+      const bar = document.getElementById('ld-bar');
+      let idx=0, donePct=8;
+      stepsInt = setInterval(()=>{
+        if (idx < steps.length){
+          document.getElementById('st_'+idx).className='mt-1 inline-block w-2.5 h-2.5 rounded-full bg-brand-green';
+          idx++; donePct = Math.min(95, Math.round((idx/steps.length)*100));
+          bar.style.width = donePct + '%';
         } else {
-          const cur = parseFloat(barEl.style.width) || 98;
-          barEl.style.width = Math.min(99, cur + 0.2) + '%';
+          // gentle creep
+          donePct = Math.min(97, donePct + 0.2);
+          bar.style.width = donePct + '%';
         }
-      }, stepMs);
+      }, Math.max(900, Math.floor(24000/steps.length)));
 
-      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width='100%'; } };
+      const t  = document.getElementById('ld-time');
+      let ms=0; timerInt = setInterval(()=>{ ms+=200; const m = Math.floor(ms/60000), s = Math.floor((ms/1000)%60); t.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` }, 200);
+    }
+    function stopLoader(){
+      clearInterval(timerInt); clearInterval(stepsInt);
+      document.getElementById('ld-bar').style.width='100%';
+      elLoader.style.display='none';
+    }
+    function showError(msg){ stopLoader(); elError.style.display='block'; elErrMsg.textContent = msg || 'Something went wrong.'; elContent.style.display='none'; elResults.style.display='block'; }
+    function showContent(){ stopLoader(); elError.style.display='none'; elContent.style.display='block'; elResults.style.display='block'; }
+
+    /* ---------- API plumbing (direct or via proxy) ---------- */
+    function buildApiUrl(path){
+      if (PROXY_BASE){
+        // Proxy expects full path starting with /v1beta/...
+        return new URL(path, PROXY_BASE).toString();
+      }
+      return new URL(path, 'https://generativelanguage.googleapis.com').toString();
     }
 
-    function showState(state, message='') {
-      resultsWrap.style.display = 'block';
-      loader.style.display = 'none'; errorBox.style.display='none'; content.style.display='none';
-      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl=null; }
-      if (state==='loading'){ loader.style.display='block'; __loaderCtl=startLoadingAnimation(); }
-      if (state==='error'){ errorBox.style.display='block'; errorMsg.textContent=message||'Something went wrong.'; }
-      if (state==='content'){ content.style.display='block'; }
-    }
-
-    /**********************
-     * API HELPERS (Gemini v1beta)
-     **********************/
-    function getKey(){ return (window.zakk && String(window.zakk).trim()) || ''; }
-
-    async function fetchWithBackoff(url, options, retries=3, delay=800) {
-      let lastError;
-      for (let i=0;i<retries;i++) {
-        try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body=null; try{ body=await res.json(); }catch{}
-            const msg = body?.error?.message || res.statusText || 'Request failed';
-            const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status;
-            throw err;
+    async function fetchWithBackoff(url, options, retries=2, delay=700){
+      let lastErr;
+      for (let i=0;i<retries;i++){
+        try{
+          const res = await fetch(url, {
+            mode:'cors', cache:'no-store', credentials:'omit',
+            referrerPolicy:'no-referrer',
+            ...options,
+            headers:{ 'Content-Type':'application/json', ...(options?.headers||{}) }
+          });
+          if (!res.ok){
+            const txt = await res.text().catch(()=> '');
+            let msg = txt; try{ const j = JSON.parse(txt); msg = j.error?.message || msg; }catch{}
+            throw new Error(`${msg || res.statusText} (HTTP ${res.status})`);
           }
-          return await res.json();
-        } catch (e) {
-          lastError = e;
+          const ct = res.headers.get('content-type')||'';
+          if (ct.includes('application/json')) return await res.json();
+          return await res.json().catch(async()=>({ raw: await res.text() }));
+        }catch(e){
+          lastErr = e;
+          // tell the user when fetch was blocked before reaching the network
+          if (e instanceof TypeError && /Failed to fetch/i.test(e.message)) throw new Error('Network/CORS error: the browser could not reach the Google Generative Language API. Serve this page via http(s) and temporarily disable extensions that block third‑party requests for generativelanguage.googleapis.com.');
           if (i < retries-1) await new Promise(r=>setTimeout(r, delay*Math.pow(2,i)));
         }
       }
-      throw lastError || new Error('API request failed.');
+      throw lastErr || new Error('API request failed.');
     }
 
-    async function chooseModel() {
-      const key = getKey();
-      if (!key) throw new Error('Missing API key.');
-      try {
-        const data = await fetchWithBackoff(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`, {method:'GET'});
-        const models = data?.models || [];
-        const have = new Set(models.map(m=>m.name));
-        for (const want of MODEL_PRIORITY) if (have.has(want)) return want;
-      } catch(_) {}
-      // fallback to first in priority list
-      return MODEL_PRIORITY[0];
-    }
-
-    function makePayload({systemPrompt, userQuery, withSearch}) {
+    function makePayload({systemPrompt,userQuery,withSearch}){
       const payload = {
-        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.2,
-          topP: 0.95
-        }
+        contents:[{ role:'user', parts:[{ text:userQuery }] }],
+        systemInstruction:{ parts:[{ text:systemPrompt }] },
+        generationConfig:{ maxOutputTokens: MAX_OUTPUT_TOKENS, temperature:0.2, topP:0.95 }
       };
-      if (withSearch) {
-        // NOTE: When tools are enabled, responseMimeType is NOT supported.
-        payload.tools = [{ googleSearch: {} }];
-      } else {
-        payload.generationConfig.responseMimeType = "application/json";
-      }
+      if (withSearch) payload.tools = [{ googleSearch:{} }];
+      else payload.generationConfig.responseMimeType = "application/json";
       return payload;
     }
 
-    function parseCandidateJSON(cand) {
+    function parseCandidateJSON(cand){
       const parts = cand?.content?.parts || [];
-      // 1) try text parts
-      for (const p of parts) {
-        if (typeof p?.text === 'string' && p.text.trim()) {
+      for (const p of parts){
+        if (typeof p?.text === 'string' && p.text.trim()){
           const raw = p.text.replace(/```json/g,'').replace(/```/g,'').trim();
           try { return JSON.parse(raw); } catch {}
           const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
-          if (cut > 0) {
-            const maybe = raw.slice(0, cut+1);
-            try { return JSON.parse(maybe); } catch {}
-          }
+          if (cut > 0){ try { return JSON.parse(raw.slice(0,cut+1)); } catch{} }
         }
       }
-      // 2) inline_data (base64 JSON)
-      for (const p of parts) {
-        if (p?.inline_data?.data && String(p.inline_data?.mimeType||'').toLowerCase().includes('json')) {
+      for (const p of parts){
+        if (p?.inline_data?.data && String(p.inline_data?.mimeType||'').toLowerCase().includes('json')){
           try { return JSON.parse(atob(p.inline_data.data)); } catch {}
         }
       }
-      const preview = parts.find(p=>p.text)?.text?.slice(0,300)?.replace(/\s+/g,' ') || 'No text content';
+      const preview = parts.find(p=>p.text)?.text?.slice(0,280)?.replace(/\s+/g,' ') || 'No text content';
       throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
     }
 
-    async function callReportAPI(systemPrompt, userQuery) {
-      const key = getKey();
-      if (!key) throw new Error('Missing API key.');
-      const base = 'https://generativelanguage.googleapis.com/v1beta/models';
+    async function callReportAPI(systemPrompt, userQuery){
+      const key = getApiKey();
+      if (!PROXY_BASE && !key) throw new Error('Missing API key.');
+
+      const base = '/v1beta/models';
       let lastErr;
 
-      const model = await chooseModel();
+      for (const model of MODEL_PRIORITY){
+        const path = `${base}/${model}:generateContent`;
 
-      // Try: (1) with googleSearch tool   (2) w/out tool but stricter JSON
-      const attempts = [
-        { withSearch: USE_SEARCH_TOOL, stricter: false },
-        { withSearch: false, stricter: true }
-      ];
-
-      for (const attempt of attempts) {
-        const prompt = attempt.stricter
-          ? systemPrompt + `
-
-IMPORTANT:
-- Output a SINGLE JSON object only (no prose, no markdown).
-- If you cannot find a field, use "N/A" or [] as appropriate.
-- Do not include code fences.`
-          : systemPrompt;
-
-        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-        const payload = makePayload({ systemPrompt: prompt, userQuery, withSearch: attempt.withSearch });
-
+        // Attempt 1: with googleSearch tool (no responseMimeType)
         try {
+          const url = buildApiUrl(path) + (PROXY_BASE ? '' : `?key=${encodeURIComponent(key)}`);
+          const payload = makePayload({ systemPrompt, userQuery, withSearch: USE_SEARCH_TOOL });
           const data = await fetchWithBackoff(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method:'POST',
+            headers: PROXY_BASE ? {} : { 'x-goog-api-key': key },
             body: JSON.stringify(payload)
           });
           const cand = data?.candidates?.[0];
           if (!cand) throw new Error('No candidates in response.');
           const json = parseCandidateJSON(cand);
-
           const atts = cand?.groundingMetadata?.groundingAttributions || [];
-          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
-
+          const sources = atts.map(a=>({ uri:a.web?.uri, title:a.web?.title })).filter(s=>s.uri);
           return { json, sources, model };
-        } catch (e) {
-          lastErr = e;
-        }
+        } catch(e1) { lastErr = e1; }
+
+        // Attempt 2: strict JSON only (no tools)
+        try {
+          const strictPrompt = systemPrompt + `
+
+IMPORTANT:
+- Output ONE JSON object only (no prose/markdown).
+- Use "N/A" or [] if unknown.`;
+          const url = buildApiUrl(path) + (PROXY_BASE ? '' : `?key=${encodeURIComponent(key)}`);
+          const payload = makePayload({ systemPrompt: strictPrompt, userQuery, withSearch: false });
+          const data = await fetchWithBackoff(url, {
+            method:'POST',
+            headers: PROXY_BASE ? {} : { 'x-goog-api-key': key },
+            body: JSON.stringify(payload)
+          });
+          const cand = data?.candidates?.[0];
+          if (!cand) throw new Error('No candidates in response.');
+          const json = parseCandidateJSON(cand);
+          const atts = cand?.groundingMetadata?.groundingAttributions || [];
+          const sources = atts.map(a=>({ uri:a.web?.uri, title:a.web?.title })).filter(s=>s.uri);
+          return { json, sources, model };
+        } catch(e2) { lastErr = e2; }
       }
-      throw lastErr || new Error('All attempts failed.');
+      throw lastErr || new Error('All model attempts failed.');
     }
 
-    /**********************
-     * PROMPT
-     **********************/
-    function buildSystemPrompt() {
+    /* ---------- System Prompt (US‑only) ---------- */
+    function buildSystemPrompt(){
       return `
-You are a US-focused business analyst. Always prefer US entities. If the query matches a non‑US brand, select the closest US entity (US HQ or US subsidiary) and note if approximate.
+You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
+US‑only rule: Prefer a US‑registered entity that matches the query. If the query is not a US company, set "notUS": true and still produce the closest US presence or subsidiary if one exists; otherwise leave fields as "N/A".
 
-Return a SINGLE JSON object ONLY (no commentary, no markdown). Use "N/A" when unknown. Keep strings concise but specific. Include links when available.
+Return fields:
+summary: { companyName, summary, highlights: [string] }
+profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+contact: { phone, email, address, city, state, zip, lat, lng }
+sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
+publicRecords: { findings: [{ type, details }] }
+riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
+leadership: [{ name, title, linkedin }]
+products: [string]
+competitors: [string]
+webPresence: { twitter, linkedin, youtube, facebook, wikipedia, traffic }
+news: [{ title, date, source, url }]
+reviews: [{ snippet, source, url }]
+chartPoints: { revenue: [number], cashFlow: [number] }   // 10–24 points
+citations: [{ title, url }]
+notUS: boolean
 
-JSON fields to return:
-
-{
-  "summary": { "companyName": "", "summary": "" },
-
-  "profile": {
-    "founded": "", "headquarters": "", "employees": "",
-    "website": "", "industry": "", "subindustry": "", "ticker": ""
-  },
-
-  "contact": {
-    "phone": "", "email": "", "address": "",
-    "city": "", "state": "", "postalCode": "", "country": "US"
-  },
-
-  "sos": {
-    "entityName": "", "entityType": "", "status": "",
-    "jurisdiction": "", "formationDate": "", "registeredAgent": ""
-  },
-
-  "publicRecords": {
-    "findings": [ { "type": "", "details": "" } ]
-  },
-
-  "riskScore": {
-    "score": 300..850,
-    "justification": "",
-    "positiveFactors": [""],
-    "negativeFactors": [""]
-  },
-
-  "swot": {
-    "strengths": [""], "weaknesses": [""], "opportunities": [""], "threats": [""]
-  },
-
-  "leadership": [ { "name": "", "title": "", "linkedin": "" } ],
-
-  "products": [ "" ],
-  "competitors": [ "" ],
-
-  "webPresence": {
-    "twitter": "", "linkedin": "", "linkedinOwner": "",
-    "youtube": "", "facebook": "", "instagram": "",
-    "traffic": "", "domain": "", "techStack": [""]
-  },
-
-  "news": [ { "title":"", "date":"", "source":"", "url":"" } ],
-
-  "reviews": [ { "snippet":"", "source":"", "url":"" } ],
-
-  "kpis": {
-    "revenueTTMUSD": "", "employees": "", "growthYoY": "",
-    "estCustomers": "", "fundingTotalUSD": "", "lastRound": "",
-    "arpuUSD": "", "cacUSD": "", "ltvUSD": "", "churnRatePct": "",
-    "grossMarginPct": "", "profitMarginPct": ""
-  },
-
-  "chartPoints": {
-    "revenue": [10..24 numbers],
-    "cashFlow": [10..24 numbers]
-  },
-
-  "citations": [ { "title":"", "url":"" } ]
-}
-
-Ground with high-quality sources. Prefer: official site, US state SOS pages, SEC, reputable news, Crunchbase, LinkedIn (company and founder), BBB, Trustpilot, Glassdoor (for reviews), and press releases.
-
-If a section has no reliable data, set "N/A" or [].
+If you cannot find data, use "N/A" or [].
 `.trim();
     }
 
-    /**********************
-     * SOURCES
-     **********************/
-    function normalizeUrl(u){ try{ const url=new URL(u); url.search=''; if(url.pathname!=='/'&&url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); }catch{return null;} }
-    function prettyUrl(u){ try{ const url=new URL(u); let out=url.hostname.replace(/^www\./,''); if(url.pathname && url.pathname!=='/') out+=url.pathname; return out.length>60?out.slice(0,57)+'…':out; }catch{return u;} }
-    function collectSources(json, modelSources) {
-      const out=[], push=(title,url,kind)=>{ const norm=normalizeUrl(url); if(!norm) return; out.push({title:title||prettyUrl(norm), url:norm, kind}); };
-      (json?.citations||[]).forEach(c=>push(c.title||c.url, c.url, 'citation'));
-      (modelSources||[]).forEach(s=>push(s.title||s.uri, s.uri, 'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+    /* ---------- Populate UI ---------- */
+    function populateSources(json, modelSources){
+      const list = [];
+      const push = (title,url,kind)=>{ if(!url) return; try{ new URL(url); list.push({title, url, kind}); }catch{} }
+      ;(json?.citations||[]).forEach(c=>push(c.title||c.url,c.url,'citation'));
+      (json?.news||[]).forEach(n=>push(n.title||n.source,n.url,'news'));
+      (json?.reviews||[]).forEach(r=>push(r.source||'Review',r.url,'review'));
       const w=json?.webPresence||{};
-      if (w.twitter)   push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin)  push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube)   push('YouTube', w.youtube, 'social');
-      if (w.facebook)  push('Facebook', w.facebook, 'social');
-      (json?.news||[]).forEach(n=>{ if (n?.url) push(n.title||n.source||'News', n.url, 'news'); });
-      (json?.reviews||[]).forEach(r=>{ if (r?.url) push(r.source||'Review', r.url, 'review'); });
+      if (w.twitter) push('Twitter/X',w.twitter,'social');
+      if (w.linkedin) push('LinkedIn',w.linkedin,'social');
+      if (w.youtube) push('YouTube',w.youtube,'social');
+      if (w.facebook) push('Facebook',w.facebook,'social');
+      (modelSources||[]).forEach(s=>push(s.title||s.uri,s.uri,'source'));
 
-      const seen=new Set(); return out.filter(({url})=>!seen.has(url)&&seen.add(url));
-    }
-    function populateSources(links) {
-      sourcesChips.innerHTML=''; sourcesList.innerHTML='';
-      if (!Array.isArray(links)||!links.length){ sourcesWrap.style.display='none'; return; }
-      sourcesWrap.style.display='block';
-      links.forEach(({url,title,kind})=>{
-        const emoji = kind==='news'?'📰':kind==='review'?'⭐':kind==='social'?'🔗':kind==='site'?'🏢':kind==='citation'?'📚':'🔗';
-        const span=document.createElement('span');
-        span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||prettyUrl(url)}</a>`;
-        sourcesChips.appendChild(span);
-      });
-      links.forEach(({url,title})=>{
-        const li=document.createElement('li');
-        li.className='text-sm';
-        li.innerHTML=`<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||prettyUrl(url)}</a>
-                      <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        sourcesList.appendChild(li);
-      });
-      let open=false;
-      toggleSources.onclick=()=>{ open=!open; sourcesList.classList.toggle('hidden',!open); toggleSources.textContent=open?'Hide list':'Show list'; };
-    }
-
-    /**********************
-     * POPULATE UI
-     **********************/
-    function li(text, color='text-brand-dark') {
-      const li=document.createElement('li'); li.className='flex items-start';
-      li.innerHTML = `<svg class="w-4 h-4 ${color.includes('red')?'text-red-500':'text-green-500'} mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm${color.includes('red') ? '0 0H0' : '3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'}" clip-rule="evenodd"/></svg>
-        <span class="text-sm ${color}">${text}</span>`;
-      return li;
-    }
-
-    function renderKpis(kpis) {
-      kpiRows.innerHTML = '';
-      const pairs = [
-        ['Revenue (TTM, USD)', kpis?.revenueTTMUSD || 'N/A'],
-        ['Employees', kpis?.employees || 'N/A'],
-        ['YoY Growth', kpis?.growthYoY || 'N/A'],
-        ['Est. Customers', kpis?.estCustomers || 'N/A'],
-        ['Funding (Total USD)', kpis?.fundingTotalUSD || 'N/A'],
-        ['Last Round', kpis?.lastRound || 'N/A'],
-        ['ARPU (USD)', kpis?.arpuUSD || 'N/A'],
-        ['CAC (USD)', kpis?.cacUSD || 'N/A'],
-        ['LTV (USD)', kpis?.ltvUSD || 'N/A'],
-        ['Churn', kpis?.churnRatePct || 'N/A'],
-        ['Gross Margin', kpis?.grossMarginPct || 'N/A'],
-        ['Profit Margin', kpis?.profitMarginPct || 'N/A'],
-      ];
-      for (let i=0;i<pairs.length;i+=3){
-        const t = document.createElement('tr');
-        const cells = pairs.slice(i,i+3);
-        t.innerHTML = cells.map(([k,v])=>`
-          <td class="py-2 pr-6 text-gray-500">${k}</td>
-          <td class="py-2 pr-6 font-medium">${v}</td>
-        `).join('');
-        kpiRows.appendChild(t);
+      // de‑dupe by normalized URL
+      const seen=new Set(), final=[];
+      for (const it of list){
+        const key = it.url.replace(/\/+$/,''); if (seen.has(key)) continue; seen.add(key); final.push(it);
       }
+
+      if (!final.length){ elSourcesWrap.style.display='none'; return; }
+      elSourcesWrap.style.display='block';
+      elSourcesChips.innerHTML = '';
+      elSourcesList.innerHTML  = '';
+      final.forEach(({title,url,kind})=>{
+        const emoji = kind==='news'?'📰':kind==='review'?'⭐':kind==='social'?'🔗':kind==='citation'?'📚':'🔗';
+        const chip = document.createElement('span');
+        chip.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        chip.innerHTML = `${emoji} <a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || toDomain(url)}</a>`;
+        elSourcesChips.appendChild(chip);
+
+        const li = document.createElement('li');
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || toDomain(url)}</a>
+                        <span class="text-xs text-brand-gray ml-1">(${toDomain(url)})</span>`;
+        elSourcesList.appendChild(li);
+      });
+
+      let open=false;
+      elSourcesToggle.onclick = () => {
+        open=!open; elSourcesList.classList.toggle('hidden', !open);
+        elSourcesToggle.textContent = open ? 'Hide list' : 'Show list';
+      };
     }
 
-    function populateReport(data) {
-      // Title + Summary
-      setText(titleEl, data?.summary?.companyName || data?.profile?.companyName || 'Company');
-      summaryEl.textContent = data?.summary?.summary || 'No summary available.';
+    function populateReport(d){
+      // Title
+      setText(elReportTitle, d?.summary?.companyName || 'N/A');
+
+      // US hint
+      elUSpill.classList.toggle('hidden', !!d?.notUS);
+
+      // Summary
+      elSummary.textContent = d?.summary?.summary || 'No summary available.';
+      elHighlights.innerHTML = '';
+      (d?.summary?.highlights || []).forEach(h=>{
+        const li = document.createElement('li'); li.textContent = h; elHighlights.appendChild(li);
+      });
 
       // Score
-      const score = Number(data?.riskScore?.score) || 0;
-      scoreDigit.textContent = score || '—';
-      scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
-      scoreCircle.className='score-circle mb-4';
-      if (score < 550) scoreCircle.classList.add('score-red');
-      else if (score < 700) scoreCircle.classList.add('score-yellow');
-      else scoreCircle.classList.add('score-green');
+      const s = Number(d?.riskScore?.score||0);
+      elScoreNum.textContent = s || '—';
+      elScoreWhy.textContent = d?.riskScore?.justification || 'No justification provided.';
+      elScoreCircle.className = 'score';
+      if (s && s < 550) elScoreCircle.classList.add('low');
+      else if (s && s < 700) elScoreCircle.classList.add('mid');
 
-      posList.innerHTML=''; (data?.riskScore?.positiveFactors||[]).forEach(f=>posList.appendChild(li(f,'text-brand-dark')));
-      negList.innerHTML=''; (data?.riskScore?.negativeFactors||[]).forEach(f=>negList.appendChild(li(f,'text-red-700')));
+      elScorePos.innerHTML = '';
+      (d?.riskScore?.positiveFactors || []).forEach(t=>{
+        const li=document.createElement('li');
+        li.className='flex items-start';
+        li.innerHTML='<svg class="w-4 h-4 text-emerald-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>'+t+'</span>';
+        elScorePos.appendChild(li);
+      });
+      elScoreNeg.innerHTML = '';
+      (d?.riskScore?.negativeFactors || []).forEach(t=>{
+        const li=document.createElement('li');
+        li.className='flex items-start';
+        li.innerHTML='<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span>'+t+'</span>';
+        elScoreNeg.appendChild(li);
+      });
 
       // Facts
-      const p = data?.profile || {};
-      setText(factsFounded, p.founded);
-      setText(factsHQ, p.headquarters);
-      setText(factsEmployees, p.employees);
-      setText(factsIndustry, p.industry || p.subindustry);
-      setText(factsTicker, p.ticker);
-      factsWebsite.innerHTML = linkifyMaybe(p.website);
-
-      // Contact + Map
-      const c = data?.contact || {};
-      setText(phoneEl, c.phone);
-      setText(emailEl, c.email);
-      const addr = [c.address, c.city, c.state, c.postalCode].filter(Boolean).join(', ');
-      setText(addressEl, addr);
-      const gml = gmapsLinkFromAddress(addr);
-      if (gml) { mapsRow.classList.remove('hidden'); mapsLink.href=gml; }
+      const p = d?.profile || {};
+      setText(elFactsFounded, p.founded);
+      setText(elFactsHQ, p.headquarters);
+      setText(elFactsEmployees, p.employees);
+      setText(elFactsIndustry, p.industry || p.subindustry);
+      setText(elFactsTicker, p.ticker);
+      elFactsWebsite.innerHTML = linkify(p.website, toDomain(p.website||''));
 
       // News
-      newsList.innerHTML='';
-      (data?.news||[]).slice(0,6).forEach(n=>{
+      elNewsList.innerHTML = '';
+      (d?.news || []).slice(0,6).forEach(n=>{
         const li=document.createElement('li');
-        li.innerHTML = `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Untitled'}</a>
-                        <div class="text-xs text-gray-500">${n.source||'Source'}${n.date?' • '+n.date:''}</div>`;
-        newsList.appendChild(li);
+        const src = n.source ? ` • ${n.source}` : '';
+        const date = n.date ? ` • ${n.date}` : '';
+        li.innerHTML = `<a class="text-brand-dark hover:text-brand-green font-medium" target="_blank" rel="noopener" href="${n.url||'#'}">${n.title||'Untitled'}</a>
+                        <div class="text-xs text-brand-gray">${(n.source||'Source')}${date}</div>`;
+        elNewsList.appendChild(li);
       });
-      if (!newsList.children.length) newsList.innerHTML='<li class="text-sm text-gray-600">No recent headlines.</li>';
+      if (!elNewsList.children.length){
+        elNewsList.innerHTML = '<li class="text-sm text-brand-gray">No recent headlines found.</li>';
+      }
 
-      // SOS
-      const s = data?.sos || {};
-      setText(sosName, s.entityName);
-      setText(sosEntity, s.entityType);
-      setText(sosStatus, s.status);
-      setText(sosJuris, s.jurisdiction);
-      setText(sosDate, s.formationDate);
-      setText(sosAgent, s.registeredAgent);
+      // Contact
+      const c = d?.contact || {};
+      setText(elContactPhone, c.phone);
+      setText(elContactEmail, c.email);
+      const addr = c.address || [c.city,c.state,c.zip].filter(Boolean).join(', ');
+      setText(elContactAddr, addr);
+      elMapLink.href = mapUrlFromAddress(addr);
 
-      // Public Records
-      recList.innerHTML='';
-      (data?.publicRecords?.findings||[]).forEach(f=>{
-        const li=document.createElement('li');
-        li.textContent = `${f.type || 'Finding'}: ${f.details || ''}`;
-        recList.appendChild(li);
+      // SoS / Records
+      const s2 = d?.sos || {};
+      setText(elSosName, s2.entityName);
+      setText(elSosType, s2.entityType);
+      setText(elSosStat, s2.status);
+      setText(elSosJuris, s2.jurisdiction);
+      setText(elSosDate, s2.formationDate);
+      setText(elSosAgent, s2.registeredAgent);
+      elSosStat.className = 'ml-1'; if ((s2.status||'').toLowerCase()==='active') elSosStat.classList.add('text-emerald-600');
+
+      elRecords.innerHTML = '';
+      (d?.publicRecords?.findings || []).forEach(f=>{
+        const li=document.createElement('li'); li.textContent = `${f.type||'Finding'} — ${f.details||''}`; elRecords.appendChild(li);
       });
-      if (!recList.children.length) recList.innerHTML='<li class="text-sm text-gray-600">No notable public records found.</li>';
+      if (!elRecords.children.length){ elRecords.innerHTML = '<li class="text-sm text-brand-gray">No public records found.</li>'; }
 
-      // Leadership, Products, Competitors
-      leaderList.innerHTML='';
-      (data?.leadership||[]).forEach(l=>{
+      // Leadership
+      elLeaders.innerHTML = '';
+      (d?.leadership || []).forEach(l=>{
         const li=document.createElement('li');
         const ln = l.linkedin ? ` — <a class="text-brand-green hover:underline" target="_blank" rel="noopener" href="${l.linkedin}">LinkedIn</a>` : '';
-        li.innerHTML = `<span class="font-medium">${l.name||'N/A'}</span> — <span class="text-gray-700">${l.title||''}</span>${ln}`;
-        leaderList.appendChild(li);
+        li.innerHTML = `<span class="font-medium">${l.name||'N/A'}</span> <span class="text-brand-gray">— ${l.title||''}</span>${ln}`;
+        elLeaders.appendChild(li);
       });
-      if (!leaderList.children.length) leaderList.innerHTML='<li class="text-sm text-gray-600">No leadership data.</li>';
+      if (!elLeaders.children.length){ elLeaders.innerHTML = '<li class="text-sm text-brand-gray">No leadership data.</li>'; }
 
-      productsList.innerHTML=''; (data?.products||[]).forEach(t=>{ const li=document.createElement('li'); li.textContent=t; productsList.appendChild(li); });
-      if (!productsList.children.length) productsList.innerHTML='<li class="text-sm text-gray-600">No products listed.</li>';
+      // Products
+      elProds.innerHTML = '';
+      (d?.products || []).forEach(p=>{
+        const li = document.createElement('li'); li.textContent = p; elProds.appendChild(li);
+      });
+      if (!elProds.children.length){ elProds.innerHTML = '<li class="text-sm text-brand-gray">No products listed.</li>'; }
 
-      compList.innerHTML=''; (data?.competitors||[]).forEach(cn=>{ const li=document.createElement('li'); li.textContent=cn; compList.appendChild(li); });
-      if (!compList.children.length) compList.innerHTML='<li class="text-sm text-gray-600">No competitors identified.</li>';
+      // Competitors
+      elComps.innerHTML = '';
+      (d?.competitors || []).forEach(c=>{
+        const li = document.createElement('li'); li.textContent = c; elComps.appendChild(li);
+      });
+      if (!elComps.children.length){ elComps.innerHTML = '<li class="text-sm text-brand-gray">No competitors identified.</li>'; }
 
       // Social
-      socialList.innerHTML='';
-      const w = data?.webPresence || {};
+      elSocial.innerHTML = '';
+      const w = d?.webPresence || {};
       const socialPairs = [
         ['Website Traffic', w.traffic],
         ['Twitter/X', w.twitter],
-        ['LinkedIn (Company)', w.linkedin],
-        ['LinkedIn (Owner)', w.linkedinOwner],
-        ['YouTube', w.youtube], ['Facebook', w.facebook], ['Instagram', w.instagram],
-        ['Domain', w.domain], ['Tech Stack', (w.techStack||[]).join(', ')]
+        ['LinkedIn', w.linkedin],
+        ['YouTube', w.youtube],
+        ['Facebook', w.facebook],
+        ['Wikipedia', w.wikipedia],
       ];
       socialPairs.forEach(([k,v])=>{
         if (!v) return;
         const li=document.createElement('li');
-        let valueHtml=v;
-        if (typeof v==='string' && /^https?:\/\//i.test(v)) {
-          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-        }
-        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
-        socialList.appendChild(li);
+        li.innerHTML = `<span class="text-brand-gray">${k}:</span> <span class="font-medium">${/^https?:\/\//i.test(String(v)) ? `<a class="text-brand-green hover:underline" target="_blank" rel="noopener" href="${v}">${toDomain(v)}</a>` : v}</span>`;
+        elSocial.appendChild(li);
       });
-      if (!socialList.children.length) socialList.innerHTML='<li class="text-sm text-gray-600">No web/social signals.</li>';
+      if (!elSocial.children.length){ elSocial.innerHTML = '<li class="text-sm text-brand-gray">No social signals.</li>'; }
 
       // Reviews
-      reviewsList.innerHTML='';
-      (data?.reviews||[]).slice(0,4).forEach(r=>{
-        const div=document.createElement('div');
-        div.className='border border-brand-border rounded-lg p-3 bg-white';
-        div.innerHTML = `<p class="text-sm text-gray-700 italic">"${r.snippet||'N/A'}"</p>
-                         <div class="text-xs text-gray-500 mt-1">${r.source||'Source'}${r.url?` — <a href="${r.url}" target="_blank" rel="noopener" class="text-brand-green hover:underline">Link</a>`:''}</div>`;
-        reviewsList.appendChild(div);
+      const rv = d?.reviews || [];
+      const rvWrap = document.getElementById('reviews'); rvWrap.innerHTML='';
+      if (!rv.length){ rvWrap.innerHTML = '<div class="text-sm text-brand-gray">No customer reviews found.</div>'; }
+      rv.forEach(r=>{
+        const q = document.createElement('blockquote');
+        q.className='p-3 border border-brand-border rounded-lg bg-brand-light text-sm';
+        const src = r.source ? ` — <span class="text-brand-gray">${r.source}</span>`:'';
+        const u = r.url ? ` <a class="text-brand-green hover:underline" target="_blank" rel="noopener" href="${r.url}">Link</a>`:'';
+        q.innerHTML = `<span class="italic">“${r.snippet||'N/A'}”</span>${src}${u}`;
+        rvWrap.appendChild(q);
       });
-      if (!reviewsList.children.length) reviewsList.innerHTML='<div class="text-sm text-gray-600">No recent reviews found.</div>';
-
-      // KPIs
-      renderKpis(data?.kpis || {});
 
       // Charts
-      const pts = data?.chartPoints || {};
-      renderLineChart(chartRevenue, Array.isArray(pts.revenue)&&pts.revenue.length?pts.revenue:[30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
-      renderLineChart(chartCash, Array.isArray(pts.cashFlow)&&pts.cashFlow.length?pts.cashFlow:[65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
-
-      // SWOT + Risks
-      swotS.innerHTML=''; (data?.swot?.strengths||[]).forEach(x=>{const li=document.createElement('li'); li.textContent=x; swotS.appendChild(li);});
-      swotW.innerHTML=''; (data?.swot?.weaknesses||[]).forEach(x=>{const li=document.createElement('li'); li.textContent=x; swotW.appendChild(li);});
-      swotO.innerHTML=''; (data?.swot?.opportunities||[]).forEach(x=>{const li=document.createElement('li'); li.textContent=x; swotO.appendChild(li);});
-      swotT.innerHTML=''; (data?.swot?.threats||[]).forEach(x=>{const li=document.createElement('li'); li.textContent=x; swotT.appendChild(li);});
-      risksList.innerHTML=''; (data?.risks||[]).forEach(x=>{const li=document.createElement('li'); li.textContent=x; risksList.appendChild(li);});
+      const pts = d?.chartPoints || {};
+      renderLineChart(elChartRev, Array.isArray(pts.revenue)?pts.revenue:[30,36,34,41,46,55,60,67,71,75], '#00C09A');
+      renderLineChart(elChartCash, Array.isArray(pts.cashFlow)?pts.cashFlow:[62,57,60,53,49,45,44,43,42,41], '#3B82F6');
     }
 
-    /**********************
-     * MAIN FLOW
-     **********************/
-    async function generateReport(query) {
-      resultsWrap.style.display='block';
-      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-      showState('loading');
-      btn.disabled=true; btn.classList.add('cta-disabled');
-
-      try {
-        const systemPrompt = buildSystemPrompt();
-        const userQuery = `Generate a comprehensive, US‑focused business report JSON for: "${query}"`;
-
-        const { json, sources, model } = await callReportAPI(systemPrompt, userQuery);
-        populateReport(json);
-        const links = collectSources(json, sources);
-        populateSources(links);
-        showState('content');
-        console.log('Model used:', model);
-      } catch (e) {
-        console.error(e);
-        showState('error', e.message || 'Failed to generate report.');
-      } finally {
-        btn.disabled=false; btn.classList.remove('cta-disabled');
-      }
-    }
-
-    // Wire up UI
+    /* ---------- Form ---------- */
     document.addEventListener('DOMContentLoaded', ()=>{
       const form = document.getElementById('search-form');
-      const input = document.getElementById('business-name');
-      const rerunBtn = document.getElementById('rerun');
+      const input= document.getElementById('business-name');
+      const btn  = document.getElementById('generate-btn');
+      const rerun= document.getElementById('rerun');
 
-      form.addEventListener('submit', (ev)=>{
+      async function run(query){
+        btn.disabled = true; btn.classList.add('opacity-60'); startLoader();
+        const sys = buildSystemPrompt();
+        const user = `Create a comprehensive, US‑focused business report for "${query}". Include US SoS data if available and enrich with public web results.`;
+
+        try{
+          const { json, sources } = await callReportAPI(sys, user);
+          populateReport(json);
+          populateSources(json, sources);
+          showContent();
+        }catch(e){
+          console.error(e);
+          showError(e.message||'Failed to generate report.');
+        }finally{
+          btn.disabled = false; btn.classList.remove('opacity-60');
+        }
+      }
+
+      form.addEventListener('submit',(ev)=>{
         ev.preventDefault();
-        const q=(input.value||'').trim();
-        if (!q) { showState('error','Please enter a business name.'); return; }
-        generateReport(q);
+        const q = (input.value||'').trim();
+        if(!q) return showError('Please enter a company name.');
+        elResults.style.display='block';
+        run(q);
       });
-
-      rerunBtn?.addEventListener('click', ()=>{
-        const q=(input.value||'').trim();
-        if (!q) { showState('error','Please enter a business name.'); return; }
-        generateReport(q);
+      rerun.addEventListener('click', ()=> {
+        const q = (input.value||'').trim();
+        if(!q) return showError('Please enter a company name.');
+        run(q);
       });
     });
   </script>
