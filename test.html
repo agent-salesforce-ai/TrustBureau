@@ -21,7 +21,8 @@
             'brand-gray':  '#6B7280',
             'brand-light': '#F8F9FA',
             'brand-border':'#E5E7EB',
-          }
+          },
+          boxShadow: { card: '0 10px 24px rgba(0,0,0,.06)' }
         }
       }
     }
@@ -46,13 +47,24 @@
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
-    /* Grid placeholder for map (until embed loads) */
-    .map-grid {
-      background-image:
-        linear-gradient(to right, rgba(17,24,39,.06) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(17,24,39,.06) 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
+    .step-icon{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border-radius:9999px;background:#E5E7EB;color:#fff;flex:none;margin-top:.2rem}
+    .step-icon.done{background:#059669}
+    .step-icon>svg{width:.7rem;height:.7rem;display:none}
+    .step-icon.done>svg{display:block}
+    .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
+    .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
+
+    .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
+      background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
+                 conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
+      animation: radar-spin 1.5s linear infinite; }
+    .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
+
+    @keyframes radar-spin { to { transform: rotate(360deg); } }
+
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
+    .skeleton-card { border:1px solid #E5E7EB; border-radius:.75rem; padding:1rem; background:#fff; }
   </style>
 </head>
 
@@ -73,7 +85,7 @@
     </nav>
   </header>
 
-  <!-- Hero / Search (centered) -->
+  <!-- Centered Search -->
   <section class="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14">
     <div class="max-w-3xl mx-auto text-center">
       <h1 class="font-heading text-4xl md:text-6xl font-extrabold leading-tight">Live AI Business Report</h1>
@@ -81,7 +93,7 @@
 
       <div class="widget-card mt-7 p-4">
         <form id="search-form" class="w-full flex flex-col sm:flex-row gap-3 justify-center" autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Tesla, Inc.; Taco Bell Corp.; Aquamark.io"
+          <input id="business-name" type="text" placeholder="e.g., Apple Inc.; Costco Wholesale Corp.; Aquamark.io"
                  class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
           <button id="generate-report-btn" type="submit"
                   class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
@@ -99,58 +111,88 @@
   <!-- Results -->
   <section id="results" class="max-w-6xl mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
+      <!-- Loader -->
+      <div id="report-loader" style="display:none;" class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
+        <div class="flex items-center gap-5">
+          <div class="radar" aria-hidden="true"></div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <div class="font-heading font-semibold">Building your report…</div>
+              <div id="loader-timer" class="text-xs text-gray-500">00:00</div>
+            </div>
+            <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
+            <p class="text-xs text-gray-500 mt-2">Usually 10–30s — scanning public data and synthesizing a complete snapshot.</p>
+          </div>
+        </div>
+        <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="skeleton-card space-y-3">
+            <div class="w-28 h-3 rounded shimmer"></div>
+            <div class="w-full h-20 shimmer rounded-md"></div>
+            <div class="w-3/4 h-3 rounded shimmer"></div>
+          </div>
+          <div class="skeleton-card space-y-3">
+            <div class="w-32 h-3 rounded shimmer"></div>
+            <div class="w-full h-20 shimmer rounded-md"></div>
+            <div class="w-1/2 h-3 rounded shimmer"></div>
+          </div>
+          <div class="skeleton-card space-y-3">
+            <div class="w-36 h-3 rounded shimmer"></div>
+            <div class="w-full h-20 shimmer rounded-md"></div>
+            <div class="w-5/6 h-3 rounded shimmer"></div>
+          </div>
+        </div>
+      </div>
 
       <!-- Error -->
       <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
         <p id="report-error-message" class="text-sm text-red-700"></p>
       </div>
 
-      <!-- REPORT CONTENT -->
+      <!-- Content -->
       <div id="report-content" style="display:none;" class="space-y-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
-          <div class="flex items-center gap-3">
-            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
-          </div>
+          <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
         </div>
 
-        <!-- Corporate Filings (first) + Summary block with Facts moved down -->
+        <!-- Score + Summary (filings moved here) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Corporate Filings (moved up) -->
+          <!-- Score -->
           <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Corporate Filings</h3>
-            <ul class="text-sm text-gray-800 space-y-1">
-              <li><span class="text-gray-500">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
-              <li>
-                <span class="text-gray-500">Status:</span>
-                <span id="report-sos-status" class="ml-1"></span>
-              </li>
-              <li><span class="text-gray-500">Jurisdiction:</span> <span id="report-sos-jurisdiction" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Formation Date:</span> <span id="report-sos-date" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
-            </ul>
+            <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
+            <div class="flex flex-col items-center">
+              <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">…</span></div>
+              <p id="report-score-justification" class="text-center text-gray-600 text-sm mb-3 italic"></p>
+              <div class="w-full text-left">
+                <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Positives</h4>
+                <ul id="report-score-positives" class="space-y-1.5 mb-3"></ul>
+                <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Risks</h4>
+                <ul id="report-score-negatives" class="space-y-1.5"></ul>
+              </div>
+            </div>
           </div>
 
-          <!-- Summary & filled area -->
+          <!-- Business Summary + Filings + Headlines -->
           <div class="lg:col-span-2 widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
             <p id="report-summary" class="text-sm text-gray-800 leading-relaxed"></p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <!-- Company Facts (moved here) -->
+              <!-- Corporate Filings (mini) -->
               <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Company Facts</h4>
-                <ul class="text-sm text-gray-700 space-y-1">
-                  <li><span class="text-gray-500">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Website:</span> <span id="facts-website" class="ml-1"></span></li>
+                <h4 class="text-sm font-semibold text-brand-dark mb-3">Corporate Filings</h4>
+                <ul class="text-sm text-gray-800 space-y-1">
+                  <li><span class="text-gray-500">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Status:</span> <span id="report-sos-status" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Jurisdiction:</span> <span id="report-sos-jurisdiction" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Formation Date:</span> <span id="report-sos-date" class="ml-1"></span></li>
+                  <li><span class="text-gray-500">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
                 </ul>
               </div>
 
@@ -158,22 +200,20 @@
                 <h4 class="text-sm font-semibold text-brand-dark mb-3">Operational Highlights</h4>
                 <ul id="report-highlights" class="space-y-2 text-sm text-gray-800"></ul>
               </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div class="p-4 border border-brand-border rounded-lg">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Recent Headlines</h4>
+              <!-- Headlines (fills the big blank space) -->
+              <div class="md:col-span-2 p-4 border border-brand-border rounded-lg bg-white min-h-[220px]">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-sm font-semibold text-brand-dark">Recent Headlines</h4>
+                  <span id="news-updated" class="text-xs text-gray-500"></span>
+                </div>
                 <ul id="report-news-list" class="space-y-2"></ul>
-              </div>
-              <div class="p-4 border border-brand-border rounded-lg">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Brands &amp; Business Lines</h4>
-                <ul id="report-segments-list" class="space-y-2 text-sm text-gray-800"></ul>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Contact & Map (map now uses SoS business address preferred) -->
+        <!-- Contact & Map (embed uses SOS address; no API key needed) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
@@ -185,21 +225,29 @@
             </ul>
           </div>
           <div class="widget-card p-0 overflow-hidden">
-            <div class="relative h-[260px] md:h-[300px] w-full">
-              <!-- Embed map (shows when we have address) -->
-              <iframe id="map-embed" class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="display:none;"></iframe>
-              <!-- Placeholder grid until embed appears -->
-              <div id="map-placeholder" class="map-grid absolute inset-0 flex items-center justify-center text-sm text-gray-500">
-                Map placeholder — loads from SoS business address when available
-              </div>
-            </div>
+            <iframe id="map-embed" title="Map" class="w-full h-[260px] md:h-[300px] border-0"
+                    referrerpolicy="no-referrer-when-downgrade" loading="lazy"></iframe>
           </div>
         </div>
 
-        <!-- Public Records -->
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Public Records</h3>
-          <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-800 leading-relaxed"></ul>
+        <!-- SWAPPED: Company Facts (down here) + Public Records -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Company Facts</h3>
+            <ul class="text-sm text-gray-700 space-y-1">
+              <li><span class="text-gray-500">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
+              <li><span class="text-gray-500">Website:</span> <span id="facts-website" class="ml-1"></span></li>
+            </ul>
+          </div>
+
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Public Records</h3>
+            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-800 leading-relaxed"></ul>
+          </div>
         </div>
 
         <!-- Leadership / Products / Competitors / Web Signals -->
@@ -244,30 +292,7 @@
           </div>
         </div>
 
-        <!-- KPIs Table -->
-        <div class="widget-card p-5 md:p-6">
-          <div class="flex items-center justify-between">
-            <h3 class="font-heading font-semibold">KPIs (Fictional / Derived)</h3>
-            <span class="text-xs text-gray-500">Scrollable →</span>
-          </div>
-          <div class="mt-3 overflow-x-auto">
-            <table class="min-w-[700px] w-full text-sm">
-              <thead class="bg-brand-light text-gray-700">
-                <tr>
-                  <th class="text-left px-3 py-2 font-semibold">Metric</th>
-                  <th class="text-left px-3 py-2 font-semibold">Q1</th>
-                  <th class="text-left px-3 py-2 font-semibold">Q2</th>
-                  <th class="text-left px-3 py-2 font-semibold">Q3</th>
-                  <th class="text-left px-3 py-2 font-semibold">Q4</th>
-                  <th class="text-left px-3 py-2 font-semibold">YoY</th>
-                </tr>
-              </thead>
-              <tbody id="kpi-tbody" class="divide-y divide-brand-border"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Sources: auto-expanded -->
+        <!-- Sources (auto‑expanded) -->
         <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources &amp; Links</h4>
@@ -288,8 +313,7 @@
 
   <script>
     /* ===================== Config ===================== */
-    const zakk = "AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q"; // or set window.zakk at runtime
-    const PROXY_BASE = "";              // optional proxy for local dev; leave blank for direct
+    const zakk = "AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q";                       // ← put your dev key here or set window.zakk at runtime
     const MODEL_CANDIDATES = ['gemini-2.5-flash','gemini-2.5-flash-preview-09-2025'];
     const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
     const MAX_OUTPUT_TOKENS = 8192;
@@ -300,16 +324,23 @@
       return fromWindow || fromConst;
     }
     function makeUrl(model, key) {
-      if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models/${model}:generateContent`;
       return `${DIRECT_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`;
     }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
     function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
-    function linkifyMaybe(v) { if (!v) return 'N/A'; const s=String(v).trim(); return /^https?:\/\//i.test(s) ? `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>` : s; }
-
+    function linkifyMaybe(v) {
+      if (!v) return 'N/A';
+      const s = String(v).trim();
+      if (/^https?:\/\//i.test(s)) {
+        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      }
+      return s;
+    }
     function renderLineChart(container, values, color) {
-      const ok = Array.isArray(values) && values.length > 1;
-      const nums = ok ? values.map(v => Number.isFinite(+v) ? +v : 0) : [30,35,33,40,38,45,50,55,60,62,65,70];
+      if (!Array.isArray(values) || values.length < 2) {
+        container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>'; return;
+      }
+      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
       const min = Math.min(...nums), max = Math.max(...nums);
       const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
       const step = 100 / (norm.length - 1);
@@ -321,11 +352,169 @@
         </svg>`;
     }
 
-    /* ===================== API ===================== */
+    /* Loader */
+    let __loaderCtl = null;
+    function startLoadingAnimation() {
+      const steps = [
+        'Matching business identity (US bias)','Searching open web','Pulling SOS filings',
+        'Parsing metadata','Checking public records','Gathering leadership',
+        'Mapping products & services','Finding competitors','Collecting web & social',
+        'Crawling headlines','Reading customer reviews','Synthesizing risk score'
+      ];
+      const stepsOl = document.getElementById('loader-steps');
+      const barEl   = document.getElementById('loader-bar');
+      const timerEl = document.getElementById('loader-timer');
+
+      stepsOl.innerHTML = steps.map((s,i) => `
+        <li class="flex items-start gap-2">
+          <span class="step-icon" id="ld_${i}">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </span>
+          <span>${s}</span>
+        </li>`).join('');
+
+      let elapsed = 0;
+      const tTimer = setInterval(() => {
+        elapsed += 200;
+        const m = Math.floor(elapsed/1000/60);
+        const s = Math.floor((elapsed/1000)%60);
+        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }, 200);
+
+      let idx = 0;
+      const stepMs = Math.max(900, Math.floor(24000 / steps.length));
+      const tSteps = setInterval(() => {
+        if (idx < steps.length) {
+          document.getElementById(`ld_${idx}`)?.classList.add('done');
+          idx++;
+          const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
+          barEl.style.width = pct + '%';
+        } else {
+          const cur = parseFloat(barEl.style.width) || 98;
+          barEl.style.width = Math.min(99, cur + 0.2) + '%';
+        }
+      }, stepMs);
+
+      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
+    }
+
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
+
+    function showState(state, message = '') {
+      loader.style.display = 'none';
+      errBox.style.display = 'none';
+      content.style.display = 'none';
+      results.style.display = 'block';
+      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+      if (state === 'loading') { loader.style.display = 'block'; __loaderCtl = startLoadingAnimation(); }
+      else if (state === 'error') { errBox.style.display = 'block'; errMsg.textContent = message || 'Something went wrong.'; }
+      else if (state === 'content') { content.style.display = 'block'; }
+    }
+
+    /* JSON parsing */
+    function parseCandidateJSON(candidate) {
+      const parts = candidate?.content?.parts || [];
+      for (const p of parts) {
+        if (typeof p?.text === 'string' && p.text.trim()) {
+          const raw0 = p.text.trim();
+          const raw = raw0.replace(/```json/g, '```').replace(/```/g, '');
+          try { return JSON.parse(raw); } catch {}
+          const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
+          if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
+        }
+      }
+      for (const p of parts) {
+        if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
+          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
+        }
+      }
+      const preview = parts.find(p => p.text)?.text?.slice(0, 300)?.replace(/\s+/g,' ') || 'No text';
+      throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
+    }
+
+    /* Sources */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      // Auto‑expanded by default
+      ul.classList.remove('hidden');
+      const toggle = document.getElementById('toggle-sources');
+      toggle.textContent = 'Hide list';
+      let open = true;
+      toggle.onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        toggle.textContent = open ? 'Hide list' : 'Show list';
+      };
+    }
+
+    /* Fetch helper */
+    async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
+      let lastError;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try { body = await res.json(); } catch {}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+        }
+      }
+      throw lastError || new Error('API request failed.');
+    }
+
+    /* API call */
     function makePayload(systemPrompt, userQuery) {
       return {
         contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        system_instruction: { parts: [{ text: systemPrompt }] }, // v1beta snake_case
+        system_instruction: { parts: [{ text: systemPrompt }] },
         generation_config: {
           max_output_tokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
@@ -335,30 +524,13 @@
       };
     }
 
-    async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
-      let err;
-      for (let i=0;i<retries;i++){
-        try{
-          const res = await fetch(url, options);
-          if(!res.ok){
-            let body=null; try{ body=await res.json(); }catch{}
-            throw new Error((body?.error?.message||res.statusText)+` (HTTP ${res.status})`);
-          }
-          return await res.json();
-        }catch(e){ err=e; if(i<retries-1) await new Promise(r=>setTimeout(r, delay*Math.pow(2,i))); }
-      }
-      throw err || new Error('Request failed.');
-    }
-
     async function callReportAPI(systemPrompt, userQuery) {
       const key = getApiKey();
-      if (!key && !PROXY_BASE) throw new Error('Missing API key (zakk).');
-
+      if (!key) throw new Error('Missing API key (zakk). Set it near the top of the file.');
       let lastErr;
       for (const model of MODEL_CANDIDATES) {
         const url = makeUrl(model, key);
         let payload = makePayload(systemPrompt, userQuery);
-
         for (let attempt = 1; attempt <= 2; attempt++) {
           try {
             const data = await fetchWithBackoff(url, {
@@ -366,35 +538,20 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
             });
-
             const cand = data?.candidates?.[0];
             if (!cand) throw new Error('No candidates in response.');
-
-            // Parse JSON (text or inline_data)
-            const parts = cand?.content?.parts || [];
-            let json=null;
-            for (const p of parts) {
-              if (typeof p?.text === 'string' && p.text.trim()) {
-                const raw = p.text.replace(/```json/g,'```').replace(/```/g,'').trim();
-                try { json = JSON.parse(raw); break; } catch {}
-                const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
-                if (cut>0) { try { json = JSON.parse(raw.slice(0,cut+1)); break; } catch {} }
-              }
-              if (p?.inline_data?.data && /json/i.test(p.inline_data.mimeType||'')) {
-                try { json = JSON.parse(atob(p.inline_data.data)); break; } catch {}
-              }
-            }
-            if(!json) throw new Error('Model returned no parseable JSON.');
-
+            const json = parseCandidateJSON(cand);
             const atts = cand?.groundingMetadata?.groundingAttributions || [];
             const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
-
             return { json, sources };
           } catch (e) {
             lastErr = e;
-            const parseIssue = /parseable JSON|Unexpected end|Unexpected token|invalid json/i.test(e.message||'');
-            if (attempt===1 && parseIssue) {
-              payload = makePayload(systemPrompt + '\n\nReturn JSON only. No prose. If unknown, use "N/A" or [].', userQuery);
+            const parseIssue = /no parseable JSON|Unexpected end of JSON|Unexpected token|Invalid or unexpected/i.test(e.message || '');
+            if (attempt === 1 && parseIssue) {
+              const stricter = `${systemPrompt}
+
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
+              payload = makePayload(stricter, userQuery);
               continue;
             }
             break;
@@ -404,21 +561,16 @@
       throw lastErr || new Error('All model attempts failed.');
     }
 
-    /* ===================== Prompt (includes SoS address fields) ===================== */
+    /* Prompt */
     function buildSystemPrompt() {
       return `
-You are a meticulous US-focused business analyst. Return a SINGLE JSON object ONLY (no commentary, no code fences).
-Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unknown.
+You are a meticulous US-focused business analyst. Return a SINGLE JSON object ONLY (no commentary, no code fences). 
+Prioritize US Secretary‑of‑State and corporate registry data for contact address. Use "N/A" when unknown.
 
+JSON schema:
 {
   "summary": { "companyName": string, "summary": string },
-  "sos": {
-    "entityName": string, "status": string, "entityType": string, "jurisdiction": string,
-    "formationDate": string, "registeredAgent": string,
-    "businessAddress": string,                // preferred address for map (principal office or business address)
-    "mailingAddress": string,                 // optional
-    "registeredOfficeAddress": string         // optional
-  },
+  "sos": { "entityName": string, "status": string, "entityType": string, "jurisdiction": string, "formationDate": string, "registeredAgent": string },
   "publicRecords": { "findings": [{ "type": string, "details": string }] },
   "riskScore": { "score": number, "justification": string, "positiveFactors": [string], "negativeFactors": [string] },
   "reviews": [{ "snippet": string, "source": string, "url": string }],
@@ -429,20 +581,26 @@ Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unkn
   "products": [string],
   "competitors": [string],
   "webPresence": { "twitter": string, "linkedin": string, "youtube": string, "traffic": string },
-  "contact": { "phone": string, "email": string, "address": string },
+  "contact": { "phone": string, "email": string, "address": string, "lat": number, "lng": number, "mapsLink": string },
   "highlights": [string],
-  "kpis": [{ "metric": string, "q1": string, "q2": string, "q3": string, "q4": string, "yoy": string }],
   "citations": [{ "title": string, "url": string }]
 }
 
-Scoring: 300 (high risk) → 850 (low risk). Provide balanced positives & negatives.
+- contact.address should reflect the best US SOS/filings address for the entity.
+- If lat/lng cannot be determined, omit them; the UI will still show the address and a Maps link.
+- riskScore.score: 300 (high risk) to 850 (low risk).
 Return valid JSON only.
       `.trim();
     }
 
-    /* ===================== DOM refs ===================== */
+    /* DOM refs */
     const titleEl = document.getElementById('report-title');
     const summaryEl = document.getElementById('report-summary');
+    const scoreCircle = document.getElementById('report-score-circle');
+    const scoreDigit  = document.getElementById('report-score-digit');
+    const scoreJust   = document.getElementById('report-score-justification');
+    const posList     = document.getElementById('report-score-positives');
+    const negList     = document.getElementById('report-score-negatives');
 
     const sosName = document.getElementById('report-sos-name');
     const sosStatus = document.getElementById('report-sos-status');
@@ -464,9 +622,7 @@ Return valid JSON only.
     const contactEmail = document.getElementById('contact-email');
     const contactAddr  = document.getElementById('contact-address');
     const contactMap   = document.getElementById('contact-maplink');
-
-    const mapEmbed      = document.getElementById('map-embed');
-    const mapPlaceholder= document.getElementById('map-placeholder');
+    const mapIframe    = document.getElementById('map-embed');
 
     const recList    = document.getElementById('report-records-list');
     const reviewsList= document.getElementById('report-reviews-list');
@@ -475,100 +631,84 @@ Return valid JSON only.
     const compList   = document.getElementById('report-competitors-list');
     const socialList = document.getElementById('report-social-list');
 
+    const newsRoll   = document.getElementById('report-news-list');
+    const newsUpdated= document.getElementById('news-updated');
+
     const chartRevenue = document.getElementById('report-chart-revenue');
     const chartCash    = document.getElementById('report-chart-cashflow');
-    const kpiTbody     = document.getElementById('kpi-tbody');
-    const headlinesList= document.getElementById('report-news-list');
-    const segmentsList = document.getElementById('report-segments-list');
 
-    /* ===================== Helpers ===================== */
-    function bestSOSAddress(sos) {
-      const cands = [
-        'businessAddress','principalAddress','principalOfficeAddress',
-        'registeredOfficeAddress','registeredAddress','officeAddress',
-        'address','mailingAddress'
-      ];
-      for (const k of cands) {
-        const v = sos && sos[k];
-        if (v && String(v).trim() && String(v).trim().toUpperCase() !== 'N/A') return String(v).trim();
-      }
-      return '';
-    }
-
-    /* ===================== Populate ===================== */
+    /* Populate report */
     function populateReport(data) {
       setText(titleEl, data?.summary?.companyName);
       summaryEl.textContent = data?.summary?.summary || 'No summary could be found.';
 
-      // Filings
+      const score = data?.riskScore?.score || 0;
+      scoreDigit.textContent = score;
+      scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
+      scoreCircle.className = 'score-circle mb-4';
+      if (score < 550) scoreCircle.classList.add('score-red');
+      else if (score < 700) scoreCircle.classList.add('score-yellow');
+      else scoreCircle.classList.add('score-green');
+
+      posList.innerHTML = '';
+      (data?.riskScore?.positiveFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
+        posList.appendChild(li);
+      });
+      negList.innerHTML = '';
+      (data?.riskScore?.negativeFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
+        negList.appendChild(li);
+      });
+
+      // Filings (in summary)
       const sos = data?.sos || {};
       setText(sosName,  sos.entityName);
       setText(sosEntity,sos.entityType);
-      const statusLower = (sos.status || '').toLowerCase().trim();
-      sosStatus.className = 'ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium';
-      if (statusLower === 'active') sosStatus.classList.add('bg-green-100','text-green-700');
-      else if (statusLower && statusLower !== 'n/a') sosStatus.classList.add('bg-red-100','text-red-700');
-      else sosStatus.classList.add('bg-gray-100','text-gray-600');
-      sosStatus.textContent = sos.status || 'N/A';
+      setText(sosStatus,sos.status);
       setText(sosJuris, sos.jurisdiction);
       setText(sosDate,  sos.formationDate);
       setText(sosAgent, sos.registeredAgent);
+      const st = (sos.status || '').toLowerCase();
+      sosStatus.className = '';
+      if (st.includes('active')) sosStatus.className = 'inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold';
+      else if (sos.status && !st.includes('n/a')) sosStatus.className = 'text-red-600';
 
-      // Facts
+      // Facts (moved down)
       const p = data?.profile || {};
       setText(factsFounded, p.founded);
       setText(factsHQ, p.headquarters || p.hq);
       setText(factsEmployees, p.employees);
       setText(factsIndustry, p.industry || p.subindustry);
       setText(factsTicker, p.ticker);
-      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
+      factsWebsite.innerHTML = p.website && /^https?:\/\//.test(p.website) ? linkifyMaybe(p.website) : (p.website || 'N/A');
 
       // Highlights
       highlightsList.innerHTML = '';
-      (data?.highlights || []).slice(0,8).forEach(t => { const li = document.createElement('li'); li.textContent = t; highlightsList.appendChild(li); });
+      (data?.highlights || []).slice(0,8).forEach(t => { const li=document.createElement('li'); li.textContent=t; highlightsList.appendChild(li); });
       if (!highlightsList.children.length) highlightsList.innerHTML = '<li class="text-sm text-gray-600">No highlights available.</li>';
 
-      // Headlines
-      headlinesList.innerHTML = '';
-      (data?.news || []).slice(0,6).forEach(n => {
-        const li = document.createElement('li');
-        li.innerHTML =
-          `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
-           <div class="text-xs text-gray-500">${n.source || 'Source'}${n.date ? ' • ' + n.date : ''}</div>`;
-        headlinesList.appendChild(li);
-      });
-      if (!headlinesList.children.length) headlinesList.innerHTML = '<li class="text-sm text-gray-600">No recent headlines found.</li>';
-
-      // Business lines (fallback to sample segments if empty)
-      segmentsList.innerHTML = '';
-      let segs = (data?.products || []).slice(0,8);
-      if (!segs.length && data?.summary?.summary) segs = ['Email & Messaging','Advertising / Media','Search / Web Portal'];
-      segs.forEach(s => { const li = document.createElement('li'); li.textContent = s; segmentsList.appendChild(li); });
-      if (!segmentsList.children.length) segmentsList.innerHTML = '<li class="text-sm text-gray-600">No segment info available.</li>';
-
-      // Contact + Map
+      // Contact from SOS address
       const c = data?.contact || {};
-      const sosAddr = bestSOSAddress(sos);
-      const displayAddress = c.address || sosAddr; // show contact addr if present; otherwise SoS
       setText(contactPhone, c.phone);
       setText(contactEmail, c.email);
-      setText(contactAddr,  displayAddress || 'N/A');
-
-      // Map: prefer SoS address for query
-      const mapQuery = sosAddr || c.address || '';
-      if (mapQuery) {
-        const src = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
-        mapEmbed.src = src;
-        mapEmbed.style.display = 'block';
-        mapPlaceholder.style.display = 'none';
-        contactMap.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
-        contactMap.style.pointerEvents = 'auto';
-      } else {
-        mapEmbed.style.display = 'none';
-        mapPlaceholder.style.display = 'flex';
-        contactMap.href = '#';
-        contactMap.style.pointerEvents = 'none';
-      }
+      setText(contactAddr,  c.address);
+      const mapsHref = c.mapsLink || (c.lat && c.lng
+        ? `https://www.google.com/maps?q=${encodeURIComponent(c.lat)},${encodeURIComponent(c.lng)}&z=14`
+        : c.address ? `https://www.google.com/maps?q=${encodeURIComponent(c.address)}&z=14` : '#');
+      contactMap.href = mapsHref;
+      contactMap.style.pointerEvents = mapsHref === '#' ? 'none' : 'auto';
+      // iframe embed
+      const embedSrc = c.lat && c.lng
+        ? `https://www.google.com/maps?q=${encodeURIComponent(c.lat)},${encodeURIComponent(c.lng)}&hl=en&z=14&output=embed`
+        : c.address ? `https://www.google.com/maps?q=${encodeURIComponent(c.address)}&hl=en&z=14&output=embed` : 'about:blank';
+      mapIframe.src = embedSrc;
 
       // Public records
       recList.innerHTML = '';
@@ -583,8 +723,7 @@ Return valid JSON only.
       leaderList.innerHTML = '';
       (data?.leadership || []).slice(0,8).forEach(l => {
         const li = document.createElement('li');
-        const linked = l.linkedin && /^https?:\/\//.test(l.linkedin)
-          ? ` — <a class="text-brand-green hover:underline" href="${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>` : '';
+        const linked = l.linkedin && /^https?:\/\//.test(l.linkedin) ? ` — <a class="text-brand-green hover:underline" href="${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>` : '';
         li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>${linked}`;
         leaderList.appendChild(li);
       });
@@ -600,16 +739,14 @@ Return valid JSON only.
       (data?.competitors || []).slice(0,12).forEach(cmp => { const li = document.createElement('li'); li.textContent = cmp; compList.appendChild(li); });
       if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
 
-      // Social / web presence
+      // Web / social
       socialList.innerHTML = '';
       const w = data?.webPresence || {};
       [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
         if (!v) return;
         const li = document.createElement('li');
         let valueHtml = v;
-        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-        }
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
         li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
         socialList.appendChild(li);
       });
@@ -627,122 +764,69 @@ Return valid JSON only.
       if (!reviewsList.children.length) reviewsList.innerHTML = '<p class="text-sm text-gray-600">No recent customer reviews found.</p>';
 
       // Charts
-      renderLineChart(chartRevenue, data?.chartPoints?.revenue, '#00C09A');
-      renderLineChart(chartCash,    data?.chartPoints?.cashFlow,  '#3B82F6');
+      const points = data?.chartPoints || {};
+      renderLineChart(chartRevenue, Array.isArray(points.revenue)&&points.revenue.length>1 ? points.revenue : [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
+      renderLineChart(chartCash, Array.isArray(points.cashFlow)&&points.cashFlow.length>1 ? points.cashFlow : [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
 
-      // KPIs (fallback sample)
-      kpiTbody.innerHTML = '';
-      (data?.kpis || [
-        { metric:'New Customers', q1:'120', q2:'140', q3:'160', q4:'200', yoy:'+24%' },
-        { metric:'Churn Rate',    q1:'3.2%', q2:'3.1%', q3:'3.3%', q4:'3.0%', yoy:'-0.2pp' },
-        { metric:'Gross Margin',  q1:'61%',  q2:'63%',  q3:'62%',  q4:'64%',  yoy:'+2pp'  },
-      ]).forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="px-3 py-2 font-medium">${row.metric || 'N/A'}</td>
-          <td class="px-3 py-2">${row.q1 || '—'}</td>
-          <td class="px-3 py-2">${row.q2 || '—'}</td>
-          <td class="px-3 py-2">${row.q3 || '—'}</td>
-          <td class="px-3 py-2">${row.q4 || '—'}</td>
-          <td class="px-3 py-2">${row.yoy || '—'}</td>`;
-        kpiTbody.appendChild(tr);
-      });
+      // News
+      newsRoll.innerHTML = '';
+      const news = (data?.news || []).slice(0,8);
+      if (news.length) {
+        newsUpdated.textContent = `${news.length} items`;
+        news.forEach(n => {
+          const li = document.createElement('li');
+          const href = n.url && /^https?:\/\//.test(n.url) ? n.url : '#';
+          const dat  = n.date ? ` • ${n.date}` : '';
+          li.innerHTML = `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${href}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+                          <div class="text-xs text-gray-500">${(n.source || 'Source')}${dat}</div>`;
+          newsRoll.appendChild(li);
+        });
+      } else {
+        newsUpdated.textContent = '';
+        newsRoll.innerHTML = '<li class="text-sm text-gray-600">No recent headlines found.</li>';
+      }
     }
 
-    // Sources (auto-expanded)
-    function normalizeUrl(u){ try{ const url=new URL(u); url.search=''; if(url.pathname!=='/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); }catch{ return null; } }
-    function prettyUrl(u){ try{ const url=new URL(u); let out=url.hostname.replace(/^www\./,''); if(url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; }catch{ return u; } }
-    function collectSources(json, modelSources) {
-      const out=[], push=(title,url,kind)=>{ const norm=normalizeUrl(url); if(!norm) return; out.push({title:title||prettyUrl(norm), url:norm, kind}); };
-      (json?.citations||[]).forEach(c=>push(c.title||c.url,c.url,'citation'));
-      (modelSources||[]).forEach(s=>push(s.title||s.uri,s.uri,'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w=json?.webPresence||{};
-      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.news||[]).forEach(n=>{ if(n?.url) push(n.title||n.source||'News', n.url,'news'); });
-      (json?.reviews||[]).forEach(r=>{ if(r?.url) push(r.source||'Review', r.url,'review'); });
-      const seen=new Set(); return out.filter(({url})=>!seen.has(url)&&seen.add(url));
-    }
-    function populateSources(links) {
-      const chips=document.getElementById('report-sources-chips');
-      const ul=document.getElementById('report-sources');
-      const box=document.getElementById('report-sources-container');
-      chips.innerHTML=''; ul.innerHTML='';
-      if(!Array.isArray(links)||!links.length){ box.style.display='none'; return; }
-      box.style.display='block';
-      links.forEach(({url,title,kind})=>{
-        const emoji=kind==='news'?'📰':kind==='review'?'⭐':kind==='social'?'🔗':kind==='site'?'🏢':kind==='citation'?'📚':'🔗';
-        const span=document.createElement('span');
-        span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML=`${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({url,title})=>{
-        const li=document.createElement('li');
-        li.className='text-sm';
-        li.innerHTML=`<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||prettyUrl(url)}</a>
-                      <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      // Auto-expanded by default; toggle remains available
-      let open = true;
-      document.getElementById('toggle-sources').onclick = () => {
-        open = !open;
-        ul.classList.toggle('hidden', !open);
-        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
-      };
-    }
-
-    // Wire up UI
+    /* Wire up */
     document.addEventListener('DOMContentLoaded', () => {
-      const results = document.getElementById('report-results-container');
-      const errBox  = document.getElementById('report-error-container');
-      const errMsg  = document.getElementById('report-error-message');
-      const content = document.getElementById('report-content');
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
 
-      function showState(state, message=''){
-        errBox.style.display='none'; content.style.display='none'; results.style.display='block';
-        if(state==='error'){ errBox.style.display='block'; errMsg.textContent=message||'Something went wrong.'; }
-        if(state==='content'){ content.style.display='block'; }
-      }
+      async function runReport(query) {
+        document.getElementById('report-results-container').style.display = 'block';
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+        showState('loading');
+        btn.classList.add('cta-disabled'); btn.disabled = true;
 
-      async function runReport(q){
-        results.style.display='block';
-        document.getElementById('results')?.scrollIntoView({behavior:'smooth'});
-        btn.disabled=true; btn.classList.add('cta-disabled'); showState('error','Generating report…');
+        const systemPrompt = buildSystemPrompt();
+        const userQuery = `Generate a comprehensive US-focused AI business report for: "${query}"`;
 
-        try{
-          const { json, sources } = await callReportAPI(buildSystemPrompt(), `Generate a comprehensive US-focused AI business report for: "${q}"`);
+        try {
+          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
           populateReport(json);
-          populateSources(collectSources(json, sources));
+          populateSources(collectSources(json, sources)); // auto‑expanded
           showState('content');
-        }catch(e){
+        } catch (e) {
           console.error(e);
-          const corsHint = (!PROXY_BASE && /Failed to fetch|NetworkError|CORS|TypeError: fetch/i.test(String(e)))
-            ? 'Network/CORS error: serve this page via http(s) and/or configure a tiny proxy (set PROXY_BASE) for local testing.'
-            : '';
-          showState('error', e.message || corsHint || 'Failed to generate report.');
-        }finally{
-          btn.disabled=false; btn.classList.remove('cta-disabled');
+          const hint = /fetch|network|cors/i.test(String(e)) ?
+            'Network/CORS: serve this file via http(s) and temporarily disable extensions that block requests to generativelanguage.googleapis.com.' : '';
+          showState('error', e.message || hint || 'Failed to generate report.');
+        } finally {
+          btn.disabled = false; btn.classList.remove('cta-disabled');
         }
       }
 
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = (input.value || '').trim();
-        if(!q){ showState('error','Please enter a business name.'); return; }
+        if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
       });
-
       rerunBtn?.addEventListener('click', () => {
         const q = (input.value || '').trim();
-        if(!q){ showState('error','Please enter a business name.'); return; }
+        if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
       });
     });
