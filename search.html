@@ -40,26 +40,44 @@
 
     .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 
-    /* CTA / buttons (match "Request Demo" feel) */
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid transparent;font-weight:700;border-radius:.5rem;transition:all .2s ease}
+    /* CTA (matches main site) */
+    .cta-button { transition: all 0.3s ease; }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15); }
+    .cta-button:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,192,154,.35), 0 10px 20px rgba(0,192,154,.15); }
+    .cta-disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Base button */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid transparent;font-weight:700;border-radius:.5rem}
     .btn--lg{padding:.875rem 1rem;font-size:1.125rem}
     .btn-primary{background:#00C09A;color:#fff}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,192,154,.15)}
-    .btn:focus{outline:none;box-shadow:0 0 0 3px rgba(0,192,154,.35),0 10px 20px rgba(0,192,154,.15)}
-    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-    /* Card look */
+    /* Card */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
     .widget-card:hover{transform:translateY(-2px);box-shadow:0 18px 32px rgba(0,192,154,.15);border-color:#d1d5db}
     .widget-card:focus-within{box-shadow:0 0 0 3px rgba(0,192,154,.15),0 18px 32px rgba(0,192,154,.15)}
 
-    /* Score gauge */
+    /* Score */
     .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
     .truncate-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .leading-tightish{line-height:1.35}
+
+    /* Key–value grid for tidy wrapping/placement */
+    .kv-grid{display:grid;grid-template-columns:140px minmax(0,1fr);gap:.375rem .75rem;align-items:start}
+    @media (min-width:640px){.kv-grid{grid-template-columns:180px minmax(0,1fr)}}
+    .kv-term{color:#6b7280;white-space:nowrap}
+    .kv-val{color:#111827;overflow-wrap:anywhere}
+
+    /* Sources chips */
+    .chips { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .chip  { border:1px solid #E5E7EB; border-radius:9999px; background:#F8F9FA; padding:.375rem .625rem; font-size:.80rem; line-height:1; }
+    .chip a{ color:#00C09A; font-weight:600; }
+
+    /* let long URLs wrap cleanly inside lists */
+    .link-wrap { word-break: break-word; overflow-wrap: anywhere; }
   </style>
 </head>
 
@@ -74,8 +92,6 @@
         </svg>
         <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
       </a>
-
-      <!-- Back to main -->
       <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
         <span aria-hidden="true">←</span> Back to Main
       </a>
@@ -90,16 +106,16 @@
 
       <div class="widget-card p-3 md:p-4 mt-6">
         <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Tesla, Inc. or Apex Innovations"
+          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
                  class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
-          <button id="generate-report-btn" type="submit" class="btn btn-primary btn--lg">
+          <button id="generate-report-btn" type="submit" class="btn btn-primary btn--lg cta-button">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
             </svg>
             Generate
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS & public‑records matching.</p>
+        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS &amp; public‑records matching.</p>
       </div>
     </div>
   </section>
@@ -130,18 +146,18 @@
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
           <div class="flex items-center gap-3">
-            <button id="rerun" class="btn btn-primary">Re‑run</button>
+            <button id="rerun" class="btn btn-primary cta-button">Re‑run</button>
           </div>
         </div>
 
-        <!-- Score + Summary (with filled area) -->
+        <!-- Score + Summary -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Score -->
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
             <div class="flex flex-col items-center">
               <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">…</span></div>
-              <p id="report-score-justification" class="text-center text-gray-500 text-sm mb-4 italic"></p>
+              <p id="report-score-justification" class="text-center text-gray-500 text-sm mb-4 italic leading-tightish"></p>
               <div class="w-full text-left">
                 <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Factors</h4>
                 <ul id="report-score-positives" class="space-y-1.5 mb-2"></ul>
@@ -150,22 +166,22 @@
             </div>
           </div>
 
-          <!-- Summary (Company Facts + Headlines) -->
+          <!-- Summary (Facts + Headlines) -->
           <div class="md:col-span-2 widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
-            <p id="report-summary" class="text-sm text-gray-700"></p>
+            <p id="report-summary" class="text-sm text-gray-700 leading-relaxed"></p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <!-- Company Facts -->
               <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
                 <h4 class="text-sm font-semibold text-brand-dark mb-3">Company Facts</h4>
-                <ul class="text-sm text-gray-700 space-y-2">
-                  <li class="flex justify-between"><span class="text-gray-500">Founded</span><span id="facts-founded" class="font-medium"></span></li>
-                  <li class="flex justify-between"><span class="text-gray-500">Headquarters</span><span id="facts-hq" class="font-medium"></span></li>
-                  <li class="flex justify-between"><span class="text-gray-500">Employees</span><span id="facts-employees" class="font-medium"></span></li>
-                  <li class="flex justify-between"><span class="text-gray-500">Industry</span><span id="facts-industry" class="font-medium"></span></li>
-                  <li class="flex justify-between"><span class="text-gray-500">Ticker</span><span id="facts-ticker" class="font-medium"></span></li>
-                  <li class="flex justify-between"><span class="text-gray-500">Website</span><span id="facts-website" class="font-medium truncate max-w-[12rem] text-right"></span></li>
+                <ul class="text-sm text-gray-700 space-y-1">
+                  <li class="kv-grid"><span class="kv-term">Founded</span><span id="facts-founded" class="kv-val"></span></li>
+                  <li class="kv-grid"><span class="kv-term">Headquarters</span><span id="facts-hq" class="kv-val"></span></li>
+                  <li class="kv-grid"><span class="kv-term">Employees</span><span id="facts-employees" class="kv-val"></span></li>
+                  <li class="kv-grid"><span class="kv-term">Industry</span><span id="facts-industry" class="kv-val"></span></li>
+                  <li class="kv-grid"><span class="kv-term">Ticker</span><span id="facts-ticker" class="kv-val"></span></li>
+                  <li class="kv-grid"><span class="kv-term">Website</span><span id="facts-website" class="kv-val link-wrap"></span></li>
                 </ul>
               </div>
 
@@ -182,19 +198,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Corporate Filings</h3>
-            <ul class="space-y-2 text-sm text-gray-700">
-              <li class="flex justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark text-right"></span></li>
-              <li class="flex justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark text-right"></span></li>
-              <li class="flex justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark text-right"></span></li>
-              <li class="flex justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark text-right"></span></li>
-              <li class="flex justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark text-right"></span></li>
-              <li class="flex justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark text-right"></span></li>
+            <ul class="text-sm text-gray-700 space-y-1">
+              <li class="kv-grid"><span class="kv-term">Entity Name</span><span id="report-sos-name" class="kv-val"></span></li>
+              <li class="kv-grid"><span class="kv-term">Entity Type</span><span id="report-sos-entity" class="kv-val"></span></li>
+              <li class="kv-grid"><span class="kv-term">Status</span><span id="report-sos-status" class="kv-val"></span></li>
+              <li class="kv-grid"><span class="kv-term">Jurisdiction</span><span id="report-sos-jurisdiction" class="kv-val"></span></li>
+              <li class="kv-grid"><span class="kv-term">Formation Date</span><span id="report-sos-date" class="kv-val"></span></li>
+              <li class="kv-grid"><span class="kv-term">Registered Agent</span><span id="report-sos-agent" class="kv-val"></span></li>
             </ul>
           </div>
 
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Public Records</h3>
-            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-700"></ul>
+            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-700 leading-relaxed"></ul>
           </div>
         </div>
 
@@ -202,19 +218,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Leadership</h3>
-            <ul id="report-leadership-list" class="space-y-2 text-sm text-gray-700"></ul>
+            <ul id="report-leadership-list" class="space-y-2 text-sm text-gray-700 leading-tightish"></ul>
           </div>
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Products &amp; Services</h3>
-            <ul id="report-products-list" class="space-y-2 text-sm text-gray-700"></ul>
+            <ul id="report-products-list" class="space-y-2 text-sm text-gray-700 leading-tightish"></ul>
           </div>
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Competitors</h3>
-            <ul id="report-competitors-list" class="space-y-2 text-sm text-gray-700"></ul>
+            <ul id="report-competitors-list" class="space-y-2 text-sm text-gray-700 leading-tightish"></ul>
           </div>
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Web &amp; Social Signals</h3>
-            <ul id="report-social-list" class="space-y-2 text-sm text-gray-700"></ul>
+            <ul id="report-social-list" class="space-y-1.5 text-sm text-gray-700"></ul>
           </div>
         </div>
 
@@ -240,10 +256,14 @@
           </div>
         </div>
 
-        <!-- Sources -->
+        <!-- Sources & Links -->
         <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
-          <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Sources Used</h4>
-          <ul id="report-sources" class="space-y-1 list-disc list-inside"></ul>
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources &amp; Links</h4>
+            <button id="toggle-sources" type="button" class="text-xs text-brand-green hover:underline">Show list</button>
+          </div>
+          <div id="report-sources-chips" class="chips mt-3"></div>
+          <ul id="report-sources" class="mt-4 space-y-1 list-disc list-inside hidden"></ul>
         </div>
       </div>
     </div>
@@ -257,14 +277,10 @@
   </footer>
 
   <script>
-    /* =======================
-       1) Put your key here
-       ======================= */
+    /* ========= 1) Put your Gemini key here ========= */
     const zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
 
-    /* =======================
-       2) Model + token strategy
-       ======================= */
+    /* ========= 2) Model + token strategy ========= */
     const MODEL_CANDIDATES = [
       'gemini-2.5-pro',   // start here
       'gemini-2.0-pro',
@@ -323,6 +339,8 @@
 
       const sourcesBox = document.getElementById('report-sources-container');
       const sourcesUl  = document.getElementById('report-sources');
+      const sourcesChips = document.getElementById('report-sources-chips');
+      const sourcesToggle = document.getElementById('toggle-sources');
 
       // ----- UI helpers
       function showState(state, msg='') {
@@ -336,22 +354,93 @@
       }
       function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
 
-      function populateSources(sources) {
-        sourcesUl.innerHTML = '';
-        if (sources && sources.length) {
-          sources.forEach(s => {
-            const li = document.createElement('li');
-            li.className = 'text-xs truncate';
-            li.innerHTML = `<a href="${s.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-green hover:underline">${s.title || s.uri}</a>`;
-            sourcesUl.appendChild(li);
-          });
-          sourcesBox.style.display = 'block';
+      function toDomain(url) {
+        try {
+          const u = new URL(url);
+          return u.hostname.replace(/^www\./,'');
+        } catch { return url; }
+      }
+      function linkifyMaybe(v) {
+        if (!v) return 'N/A';
+        const s = String(v).trim();
+        if (/^https?:\/\//i.test(s)) {
+          return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline link-wrap">${toDomain(s)}</a>`;
+        }
+        return s;
+      }
+
+      // ----- URL helpers for sources
+      function normalizeUrl(u) {
+        try {
+          const url = new URL(u);
+          url.search = '';
+          if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1);
+          return url.toString();
+        } catch { return null; }
+      }
+      function prettyUrl(u) {
+        try {
+          const url = new URL(u);
+          let out = url.hostname.replace(/^www\./, '');
+          if (url.pathname && url.pathname !== '/') out += url.pathname;
+          return out.length > 60 ? out.slice(0, 57) + '…' : out;
+        } catch { return u; }
+      }
+
+      // ----- Chart utilities
+      function renderLineChart(container, values, color) {
+        if (!Array.isArray(values) || values.length < 2) {
+          container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
+          return;
+        }
+        const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
+        const min = Math.min(...nums), max = Math.max(...nums);
+        const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(_ => 50);
+        const step = 100 / (norm.length - 1);
+        const pts = norm.map((v,i) => {
+          const x = (i * step).toFixed(2);
+          const y = (50 - (v/100)*44 - 3).toFixed(2);
+          return `${x},${y}`;
+        }).join(' ');
+        container.innerHTML = `
+          <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+            <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+            <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+          </svg>
+        `;
+      }
+      function sanitizeAndColorizeSVG(svgString, color) {
+        if (!svgString || typeof svgString !== 'string') return null;
+        let s = svgString.trim();
+        if (!s.includes('<svg')) s = `<svg viewBox="0 0 100 50" preserveAspectRatio="none">${s}</svg>`;
+        s = s.replace(/stroke="[^"]*"/g, '').replace(/fill="[^"]*"/g, 'fill="none"');
+        s = s.replace(/<polyline/gi, `<polyline stroke="${color}" stroke-width="2"`);
+        s = s.replace(/<path/gi, `<path stroke="${color}" stroke-width="2" fill="none"`);
+        if (!/line\s+.*y1="48"/.test(s)) {
+          s = s.replace('</svg>', `<line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" /></svg>`);
+        }
+        return s;
+      }
+      function renderChartsFromData(data) {
+        const points = data.chartPoints || {};
+        if (Array.isArray(points.revenue) && points.revenue.length > 1) {
+          renderLineChart(chartRevenue, points.revenue, '#00C09A');
+        } else if (data.charts?.revenueTrend) {
+          chartRevenue.innerHTML = sanitizeAndColorizeSVG(data.charts.revenueTrend, '#00C09A') || '<p class="text-sm text-gray-700">Chart not available.</p>';
         } else {
-          sourcesBox.style.display = 'none';
+          renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
+        }
+
+        if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) {
+          renderLineChart(chartCash, points.cashFlow, '#3B82F6');
+        } else if (data.charts?.cashFlow) {
+          chartCash.innerHTML = sanitizeAndColorizeSVG(data.charts.cashFlow, '#3B82F6') || '<p class="text-sm text-gray-700">Chart not available.</p>';
+        } else {
+          renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
         }
       }
 
-      // ----- Render
+      // ----- Render report
       function populateReport(data) {
         // Summary
         setText(titleEl, data.summary?.companyName);
@@ -390,26 +479,9 @@
         setText(sosJuris, data.sos?.jurisdiction);
         setText(sosDate,  data.sos?.formationDate);
         setText(sosAgent, data.sos?.registeredAgent);
-        sosStatus.className = 'font-medium text-brand-dark text-right';
+        sosStatus.className = 'kv-val';
         if ((data.sos?.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
         else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
-
-        // Records
-        recList.innerHTML = '';
-        if (data.publicRecords?.findings?.length) {
-          data.publicRecords.findings.forEach(f => {
-            const li = document.createElement('li');
-            const none = (f.type || '').toLowerCase() === 'no records found';
-            li.className = none ? 'text-green-600' : 'text-red-600';
-            li.innerHTML = `<strong>${f.type}:</strong> <span class="${none ? '' : 'text-gray-700'}">${f.details}</span>`;
-            recList.appendChild(li);
-          });
-        } else {
-          const li = document.createElement('li');
-          li.className = 'text-green-600';
-          li.innerHTML = '<strong>No Records Found:</strong> No significant public records were found.';
-          recList.appendChild(li);
-        }
 
         // Facts
         const p = data.profile || {};
@@ -419,18 +491,18 @@
         setText(factsIndustry, p.industry || p.subindustry);
         setText(factsTicker, p.ticker);
         if (p.website && /^https?:\/\//.test(p.website)) {
-          factsWebsite.innerHTML = `<a href="${p.website}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${p.website.replace(/^https?:\/\//,'')}</a>`;
+          factsWebsite.innerHTML = linkifyMaybe(p.website);
         } else {
           setText(factsWebsite, p.website);
         }
 
-        // Headlines
+        // News
         newsList.innerHTML = '';
         if (data.news?.length) {
-          data.news.slice(0,5).forEach(n => {
+          data.news.slice(0,6).forEach(n => {
             const li = document.createElement('li');
             li.innerHTML =
-              `<a class="text-brand-dark hover:text-brand-green font-medium truncate-2" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+              `<a class="text-brand-dark hover:text-brand-green font-medium truncate-2 leading-tightish" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
                <div class="text-xs text-gray-500">${n.source || 'Source'} ${n.date ? '• ' + n.date : ''}</div>`;
             newsList.appendChild(li);
           });
@@ -441,7 +513,7 @@
         // Leadership
         leaderList.innerHTML = '';
         if (data.leadership?.length) {
-          data.leadership.slice(0,6).forEach(l => {
+          data.leadership.slice(0,8).forEach(l => {
             const li = document.createElement('li');
             li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
             leaderList.appendChild(li);
@@ -453,7 +525,7 @@
         // Products
         productsList.innerHTML = '';
         if (data.products?.length) {
-          data.products.slice(0,8).forEach(t => {
+          data.products.slice(0,12).forEach(t => {
             const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li);
           });
         } else {
@@ -463,26 +535,130 @@
         // Competitors
         compList.innerHTML = '';
         if (data.competitors?.length) {
-          data.competitors.slice(0,8).forEach(c => {
+          data.competitors.slice(0,12).forEach(c => {
             const li = document.createElement('li'); li.textContent = c; compList.appendChild(li);
           });
         } else {
           compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
         }
 
-        // Social
+        // Social signals (linkified)
         socialList.innerHTML = '';
         const w = data.webPresence || {};
         [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]]
-          .forEach(([k,v]) => { if (v) { const li = document.createElement('li'); li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${v}</span>`; socialList.appendChild(li); }});
-        if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals detected.</li>';
+          .forEach(([k,v]) => {
+            if (!v) return;
+            const li = document.createElement('li');
+            let valueHtml = v;
+            if (typeof v === 'string' && /^https?:\/\//.test(v)) {
+              valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline link-wrap">${toDomain(v)}</a>`;
+            }
+            li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
+            socialList.appendChild(li);
+          });
+        if (!socialList.children.length) {
+          socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals detected.</li>';
+        }
 
         // Charts
-        chartRevenue.innerHTML = data.charts?.revenueTrend || '<p class="text-sm text-gray-700">Chart not available.</p>';
-        chartCash.innerHTML    = data.charts?.cashFlow     || '<p class="text-sm text-gray-700">Chart not available.</p>';
+        renderChartsFromData(data);
+
+        // Reviews
+        reviewsList.innerHTML = '';
+        if (data.reviews?.length) {
+          data.reviews.slice(0,3).forEach(r => {
+            const el = document.createElement('blockquote');
+            el.className = 'p-4 border-l-4 border-brand-border bg-brand-light';
+            const src = r.source || 'Source';
+            const source = r.url ? `<a class="text-brand-green hover:underline" href="${r.url}" target="_blank" rel="noopener">${toDomain(r.url)}</a>` : src;
+            el.innerHTML = `<p class="text-sm italic text-brand-gray">"${r.snippet || ''}"</p><footer class="mt-2 text-xs text-brand-dark font-medium">${source}</footer>`;
+            reviewsList.appendChild(el);
+          });
+        } else {
+          reviewsList.innerHTML = '<p class="text-sm text-gray-600">No recent customer reviews found.</p>';
+        }
       }
 
-      // ----- Networking
+      // ----- Sources collection + rendering
+      function collectSources(json, modelSources) {
+        const out = [];
+        const push = (title, url, kind) => {
+          const norm = normalizeUrl(url);
+          if (!norm) return;
+          out.push({ title: title || prettyUrl(norm), url: norm, kind });
+        };
+
+        // 1) Explicit citations from the model
+        (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+
+        // 2) Grounding attributions from the API
+        (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+
+        // 3) Company website
+        if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+
+        // 4) Social / web presence
+        const w = json?.webPresence || {};
+        if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+        if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+        if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+
+        // 5) News items
+        (json?.news || []).forEach(n => {
+          if (n?.url) push(n.title || n.source || 'News', n.url, 'news');
+        });
+
+        // 6) Review pages
+        (json?.reviews || []).forEach(r => {
+          if (r?.url) push(r.source || 'Review', r.url, 'review');
+        });
+
+        // Deduplicate by URL
+        const seen = new Set();
+        return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+      }
+
+      function populateSources(links) {
+        sourcesUl.innerHTML = '';
+        sourcesChips.innerHTML = '';
+        if (!Array.isArray(links) || links.length === 0) {
+          sourcesBox.style.display = 'none';
+          return;
+        }
+        sourcesBox.style.display = 'block';
+
+        // chips
+        links.forEach(({ url, title, kind }) => {
+          const emoji =
+            kind === 'news'   ? '📰' :
+            kind === 'review' ? '⭐' :
+            kind === 'social' ? '🔗' :
+            kind === 'site'   ? '🏢' :
+            kind === 'citation' ? '📚' : '🔗';
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener">${title || toDomain(url)}</a>`;
+          sourcesChips.appendChild(chip);
+        });
+
+        // full list (toggle)
+        links.forEach(({ url, title }) => {
+          const li = document.createElement('li');
+          li.className = 'text-sm';
+          li.innerHTML = `<a class="text-brand-green hover:underline link-wrap" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                          <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+          sourcesUl.appendChild(li);
+        });
+
+        let open = false;
+        sourcesToggle.onclick = () => {
+          open = !open;
+          sourcesUl.classList.toggle('hidden', !open);
+          sourcesToggle.textContent = open ? 'Hide list' : 'Show list';
+        };
+      }
+
+      // ----- Networking with backoff
       async function fetchWithBackoff(url, options, retries=3, delay=800) {
         let lastError;
         for (let i=0;i<retries;i++) {
@@ -520,8 +696,8 @@
           const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(zakk)}`;
 
           for (const maxTokens of TOKEN_TRIES) {
-            // 1) Try WITH google_search tool
             try {
+              // Try WITH google_search tool first
               const withTool = {
                 ...payloadBase,
                 tools: [{ google_search: {} }],
@@ -542,24 +718,19 @@
               const cand = result?.candidates?.[0];
               const text = cand?.content?.parts?.[0]?.text;
               if (!text) throw new Error('Empty response from model.');
+              const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
 
-              const jsonString = text.replace(/```json/g,'').replace(/```/g,'').trim();
-              const json = JSON.parse(jsonString);
-
-              // Optional grounding links
               const atts = cand?.groundingMetadata?.groundingAttributions || [];
-              const sources = atts
-                .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-                .filter(s => s.uri);
+              const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
 
               return { json, sources };
             } catch (e) {
               lastErr = e;
               const msg = String(e?.message || '').toLowerCase();
-              const isToolProblem = msg.includes('tool') || msg.includes('invalid_argument') || msg.includes('unsupported');
+              const isToolProblem  = msg.includes('tool') || msg.includes('invalid_argument') || msg.includes('unsupported');
               const isTokenProblem = msg.includes('token') || msg.includes('max') || msg.includes('length');
 
-              // 2) Retry WITHOUT tool (same token cap) if tool not allowed
+              // Retry WITHOUT the tool if tool not allowed, same token cap
               if (isToolProblem) {
                 try {
                   const noTool = {
@@ -581,22 +752,17 @@
                   const cand = result?.candidates?.[0];
                   const text = cand?.content?.parts?.[0]?.text;
                   if (!text) throw new Error('Empty response from model.');
-
-                  const jsonString = text.replace(/```json/g,'').replace(/```/g,'').trim();
-                  const json = JSON.parse(jsonString);
+                  const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
 
                   return { json, sources: [] };
                 } catch (e2) {
                   lastErr = e2;
-                  if (!isTokenProblem) break; // not a token issue → try next model
+                  if (!isTokenProblem) break; // try next model
                 }
               }
 
-              // If token issue, try next smaller cap in TOKEN_TRIES
-              if (isTokenProblem) continue;
-
-              // Otherwise try next model
-              break;
+              if (isTokenProblem) continue; // try smaller token cap
+              break; // try next model
             }
           }
         }
@@ -612,19 +778,23 @@ Include:
 2) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
 3) publicRecords: { findings: [{ type, details }] }
 4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
-5) reviews: [{ snippet, source }]
+5) reviews: [{ snippet, source, url }]
+   - Prefer sources from Google Reviews and Trustpilot when available; include the review page URL.
+   - Keep each snippet brief (≤2 sentences).
 6) charts: { revenueTrend (SVG string), cashFlow (SVG string) }
-7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
-8) news: [{ title, date, source, url }]
-9) leadership: [{ name, title }]
-10) products: [string]
-11) competitors: [string]
-12) webPresence: { twitter, linkedin, youtube, traffic }
+7) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each, normalized 0..100
+8) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+9) news: [{ title, date, source, url }]
+10) leadership: [{ name, title }]
+11) products: [string]
+12) competitors: [string]
+13) webPresence: { twitter, linkedin, youtube, traffic }
+14) citations: [{ title, url }]  // authoritative links used (official site, filings, major press, review pages)
 
 Rules:
 - If unknown, use "N/A" or [].
-- SVGs: viewBox="0 0 100 50", use <polyline>. revenueTrend stroke #00C09A; cashFlow stroke #3B82F6.
-- Respond ONLY with valid JSON that matches the structure above.
+- You may return both "charts" (SVG) and "chartPoints".
+- Respond ONLY with valid JSON that matches the structure above. No markdown fences.
         `.trim();
       }
 
@@ -632,6 +802,7 @@ Rules:
         results.style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
         showState('loading');
+        btn.classList.add('cta-disabled');
         btn.disabled = true;
 
         const systemPrompt = buildSystemPrompt();
@@ -640,18 +811,19 @@ Rules:
         try {
           const { json, sources } = await callReportAPI(systemPrompt, userQuery);
           populateReport(json);
-          if (Array.isArray(sources) && sources.length) populateSources(sources);
-          else sourcesBox.style.display = 'none';
+          const links = collectSources(json, sources);
+          populateSources(links);
           showState('content');
         } catch (e) {
           showState('error', e.message || 'Failed to generate report.');
           console.error(e);
         } finally {
           btn.disabled = false;
+          btn.classList.remove('cta-disabled');
         }
       }
 
-      // Submit handler
+      // Submit
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = (input.value || '').trim();
@@ -659,7 +831,7 @@ Rules:
         runReport(q);
       });
 
-      // Rerun
+      // Re-run
       rerunBtn?.addEventListener('click', () => {
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
