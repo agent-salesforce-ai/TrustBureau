@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Live AI Business Report – TrustBureau.ai</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -27,7 +27,7 @@
     }
   </script>
 
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -40,7 +40,7 @@
 
     .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 
-    /* CTA-style buttons (matches your Request Demo style) */
+    /* CTA / buttons (match "Request Demo" feel) */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid transparent;font-weight:700;border-radius:.5rem;transition:all .2s ease}
     .btn--lg{padding:.875rem 1rem;font-size:1.125rem}
     .btn-primary{background:#00C09A;color:#fff}
@@ -48,12 +48,12 @@
     .btn:focus{outline:none;box-shadow:0 0 0 3px rgba(0,192,154,.35),0 10px 20px rgba(0,192,154,.15)}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-    /* Cards */
+    /* Card look */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
     .widget-card:hover{transform:translateY(-2px);box-shadow:0 18px 32px rgba(0,192,154,.15);border-color:#d1d5db}
     .widget-card:focus-within{box-shadow:0 0 0 3px rgba(0,192,154,.15),0 18px 32px rgba(0,192,154,.15)}
 
-    /* Score badge */
+    /* Score gauge */
     .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
@@ -86,7 +86,7 @@
   <section class="container mx-auto px-4 md:px-6 py-10 md:py-16">
     <div class="max-w-3xl mx-auto">
       <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-center leading-tight">Live AI Business Report</h1>
-      <p class="text-gray-500 text-center mt-3 md:mt-4">Search a company and the full report appears below. Powered by Gemini.</p>
+      <p class="text-gray-500 text-center mt-3 md:mt-4">Search a company and the full report appears below.</p>
 
       <div class="widget-card p-3 md:p-4 mt-6">
         <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
@@ -99,7 +99,7 @@
             Generate
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS &amp; public‑records matching.</p>
+        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS & public‑records matching.</p>
       </div>
     </div>
   </section>
@@ -134,7 +134,7 @@
           </div>
         </div>
 
-        <!-- Score + Summary + Filled space -->
+        <!-- Score + Summary (with filled area) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Score -->
           <div class="widget-card p-5 md:p-6">
@@ -150,7 +150,7 @@
             </div>
           </div>
 
-          <!-- Summary (Company Facts + Headlines fill blank space) -->
+          <!-- Summary (Company Facts + Headlines) -->
           <div class="md:col-span-2 widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
             <p id="report-summary" class="text-sm text-gray-700"></p>
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <!-- Extra sections -->
+        <!-- Leadership / Products / Competitors / Web Signals -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Leadership</h3>
@@ -257,32 +257,25 @@
   </footer>
 
   <script>
-    /* ================================
-       0) Put your Gemini key here
-       ================================ */
+    /* =======================
+       1) Put your key here
+       ======================= */
     const zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
 
-    /* ================================
-       1) Model + token policy
-       ================================ */
-    // Start with 2.5 Pro, then fall back to other models if needed
+    /* =======================
+       2) Model + token strategy
+       ======================= */
     const MODEL_CANDIDATES = [
-      'gemini-2.5-pro',
-      'gemini-2.5-pro-preview-09-2025',
-      'gemini-2.5-flash-preview-09-2025',
+      'gemini-2.5-pro',   // start here
       'gemini-2.0-pro',
       'gemini-2.0-flash',
       'gemini-1.5-pro',
       'gemini-1.5-flash'
     ];
+    const TOKEN_TRIES = [40000, 32768, 16384, 8192, 4096, 2048];
 
-    // Request a huge output cap first; step down if the API refuses
-    const TOKEN_TRIES = [40000, 32768, 24576, 16384, 8192, 4096, 2048];
-
-    /* ================================
-       2) DOM refs + helpers
-       ================================ */
     document.addEventListener('DOMContentLoaded', () => {
+      // ----- Refs
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
@@ -331,6 +324,7 @@
       const sourcesBox = document.getElementById('report-sources-container');
       const sourcesUl  = document.getElementById('report-sources');
 
+      // ----- UI helpers
       function showState(state, msg='') {
         loader.style.display = 'none';
         errBox.style.display = 'none';
@@ -340,7 +334,6 @@
         else if (state === 'error') { errBox.style.display = 'block'; errMsg.textContent = msg; }
         else if (state === 'content') content.style.display = 'block';
       }
-
       function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
 
       function populateSources(sources) {
@@ -358,6 +351,7 @@
         }
       }
 
+      // ----- Render
       function populateReport(data) {
         // Summary
         setText(titleEl, data.summary?.companyName);
@@ -400,7 +394,7 @@
         if ((data.sos?.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
         else if (data.sos?.status && data.sos?.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
 
-        // Public records
+        // Records
         recList.innerHTML = '';
         if (data.publicRecords?.findings?.length) {
           data.publicRecords.findings.forEach(f => {
@@ -433,7 +427,7 @@
         // Headlines
         newsList.innerHTML = '';
         if (data.news?.length) {
-          data.news.slice(0,6).forEach(n => {
+          data.news.slice(0,5).forEach(n => {
             const li = document.createElement('li');
             li.innerHTML =
               `<a class="text-brand-dark hover:text-brand-green font-medium truncate-2" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
@@ -447,7 +441,7 @@
         // Leadership
         leaderList.innerHTML = '';
         if (data.leadership?.length) {
-          data.leadership.slice(0,8).forEach(l => {
+          data.leadership.slice(0,6).forEach(l => {
             const li = document.createElement('li');
             li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
             leaderList.appendChild(li);
@@ -459,7 +453,7 @@
         // Products
         productsList.innerHTML = '';
         if (data.products?.length) {
-          data.products.slice(0,12).forEach(t => {
+          data.products.slice(0,8).forEach(t => {
             const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li);
           });
         } else {
@@ -469,14 +463,14 @@
         // Competitors
         compList.innerHTML = '';
         if (data.competitors?.length) {
-          data.competitors.slice(0,12).forEach(c => {
+          data.competitors.slice(0,8).forEach(c => {
             const li = document.createElement('li'); li.textContent = c; compList.appendChild(li);
           });
         } else {
           compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
         }
 
-        // Social signals
+        // Social
         socialList.innerHTML = '';
         const w = data.webPresence || {};
         [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]]
@@ -488,7 +482,7 @@
         chartCash.innerHTML    = data.charts?.cashFlow     || '<p class="text-sm text-gray-700">Chart not available.</p>';
       }
 
-      // Network helper with retry/backoff
+      // ----- Networking
       async function fetchWithBackoff(url, options, retries=3, delay=800) {
         let lastError;
         for (let i=0;i<retries;i++) {
@@ -510,10 +504,9 @@
         throw lastError || new Error('API request failed after retries.');
       }
 
-      // Call Gemini with model/token/tool fallbacks
       async function callReportAPI(systemPrompt, userQuery) {
-        if (!zakk || zakk === 'REPLACE_WITH_YOUR_GEMINI_KEY') {
-          throw new Error("Missing API key (zakk). Set it at the top of the file.");
+        if (!zakk || zakk === 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM') {
+          throw new Error("Missing API key (zakk). Set it near the top of the file.");
         }
 
         const payloadBase = {
@@ -553,8 +546,11 @@
               const jsonString = text.replace(/```json/g,'').replace(/```/g,'').trim();
               const json = JSON.parse(jsonString);
 
+              // Optional grounding links
               const atts = cand?.groundingMetadata?.groundingAttributions || [];
-              const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+              const sources = atts
+                .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+                .filter(s => s.uri);
 
               return { json, sources };
             } catch (e) {
@@ -563,7 +559,7 @@
               const isToolProblem = msg.includes('tool') || msg.includes('invalid_argument') || msg.includes('unsupported');
               const isTokenProblem = msg.includes('token') || msg.includes('max') || msg.includes('length');
 
-              // 2) Retry WITHOUT the tool (same token cap) if tool seems unsupported
+              // 2) Retry WITHOUT tool (same token cap) if tool not allowed
               if (isToolProblem) {
                 try {
                   const noTool = {
@@ -592,14 +588,14 @@
                   return { json, sources: [] };
                 } catch (e2) {
                   lastErr = e2;
-                  if (!isTokenProblem) break; // move to next model unless token-related
+                  if (!isTokenProblem) break; // not a token issue → try next model
                 }
               }
 
-              // Token‑related? Try a smaller cap next
+              // If token issue, try next smaller cap in TOKEN_TRIES
               if (isTokenProblem) continue;
 
-              // Otherwise go to next model
+              // Otherwise try next model
               break;
             }
           }
@@ -610,39 +606,39 @@
 
       function buildSystemPrompt() {
         return `
-You are an AI business analyst. Return ONE JSON object ONLY (no prose).
+You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
 Include:
-  "summary": { "companyName": "string", "summary": "string" },
-  "profile": { "founded": "string", "headquarters": "string", "employees": "string", "website": "string", "industry": "string", "subindustry": "string", "ticker": "string" },
-  "sos": { "entityName": "string", "status": "string", "entityType": "string", "jurisdiction": "string", "formationDate": "string", "registeredAgent": "string" },
-  "publicRecords": { "findings": [ { "type": "string", "details": "string" } ] },
-  "riskScore": { "score": 0, "justification": "string", "positiveFactors": ["string"], "negativeFactors": ["string"] },
-  "reviews": [ { "snippet": "string", "source": "string" } ],
-  "charts": { "revenueTrend": "string", "cashFlow": "string" },
-  "news": [ { "title": "string", "date": "string", "source": "string", "url": "string" } ],
-  "leadership": [ { "name": "string", "title": "string" } ],
-  "products": ["string"],
-  "competitors": ["string"],
-  "webPresence": { "twitter": "string", "linkedin": "string", "youtube": "string", "traffic": "string" }
+1) summary: { companyName, summary }
+2) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
+3) publicRecords: { findings: [{ type, details }] }
+4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
+5) reviews: [{ snippet, source }]
+6) charts: { revenueTrend (SVG string), cashFlow (SVG string) }
+7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+8) news: [{ title, date, source, url }]
+9) leadership: [{ name, title }]
+10) products: [string]
+11) competitors: [string]
+12) webPresence: { twitter, linkedin, youtube, traffic }
 
 Rules:
 - If unknown, use "N/A" or [].
-- Limit arrays: news ≤ 6, reviews ≤ 3, leadership ≤ 8, products ≤ 12, competitors ≤ 12.
-- Keep summary ≤ 180 words.
-- For "charts", return minimalist inline SVG strings: viewBox="0 0 100 50", use <polyline>;
-  revenue line stroke="#00C09A", cashFlow line stroke="#3B82F6".
-- Respond with JSON ONLY (no markdown fences, no commentary).
+- SVGs: viewBox="0 0 100 50", use <polyline>. revenueTrend stroke #00C09A; cashFlow stroke #3B82F6.
+- Respond ONLY with valid JSON that matches the structure above.
         `.trim();
       }
 
-      async function run(query) {
+      async function runReport(query) {
         results.style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
         showState('loading');
         btn.disabled = true;
 
+        const systemPrompt = buildSystemPrompt();
+        const userQuery = `Generate a comprehensive AI business report for: "${query}"`;
+
         try {
-          const { json, sources } = await callReportAPI(buildSystemPrompt(), `Generate a comprehensive AI business report for: "${query}"`);
+          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
           populateReport(json);
           if (Array.isArray(sources) && sources.length) populateSources(sources);
           else sourcesBox.style.display = 'none';
@@ -655,19 +651,19 @@ Rules:
         }
       }
 
-      // Submit (and Enter key) handler
+      // Submit handler
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
-        run(q);
+        runReport(q);
       });
 
-      // Rerun button
+      // Rerun
       rerunBtn?.addEventListener('click', () => {
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
-        run(q);
+        runReport(q);
       });
     });
   </script>
