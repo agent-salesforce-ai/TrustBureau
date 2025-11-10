@@ -32,32 +32,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- ===== Dev API key (override with window.zakk if set earlier) ===== -->
-  <script>
-    const zakk = 'REPLACE_WITH_YOUR_DEVELOPMENT_KEY';
-    if (typeof window !== 'undefined' && (!window.zakk || String(window.zakk).trim()==='')) {
-      window.zakk = zakk;
-    }
-  </script>
-
   <style>
     html { scroll-behavior: smooth; }
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
     .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 
+    /* CTA (match main site) */
     .cta-button { transition: all .3s ease; }
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
+    .yellow-gradient-text{background:linear-gradient(90deg,#FACC15 0%,#EAB308 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
-    .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-      font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
+    /* Score */
+    .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
-    /* Loader */
+    /* ===== Loader: radar + stepper + skeleton ===== */
     .radar {
       width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
       background:
@@ -69,7 +63,7 @@
     @keyframes radar-spin { to { transform: rotate(360deg); } }
 
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.1s ease-in-out infinite; }
+    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
     .skeleton-card { border:1px solid #E5E7EB; border-radius:.75rem; padding:1rem; background:#fff; }
     .skel-line { height:.7rem; border-radius:.35rem; }
 
@@ -80,15 +74,6 @@
 
     .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
     .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
-
-    /* Map-like card */
-    .map-card {
-      background: radial-gradient(120px 80px at 80% 20%, rgba(0,192,154,.10), transparent 60%),
-                  radial-gradient(180px 120px at 10% 90%, rgba(0,0,0,.05), transparent 60%),
-                  #F8FAFC;
-      border:1px solid #E5E7EB;border-radius:.75rem;position:relative;overflow:hidden;
-    }
-    .pin { position:absolute; right:18px; bottom:18px; width:32px; height:32px; color:#00C09A; }
   </style>
 </head>
 
@@ -117,7 +102,7 @@
 
       <div class="widget-card p-3 md:p-4 mt-6">
         <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Walmart Inc., Tesla, Inc., Taco Bell Corp."
+          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
                  class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
           <button id="generate-report-btn" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -126,7 +111,7 @@
             Generate
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name. U.S. entities are prioritized automatically.</p>
+        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better SOS &amp; public‑records matching.</p>
       </div>
     </div>
   </section>
@@ -134,7 +119,7 @@
   <!-- Results -->
   <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
-      <!-- Loader -->
+      <!-- LOADER -->
       <div id="report-loader" style="display:none;"
            class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
         <div class="flex items-center gap-5">
@@ -145,7 +130,7 @@
               <div id="loader-timer" class="text-xs text-gray-500">00:00</div>
             </div>
             <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
-            <p class="text-xs text-gray-500 mt-2">Step 1: core snapshot • Step 2: auto‑enrichment if anything is thin.</p>
+            <p class="text-xs text-gray-500 mt-2">Usually 10–30s — scanning SOS, public records, reviews and recent headlines.</p>
           </div>
         </div>
         <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
@@ -170,6 +155,7 @@
           </div>
         </div>
       </div>
+      <!-- /LOADER -->
 
       <!-- Error -->
       <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
@@ -181,7 +167,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot <span id="us-badge" class="ml-2 inline-block rounded-full px-2 py-0.5 text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200" style="display:none;">US‑preferred</span></p>
+            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
           <div class="flex items-center gap-3">
             <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
@@ -228,34 +214,8 @@
           </div>
         </div>
 
-        <!-- Contact/Location + Corporate Filings -->
+        <!-- Filings + Public Records -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
-            <div class="map-card p-4 relative">
-              <div class="text-sm text-gray-700">
-                <div class="flex items-start gap-2">
-                  <svg class="w-5 h-5 text-brand-green mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
-                  <div><div id="contact-address" class="font-medium"></div><div id="contact-cityline" class="text-gray-500"></div></div>
-                </div>
-                <div class="flex items-center gap-2 mt-2">
-                  <svg class="w-5 h-5 text-brand-green" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V21a1 1 0 0 1-1 1C10.42 22 2 13.58 2 3a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.24 1.01l-2.2 2.2Z"/></svg>
-                  <a id="contact-phone" href="#" class="text-brand-green hover:underline">N/A</a>
-                </div>
-                <div class="flex items-center gap-2 mt-1">
-                  <svg class="w-5 h-5 text-brand-green" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v.4l10 6 10-6V6a2 2 0 0 0-2-2Z"/><path d="M22 8.2 12.6 13a1.5 1.5 0 0 1-1.2 0L2 8.2V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8.2Z"/></svg>
-                  <a id="contact-email" href="#" class="text-brand-green hover:underline">N/A</a>
-                </div>
-                <a id="maps-link" href="#" target="_blank" rel="noopener"
-                   class="inline-flex items-center gap-2 mt-3 text-sm text-brand-green hover:underline">
-                  Open in Google Maps
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.3 9.3-1.4-1.42 9.3-9.3H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg>
-                </a>
-              </div>
-              <svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
-            </div>
-          </div>
-
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Corporate Filings</h3>
             <ul class="text-sm text-gray-700 space-y-1">
@@ -267,12 +227,11 @@
               <li><span class="text-gray-500">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
             </ul>
           </div>
-        </div>
 
-        <!-- Public Records -->
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Public Records</h3>
-          <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-700 leading-relaxed"></ul>
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Public Records</h3>
+            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-700 leading-relaxed"></ul>
+          </div>
         </div>
 
         <!-- Leadership / Products / Competitors / Web Signals -->
@@ -339,26 +298,30 @@
   <script>
     /* ===================== Config ===================== */
     const MODEL_CANDIDATES = [
-      'gemini-2.5-pro',                   // try Pro first
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-preview-09-2025',
-      'gemini-2.0-flash'
+      'gemini-2.5-flash-preview-09-2025',// Use the standard, compatible model
+      'gemini-2.5-flash'                // Fallback
+      // 'gemini-2.0-pro', // <-- This was causing a "Not Found" error
+      // 'gemini-2.0-flash', // <-- This was also incompatible
     ];
-    const USE_SEARCH_TOOL = true;
-    const MAX_OUTPUT_TOKENS = 16384; // larger cap for richer payloads
+    const USE_SEARCH_TOOL = true;          // per your request
+    const MAX_OUTPUT_TOKENS = 16000;        // safe cap to avoid payload errors
+
+    // *** API key moved here to fix scope issue ***
+    const zakk = 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
+    function getApiKey() {
+      // Use the 'zakk' constant defined right above.
+      return (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
+    }
 
     /* ===================== Utilities ===================== */
-    function getApiKey() {
-      const w = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      const c = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-      return w || c;
-    }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
     function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
     function linkifyMaybe(v) {
-      if (!v) return 'N/A';
+      if (!v) return 'NIA';
       const s = String(v).trim();
-      if (/^https?:\/\//i.test(s)) return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      if (/^https?:\/\//i.test(s)) {
+        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      }
       return s;
     }
     function renderLineChart(container, values, color) {
@@ -371,20 +334,21 @@
       const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
       const step = 100 / (norm.length - 1);
       const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
-      container.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+      container.innerHTML =
+        `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
           <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
           <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
         </svg>`;
     }
 
-    /* ===================== Loader ===================== */
+    /* ===================== Loader UI ===================== */
     let __loaderCtl = null;
     function startLoadingAnimation() {
       const steps = [
-        'Matching business identity (US‑preferred)','Searching web + LinkedIn','Pulling SOS/filings',
-        'Resolving address & contact','Gathering leadership','Mapping products/services',
-        'Finding competitors','Collecting news & reviews','Synthesizing risk score',
-        'Enrichment pass (if needed)','Merging sources','Rendering report'
+        'Matching business identity','Searching the web','Pulling SOS / corporate filings',
+        'Parsing entity metadata','Checking public records','Gathering leadership',
+        'Mapping products & services','Finding competitors','Collecting web & social signals',
+        'Crawling recent headlines','Reading customer reviews','Synthesizing risk score'
       ];
       const stepsOl = document.getElementById('loader-steps');
       const barEl   = document.getElementById('loader-bar');
@@ -409,7 +373,7 @@
       }, 200);
 
       let idx = 0;
-      const stepMs = Math.max(800, Math.floor(26000 / steps.length));
+      const stepMs = Math.max(900, Math.floor(25000 / steps.length));
       const tSteps = setInterval(() => {
         if (idx < steps.length) {
           document.getElementById(`ld_${idx}`)?.classList.add('done');
@@ -425,44 +389,40 @@
       return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
     }
 
-    const results = document.getElementById('report-results-container');
-    const loader  = document.getElementById('report-loader');
-    const errBox  = document.getElementById('report-error-container');
-    const errMsg  = document.getElementById('report-error-message');
-    const content = document.getElementById('report-content');
-
-    function showState(state, message = '') {
-      loader.style.display = 'none';
-      errBox.style.display = 'none';
-      content.style.display = 'none';
-      results.style.display = 'block';
-
-      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
-      if (state === 'loading') { loader.style.display = 'block'; __loaderCtl = startLoadingAnimation(); }
-      else if (state === 'error') { errBox.style.display = 'block'; errMsg.textContent = message || 'Something went wrong.'; }
-      else if (state === 'content') { content.style.display = 'block'; }
-    }
-
     /* ===================== Robust JSON parsing ===================== */
     function parseCandidateJSON(candidate) {
       const parts = candidate?.content?.parts || [];
+
+      // Try text parts first (standard for application/json responseMimeType)
       for (const p of parts) {
         if (typeof p?.text === 'string' && p.text.trim()) {
           const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
           try { return JSON.parse(raw); } catch {}
-          const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
-          if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
+          // Truncated JSON fallback
+          const lastCurly  = raw.lastIndexOf('}');
+          const lastSquare = raw.lastIndexOf(']');
+          const cut = Math.max(lastCurly, lastSquare);
+          if (cut > 0) {
+            const maybe = raw.slice(0, cut + 1);
+            try { return JSON.parse(maybe); } catch {}
+          }
         }
       }
+
+      // Fallback: Try inline_data JSON
       for (const p of parts) {
-        if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
-          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
+        if (p?.inlineData?.data && String(p.inlineData.mimeType || '').toLowerCase().includes('json')) {
+          try { return JSON.parse(atob(p.inlineData.data)); } catch {}
         }
       }
-      throw new Error('Model returned no parseable JSON.');
+
+      // If all else fails, throw an error
+      const firstPart = parts[0]?.text || '';
+      const preview = firstPart.slice(0, 400).replace(/\s+/g,' ');
+      throw new Error(`Model returned non‑JSON (preview): ${preview}`);
     }
 
-    /* ===================== Sources ===================== */
+    /* ===================== Sources helpers ===================== */
     function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
     function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
     function collectSources(json, modelSources) {
@@ -472,12 +432,12 @@
       if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
       const w = json?.webPresence || {};
       if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedinCompany && /^https?:\/\//.test(w.linkedinCompany)) push('LinkedIn (Company)', w.linkedinCompany, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
       if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.leadership || []).forEach(p => { if (p?.linkedin && /^https?:\/\//.test(p.linkedin)) push(`${p.name || 'Executive'} – LinkedIn`, p.linkedin, 'social'); });
       (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
       (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-      const seen = new Set(); return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
     }
     function populateSources(links) {
       const chips = document.getElementById('report-sources-chips');
@@ -487,7 +447,7 @@
       if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
       box.style.display = 'block';
       links.forEach(({ url, title, kind }) => {
-        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : '📚';
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
         const span = document.createElement('span');
         span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
         span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
@@ -497,7 +457,7 @@
         const li = document.createElement('li');
         li.className = 'text-sm';
         li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+                           <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
         ul.appendChild(li);
       });
       let open = false;
@@ -508,48 +468,105 @@
       };
     }
 
-    /* ===================== API helpers ===================== */
-    function makePayload(systemPrompt, userQuery, withSearch) {
+    /* ===================== Fetch helper ===================== */
+    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
+      let lastError;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try { body = await res.json(); } catch {}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+        }
+      }
+      throw lastError || new Error('API request failed.');
+    }
+
+    /* ===================== API (v1beta, camelCase) ===================== */
+    function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
       const payload = {
         contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
+        systemInstruction: { role: 'system', parts: [{ text: systemPrompt }] },
         generationConfig: {
           maxOutputTokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
           topP: 0.95,
-          responseMimeType: "application/json"
+          // responseMimeType: "application/json" // <-- REMOVED THIS LINE TO FIX 400 ERROR
         }
       };
-      if (withSearch) payload.tools = [{ googleSearch: {} }];
+      if (withSearch) payload.tools = [{ "googleSearch": {} }]; // Use camelCase
       return payload;
     }
 
-    async function callGemini(systemPrompt, userQuery) {
+    async function callReportAPI(systemPrompt, userQuery) {
       const key = getApiKey();
       if (!key) throw new Error('Missing API key (zakk).');
+
       const base = 'https://generativelanguage.googleapis.com/v1beta/models';
       let lastErr;
+
       for (const model of MODEL_CANDIDATES) {
         const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-        let payload = makePayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
+
+        // Two attempts: normal → stricter JSON-only
+        let payload = makeV1betaPayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
         for (let attempt = 1; attempt <= 2; attempt++) {
           try {
-            const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            const data = await res.json();
-            if (!res.ok) throw new Error((data?.error?.message || res.statusText) + ` (HTTP ${res.status})`);
-            const cand = data?.candidates?.[0]; if (!cand) throw new Error('No candidates in response.');
+            const data = await fetchWithBackoff(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const cand = data?.candidates?.[0];
+            if (!cand) throw new Error('No candidates in response.');
+
             const json = parseCandidateJSON(cand);
+
+            // === VALIDATION STEP (Stricter, per user request) ===
+            const missing = [];
+            if (!json.summary?.companyName || json.summary.companyName === 'N/A') missing.push('summary.companyName');
+            if (!json.sos?.entityName || json.sos.entityName === 'N/A') missing.push('sos.entityName');
+            if (!json.riskScore?.score) missing.push('riskScore.score');
+            // Check for minimum counts
+            if (!Array.isArray(json.news) || json.news.length < 3) missing.push('news (min 3)');
+            if (!Array.isArray(json.reviews) || json.reviews.length < 3) missing.push('reviews (min 3)');
+            if (!Array.isArray(json.leadership) || json.leadership.length < 3) missing.push('leadership (min 3)');
+            if (!Array.isArray(json.products) || json.products.length < 3) missing.push('products (min 3)');
+            if (!Array.isArray(json.competitors) || json.competitors.length < 3) missing.push('competitors (min 3)');
+            if (!Array.isArray(json.publicRecords?.findings)) missing.push('publicRecords.findings');
+            // === END VALIDATION ===
+
+            if (missing.length > 0) { // Check if any validation failed
+              throw new Error(`Model JSON missing/short keys: ${missing.join(', ')}`);
+            }
+            // === END VALIDATION ===
+
             const atts = cand?.groundingMetadata?.groundingAttributions || [];
-            const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+            const sources = atts
+              .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+              .filter(s => s.uri);
+
             return { json, sources };
           } catch (e) {
             lastErr = e;
-            if (attempt === 1) {
-              // tighten if JSON or sparsity issues
-              const harder = systemPrompt + `
+            const msg = e.message || '';
+            const parseIssue = /non‑JSON|no JSON|Unexpected end of JSON input|Empty model response/i.test(msg);
+            const missingKeysIssue = /missing\/short keys/i.test(msg); // Check for our new error
 
-RULES: One JSON object only. If any field is unknown, use "N/A" or []. MAKE IT COMPLETE.`;
-              payload = makePayload(harder, userQuery, USE_SEARCH_TOOL);
+            if (attempt === 1 && (parseIssue || missingKeysIssue)) { // Trigger retry on missing/short keys
+              const stricter = `${systemPrompt}
+
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). You MUST include all 13 top-level keys. You MUST return at least 3 items for news, reviews, leadership, products, and competitors, even if you have to search harder. If you cannot find data, use "N/A" or [].`;
+              payload = makeV1betaPayload(stricter, userQuery, USE_SEARCH_TOOL);
               continue;
             }
             break; // next model
@@ -559,110 +576,37 @@ RULES: One JSON object only. If any field is unknown, use "N/A" or []. MAKE IT C
       throw lastErr || new Error('All model attempts failed.');
     }
 
-    /* ===================== Prompts ===================== */
-    function baseSystemPrompt() {
+    /* ===================== System prompt ===================== */
+    function buildSystemPrompt() {
       return `
-You are an AI business analyst. Return ONE valid JSON object only (no prose, no code fences).
-
-US-FIRST ENTITY CHOICE:
-- Prefer United States entities and US sources; if clearly non-US, still return but set "profile.isUS": false and "profile.country".
-
-LINKEDIN:
-- Try site:linkedin.com/company for the company; site:linkedin.com/in for owner/founder/CEO names (+ company) to disambiguate.
-
-STRUCTURE:
-{
-  "summary": { "companyName": "string", "summary": "60–140 words" },
-  "sos": { "entityName": "string", "status": "string", "entityType": "string", "jurisdiction": "string", "formationDate": "string", "registeredAgent": "string" },
-  "publicRecords": { "findings": [{ "type": "string", "details": "string" }] },
-  "riskScore": { "score": 300, "justification": "string", "positiveFactors": ["string"], "negativeFactors": ["string"] },
-  "reviews": [{ "snippet": "string", "source": "string", "url": "string" }],
-  "chartPoints": { "revenue": [number], "cashFlow": [number] },
-  "profile": {
-    "founded": "string", "headquarters": "string", "employees": "string",
-    "website": "string", "industry": "string", "subindustry": "string",
-    "ticker": "string", "country": "United States", "isUS": true
-  },
-  "contact": { "addressLine": "string", "city": "string", "state": "string", "postalCode": "string", "phone": "string", "email": "string" },
-  "news": [{ "title": "string", "date": "YYYY-MM-DD", "source": "string", "url": "string" }],
-  "leadership": [{ "name": "string", "title": "string", "linkedin": "string" }],
-  "products": ["string"], "competitors": ["string"],
-  "webPresence": { "twitter": "string", "linkedinCompany": "string", "youtube": "string", "traffic": "string" },
-  "citations": [{ "title": "string", "url": "string" }]
-}
-
-MINIMUMS:
-- news >= 6; leadership >= 5 (prefer Owner/Founder/CEO first, add LinkedIn urls); products >= 8; competitors >= 6; reviews >= 3 (with urls).
-- If an item truly cannot be found, use "N/A" or [].
-
-Return ONLY the JSON object.
+You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
+Include:
+1) summary: { companyName, summary }
+2) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
+3) publicRecords: { findings: [{ type, details }] }
+4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
+5) reviews: [{ snippet, source, url }] // (at least 3)
+6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
+7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+8) news: [{ title, date, source, url }] // (at* least 3)
+9) leadership: [{ name, title }] // (at least 3)
+10) products: [string] // (at least 3)
+11) competitors: [string] // (at least 3)
+12) webPresence: { twitter, linkedin, youtube, traffic }
+13) citations: [{ title, url }]
+If unknown, use "N/A" or [].
+Respond ONLY with valid JSON. No markdown fences.
       `.trim();
-    }
-
-    function enrichmentPrompt(needs, snapshot) {
-      return `
-You produced a sparse report for the company. Using web search, return ONE JSON object that includes ONLY the following keys, filling them to (or beyond) the minimum counts:
-
-NEEDED: ${needs.join(', ')}
-
-MINIMUMS:
-- news >= 6; leadership >= 5 (with LinkedIn where possible); products >= 8; competitors >= 6; reviews >= 3.
-- Also return "contact" with addressLine/city/state/postalCode/phone/email if missing.
-- Use US sources first; keep "profile.isUS" accuracy.
-
-HINT SNAPSHOT (may help disambiguate):
-${JSON.stringify(snapshot).slice(0, 5000)}
-
-Return ONLY the JSON with the requested keys. No prose.
-      `.trim();
-    }
-
-    /* ===================== Evaluate & Merge ===================== */
-    function needList(d) {
-      const needs = [];
-      const has = (a, min) => Array.isArray(a) && a.length >= min;
-      if (!has(d?.news, 6)) needs.push('news');
-      if (!has(d?.reviews, 3)) needs.push('reviews');
-      if (!has(d?.leadership, 5)) needs.push('leadership');
-      if (!has(d?.products, 8)) needs.push('products');
-      if (!has(d?.competitors, 6)) needs.push('competitors');
-      if (!d?.contact || !(d.contact.addressLine || d.contact.city || d.contact.phone || d.contact.email)) needs.push('contact');
-      if (!d?.webPresence?.linkedinCompany) needs.push('webPresence'); // to get LinkedIn company url
-      return needs;
-    }
-
-    function mergeArrays(a = [], b = [], key) {
-      const out = [...a];
-      const seen = new Set(a.map(x => key ? x?.[key] : x));
-      b.forEach(item => {
-        const k = key ? item?.[key] : item;
-        if (k && !seen.has(k)) { out.push(item); seen.add(k); }
-      });
-      return out;
-    }
-
-    function deepMergeReport(base, add) {
-      const out = JSON.parse(JSON.stringify(base || {}));
-      // Simple keys
-      ['summary','sos','riskScore','profile','contact','chartPoints','webPresence'].forEach(k => {
-        if (add?.[k]) out[k] = { ...(out[k] || {}), ...(add[k] || {}) };
-      });
-      // Arrays
-      out.news        = mergeArrays(out.news,        add.news,        'url');
-      out.reviews     = mergeArrays(out.reviews,     add.reviews,     'url');
-      out.leadership  = mergeArrays(out.leadership,  add.leadership,  'linkedin'); // uniq by linkedin when present
-      out.products    = mergeArrays(out.products,    add.products);
-      out.competitors = mergeArrays(out.competitors, add.competitors);
-      if (add?.publicRecords?.findings) {
-        out.publicRecords = out.publicRecords || { findings: [] };
-        out.publicRecords.findings = mergeArrays(out.publicRecords.findings, add.publicRecords.findings, 'details');
-      }
-      out.citations   = mergeArrays(out.citations,   add.citations,   'url');
-      return out;
     }
 
     /* ===================== DOM refs ===================== */
-    const usBadge = document.getElementById('us-badge');
+    // Moved these 5 to the top to fix hoisting/scope issues
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
+
     const titleEl = document.getElementById('report-title');
     const summaryEl = document.getElementById('report-summary');
     const scoreCircle = document.getElementById('report-score-circle');
@@ -696,18 +640,10 @@ Return ONLY the JSON with the requested keys. No prose.
     const chartRevenue = document.getElementById('report-chart-revenue');
     const chartCash    = document.getElementById('report-chart-cashflow');
 
-    const contactAddress = document.getElementById('contact-address');
-    const contactCityline= document.getElementById('contact-cityline');
-    const contactPhone   = document.getElementById('contact-phone');
-    const contactEmail   = document.getElementById('contact-email');
-    const mapsLink       = document.getElementById('maps-link');
-
-    /* ===================== Populate ===================== */
+    /* ===================== Populate Report ===================== */
     function populateReport(data) {
       setText(titleEl, data?.summary?.companyName);
       summaryEl.textContent = data?.summary?.summary || 'No summary could be found.';
-
-      if (data?.profile?.isUS === true) usBadge.style.display = 'inline-block'; else usBadge.style.display = 'none';
 
       const score = data?.riskScore?.score || 0;
       scoreDigit.textContent = score;
@@ -734,19 +670,6 @@ Return ONLY the JSON with the requested keys. No prose.
         negList.appendChild(li);
       });
 
-      // Contact & location
-      const c = data?.contact || {};
-      const cityline = [c.city, c.state, c.postalCode].filter(Boolean).join(', ').replace(', ,', ',');
-      setText(contactAddress, c.addressLine || data?.profile?.headquarters || 'N/A');
-      setText(contactCityline, cityline || '');
-      contactPhone.href = c.phone ? `tel:${(c.phone+'').replace(/[^\d+]/g,'')}` : '#';
-      contactPhone.textContent = c.phone || 'N/A';
-      contactEmail.href = c.email ? `mailto:${c.email}` : '#';
-      contactEmail.textContent = c.email || 'N/A';
-      const qMaps = encodeURIComponent([c.addressLine, c.city, c.state, c.postalCode].filter(Boolean).join(' ') || data?.profile?.headquarters || '');
-      mapsLink.href = qMaps ? `https://www.google.com/maps/search/?api=1&query=${qMaps}` : '#';
-
-      // Filings
       const sos = data?.sos || {};
       setText(sosName,  sos.entityName);
       setText(sosEntity,sos.entityType);
@@ -754,74 +677,82 @@ Return ONLY the JSON with the requested keys. No prose.
       setText(sosJuris, sos.jurisdiction);
       setText(sosDate,  sos.formationDate);
       setText(sosAgent, sos.registeredAgent);
+      sosStatus.className = '';
+      if ((sos.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
+      else if (sos.status && sos.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
 
-      // Facts
       const p = data?.profile || {};
       setText(factsFounded, p.founded);
-      setText(factsHQ, p.headquarters);
+      setText(factsHQ, p.headquarters || p.hq);
       setText(factsEmployees, p.employees);
       setText(factsIndustry, p.industry || p.subindustry);
       setText(factsTicker, p.ticker);
-      factsWebsite.innerHTML = p.website ? linkifyMaybe(p.website) : 'N/A';
+      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
 
-      // News
       newsList.innerHTML = '';
-      (data?.news || []).slice(0, 8).forEach(n => {
+      (data?.news || []).slice(0,6).forEach(n => {
         const li = document.createElement('li');
-        li.innerHTML = `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
-                        <div class="text-xs text-gray-500">${n.source || 'Source'}${n.date ? ' • ' + n.date : ''}</div>`;
+        li.innerHTML =
+          `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+           <div class="text-xs text-gray-500">${n.source || 'Source'}${n.date ? ' • ' + n.date : ''}</div>`;
         newsList.appendChild(li);
       });
       if (!newsList.children.length) newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
 
-      // Public records
+      // --- POPULATE PUBLIC RECORDS ---
       recList.innerHTML = '';
-      if (Array.isArray(data?.publicRecords?.findings) && data.publicRecords.findings.length) {
-        data.publicRecords.findings.forEach(f => {
-          const li = document.createElement('li');
-          li.innerHTML = `<strong>${f.type || 'Record'}:</strong> <span class="text-gray-700">${f.details || ''}</span>`;
-          recList.appendChild(li);
-        });
-      } else {
-        recList.innerHTML = '<li class="text-sm text-gray-600">No significant public records found.</li>';
-      }
-
-      // Leadership (LinkedIn badges)
-      leaderList.innerHTML = '';
-      (data?.leadership || []).slice(0, 12).forEach(l => {
+      (data?.publicRecords?.findings || []).slice(0, 8).forEach(r => {
         const li = document.createElement('li');
-        const linked = l?.linkedin && /^https?:\/\//i.test(l.linkedin)
-          ? ` <a href="${l.linkedin}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-brand-green hover:underline">
-               <svg viewBox="0 0 24 24" class="w-4 h-4" aria-hidden="true"><path fill="currentColor" d="M19 3A2.94 2.94 0 0 1 22 6v12a2.94 2.94 0 0 1-3 3H5a2.94 2.94 0 0 1-3-3V6a2.94 2.94 0 0 1 3-3Zm-9.65 6H6.35V18h3V9Zm.2-3.5A1.77 1.77 0 0 0 8 3.75 1.75 1.75 0 1 0 9.55 5.5ZM20 13.26c0-3.06-1.63-4.49-3.81-4.49a3.31 3.31 0 0 0-3 1.65h-.06V9h-3v9h3v-4.77c0-1.26.24-2.48 1.81-2.48s1.62 1.39 1.62 2.57V18h3Z"/></svg>
-               LinkedIn
-             </a>` : '';
-        li.innerHTML = `<span class="font-medium text-brand-dark">${l?.name || 'N/A'}</span> — <span class="text-gray-700">${l?.title || ''}</span>${linked}`;
+        li.innerHTML = `<span class="font-medium text-brand-dark">${r.type || 'Record'}:</span> ${r.details || 'N/A'}`;
+        recList.appendChild(li);
+      });
+      if (!recList.children.length) recList.innerHTML = '<li class="text-sm text-gray-600 list-none">No public records found.</li>';
+      // --- END ---
+
+      leaderList.innerHTML = '';
+      (data?.leadership || []).slice(0,8).forEach(l => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>`;
         leaderList.appendChild(li);
       });
       if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
 
-      // Products & competitors
       productsList.innerHTML = '';
-      (data?.products || []).slice(0, 20).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
+      (data?.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
       if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
 
       compList.innerHTML = '';
-      (data?.competitors || []).slice(0, 12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      (data?.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
       if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
 
-      // Social
       socialList.innerHTML = '';
       const w = data?.webPresence || {};
-      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn (Company)', w.linkedinCompany], ['YouTube', w.youtube]].forEach(([k,v]) => {
+      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
         if (!v) return;
         const li = document.createElement('li');
-        const val = (typeof v === 'string' && /^https?:\/\//i.test(v)) ? `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>` : v;
-        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${val}</span>`;
+        let valueHtml = v;
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
+          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
+        }
+        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
         socialList.appendChild(li);
       });
       if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
 
-      // Charts
+      // --- POPULATE REVIEWS ---
+      reviewsList.innerHTML = '';
+      (data?.reviews || []).slice(0, 5).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'border border-brand-border rounded-lg bg-brand-light p-3';
+        div.innerHTML =
+          `<p class="text-sm text-brand-dark italic">"${r.snippet || 'N/A'}"</p>` +
+          `<div class="text-xs text-gray-500 mt-1.5">${r.source || 'Source'}${r.url ? ' • <a href="'+r.url+'" target="_blank" rel="noopener" class="text-brand-green hover:underline">Link</a>' : ''}</div>`;
+        reviewsList.appendChild(div);
+
+      });
+      if (!reviewsList.children.length) reviewsList.innerHTML = '<p class="text-sm text-gray-600">No customer reviews found.</p>';
+      // --- END ---
+
       const points = data?.chartPoints || {};
       if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
       else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
@@ -830,39 +761,47 @@ Return ONLY the JSON with the requested keys. No prose.
       else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
     }
 
-    /* ===================== Wire up ===================== */
+    /* ===================== Wire up UI ===================== */
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
 
+      // Use the 'results' var defined in "DOM refs"
+      function showState(state, message = '') {
+        loader.style.display = 'none';
+        errBox.style.display = 'none';
+        content.style.display = 'none';
+        results.style.display = 'block';
+
+        if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+
+        if (state === 'loading') {
+          loader.style.display = 'block';
+          __loaderCtl = startLoadingAnimation();
+        } else if (state === 'error') {
+          errBox.style.display = 'block';
+          errMsg.textContent = message || 'Something went wrong.';
+        } else if (state === 'content') {
+          content.style.display = 'block';
+        }
+      }
+
       async function runReport(query) {
         document.getElementById('report-results-container').style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-        showState('loading'); btn.classList.add('cta-disabled'); btn.disabled = true;
+        showState('loading');
+        btn.classList.add('cta-disabled'); btn.disabled = true;
+
+        const systemPrompt = buildSystemPrompt();
+        // Updated query to be more explicit, per user request
+        const userQuery = `Generate an in-depth, comprehensive AI business report for: "${query}". Search public records, UCC filings, recent news (last 12 months), and LinkedIn for leadership profiles.`;
 
         try {
-          // Pass 1: core snapshot
-          const systemPrompt = baseSystemPrompt();
-          const userQuery = `Comprehensive AI business report for: "${query}". Prefer United States entity and sources.`;
-          const { json: snap, sources: s1 } = await callGemini(systemPrompt, userQuery);
-
-          // Check sparsity
-          let report = snap;
-          let sources = [...(s1 || [])];
-
-          const needs = needList(report);
-          if (needs.length) {
-            // Pass 2: enrichment (target only missing sections)
-            const enrichUser = `Enrich report for "${query}" with the requested keys only.`;
-            const { json: extra, sources: s2 } = await callGemini(enrichmentPrompt(needs, report), enrichUser);
-            report = deepMergeReport(report, extra || {});
-            sources = sources.concat(s2 || []);
-          }
-
-          populateReport(report);
-          const links = collectSources(report, sources);
+          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
+          populateReport(json);
+          const links = collectSources(json, sources);
           populateSources(links);
           showState('content');
         } catch (e) {
