@@ -32,6 +32,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
 
+  <!-- *** Set your Gemini API key here *** -->
+  <script>
+    // Make the key globally visible to all scripts regardless of scope.
+    // Replace the value below with your real key (keep the quotes).
+    window.zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
+  </script>
+
   <style>
     html { scroll-behavior: smooth; }
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
@@ -76,7 +83,7 @@
     .chip  { border:1px solid #E5E7EB; border-radius:9999px; background:#F8F9FA; padding:.375rem .625rem; font-size:.80rem; line-height:1; }
     .chip a{ color:#00C09A; font-weight:600; }
 
-    /* let long URLs wrap cleanly inside lists */
+    /* long URLs wrap cleanly inside lists */
     .link-wrap { word-break: break-word; overflow-wrap: anywhere; }
   </style>
 </head>
@@ -277,10 +284,13 @@
   </footer>
 
   <script>
-    /* ========= 1) Put your Gemini key here ========= */
-    const zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
+    /* ========= Key loader ========= */
+    function getApiKey() {
+      const fromGlobal = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+      return fromGlobal; // single source of truth; easy to maintain
+    }
 
-    /* ========= 2) Model + token strategy ========= */
+    /* ========= Model + token strategy ========= */
     const MODEL_CANDIDATES = [
       'gemini-2.5-pro',   // start here
       'gemini-2.0-pro',
@@ -604,14 +614,10 @@
         if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
 
         // 5) News items
-        (json?.news || []).forEach(n => {
-          if (n?.url) push(n.title || n.source || 'News', n.url, 'news');
-        });
+        (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
 
         // 6) Review pages
-        (json?.reviews || []).forEach(r => {
-          if (r?.url) push(r.source || 'Review', r.url, 'review');
-        });
+        (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
 
         // Deduplicate by URL
         const seen = new Set();
@@ -681,7 +687,8 @@
       }
 
       async function callReportAPI(systemPrompt, userQuery) {
-        if (!zakk || zakk === 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM') {
+        const apiKey = getApiKey();
+        if (!apiKey) {
           throw new Error("Missing API key (zakk). Set it near the top of the file.");
         }
 
@@ -693,7 +700,7 @@
         let lastErr;
 
         for (const model of MODEL_CANDIDATES) {
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(zakk)}`;
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
           for (const maxTokens of TOKEN_TRIES) {
             try {
