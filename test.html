@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
 
   <!-- Tailwind -->
@@ -12,76 +12,72 @@
       theme: {
         extend: {
           fontFamily: {
-            heading: ['Plus Jakarta Sans','sans-serif'],
-            sans: ['Inter','sans-serif'],
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            'brand-green':'#00C09A',
-            'brand-dark':'#1A1A1A',
-            'brand-gray':'#666666',
-            'brand-light':'#F8F9FA',
+            'brand-green': '#00C09A',
+            'brand-dark':  '#1A1A1A',
+            'brand-gray':  '#666666',
+            'brand-light': '#F8F9FA',
             'brand-border':'#E5E7EB',
-            'pin-pink':'#FF78B0'
           }
         }
       }
     }
   </script>
 
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- API key (you can also set window.zakk at runtime). -->
+  <!-- === Development API key (CLIENT-SIDE, per your request) === -->
   <script>
-    /* Put your development key below (the constant wins if set). */
-    const zakk = (typeof window !== 'undefined' && window.zakk && String(window.zakk).trim())
-      ? String(window.zakk).trim()
-      : 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
+    // You said this dev key is safe to embed:
+    const zakk = 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
+
+    // Allow overrides (optional): ?zakk=KEY or window.zakk='KEY'
+    (function ensureApiKey(){
+      try {
+        const qs = new URLSearchParams(location.search).get('zakk') || '';
+        const win = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk) : '';
+        const picked = (qs || win || zakk || '').trim();
+        if (!picked) console.warn('No API key found for Google Generative Language API');
+        if (typeof window !== 'undefined') window.zakk = picked;
+      } catch {
+        if (typeof window !== 'undefined') window.zakk = zakk;
+      }
+    })();
   </script>
 
   <style>
     html { scroll-behavior: smooth; }
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
-
-    .cta-button { transition:all .25s ease; }
-    .cta-button:hover { transform:translateY(-2px); box-shadow:0 10px 20px rgba(0,192,154,.18); }
-    .cta-disabled { opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
-
+    .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+    .cta-button { transition: all .3s ease; }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
+    .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
-    .score-circle{width:120px;height:120px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
+    .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
-
-    /* Loader: radar + stepper + skeleton */
     .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
-      background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
-                  conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
-      animation:radar-spin 1.6s linear infinite;
-    }
+      background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%), conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
+      animation: radar-spin 1.6s linear infinite; }
     .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
-    @keyframes radar-spin { to{ transform:rotate(360deg) } }
+    @keyframes radar-spin { to { transform: rotate(360deg); } }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .shimmer{ background:linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
-    .skeleton-card{ border:1px solid #E5E7EB; border-radius:.75rem; padding:1rem; background:#fff; }
-    .skel-line{ height:.7rem; border-radius:.35rem; }
-
+    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
+    .skeleton-card { border:1px solid #E5E7EB; border-radius:.75rem; padding:1rem; background:#fff; }
+    .skel-line { height:.7rem; border-radius:.35rem; }
     .step-icon{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border-radius:9999px;background:#E5E7EB;color:#fff;flex:none;margin-top:2px}
     .step-icon.done{background:#059669}
     .step-icon>svg{width:.7rem;height:.7rem;display:none}
     .step-icon.done>svg{display:block}
     .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
     .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
-
-    /* Map card with a “pink pin” */
-    .map-canvas{background:linear-gradient(180deg,#eef2ff 0%,#f8fafc 100%);border:1px solid #E5E7EB;border-radius:.5rem;position:relative;overflow:hidden}
-    .map-grids::before,.map-grids::after{content:"";position:absolute;inset:0;background-image:
-      linear-gradient(#e2e8f0 1px, transparent 1px),linear-gradient(90deg,#e2e8f0 1px, transparent 1px);
-      background-size:22px 22px;opacity:.45}
-    .map-pin{position:absolute;width:22px;height:22px;background:#FF78B0;border-radius:9999px;left:50%;top:48%;transform:translate(-50%,-50%);box-shadow:0 10px 18px rgba(255,120,176,.35)}
-    .map-pin::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);width:20px;height:6px;background:rgba(0,0,0,.08);border-radius:9999px;filter:blur(2px)}
   </style>
 </head>
 
@@ -90,10 +86,7 @@
   <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
     <nav class="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
       <a href="/" class="flex items-center gap-2.5">
-        <svg width="36" height="36" viewBox="0 0 50 50" fill="none" aria-hidden="true">
-          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="36" height="36" viewBox="0 0 50 50" fill="#00C09A" aria-hidden="true"><path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z"/><path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
       </a>
       <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
@@ -110,13 +103,10 @@
 
       <div class="widget-card p-3 md:p-4 mt-6">
         <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Tesla, Inc., Taco Bell Corp., Acme LLC"
-                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green"/>
-          <button id="generate-report-btn" type="submit"
-                  class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-            </svg>
+          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
+                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
+          <button id="generate-report-btn" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
             Generate
           </button>
         </form>
@@ -128,9 +118,8 @@
   <!-- Results -->
   <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
-
-      <!-- Loader -->
-      <div id="report-loader" style="display:none" class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
+      <!-- LOADER -->
+      <div id="report-loader" style="display:none;" class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
         <div class="flex items-center gap-5">
           <div class="radar" aria-hidden="true"></div>
           <div class="flex-1">
@@ -144,39 +133,23 @@
         </div>
         <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="skeleton-card space-y-3">
-            <div class="w-28 skel-line shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-3/4 skel-line shimmer"></div>
-            <div class="w-1/2 skel-line shimmer"></div>
-          </div>
-          <div class="skeleton-card space-y-3">
-            <div class="w-32 skel-line shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-2/3 skel-line shimmer"></div>
-            <div class="w-1/3 skel-line shimmer"></div>
-          </div>
-          <div class="skeleton-card space-y-3">
-            <div class="w-36 skel-line shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-5/6 skel-line shimmer"></div>
-            <div class="w-1/2 skel-line shimmer"></div>
-          </div>
+          <div class="skeleton-card space-y-3"><div class="w-28 skel-line shimmer"></div><div class="w-full h-20 shimmer rounded-md"></div><div class="w-3/4 skel-line shimmer"></div><div class="w-1/2 skel-line shimmer"></div></div>
+          <div class="skeleton-card space-y-3"><div class="w-32 skel-line shimmer"></div><div class="w-full h-20 shimmer rounded-md"></div><div class="w-2/3 skel-line shimmer"></div><div class="w-1/3 skel-line shimmer"></div></div>
+          <div class="skeleton-card space-y-3"><div class="w-36 skel-line shimmer"></div><div class="w-full h-20 shimmer rounded-md"></div><div class="w-5/6 skel-line shimmer"></div><div class="w-1/2 skel-line shimmer"></div></div>
         </div>
       </div>
 
       <!-- Error -->
-      <div id="report-error-container" style="display:none" class="widget-card p-6 border-red-200 bg-red-50">
+      <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
         <p id="report-error-message" class="text-sm text-red-700"></p>
       </div>
 
       <!-- Content -->
-      <div id="report-content" style="display:none" class="space-y-8">
-        <!-- Title row -->
+      <div id="report-content" style="display:none;" class="space-y-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div class="flex items-center gap-2">
+          <div>
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-            <span id="us-badge" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-brand-light border border-brand-border text-brand-gray">US‑preferred</span>
+            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
           <div class="flex items-center gap-3">
             <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
@@ -263,22 +236,6 @@
           </div>
         </div>
 
-        <!-- Contact & Map -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Contact</h3>
-            <ul class="text-sm text-gray-700 space-y-1" id="contact-list"></ul>
-            <div class="mt-2 text-xs text-gray-500" id="contact-note"></div>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Location (Approx.)</h3>
-            <div class="map-canvas map-grids h-40 relative">
-              <div class="map-pin"></div>
-            </div>
-            <div id="map-address" class="text-sm text-gray-700 mt-3"></div>
-          </div>
-        </div>
-
         <!-- Reviews + Charts -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="widget-card p-5 md:p-6">
@@ -321,68 +278,68 @@
   </footer>
 
   <script>
-    /* ========================= Config ========================= */
+    /* ===================== Config ===================== */
     const MODEL_CANDIDATES = [
-      'gemini-2.5-pro',
-      'gemini-2.5-flash',
+      'gemini-2.5-pro',                 // try Pro first for richer content
+      'gemini-2.5-flash',               // fast fallback
+      'gemini-2.5-flash-preview-09-2025',
       'gemini-2.0-flash',
-      'gemini-1.5-flash'
     ];
-    const USE_SEARCH_TOOL_FIRST = true;   // will auto-retry without tools if needed
+    const USE_SEARCH_TOOL = true;     // enables googleSearch tool
     const MAX_OUTPUT_TOKENS = 8192;
 
-    /* ========================= Utilities ========================= */
-    function getKey(){ return (typeof zakk === 'string' && zakk.trim()) ? zakk.trim() : ''; }
+    /* ===================== Utilities ===================== */
+    function getApiKey() {
+      try {
+        const qs = new URLSearchParams(location.search).get('zakk') || '';
+        const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+        const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
+        const key = (qs || fromWindow || fromConst || '').trim();
+        return key;
+      } catch {
+        return (typeof zakk !== 'undefined' ? String(zakk).trim() : '');
+      }
+    }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
-    function toDomain(url){ try{ return new URL(url).hostname.replace(/^www\./,''); }catch{return url;} }
-    function linkifyMaybe(v){
-      if(!v) return 'N/A';
+    function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
+    function linkifyMaybe(v) {
+      if (!v) return 'N/A';
       const s = String(v).trim();
-      if(/^https?:\/\//i.test(s)) return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      if (/^https?:\/\//i.test(s)) {
+        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+      }
       return s;
     }
-    function renderLineChart(container, values, color){
-      if(!Array.isArray(values) || values.length<2){
+    function renderLineChart(container, values, color) {
+      if (!Array.isArray(values) || values.length < 2) {
         container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>'; return;
       }
       const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
       const min = Math.min(...nums), max = Math.max(...nums);
-      const norm = (max>min) ? nums.map(n => (100*(n-min))/(max-min)) : nums.map(()=>50);
-      const step = 100/(norm.length-1);
-      const pts = norm.map((v,i)=>`${(i*step).toFixed(2)},${(50-(v/100)*44-3).toFixed(2)}`).join(' ');
-      container.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-        <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}"/>
-        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1"/>
-      </svg>`;
-    }
-    function deepMerge(base, extra){
-      if(Array.isArray(base) && Array.isArray(extra)){
-        const s = new Set(base.map(JSON.stringify));
-        extra.forEach(x => { const j = JSON.stringify(x); if(!s.has(j)) base.push(x); });
-        return base;
-      } else if(base && typeof base==='object' && extra && typeof extra==='object'){
-        Object.keys(extra).forEach(k=>{
-          if(base[k]==null) base[k]=extra[k];
-          else base[k]=deepMerge(base[k], extra[k]);
-        }); return base;
-      }
-      return (extra==null?base:extra);
+      const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
+      const step = 100 / (norm.length - 1);
+      const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
+      container.innerHTML =
+        `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+          <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+          <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+        </svg>`;
     }
 
-    /* ========================= Loader UI ========================= */
-    let __loaderCtl=null;
-    function startLoadingAnimation(){
-      const steps=[
-        'Matching business identity','Searching the web','Pulling SOS filings',
-        'Parsing entity metadata','Checking public records','Gathering leadership',
-        'Mapping products & services','Finding competitors','Collecting web & social signals',
-        'Crawling headlines','Reading customer reviews','Synthesizing risk score'
+    /* ===================== Loader UI ===================== */
+    let __loaderCtl = null;
+    function startLoadingAnimation() {
+      const steps = [
+        'Matching business identity','US company check','Searching the web',
+        'Pulling SOS / corporate filings','Parsing entity metadata','Checking public records',
+        'Gathering leadership','Mapping products & services','Finding competitors',
+        'Collecting web & social signals','Crawling recent headlines','Synthesizing risk score'
       ];
-      const stepsOl=document.getElementById('loader-steps');
-      const barEl=document.getElementById('loader-bar');
-      const timerEl=document.getElementById('loader-timer');
+      const stepsOl = document.getElementById('loader-steps');
+      const barEl   = document.getElementById('loader-bar');
+      const timerEl = document.getElementById('loader-timer');
 
-      stepsOl.innerHTML = steps.map((s,i)=>`
+      stepsOl.innerHTML = steps.map((s,i) => `
         <li class="flex items-start gap-2">
           <span class="step-icon" id="ld_${i}">
             <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -392,173 +349,150 @@
           <span>${s}</span>
         </li>`).join('');
 
-      let elapsed=0;
-      const tTimer=setInterval(()=>{
-        elapsed+=200; const m=Math.floor(elapsed/1000/60), s=Math.floor((elapsed/1000)%60);
+      let elapsed = 0;
+      const tTimer = setInterval(() => {
+        elapsed += 200;
+        const m = Math.floor(elapsed/1000/60);
+        const s = Math.floor((elapsed/1000)%60);
         timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      },200);
+      }, 200);
 
-      let idx=0; const stepMs=Math.max(900, Math.floor(25000/steps.length));
-      const tSteps=setInterval(()=>{
-        if(idx<steps.length){
+      let idx = 0;
+      const stepMs = Math.max(900, Math.floor(25000 / steps.length));
+      const tSteps = setInterval(() => {
+        if (idx < steps.length) {
           document.getElementById(`ld_${idx}`)?.classList.add('done');
-          idx++; barEl.style.width = Math.min(98, Math.round((idx/steps.length)*100 - 2)) + '%';
+          idx++;
+          const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
+          barEl.style.width = pct + '%';
         } else {
-          const cur=parseFloat(barEl.style.width)||98; barEl.style.width=Math.min(99, cur+0.2)+'%';
+          const cur = parseFloat(barEl.style.width) || 98;
+          barEl.style.width = Math.min(99, cur + 0.2) + '%';
         }
       }, stepMs);
 
-      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width='100%'; } }
+      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
     }
 
-    const results=document.getElementById('report-results-container');
-    const loader=document.getElementById('report-loader');
-    const errBox=document.getElementById('report-error-container');
-    const errMsg=document.getElementById('report-error-message');
-    const content=document.getElementById('report-content');
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
 
-    function showState(state,message=''){
-      loader.style.display='none'; errBox.style.display='none'; content.style.display='none';
-      results.style.display='block';
-      if(__loaderCtl){ __loaderCtl.stop(); __loaderCtl=null; }
-      if(state==='loading'){ loader.style.display='block'; __loaderCtl=startLoadingAnimation(); }
-      else if(state==='error'){ errBox.style.display='block'; errMsg.textContent = message||'Something went wrong.'; }
-      else if(state==='content'){ content.style.display='block'; }
+    function showState(state, message = '') {
+      loader.style.display = 'none';
+      errBox.style.display = 'none';
+      content.style.display = 'none';
+      results.style.display = 'block';
+
+      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+
+      if (state === 'loading') {
+        loader.style.display = 'block';
+        __loaderCtl = startLoadingAnimation();
+      } else if (state === 'error') {
+        errBox.style.display = 'block';
+        errMsg.textContent = message || 'Something went wrong.';
+      } else if (state === 'content') {
+        content.style.display = 'block';
+      }
     }
 
-    /* ========================= Parsing helpers ========================= */
-    function parseCandidateJSON(candidate){
-      const parts=candidate?.content?.parts||[];
-
-      // Prefer text JSON
-      for(const p of parts){
-        if(typeof p?.text==='string' && p.text.trim()){
-          const raw=p.text.replace(/```json/g,'').replace(/```/g,'').trim();
-          try{ return JSON.parse(raw); }catch{}
-          const cut=Math.max(raw.lastIndexOf('}'),raw.lastIndexOf(']'));
-          if(cut>0){ const maybe=raw.slice(0,cut+1); try{ return JSON.parse(maybe); }catch{} }
+    /* ===================== Robust JSON parsing ===================== */
+    function parseCandidateJSON(candidate) {
+      const parts = candidate?.content?.parts || [];
+      for (const p of parts) if (typeof p?.text === 'string' && p.text.trim()) {
+        const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
+        try { return JSON.parse(raw); } catch {}
+        const lastCurly  = raw.lastIndexOf('}');
+        const lastSquare = raw.lastIndexOf(']');
+        const cut = Math.max(lastCurly, lastSquare);
+        if (cut > 0) {
+          const maybe = raw.slice(0, cut + 1);
+          try { return JSON.parse(maybe); } catch {}
         }
       }
-      // Or inline base64 JSON
-      for(const p of parts){
-        if(p?.inline_data?.data && String(p.inline_data.mimeType||'').toLowerCase().includes('json')){
-          try{ return JSON.parse(atob(p.inline_data.data)); }catch{}
-        }
+      for (const p of parts) if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
+        try { return JSON.parse(atob(p.inline_data.data)); } catch {}
       }
-      const preview=parts.find(p=>p.text)?.text?.slice(0,300)?.replace(/\s+/g,' ')||'No text';
-      throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
+      const textPreview = parts.find(p => p.text)?.text?.slice(0, 400).replace(/\s+/g,' ') || 'No text content';
+      throw new Error(`Model returned no parseable JSON (preview: ${textPreview})`);
     }
 
-    /* ========================= Sources helpers ========================= */
-    function normalizeUrl(u){ try{const url=new URL(u); url.search=''; if(url.pathname!=='/'&&url.pathname.endsWith('/'))url.pathname=url.pathname.slice(0,-1); return url.toString(); }catch{return null;} }
-    function prettyUrl(u){ try{const url=new URL(u); let out=url.hostname.replace(/^www\./,''); if(url.pathname&&url.pathname!=='/') out+=url.pathname; return out.length>60?out.slice(0,57)+'…':out;}catch{return u;} }
-    function collectSources(json, modelSources){
-      const out=[], push=(title,url,kind)=>{ const norm=normalizeUrl(url); if(!norm)return; out.push({title:title||prettyUrl(norm),url:norm,kind}); };
-      (json?.citations||[]).forEach(c=>push(c.title||c.url,c.url,'citation'));
-      (modelSources||[]).forEach(s=>push(s.title||s.uri,s.uri,'source'));
-      if(json?.profile?.website) push('Official Website', json.profile.website,'site');
-      const w=json?.webPresence||{};
-      if(w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X',w.twitter,'social');
-      if(w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn',w.linkedin,'social');
-      if(w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube',w.youtube,'social');
-      (json?.news||[]).forEach(n=>{ if(n?.url) push(n.title||n.source||'News',n.url,'news'); });
-      (json?.reviews||[]).forEach(r=>{ if(r?.url) push(r.source||'Review',r.url,'review'); });
-
-      // Guaranteed LinkedIn search fallback
-      if(json?.summary?.companyName){
-        push('LinkedIn: Company search', `https://www.google.com/search?q=${encodeURIComponent(json.summary.companyName+' site:linkedin.com/company')}`,'social');
-      }
-      const exec = (json?.leadership||[]).find(l=>/founder|chief executive|ceo/i.test(l?.title||''));
-      if(exec?.name){
-        push('LinkedIn: Executive search', `https://www.google.com/search?q=${encodeURIComponent(exec.name+' site:linkedin.com/in')}`,'social');
-      }
-
-      const seen=new Set();
-      return out.filter(({url})=>!seen.has(url)&&seen.add(url));
+    /* ===================== Sources helpers ===================== */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
     }
-    function populateSources(links){
-      const chips=document.getElementById('report-sources-chips');
-      const ul=document.getElementById('report-sources');
-      const box=document.getElementById('report-sources-container');
-      chips.innerHTML=''; ul.innerHTML='';
-      if(!Array.isArray(links)||links.length===0){ box.style.display='none'; return; }
-      box.style.display='block';
-      links.forEach(({url,title,kind})=>{
-        const emoji = kind==='news'?'📰': kind==='review'?'⭐': kind==='social'?'🔗': kind==='site'?'🏢': kind==='citation'?'📚':'🔗';
-        const span=document.createElement('span');
-        span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||prettyUrl(url)}</a>`;
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
         chips.appendChild(span);
       });
-      links.forEach(({url,title})=>{
-        const li=document.createElement('li');
-        li.className='text-sm';
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||prettyUrl(url)}</a>
-                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
         ul.appendChild(li);
       });
-      let open=false;
-      document.getElementById('toggle-sources').onclick=()=>{
-        open=!open; ul.classList.toggle('hidden',!open);
-        document.getElementById('toggle-sources').textContent = open?'Hide list':'Show list';
-      }
+      let open = false;
+      document.getElementById('toggle-sources').onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+      };
     }
 
-    /* ========================= Fetch helper ========================= */
-    async function fetchWithBackoff(url, options, retries=3, delay=800){
+    /* ===================== Fetch helper ===================== */
+    async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
       let lastError;
-      for(let i=0;i<retries;i++){
-        try{
-          const res=await fetch(url,options);
-          if(!res.ok){
-            let body=null; try{ body=await res.json(); }catch{}
-            const msg=body?.error?.message || res.statusText || 'Request failed';
-            const err=new Error(`${msg} (HTTP ${res.status})`); err.code=body?.error?.status; throw err;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try { body = await res.json(); } catch {}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status || body?.error?.code;
+            throw err;
           }
           return await res.json();
-        }catch(e){
-          lastError=e; if(i<retries-1) await new Promise(r=>setTimeout(r, delay*Math.pow(2,i)));
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
         }
       }
       throw lastError || new Error('API request failed.');
     }
 
-    /* ========================= API Caller ========================= */
-    function buildSystemPrompt(){
-      return `
-You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
-Bias toward U.S.-based companies. If the subject is clearly non-U.S., still return best-effort data but prefer U.S. matches when ambiguous.
-
-Shape:
-{
-  "summary": { "companyName": string, "summary": string },
-  "sos": { "entityName": string, "status": string, "entityType": string, "jurisdiction": string, "formationDate": string, "registeredAgent": string },
-  "publicRecords": { "findings": [ { "type": string, "details": string } ] },
-  "riskScoreHints": { "ageYears": number, "hasLiensOrJudgments": boolean, "newsTone": "positive"|"neutral"|"negative", "reviewTone": "positive"|"neutral"|"negative" },
-  "reviews": [ { "snippet": string, "source": string, "url": string } ],
-  "chartPoints": { "revenue": [number], "cashFlow": [number] },
-  "profile": { "founded": string, "headquarters": string, "employees": string|number, "website": string, "industry": string, "subindustry": string, "ticker": string },
-  "news": [ { "title": string, "date": string, "source": string, "url": string } ],
-  "leadership": [ { "name": string, "title": string } ],
-  "products": [ string ],
-  "competitors": [ string ],
-  "webPresence": { "twitter": string, "linkedin": string, "youtube": string, "traffic": "High"|"Medium"|"Low"|string },
-  "contacts": { "address": string, "city": string, "state": string, "zip": string, "country": string, "phone": string, "email": string },
-  "citations": [ { "title": string, "url": string } ]
-}
-
-Rules:
-- If unknown, use "N/A" or [].
-- Include at least 6+ leadership/products/competitors items where available.
-- Prefer recent U.S. SOS/filings status if multiple entities exist.
-- Respond ONLY with valid JSON (no markdown fences).
-`.trim();
-    }
-
-    function makePayload(systemPrompt, userQuery, withSearchTool){
+    /* ===================== API (v1beta camelCase + googleSearch) ===================== */
+    function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
       const payload = {
-        contents: [{ role:'user', parts:[{ text:userQuery }] }],
-        systemInstruction: { parts:[{ text:systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
         generationConfig: {
           maxOutputTokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
@@ -566,340 +500,266 @@ Rules:
           responseMimeType: "application/json"
         }
       };
-      if(withSearchTool) payload.tools = [{ googleSearch: {} }];
+      if (withSearch) payload.tools = [{ googleSearch: {} }];
       return payload;
     }
 
-    async function callModels(systemPrompt, userQuery){
-      const key=getKey(); if(!key) throw new Error('Missing API key (zakk). Set it near the top of the file.');
-      const base='https://generativelanguage.googleapis.com/v1beta/models';
+    async function callReportAPI(systemPrompt, userQuery) {
+      const key = getApiKey();
+      if (!key) throw new Error('Missing API key (zakk).');
+
+      const base = 'https://generativelanguage.googleapis.com/v1beta/models';
       let lastErr;
 
-      for(const model of MODEL_CANDIDATES){
-        // Try with tool then without (if tool is unsupported)
-        for(const useTool of [USE_SEARCH_TOOL_FIRST, false]){
-          const url=`${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-          const payload=makePayload(systemPrompt,userQuery,useTool);
+      for (const model of MODEL_CANDIDATES) {
+        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
-          try{
-            const data=await fetchWithBackoff(url,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-            const cand=data?.candidates?.[0]; if(!cand) throw new Error('No candidates in response');
-            const json=parseCandidateJSON(cand);
+        // Two attempts: normal → stricter JSON-only
+        let payload = makeV1betaPayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const data = await fetchWithBackoff(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
 
-            const atts=cand?.groundingMetadata?.groundingAttributions||[];
-            const sources=atts.map(a=>({ uri:a.web?.uri, title:a.web?.title })).filter(s=>s.uri);
-            return { model, json, sources };
-          }catch(e){
-            lastErr=e;
-            // If 400 or 404, try next loop
+            const cand = data?.candidates?.[0];
+            if (!cand) throw new Error('No candidates in response.');
+
+            const json = parseCandidateJSON(cand);
+
+            const atts = cand?.groundingMetadata?.groundingAttributions || [];
+            const sources = atts
+              .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+              .filter(s => s.uri);
+
+            return { json, sources };
+          } catch (e) {
+            // Provide a clear message for invalid or restricted keys
+            const msg = String(e && e.message || '').toLowerCase();
+            if (msg.includes('api key') || msg.includes('permission_denied') || msg.includes('not found for api version')) {
+              throw new Error('API key appears invalid or restricted for the Generative Language API (or the model is not enabled).');
+            }
+            lastErr = e;
+
+            // If we saw "non‑JSON" content or empty text, try stricter prompt once
+            const parseIssue = /non‑json|no json|unexpected end of json input|parseable json|No candidates/i.test(e.message || '');
+            if (attempt === 1 && parseIssue) {
+              const stricter = `${systemPrompt}
+
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
+              payload = makeV1betaPayload(stricter, userQuery, USE_SEARCH_TOOL);
+              continue;
+            }
+            break; // next model
           }
         }
       }
       throw lastErr || new Error('All model attempts failed.');
     }
 
-    async function runEnrichmentIfSparse(baseJson, company){
-      const missingKeys=[];
-      if(!Array.isArray(baseJson?.leadership) || baseJson.leadership.length<3) missingKeys.push('leadership');
-      if(!Array.isArray(baseJson?.products) || baseJson.products.length<5) missingKeys.push('products');
-      if(!Array.isArray(baseJson?.competitors) || baseJson.competitors.length<5) missingKeys.push('competitors');
-      if(!Array.isArray(baseJson?.news) || baseJson.news.length<3) missingKeys.push('news');
-      if(!Array.isArray(baseJson?.reviews) || baseJson.reviews.length<2) missingKeys.push('reviews');
-      if(!baseJson?.contacts) missingKeys.push('contacts');
-      if(!baseJson?.webPresence?.linkedin) missingKeys.push('webPresence');
-      if(!baseJson?.sos?.status || !baseJson?.sos?.entityName) missingKeys.push('sos');
+    /* ===================== System prompt ===================== */
+    function buildSystemPrompt() {
+      return `
+You are an AI business analyst. **Return a SINGLE JSON object ONLY** (no commentary).
+Scope: **US-based companies only**. If query isn’t US, return the closest US entity or "N/A".
 
-      if(missingKeys.length===0) return baseJson;
+Include:
+1) summary: { companyName, summary }
+2) profile: { founded, headquarters, employees, website, industry, subindustry, ticker, naics, sic, phone, email, address }
+3) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
+4) publicRecords: { findings: [{ type, details }] }
+5) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
+6) leadership: [{ name, title, linkedinUrl }]
+7) products: [string]
+8) competitors: [string]
+9) news: [{ title, date, source, url }]
+10) reviews: [{ snippet, source, url }]
+11) webPresence: { twitter, linkedin, youtube, facebook, traffic }
+12) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points
+13) citations: [{ title, url }]
 
-      const systemPrompt = `
-Return ONLY JSON with the following missing keys for the company "${company}": ${missingKeys.join(', ')}.
-Keep the same schema as previously described. Use "N/A" where unknown. Prefer U.S. data.
-`.trim();
-
-      try{
-        const { json:extra } = await callModels(systemPrompt, `Fill gaps only for: "${company}"`);
-        return deepMerge(baseJson, extra||{});
-      }catch{
-        return baseJson; // fail-soft
-      }
+Enrichment priorities:
+- Prefer recent US media; include 5–8 distinct news items with URLs.
+- Always include LinkedIn company page and founder/CEO LinkedIn if known.
+- If information is unknown, use "N/A" or [].
+Respond ONLY with valid JSON (no markdown fences).
+      `.trim();
     }
 
-    /* ========================= Deterministic Score ========================= */
-    function computeDeterministicScore(data){
-      // Weights (transparent)
-      const W = {
-        base: 650,
-        filingsActive: +60,
-        filingsDissolved: -120,
-        ageOver10: +80,
-        ageBetween3And10: +30,
-        ageUnder3: -30,
-        lienOrJudgment: -50,
-        newsPos: +30,
-        newsNeg: -40,
-        reviewsPos: +30,
-        reviewsNeg: -40,
-        employeesLarge: +40,
-        employeesMid: +25,
-        employeesTiny: -10,
-        trafficHigh: +30,
-        trafficLow: -10,
-      };
+    /* ===================== DOM refs ===================== */
+    const titleEl = document.getElementById('report-title');
+    const summaryEl = document.getElementById('report-summary');
+    const scoreCircle = document.getElementById('report-score-circle');
+    const scoreDigit  = document.getElementById('report-score-digit');
+    const scoreJust   = document.getElementById('report-score-justification');
+    const posList     = document.getElementById('report-score-positives');
+    const negList     = document.getElementById('report-score-negatives');
 
-      let score=W.base, positives=[], negatives=[], why=[];
+    const sosName = document.getElementById('report-sos-name');
+    const sosStatus = document.getElementById('report-sos-status');
+    const sosEntity = document.getElementById('report-sos-entity');
+    const sosJuris  = document.getElementById('report-sos-jurisdiction');
+    const sosDate   = document.getElementById('report-sos-date');
+    const sosAgent  = document.getElementById('report-sos-agent');
 
-      // Age (from profile.founded or riskScoreHints.ageYears)
-      let ageYears=null;
-      if(Number.isFinite(+data?.riskScoreHints?.ageYears)) ageYears=+data.riskScoreHints.ageYears;
-      else {
-        const f=String(data?.profile?.founded||'').match(/\b(19|20)\d{2}\b/);
-        if(f){ const yr=+f[0]; const now=(new Date()).getFullYear(); ageYears=Math.max(0, now-yr); }
-      }
-      if(ageYears!=null){
-        if(ageYears>10){ score+=W.ageOver10; positives.push('Established >10 years'); }
-        else if(ageYears>=3){ score+=W.ageBetween3And10; positives.push('Operating 3–10 years'); }
-        else { score+=W.ageUnder3; negatives.push('Young company (<3 years)'); }
-      }
+    const factsFounded   = document.getElementById('facts-founded');
+    const factsHQ        = document.getElementById('facts-hq');
+    const factsEmployees = document.getElementById('facts-employees');
+    const factsIndustry  = document.getElementById('facts-industry');
+    const factsTicker    = document.getElementById('facts-ticker');
+    const factsWebsite   = document.getElementById('facts-website');
 
-      // Filings status
-      const status=String(data?.sos?.status||'').toLowerCase();
-      if(status.includes('active')){ score+=W.filingsActive; positives.push('Active SOS status'); }
-      else if(status.includes('dissolved') || status.includes('inactive') || status.includes('revoked')){ score+=W.filingsDissolved; negatives.push(`Non‑active SOS status (${data?.sos?.status||'unknown'})`); }
+    const newsList   = document.getElementById('report-news-list');
+    const recList    = document.getElementById('report-records-list');
+    const reviewsList= document.getElementById('report-reviews-list');
+    const leaderList = document.getElementById('report-leadership-list');
+    const productsList = document.getElementById('report-products-list');
+    const compList   = document.getElementById('report-competitors-list');
+    const socialList = document.getElementById('report-social-list');
 
-      // Public records
-      const findings=(data?.publicRecords?.findings||[]).map(f=>String(f?.type||'').toLowerCase());
-      const hasLienOrJudgment = findings.some(t => /lien|ucc|judgment|debt/i.test(t));
-      if(hasLienOrJudgment){ score+=W.lienOrJudgment; negatives.push('Liens/UCC/judgment flags'); }
+    const chartRevenue = document.getElementById('report-chart-revenue');
+    const chartCash    = document.getElementById('report-chart-cashflow');
 
-      // News tone
-      const nt=String(data?.riskScoreHints?.newsTone||'').toLowerCase();
-      if(nt==='positive'){ score+=W.newsPos; positives.push('Positive news sentiment'); }
-      else if(nt==='negative'){ score+=W.newsNeg; negatives.push('Negative news sentiment'); }
-
-      // Review tone
-      const rt=String(data?.riskScoreHints?.reviewTone||'').toLowerCase();
-      if(rt==='positive'){ score+=W.reviewsPos; positives.push('Positive review sentiment'); }
-      else if(rt==='negative'){ score+=W.reviewsNeg; negatives.push('Negative review sentiment'); }
-
-      // Employees size
-      const empRaw=data?.profile?.employees;
-      let empNum=null; if(Number.isFinite(+empRaw)) empNum=+empRaw;
-      if(empNum!=null){
-        if(empNum>=500){ score+=W.employeesLarge; positives.push('Large headcount'); }
-        else if(empNum>=50){ score+=W.employeesMid; positives.push('Mid‑size headcount'); }
-        else if(empNum>0){ score+=W.employeesTiny; negatives.push('Very small headcount'); }
-      }
-
-      // Traffic
-      const tf=String(data?.webPresence?.traffic||'').toLowerCase();
-      if(tf.includes('high')){ score+=W.trafficHigh; positives.push('High website traffic'); }
-      else if(tf.includes('low')){ score+=W.trafficLow; negatives.push('Low website traffic'); }
-
-      // Clip + finalize
-      score=Math.max(300, Math.min(850, Math.round(score)));
-      let justification='Score reflects filings status, company age, public‑record flags, news & review tone, and scale signals (headcount/traffic).';
-      return { score, positives, negatives, justification };
-    }
-
-    /* ========================= Populate Report ========================= */
-    const titleEl=document.getElementById('report-title');
-    const summaryEl=document.getElementById('report-summary');
-    const scoreCircle=document.getElementById('report-score-circle');
-    const scoreDigit=document.getElementById('report-score-digit');
-    const scoreJust=document.getElementById('report-score-justification');
-    const posList=document.getElementById('report-score-positives');
-    const negList=document.getElementById('report-score-negatives');
-    const usBadge=document.getElementById('us-badge');
-
-    const sosName=document.getElementById('report-sos-name');
-    const sosStatus=document.getElementById('report-sos-status');
-    const sosEntity=document.getElementById('report-sos-entity');
-    const sosJuris=document.getElementById('report-sos-jurisdiction');
-    const sosDate=document.getElementById('report-sos-date');
-    const sosAgent=document.getElementById('report-sos-agent');
-
-    const factsFounded=document.getElementById('facts-founded');
-    const factsHQ=document.getElementById('facts-hq');
-    const factsEmployees=document.getElementById('facts-employees');
-    const factsIndustry=document.getElementById('facts-industry');
-    const factsTicker=document.getElementById('facts-ticker');
-    const factsWebsite=document.getElementById('facts-website');
-
-    const newsList=document.getElementById('report-news-list');
-    const recList=document.getElementById('report-records-list');
-    const reviewsList=document.getElementById('report-reviews-list');
-    const leaderList=document.getElementById('report-leadership-list');
-    const productsList=document.getElementById('report-products-list');
-    const compList=document.getElementById('report-competitors-list');
-    const socialList=document.getElementById('report-social-list');
-
-    const chartRevenue=document.getElementById('report-chart-revenue');
-    const chartCash=document.getElementById('report-chart-cashflow');
-
-    const contactList=document.getElementById('contact-list');
-    const contactNote=document.getElementById('contact-note');
-    const mapAddress=document.getElementById('map-address');
-
-    function isUSLike(headquarters, contacts){
-      const s=(String(headquarters||'')+' '+String(contacts?.country||'')).toLowerCase();
-      return /(united states|usa|u\.s\.a|alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming)/i.test(s);
-    }
-
-    function populateReport(data){
-      // Title + summary
+    /* ===================== Populate Report ===================== */
+    function populateReport(data) {
       setText(titleEl, data?.summary?.companyName);
       summaryEl.textContent = data?.summary?.summary || 'No summary could be found.';
 
-      // US badge
-      const us=isUSLike(data?.profile?.headquarters, data?.contacts);
-      usBadge.classList.toggle('hidden', !us);
+      const score = data?.riskScore?.score || 0;
+      scoreDigit.textContent = score;
+      scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
+      scoreCircle.className = 'score-circle mb-4';
+      if (score < 550) scoreCircle.classList.add('score-red');
+      else if (score < 700) scoreCircle.classList.add('score-yellow');
+      else scoreCircle.classList.add('score-green');
 
-      // Score
-      const S=computeDeterministicScore(data);
-      scoreDigit.textContent=S.score;
-      scoreJust.textContent=S.justification;
-      scoreCircle.className='score-circle mb-4';
-      if(S.score<550) scoreCircle.classList.add('score-red'); else if(S.score<700) scoreCircle.classList.add('score-yellow'); else scoreCircle.classList.add('score-green');
-
-      posList.innerHTML=''; (S.positives||[]).forEach(f=>{
-        const li=document.createElement('li');
-        li.className='flex items-start';
-        li.innerHTML='<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'+
-          `<span class="text-sm text-brand-dark">${f}</span>`;
+      posList.innerHTML = '';
+      (data?.riskScore?.positiveFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
         posList.appendChild(li);
       });
-      negList.innerHTML=''; (S.negatives||[]).forEach(f=>{
-        const li=document.createElement('li');
-        li.className='flex items-start';
-        li.innerHTML='<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>'+
-          `<span class="text-sm text-brand-dark">${f}</span>`;
+      negList.innerHTML = '';
+      (data?.riskScore?.negativeFactors || []).forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start';
+        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
         negList.appendChild(li);
       });
 
-      // SOS
-      const sos=data?.sos||{};
-      setText(sosName, sos.entityName);
-      setText(sosEntity, sos.entityType);
-      setText(sosStatus, sos.status);
+      const sos = data?.sos || {};
+      setText(sosName,  sos.entityName);
+      setText(sosEntity,sos.entityType);
+      setText(sosStatus,sos.status);
       setText(sosJuris, sos.jurisdiction);
-      setText(sosDate, sos.formationDate);
+      setText(sosDate,  sos.formationDate);
       setText(sosAgent, sos.registeredAgent);
-      sosStatus.className='';
-      if((sos.status||'').toLowerCase().includes('active')) sosStatus.classList.add('text-green-600');
-      else if(sos.status) sosStatus.classList.add('text-red-600');
+      sosStatus.className = '';
+      if ((sos.status || '').toLowerCase() === 'active') sosStatus.classList.add('text-green-600');
+      else if (sos.status && sos.status.toLowerCase() !== 'n/a') sosStatus.classList.add('text-red-600');
 
-      // Facts
-      const p=data?.profile||{};
+      const p = data?.profile || {};
       setText(factsFounded, p.founded);
-      setText(factsHQ, p.headquarters||p.hq);
+      setText(factsHQ, p.headquarters || p.hq);
       setText(factsEmployees, p.employees);
-      setText(factsIndustry, p.industry||p.subindustry);
+      setText(factsIndustry, p.industry || p.subindustry);
       setText(factsTicker, p.ticker);
-      factsWebsite.innerHTML = p.website && /^https?:\/\//.test(p.website) ? linkifyMaybe(p.website) : (p.website||'N/A');
+      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
 
-      // News
-      newsList.innerHTML='';
-      (data?.news||[]).slice(0,7).forEach(n=>{
-        const li=document.createElement('li');
-        li.innerHTML = `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Untitled'}</a>
-                        <div class="text-xs text-gray-500">${n.source||'Source'}${n.date?' • '+n.date:''}</div>`;
+      newsList.innerHTML = '';
+      (data?.news || []).slice(0,8).forEach(n => {
+        const li = document.createElement('li');
+        li.innerHTML =
+          `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url || '#'}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+           <div class="text-xs text-gray-500">${n.source || 'Source'}${n.date ? ' • ' + n.date : ''}</div>`;
         newsList.appendChild(li);
       });
-      if(!newsList.children.length) newsList.innerHTML='<li class="text-sm text-gray-600">No recent news found.</li>';
+      if (!newsList.children.length) newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
 
-      // Public records
-      recList.innerHTML='';
-      (data?.publicRecords?.findings||[]).forEach(f=>{
-        const li=document.createElement('li'); li.textContent=`${f.type||'Record'} — ${f.details||''}`; recList.appendChild(li);
+      leaderList.innerHTML = '';
+      (data?.leadership || []).slice(0,10).forEach(l => {
+        const li = document.createElement('li');
+        const ln = l.linkedinUrl ? ` — <a class="text-brand-green hover:underline" href="${l.linkedinUrl}" target="_blank" rel="noopener">LinkedIn</a>` : '';
+        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>${ln}`;
+        leaderList.appendChild(li);
       });
-      if(!recList.children.length) recList.innerHTML='<li class="text-sm text-gray-600 list-none">No specific public records were surfaced.</li>';
+      if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">No leadership data.</li>';
 
-      // Leadership/products/competitors
-      leaderList.innerHTML=''; (data?.leadership||[]).slice(0,12).forEach(l=>{
-        const li=document.createElement('li'); li.innerHTML=`<span class="font-medium text-brand-dark">${l.name||'N/A'}</span> — <span class="text-gray-700">${l.title||''}</span>`; leaderList.appendChild(li);
+      productsList.innerHTML = '';
+      (data?.products || []).slice(0,16).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
+      if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">No products listed.</li>';
+
+      compList.innerHTML = '';
+      (data?.competitors || []).slice(0,16).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
+
+      socialList.innerHTML = '';
+      const w = data?.webPresence || {};
+      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube], ['Facebook', w.facebook]].forEach(([k,v]) => {
+        if (!v) return;
+        const li = document.createElement('li');
+        let valueHtml = v;
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
+          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
+        }
+        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
+        socialList.appendChild(li);
       });
-      if(!leaderList.children.length) leaderList.innerHTML='<li class="text-sm text-gray-600">No leadership data.</li>';
+      if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
 
-      productsList.innerHTML=''; (data?.products||[]).slice(0,16).forEach(t=>{ const li=document.createElement('li'); li.textContent=t; productsList.appendChild(li); });
-      if(!productsList.children.length) productsList.innerHTML='<li class="text-sm text-gray-600">No products listed.</li>';
+      const points = data?.chartPoints || {};
+      if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
+      else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
 
-      compList.innerHTML=''; (data?.competitors||[]).slice(0,16).forEach(c=>{ const li=document.createElement('li'); li.textContent=c; compList.appendChild(li); });
-      if(!compList.children.length) compList.innerHTML='<li class="text-sm text-gray-600">No competitors identified.</li>';
-
-      // Social
-      socialList.innerHTML='';
-      const w=data?.webPresence||{};
-      [['Website Traffic', w.traffic],['Twitter/X', w.twitter],['LinkedIn', w.linkedin],['YouTube', w.youtube]].forEach(([k,v])=>{
-        if(!v) return; const li=document.createElement('li');
-        let html=v; if(typeof v==='string' && /^https?:\/\//.test(v)) html=`<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-        li.innerHTML=`<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${html}</span>`; socialList.appendChild(li);
-      });
-      if(!socialList.children.length) socialList.innerHTML='<li class="text-sm text-gray-600">No social signals.</li>';
-
-      // Contacts + map
-      contactList.innerHTML='';
-      const c=data?.contacts||{};
-      [['Address', c.address],['City', c.city],['State', c.state],['ZIP', c.zip],['Country', c.country],['Phone', c.phone],['Email', c.email && `<a class="text-brand-green hover:underline" href="mailto:${c.email}">${c.email}</a>`]].forEach(([k,v])=>{
-        if(!v) return; const li=document.createElement('li'); li.innerHTML=`<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${typeof v==='string'?v:v}</span>`; contactList.appendChild(li);
-      });
-      if(!contactList.children.length){ contactList.innerHTML='<li class="text-sm text-gray-600">No contact info available.</li>'; }
-      mapAddress.textContent = [c.address,c.city,c.state,c.zip].filter(Boolean).join(', ') || 'N/A';
-      contactNote.textContent = 'Location is approximate for privacy/safety.';
-
-      // Reviews
-      reviewsList.innerHTML='';
-      (data?.reviews||[]).slice(0,6).forEach(r=>{
-        const card=document.createElement('div');
-        card.className='border border-brand-border rounded-lg p-3';
-        card.innerHTML=`<div class="text-sm text-gray-700">${r.snippet||''}</div>
-                        <div class="text-xs text-gray-500 mt-1">${r.source||'Source'}${r.url?` — <a href="${r.url}" target="_blank" rel="noopener" class="text-brand-green hover:underline">link</a>`:''}</div>`;
-        reviewsList.appendChild(card);
-      });
-      if(!reviewsList.children.length) reviewsList.innerHTML='<div class="text-sm text-gray-600">No recent customer reviews found.</div>';
-
-      // Charts
-      const points=data?.chartPoints||{};
-      renderLineChart(chartRevenue, Array.isArray(points.revenue)&&points.revenue.length>1?points.revenue:[30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
-      renderLineChart(chartCash, Array.isArray(points.cashFlow)&&points.cashFlow.length>1?points.cashFlow:[65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+      if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
+      else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
     }
 
-    /* ========================= Wire up ========================= */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const form=document.getElementById('search-form');
-      const input=document.getElementById('business-name');
-      const btn=document.getElementById('generate-report-btn');
-      const rerunBtn=document.getElementById('rerun');
+    /* ===================== Wire up UI ===================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('business-name');
+      const btn = document.getElementById('generate-report-btn');
+      const rerunBtn = document.getElementById('rerun');
 
-      async function runReport(query){
-        document.getElementById('report-results-container').style.display='block';
-        document.getElementById('results')?.scrollIntoView({behavior:'smooth'});
-        showState('loading'); btn.classList.add('cta-disabled'); btn.disabled=true;
+      async function runReport(query) {
+        document.getElementById('report-results-container').style.display = 'block';
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+        showState('loading');
+        btn.classList.add('cta-disabled'); btn.disabled = true;
 
-        try{
-          const systemPrompt=buildSystemPrompt();
-          const userQuery=`Generate a comprehensive U.S.-focused business report for: "${query}".`;
-          const { json, sources } = await callModels(systemPrompt, userQuery);
-          const enriched = await runEnrichmentIfSparse(json, query);
-          populateReport(enriched);
-          const links=collectSources(enriched, sources);
+        const systemPrompt = buildSystemPrompt();
+        const userQuery = `Generate a comprehensive, US‑focused AI business report for: "${query}"`;
+
+        try {
+          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
+          populateReport(json);
+          const links = collectSources(json, sources);
           populateSources(links);
           showState('content');
-        }catch(e){
+        } catch (e) {
           console.error(e);
-          showState('error', e.message||'Failed to generate report.');
-        }finally{
-          btn.disabled=false; btn.classList.remove('cta-disabled');
+          showState('error', e.message || 'Failed to generate report.');
+        } finally {
+          btn.disabled = false; btn.classList.remove('cta-disabled');
         }
       }
 
-      form.addEventListener('submit', (ev)=>{
-        ev.preventDefault(); const q=(input.value||'').trim();
-        if(!q){ showState('error','Please enter a business name.'); return; }
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const q = (input.value || '').trim();
+        if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
       });
-      rerunBtn?.addEventListener('click', ()=>{
-        const q=(input.value||'').trim();
-        if(!q){ showState('error','Please enter a business name.'); return; }
+
+      rerunBtn?.addEventListener('click', () => {
+        const q = (input.value || '').trim();
+        if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
       });
     });
