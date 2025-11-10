@@ -8,7 +8,7 @@
   <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    /* ✅ Canonical Tailwind Play CDN config (brand tokens & fonts) */
+    /* Tailwind config (brand tokens & fonts) */
     tailwind.config = {
       theme: {
         extend: {
@@ -17,11 +17,11 @@
             sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            'brand-green': '#00C09A', /* Verification Green */
-            'brand-dark':  '#1A1A1A', /* Near-black for primary text */
-            'brand-gray':  '#666666', /* Secondary/muted text */
-            'brand-light': '#F8F9FA', /* Very light grey background */
-            'brand-border':'#E5E7EB', /* Subtle border color */
+            'brand-green': '#00C09A',
+            'brand-dark':  '#1A1A1A',
+            'brand-gray':  '#666666',
+            'brand-light': '#F8F9FA',
+            'brand-border':'#E5E7EB',
           }
         }
       }
@@ -33,7 +33,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Alpine.js (deferred = more stable on mobile) -->
+  <!-- Alpine.js (deferred for mobile stability) -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
@@ -44,7 +44,7 @@
       background-color: #FFFFFF;
     }
 
-    /* Fallbacks so brand tokens still render even if Tailwind config/CDN is blocked */
+    /* Fallbacks in case CDN/config is blocked */
     .text-brand-dark  { color: #1A1A1A !important; }
     .text-brand-gray  { color: #666666 !important; }
     .text-brand-green { color: #00C09A !important; }
@@ -73,8 +73,40 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
+    /* CTA & widget cohesion */
     .cta-button { transition: all 0.3s ease; }
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15); }
+
+    .widget-card {
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .widget-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(0, 192, 154, 0.12);
+      border-color: rgba(0,192,154,0.35);
+    }
+
+    .widget-btn {
+      /* identical visual to Request Demo */
+      background-color: #00C09A;
+      color: #fff;
+      font-weight: 700;
+      padding: .875rem 2rem; /* py-3.5 px-8 */
+      border-radius: .5rem;  /* rounded-lg */
+      font-size: 1.125rem;   /* text-lg */
+      transition: all .3s ease;
+    }
+    .widget-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,192,154,.15);
+      background-color: #00a883; /* subtle hover */
+    }
+
     .hero-visual {
       background: #FFFFFF;
       border: 1px solid #E5E7EB;
@@ -99,7 +131,7 @@
 <body class="font-sans text-brand-dark" x-data="{ open: false, page: 'home' }">
   <!-- Header / Navigation -->
   <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
-    <nav class="container mx-auto px-6 py-4 flex justify-between items-center relative"><!-- relative = correct mobile menu anchoring -->
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center relative">
       <!-- Logo -->
       <a href="#" @click.prevent="page = 'home'; open = false" class="flex items-center space-x-2.5">
         <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -241,14 +273,14 @@
 
           <!-- Combined Widget -->
           <div class="max-w-4xl mx-auto mb-16">
-            <div class="bg-white border border-brand-border rounded-lg shadow-lg p-6 flex flex-col">
+            <div class="widget-card p-6 flex flex-col">
               <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">Live AI Business Report</h3>
               <div class="space-y-4 max-w-xl mx-auto w-full">
                 <div>
                   <label for="business-name" class="block text-sm font-medium text-brand-dark">Enter any Business Name</label>
                   <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="e.g., Tesla, Inc. or Apex Innovations">
                 </div>
-                <button id="generate-report-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button disabled:opacity-50 disabled:cursor-wait">
+                <button id="generate-report-btn" class="widget-btn cta-button w-full inline-flex justify-center items-center disabled:opacity-50 disabled:cursor-wait">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
                   <span>Generate Full Report</span>
                 </button>
@@ -348,7 +380,7 @@
 
           <!-- Pre-Approval Widget -->
           <div class="max-w-4xl mx-auto mb-16">
-            <div class="bg-white border border-brand-border rounded-lg shadow-lg p-6 flex flex-col">
+            <div class="widget-card p-6 flex flex-col">
               <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">Live AI Pre-Approval Generator (Fictional)</h3>
               <div class="space-y-5 max-w-xl mx-auto w-full" x-data="{ monthlyRevenue: 10000, ficoScore: 680 }">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
@@ -388,8 +420,8 @@
                   </div>
                 </div>
 
-                <!-- ✅ mobile spacing fix -->
-                <button id="generate-pre-approval-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-dark hover:bg-brand-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button disabled:opacity-50 disabled:cursor-wait mt-6 sm:mt-10">
+                <!-- Button styled like Request Demo -->
+                <button id="generate-pre-approval-btn" class="widget-btn cta-button w-full inline-flex justify-center items-center disabled:opacity-50 disabled:cursor-wait mt-6 sm:mt-10">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M11.49 3.17c.12-.22.36-.3.59-.18.23.12.3.36.18.59l-3.5 6.5A.996.996 0 008 10.5H5a1 1 0 00-1 1v3a1 1 0 001 1h3.5a.996.996 0 00.92-.62l3.5-6.5c.12-.22.04-.47-.18-.59zM5 12.5a.5.5 0 01.5-.5H8a.5.5 0 01.46.31l3.5 6.5c.12.22.04-.47-.18.59a.498.498 0 01-.59-.18L7.69 13H5.5a.5.5 0 01-.5-.5v-3z" clip-rule="evenodd" />
                     <path d="M15.5 10.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM14 12.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM15.5 14.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01z" />
@@ -436,9 +468,7 @@
                       <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Line of Credit</h4>
                       <p id="loc-limit" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
                       <table id="loc-terms-table" class="w-full text-sm text-left">
-                        <tbody>
-                          <tr><td class="pt-1.5 text-brand-gray">Rate</td><td id="loc-rate" class="pt-1.5 text-right font-medium text-brand-dark"></td></tr>
-                        </tbody>
+                        <tbody><tr><td class="pt-1.5 text-brand-gray">Rate</td><td id="loc-rate" class="pt-1.5 text-right font-medium text-brand-dark"></td></tr></tbody>
                       </table>
                       <p id="loc-note" class="text-xs text-brand-gray italic mt-4"></p>
                     </div>
@@ -543,11 +573,12 @@
                 </div>
               </div>
 
-              <!-- Financial Snapshot -->
+              <!-- Financial Snapshot (scrollable) -->
               <div class="mt-6">
                 <h4 class="font-semibold text-brand-dark mb-3">Financial Snapshot</h4>
-                <div class="border border-brand-border rounded-lg mb-6">
-                  <table class="min-w-full divide-y divide-gray-200">
+                <!-- ✅ Scrollable on small screens -->
+                <div class="border border-brand-border rounded-lg mb-6 overflow-x-auto md:overflow-x-visible">
+                  <table class="min-w-[900px] w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                       <tr>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank</th>
@@ -577,6 +608,7 @@
                   </table>
                 </div>
 
+                <!-- Charts -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <h5 class="font-medium text-brand-dark mb-2">Revenue Trend</h5>
@@ -613,7 +645,7 @@
                 </div>
               </div>
 
-              <!-- Banking Activity -->
+              <!-- Monthly Banking Activity (already scrollable) -->
               <div class="mt-6">
                 <h4 class="font-semibold text-brand-dark mb-3">Monthly Banking Activity</h4>
                 <div class="border border-brand-border rounded-lg overflow-x-auto">
@@ -798,7 +830,7 @@
               <p class="text-brand-gray">Generate human-readable explanations for complex model decisions.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" /></svg>
               <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Real-time Monitoring</h3>
               <p class="text-brand-gray">Get alerts on model drift, data integrity issues, and new threats.</p>
             </div>
@@ -1012,10 +1044,15 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- [START] SCRIPT: Widgets + API calls -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // --- UI elements (same as your original) ---
+      /**
+      
+       */
+      const zakk = "AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM"; // )
+
+      // --- UI elements ---
       const generateReportBtn = document.getElementById('generate-report-btn');
       const businessNameInput = document.getElementById('business-name');
 
@@ -1085,6 +1122,7 @@
       const sourcesContainer = document.getElementById('report-sources-container');
       const sourcesList = document.getElementById('report-sources');
 
+      // --- State helpers ---
       function showReportState(state, message = '') {
         loader.style.display = 'none';
         errorContainer.style.display = 'none';
@@ -1095,7 +1133,6 @@
         else if (state === 'error') { errorContainer.style.display = 'flex'; errorMessage.innerText = message; }
         else if (state === 'content') contentContainer.style.display = 'block';
       }
-
       function showPreApprovalState(state, message = '') {
         preApprovalLoader.style.display = 'none';
         preApprovalErrorContainer.style.display = 'none';
@@ -1106,6 +1143,7 @@
         else if (state === 'content') preApprovalContent.style.display = 'block';
       }
 
+      // --- Populate helpers ---
       function populateSources(sources) {
         sourcesList.innerHTML = '';
         if (sources && sources.length > 0) {
@@ -1120,7 +1158,6 @@
           sourcesContainer.style.display = 'none';
         }
       }
-
       function populateReport(data) {
         reportTitle.innerText = data.summary?.companyName || 'N/A';
         reportSummary.innerText = data.summary?.summary || 'No summary could be found.';
@@ -1204,7 +1241,6 @@
         chartRevenue.innerHTML = data.charts?.revenueTrend || '<p class="text-sm text-brand-gray">Chart not available.</p>';
         chartCashflow.innerHTML = data.charts?.cashFlow || '<p class="text-sm text-brand-gray">Chart not available.</p>';
       }
-
       function populatePreApproval(data) {
         const formatCurrency = (num) => {
           if (num === null || num === undefined || isNaN(num)) return 'N/A';
@@ -1268,7 +1304,7 @@
         }
       }
 
-      // --- API Calls (secure: route via your backend) ---
+      // --- Fetch wrapper ---
       async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
         let lastError;
         for (let i = 0; i < retries; i++) {
@@ -1277,14 +1313,12 @@
             if (!response.ok) {
               let errorBody;
               try { errorBody = await response.json(); } catch { errorBody = null; }
-              const errorMessage = errorBody?.error || response.statusText;
+              const errorMessage = errorBody?.error?.message || response.statusText;
               lastError = new Error(`API Error: ${errorMessage} (Status: ${response.status})`);
               if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
                 await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
                 continue;
-              } else {
-                throw lastError;
-              }
+              } else { throw lastError; }
             }
             return await response.json();
           } catch (err) {
@@ -1295,29 +1329,76 @@
         throw lastError || new Error("API request failed after retries.");
       }
 
-      // Report: call your server proxy (recommended)
-      async function callReportAPI(systemPrompt, userQuery) {
-        // Implement a server route at /api/report that calls Google safely (see earlier message).
-        const resp = await fetchWithBackoff('/api/report', {
+      // --- Direct Google API calls using `zakk` ---
+      async function callReportAPI(systemPrompt, userQuery, logId = 'report') {
+        if (!zakk) throw new Error("Missing key: set `zakk` in the script near the bottom of the HTML.");
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${zakk}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+          tools: [{ "google_search": {} }],
+          systemInstruction: { parts: [{ text: systemPrompt }] }
+        };
+
+        const result = await fetchWithBackoff(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ systemPrompt, userQuery })
+          body: JSON.stringify(payload)
         });
-        // Expected shape: { text, json, sources }
-        return resp;
+
+        const candidate = result?.candidates?.[0];
+        const text = candidate?.content?.parts?.[0]?.text;
+        if (!text) throw new Error("No content received from API.");
+
+        // try to parse JSON body (strip fences if present)
+        let json;
+        try {
+          const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+          json = JSON.parse(jsonString);
+        } catch {
+          throw new Error("Received an invalid JSON response from the API.");
+        }
+
+        // sources (if any)
+        let sources = [];
+        const gm = candidate?.groundingMetadata;
+        if (gm?.groundingAttributions) {
+          sources = gm.groundingAttributions
+            .map(a => ({ uri: a?.web?.uri, title: a?.web?.title }))
+            .filter(s => s?.uri);
+        }
+
+        return { text, json, sources };
       }
 
-      // Pre-Approval: call your server proxy
-      async function callPreApprovalAPI(systemPrompt, userQuery, generationConfig) {
-        const resp = await fetchWithBackoff('/api/pre-approval', {
+      async function callPreApprovalAPI(systemPrompt, userQuery, generationConfig, logId = 'pre-approval') {
+        if (!zakk) throw new Error("Missing key: set `zakk` in the script near the bottom of the HTML.");
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${zakk}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig
+        };
+
+        const result = await fetchWithBackoff(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ systemPrompt, userQuery, generationConfig })
+          body: JSON.stringify(payload)
         });
-        return resp;
+
+        const candidate = result?.candidates?.[0];
+        const text = candidate?.content?.parts?.[0]?.text;
+        if (!text) throw new Error("No JSON content received from API.");
+
+        try {
+          return JSON.parse(text);
+        } catch {
+          throw new Error("Invalid JSON format received from API.");
+        }
       }
 
-      // Events
+      // --- Events ---
       if (generateReportBtn) {
         generateReportBtn.addEventListener('click', async () => {
           const businessName = (businessNameInput.value || '').trim();
@@ -1351,24 +1432,18 @@
           const timeStr = (preApprovalTime.value || '').trim();
           const ficoStr = (preApprovalFico.value || '').trim();
 
-          if (!businessName || !monthlyRevenueStr || !timeStr || !ficoStr) {
-            showPreApprovalState('error', 'Please fill in all fields.'); return;
-          }
+          if (!businessName || !monthlyRevenueStr || !timeStr || !ficoStr) { showPreApprovalState('error', 'Please fill in all fields.'); return; }
 
           const monthlyRevenue = parseFloat(monthlyRevenueStr);
           const timeInBusinessMonths = parseInt(timeStr.replace(/[^0-9]/g, ''));
           const ficoScore = parseInt(ficoStr);
-
-          if (isNaN(monthlyRevenue) || isNaN(timeInBusinessMonths) || isNaN(ficoScore)) {
-            showPreApprovalState('error', 'Please enter valid numbers.'); return;
-          }
+          if (isNaN(monthlyRevenue) || isNaN(timeInBusinessMonths) || isNaN(ficoScore)) { showPreApprovalState('error', 'Please enter valid numbers.'); return; }
 
           showPreApprovalState('loading');
           preApprovalBtn.disabled = true;
 
           const systemPrompt =
             "You are an AI underwriting engine simulating the 'Enhanced Underwriting Model v3.5'. Your hard policy gates are: 6 months minimum time in business (TIB), $8,000 minimum *monthly* revenue, and a minimum FICO score of 580. Your risk tiers based on a composite score (0-100) are: Decline (<55), Enhanced (55-70), Standard (70-85), Auto-Approval (>85). For the user's inputs, first check the hard gates (TIB, monthly revenue, FICO). If they fail, decline all and state the gate failure in the 'note'. If they pass, calculate a fictional composite score based on their revenue, TIB, and FICO (e.g., $10k/mo, 12mo, 600 FICO = 60; $20k/mo, 36mo, 720 FICO = 80). Then, generate fictional terms for a Term Loan, LOC, and MCA based on their tier. Use the model's logic: 'Auto-Approval' gets a ~1.1x *monthly* revenue multiplier and ~1.24 factor. 'Standard' gets ~0.9x and ~1.32 factor. 'Enhanced' gets ~0.65x and ~1.40 factor. 'Decline' gets 0. Provide a reason in the 'note' field for all decisions (e.g., 'Approved under Standard risk tier due to solid TIB and FICO history.'). Respond *only* with the valid JSON schema.";
-
           const userQuery = `Generate pre-approval terms for: Business: "${businessName}", Industry: "${industry}", Monthly Revenue: "${monthlyRevenue.toFixed(2)}", Time in Business (Months): "${timeInBusinessMonths}", Owner FICO Score: ${ficoScore}`;
 
           const generationConfig = {
@@ -1429,5 +1504,6 @@
       }
     });
   </script>
+  <!-- [END] SCRIPT -->
 </body>
 </html>
