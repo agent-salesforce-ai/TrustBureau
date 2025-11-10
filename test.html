@@ -179,7 +179,7 @@
           </div>
         </div>
 
-        <!-- Score + Summary (fills the “blank space” with Highlights on the right) -->
+        <!-- Score + Summary (now includes “Recent Headlines” to fill space) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Score -->
           <div class="widget-card p-5 md:p-6">
@@ -218,11 +218,20 @@
                 <h4 class="text-sm font-semibold text-brand-dark mb-3">Operational Highlights</h4>
                 <ul id="report-highlights" class="space-y-2 text-sm text-gray-800"></ul>
               </div>
+
+              <!-- NEW: fills the big blank space -->
+              <div class="md:col-span-2 p-4 border border-brand-border rounded-lg bg-white min-h-[220px]">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-sm font-semibold text-brand-dark">Recent Headlines</h4>
+                  <span id="news-updated" class="text-xs text-gray-500"></span>
+                </div>
+                <ul id="report-news-list" class="space-y-2"></ul>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Contact & Map (fills previous blank area lower on page) -->
+        <!-- Contact & Map -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
@@ -236,7 +245,7 @@
           <div class="widget-card p-0 md:p-0 overflow-hidden">
             <div class="map-grid h-[260px] md:h-[300px] w-full flex items-center justify-center relative">
               <div class="absolute w-3 h-3 bg-red-500 rounded-full shadow" id="map-pin" title="Approximate pin" style="display:none;"></div>
-              <div class="text-sm text-gray-500">Map placeholder (pins if lat/lng present)</div>
+              <div class="text-sm text-gray-500">Map placeholder (🔴 pins if lat/lng present)</div>
             </div>
           </div>
         </div>
@@ -349,18 +358,9 @@
 
   <script>
     /* ===================== Config ===================== */
-    // Visible placeholder (what you requested). You can also set window.zakk at runtime.
-    const zakk = "AIzaSyDxnqLqMuQQhZvfadTJn5BGwujFu7mXoXo";
-
-    // If you deploy a proxy to avoid CORS, put it here (otherwise it calls Google directly):
-    const PROXY_BASE = ""; // e.g. "https://glai-proxy.yourname.workers.dev"
-
-    // Only the two models you asked for, in order:
-    const MODEL_CANDIDATES = [
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-preview-09-2025'
-    ];
-
+    const zakk = "AIzaSyDxnqLqMuQQhZvfadTJn5BGwujFu7mXoXo"; // or set window.zakk at runtime
+    const PROXY_BASE = ""; // optional proxy to avoid CORS, e.g. "https://your-proxy.example.com"
+    const MODEL_CANDIDATES = ['gemini-2.5-flash','gemini-2.5-flash-preview-09-2025'];
     const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
     const MAX_OUTPUT_TOKENS = 8192;
 
@@ -484,7 +484,6 @@
           const raw0 = p.text.trim();
           const raw = raw0.replace(/```json/g, '```').replace(/```/g, '');
           try { return JSON.parse(raw); } catch {}
-          // Try trimming to last } or ]
           const lastCurly  = raw.lastIndexOf('}');
           const lastSquare = raw.lastIndexOf(']');
           const cut = Math.max(lastCurly, lastSquare);
@@ -695,13 +694,15 @@ Return valid JSON only.
     const contactMap   = document.getElementById('contact-maplink');
     const mapPin       = document.getElementById('map-pin');
 
-    const newsList   = document.getElementById('report-records-list'); // reused for public records; news rendered in highlights
     const recList    = document.getElementById('report-records-list');
     const reviewsList= document.getElementById('report-reviews-list');
     const leaderList = document.getElementById('report-leadership-list');
     const productsList = document.getElementById('report-products-list');
     const compList   = document.getElementById('report-competitors-list');
     const socialList = document.getElementById('report-social-list');
+
+    const newsRoll   = document.getElementById('report-news-list');
+    const newsUpdated= document.getElementById('news-updated');
 
     const chartRevenue = document.getElementById('report-chart-revenue');
     const chartCash    = document.getElementById('report-chart-cashflow');
@@ -712,6 +713,7 @@ Return valid JSON only.
       setText(titleEl, data?.summary?.companyName);
       summaryEl.textContent = data?.summary?.summary || 'No summary could be found.';
 
+      // Score
       const score = data?.riskScore?.score || 0;
       scoreDigit.textContent = score;
       scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
@@ -737,6 +739,7 @@ Return valid JSON only.
         negList.appendChild(li);
       });
 
+      // Filings
       const sos = data?.sos || {};
       setText(sosName,  sos.entityName);
       setText(sosEntity,sos.entityType);
@@ -744,7 +747,16 @@ Return valid JSON only.
       setText(sosJuris, sos.jurisdiction);
       setText(sosDate,  sos.formationDate);
       setText(sosAgent, sos.registeredAgent);
+      // NEW: Green badge for "Active"
+      const st = (sos.status || '').toLowerCase();
+      sosStatus.className = '';
+      if (st.includes('active')) {
+        sosStatus.className = 'inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold';
+      } else if (sos.status && !st.includes('n/a')) {
+        sosStatus.className = 'text-red-600';
+      }
 
+      // Profile
       const p = data?.profile || {};
       setText(factsFounded, p.founded);
       setText(factsHQ, p.headquarters || p.hq);
@@ -754,12 +766,10 @@ Return valid JSON only.
       if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website);
       else setText(factsWebsite, p.website);
 
-      // Operational highlights
+      // Highlights
       highlightsList.innerHTML = '';
       (data?.highlights || []).slice(0,8).forEach(t => {
-        const li = document.createElement('li');
-        li.textContent = t;
-        highlightsList.appendChild(li);
+        const li = document.createElement('li'); li.textContent = t; highlightsList.appendChild(li);
       });
       if (!highlightsList.children.length) {
         highlightsList.innerHTML = '<li class="text-sm text-gray-600">No highlights available.</li>';
@@ -774,7 +784,6 @@ Return valid JSON only.
       contactMap.style.pointerEvents = contactMap.href === '#' ? 'none' : 'auto';
       if (Number.isFinite(c.lat) && Number.isFinite(c.lng)) {
         mapPin.style.display = 'block';
-        // simple center pin
         mapPin.style.top  = '50%';
         mapPin.style.left = '50%';
         mapPin.style.transform = 'translate(-50%,-50%)';
@@ -809,7 +818,7 @@ Return valid JSON only.
 
       // Competitors
       compList.innerHTML = '';
-      (data?.competitors || []).slice(0,12).forEach(c => { const li = document.createElement('li'); li.textContent = c; compList.appendChild(li); });
+      (data?.competitors || []).slice(0,12).forEach(cmp => { const li = document.createElement('li'); li.textContent = cmp; compList.appendChild(li); });
       if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">No competitors identified.</li>';
 
       // Social / web presence
@@ -865,6 +874,26 @@ Return valid JSON only.
         `;
         kpiTbody.appendChild(tr);
       });
+
+      // NEW: News list in Summary (fills space)
+      newsRoll.innerHTML = '';
+      const news = (data?.news || []).slice(0,8);
+      if (news.length) {
+        newsUpdated.textContent = `${news.length} items`;
+        news.forEach(n => {
+          const li = document.createElement('li');
+          const href = n.url && /^https?:\/\//.test(n.url) ? n.url : '#';
+          const src  = n.source ? ` — ${n.source}` : '';
+          const dat  = n.date ? ` • ${n.date}` : '';
+          li.innerHTML =
+            `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${href}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
+             <div class="text-xs text-gray-500">${(n.source || 'Source')}${dat}</div>`;
+          newsRoll.appendChild(li);
+        });
+      } else {
+        newsUpdated.textContent = '';
+        newsRoll.innerHTML = '<li class="text-sm text-gray-600">No recent headlines found.</li>';
+      }
     }
 
     /* ===================== Wire up UI ===================== */
@@ -891,7 +920,6 @@ Return valid JSON only.
           showState('content');
         } catch (e) {
           console.error(e);
-          // Friendlier CORS/network hint:
           const corsHint = (!PROXY_BASE && /Failed to fetch|NetworkError|CORS|TypeError: fetch/i.test(String(e))) 
             ? 'Network/CORS error: the browser could not reach the Google Generative Language API. Serve this page via http(s) and consider a tiny proxy (there is a PROXY_BASE slot in the code).' 
             : '';
