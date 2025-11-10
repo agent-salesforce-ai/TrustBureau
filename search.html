@@ -34,7 +34,7 @@
 
   <!-- *** Set your Gemini API key here *** -->
   <script>
-    // Replace with your real key (keep quotes)
+    // Replace with your actual key (keep quotes)
     window.zakk = 'AIzaSyCj5aQK-HF_j4gsTvijBNzSFthjrwVrztE';
   </script>
 
@@ -48,7 +48,6 @@
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
-    /* Card */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
 
     /* Score */
@@ -57,7 +56,7 @@
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
-    /* ========= Loader: radar + stepper + skeleton ========= */
+    /* ===== Loader: radar + stepper + skeleton ===== */
     .radar {
       width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
       background:
@@ -302,15 +301,14 @@
   </footer>
 
   <script>
-    /* ========= Config ========= */
-    const MODEL_PRIMARY  = 'gemini-2.5-pro';
-    const MODEL_FALLBACK = 'gemini-2.0-pro';
-    const MAX_OUTPUT_TOKENS = 8192;   // <— recommended default
-
+    /* ========= Key & constants ========= */
     function getApiKey() {
       const k = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
       return k;
     }
+
+    // Output token target (practical & fast; adjust if you really need more)
+    const MAX_OUTPUT_TOKENS = 12000;
 
     /* ========= Helpers ========= */
     async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
@@ -435,7 +433,7 @@
       }
     }
 
-    /* ========= Populate ========= */
+    /* ========= Populate Report ========= */
     const titleEl = document.getElementById('report-title');
     const summaryEl = document.getElementById('report-summary');
     const scoreCircle = document.getElementById('report-score-circle');
@@ -617,93 +615,54 @@
       };
     }
 
-    /* ========= API calls (v1 → v1beta; tool → no tool) ========= */
-    async function tryEndpoint({ endpoint, model, apiKey, payload, allowTool }) {
-      const toolObj = endpoint === 'v1' ? { googleSearchRetrieval: {} } : { google_search: {} };
-      const apiUrl = `https://generativelanguage.googleapis.com/${endpoint}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-      if (allowTool) {
-        try {
-          const withTool = {
-            ...payload,
-            tools: [toolObj],
-            generationConfig: {
-              maxOutputTokens: MAX_OUTPUT_TOKENS,
-              temperature: 0.2,
-              topP: 0.95
-            }
-          };
-          const r1 = await fetchWithBackoff(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(withTool)
-          });
-          const cand = r1?.candidates?.[0];
-          const text = cand?.content?.parts?.[0]?.text;
-          if (!text) throw new Error('Empty response from model.');
-          const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
-          const atts = cand?.groundingMetadata?.groundingAttributions || [];
-          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
-          return { json, sources, endpointUsed: endpoint, modelUsed: model };
-        } catch (e) {
-          const m = String(e?.message || '').toLowerCase();
-          const unsupportedTool = m.includes('unsupported') || m.includes('not found') || m.includes('unknown name') || m.includes('tool');
-          if (!unsupportedTool) throw e;
-        }
-      }
-
-      // Retry without tools
-      const noTool = {
-        ...payload,
-        generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.2,
-          topP: 0.95
-        }
-      };
-      const r2 = await fetchWithBackoff(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(noTool)
-      });
-      const cand2 = r2?.candidates?.[0];
-      const text2 = cand2?.content?.parts?.[0]?.text;
-      if (!text2) throw new Error('Empty response from model.');
-      const json2 = JSON.parse(text2.replace(/```json/g,'').replace(/```/g,'').trim());
-      return { json: json2, sources: [], endpointUsed: endpoint, modelUsed: model };
-    }
-
+    /* ========= API call (reverted to the previous working v1beta style) ========= */
     async function callReportAPI(systemPrompt, userQuery) {
       const apiKey = getApiKey();
       if (!apiKey) throw new Error('Missing API key (zakk). Set it near the top of the file.');
 
-      const payload = {
-        contents: [{ parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] }
-      };
+      // v1beta payload format (snake_case) + google_search tool
+      const makePayload = (sys, user) => ({
+        contents: [
+          { role: 'user', parts: [{ text: user }] }
+        ],
+        system_instruction: { role: 'system', parts: [{ text: sys }] },
+        generation_config: {
+          max_output_tokens: MAX_OUTPUT_TOKENS,
+          temperature: 0.2,
+          top_p: 0.95,
+          response_mime_type: "application/json"
+        },
+        tools: [{ google_search: {} }]
+      });
 
-      const tries = [
-        { endpoint: 'v1',     model: MODEL_PRIMARY,  allowTool: true },
-        { endpoint: 'v1',     model: MODEL_FALLBACK, allowTool: true },
-        { endpoint: 'v1',     model: MODEL_PRIMARY,  allowTool: false },
-        { endpoint: 'v1',     model: MODEL_FALLBACK, allowTool: false },
-        { endpoint: 'v1beta', model: MODEL_PRIMARY,  allowTool: true },
-        { endpoint: 'v1beta', model: MODEL_FALLBACK, allowTool: true },
-        { endpoint: 'v1beta', model: MODEL_PRIMARY,  allowTool: false },
-        { endpoint: 'v1beta', model: MODEL_FALLBACK, allowTool: false },
-      ];
+      const models = ['gemini-2.0-pro', 'gemini-2.0-flash'];
+      const base = 'https://generativelanguage.googleapis.com/v1beta/models';
+      const payload = makePayload(systemPrompt, userQuery);
 
       let lastErr;
-      for (const t of tries) {
+      for (const model of models) {
+        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
         try {
-          const out = await tryEndpoint({ ...t, apiKey, payload });
-          console.info('Using', out.modelUsed, 'on', out.endpointUsed, 'maxOutputTokens:', MAX_OUTPUT_TOKENS);
-          return out;
+          const data = await fetchWithBackoff(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const cand = data?.candidates?.[0];
+          const text = cand?.content?.parts?.[0]?.text;
+          if (!text) throw new Error('Empty response from model.');
+
+          // Parse strict JSON (strip accidental fences)
+          const json = JSON.parse(text.replace(/```json/g, '').replace(/```/g, '').trim());
+
+          // Optional grounded sources
+          const atts = cand?.groundingMetadata?.groundingAttributions || [];
+          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+
+          return { json, sources, endpointUsed: 'v1beta', modelUsed: model };
         } catch (e) {
-          lastErr = e;
-          const msg = String(e?.message || '').toLowerCase();
-          const notFoundOrUnsupported = msg.includes('http 404') || msg.includes('not found') || msg.includes('unsupported') || msg.includes('unknown name') || msg.includes('permission');
-          if (!notFoundOrUnsupported) break;
+          lastErr = e; // try next model
         }
       }
       throw lastErr || new Error('All model attempts failed.');
@@ -718,14 +677,15 @@ Include:
 3) publicRecords: { findings: [{ type, details }] }
 4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
 5) reviews: [{ snippet, source, url }]
-6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
-7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
-8) news: [{ title, date, source, url }]
-9) leadership: [{ name, title }]
-10) products: [string]
-11) competitors: [string]
-12) webPresence: { twitter, linkedin, youtube, traffic }
-13) citations: [{ title, url }]
+6) charts: { revenueTrend (SVG), cashFlow (SVG) }   // optional; chartPoints is preferred
+7) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
+8) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
+9) news: [{ title, date, source, url }]
+10) leadership: [{ name, title }]
+11) products: [string]
+12) competitors: [string]
+13) webPresence: { twitter, linkedin, youtube, traffic }
+14) citations: [{ title, url }]
 If unknown, use "N/A" or [].
 Respond ONLY with valid JSON. No markdown fences.
       `.trim();
@@ -738,11 +698,8 @@ Respond ONLY with valid JSON. No markdown fences.
       const btn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
 
-      // UI refs
-      const results = document.getElementById('report-results-container');
-
       async function runReport(query) {
-        results.style.display = 'block';
+        document.getElementById('report-results-container').style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
         showState('loading');
         btn.classList.add('cta-disabled'); btn.disabled = true;
