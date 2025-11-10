@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Live AI Business Report – TrustBureau.ai</title>
+  <title>Live AI Business Report — TrustBureau.ai</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,6 +35,7 @@
   <!-- *** Set your Gemini API key here *** -->
   <script>
     // Replace the value below with your real key (keep the quotes).
+    // This is the variable name you asked for.
     window.zakk = 'AIzaSyCURmgM7UzhBUY3NAeVGXUEbB2C7d6-EHM';
   </script>
 
@@ -48,20 +49,17 @@
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
-    /* Card */
+    /* Cards */
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
 
-    /* Score */
+    /* Score chip */
     .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.5rem;border:8px solid}
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
 
-    /* ===================== */
     /* Loader: radar + stepper + skeleton */
-    /* ===================== */
-    .radar {
-      width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
+    .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
       background:
         radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
         conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
@@ -127,9 +125,8 @@
   <!-- Results -->
   <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
     <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
-      <!-- ===== LOADER (Progress + Stepper + Skeleton) ===== -->
-      <div id="report-loader" style="display:none;"
-           class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
+      <!-- LOADER -->
+      <div id="report-loader" style="display:none;" class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
         <div class="flex items-center gap-5">
           <div class="radar" aria-hidden="true"></div>
           <div class="flex-1">
@@ -142,10 +139,8 @@
           </div>
         </div>
 
-        <!-- Stepper -->
         <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
 
-        <!-- Skeleton preview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="skeleton-card space-y-3">
             <div class="w-28 skel-line shimmer"></div>
@@ -167,7 +162,7 @@
           </div>
         </div>
       </div>
-      <!-- ===== /LOADER ===== -->
+      <!-- /LOADER -->
 
       <!-- Error -->
       <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
@@ -183,9 +178,7 @@
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
           <div class="flex items-center gap-3">
-            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">
-              Re‑run
-            </button>
+            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
           </div>
         </div>
 
@@ -311,23 +304,127 @@
   </footer>
 
   <script>
-    /* ========= Key loader ========= */
+    /* =========================================
+       API helpers (v1, model discovery, retries)
+       ========================================= */
+    const API_VERSION = 'v1';
+
     function getApiKey() {
-      const fromGlobal = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      return fromGlobal;
+      const k = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+      return k;
     }
 
-    /* ========= Model + token strategy ========= */
-    const MODEL_CANDIDATES = [
-      'gemini-2.5-pro',
-      'gemini-2.0-pro',
-      'gemini-2.0-flash',
-      'gemini-1.5-pro',
-    ];
-    const TOKEN_TRIES = [65535, 32768, 16384, 8192, 4096, 2048];
+    async function fetchWithBackoff(url, options, retries=3, delay=800) {
+      let lastError;
+      for (let i=0;i<retries;i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try{ body = await res.json(); }catch{}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r=>setTimeout(r, delay * Math.pow(2,i)));
+        }
+      }
+      throw lastError || new Error('API request failed after retries.');
+    }
 
+    async function listModels(apiKey) {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/${API_VERSION}/models?key=${encodeURIComponent(apiKey)}`
+      );
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || 'ListModels failed.');
+      return data.models || [];
+    }
+
+    function rankModel(name) {
+      const n = (name || '').toLowerCase();
+      let s = 0;
+      if (n.includes('2.5')) s += 1000;
+      if (n.includes('2.0')) s += 500;
+      if (n.includes('1.5')) s += 100;
+      if (n.includes('pro')) s += 50;
+      if (n.includes('flash')) s += 10;
+      return s;
+    }
+
+    async function chooseModel(apiKey) {
+      const models = await listModels(apiKey);
+      const eligible = models.filter(m =>
+        (m.supportedGenerationMethods || []).includes('generateContent')
+      );
+      if (!eligible.length) {
+        throw new Error('No models available for generateContent with this key/project.');
+      }
+      eligible.sort((a, b) => rankModel(b.name) - rankModel(a.name));
+      return eligible[0]; // best one
+    }
+
+    async function callReportAPI(systemPrompt, userQuery) {
+      const apiKey = getApiKey();
+      if (!apiKey) throw new Error('Missing API key (zakk). Set it near the top of the file.');
+
+      const modelInfo = await chooseModel(apiKey);               // discover best model
+      const modelName = modelInfo.name.startsWith('models/') ? modelInfo.name : `models/${modelInfo.name}`;
+      const apiUrl = `https://generativelanguage.googleapis.com/${API_VERSION}/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+      const desiredOut = 40000;
+      const maxOut = Math.max(1024, Math.min(desiredOut, Number(modelInfo.outputTokenLimit || desiredOut)));
+
+      const basePayload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          maxOutputTokens: maxOut,
+          temperature: 0.2,
+          topP: 0.95,
+          responseMimeType: 'application/json'
+        }
+      };
+
+      const attempts = [
+        { ...basePayload, tools: [{ googleSearchRetrieval: {} }] },  // with search tool
+        { ...basePayload }                                            // fallback without tool
+      ];
+
+      let lastErr;
+      for (const payload of attempts) {
+        try {
+          const result = await fetchWithBackoff(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const cand = result?.candidates?.[0];
+          const text = cand?.content?.parts?.[0]?.text;
+          if (!text) throw new Error('No JSON content received from API.');
+
+          const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
+
+          const atts = cand?.groundingMetadata?.groundingAttributions || [];
+          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+
+          console.info('Using model:', modelInfo.name, '| maxOutputTokens:', maxOut);
+          return { json, sources, modelUsed: modelInfo.name, maxOut };
+        } catch (e) {
+          lastErr = e; // try next attempt
+        }
+      }
+      throw lastErr || new Error('Model call failed.');
+    }
+
+    /* =========================================
+       UI state + loader
+       ========================================= */
     document.addEventListener('DOMContentLoaded', () => {
-      // ----- Refs
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
@@ -378,9 +475,7 @@
       const sourcesChips = document.getElementById('report-sources-chips');
       const sourcesToggle = document.getElementById('toggle-sources');
 
-      /* ---------- Loader controller (progress + steps + skeleton) ---------- */
       let __loaderCtl = null;
-
       function startLoadingAnimation() {
         const steps = [
           'Matching business identity',
@@ -401,7 +496,6 @@
         const barEl   = document.getElementById('loader-bar');
         const timerEl = document.getElementById('loader-timer');
 
-        // Build stepper
         stepsOl.innerHTML = steps.map((s,i) => `
           <li class="flex items-start gap-2">
             <span class="step-icon" id="ld_${i}">
@@ -415,7 +509,6 @@
           </li>
         `).join('');
 
-        // Timer
         let elapsed = 0;
         const tTimer = setInterval(() => {
           elapsed += 200;
@@ -424,7 +517,6 @@
           timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }, 200);
 
-        // Stepper/progress pacing (~25s total, but we fast-finish on stop)
         let idx = 0;
         const stepMs = Math.max(900, Math.floor(25000 / steps.length));
         const tSteps = setInterval(() => {
@@ -439,19 +531,9 @@
           }
         }, stepMs);
 
-        return {
-          stop() {
-            clearInterval(tSteps);
-            clearInterval(tTimer);
-            for (let i = idx; i < steps.length; i++) {
-              document.getElementById(`ld_${i}`)?.classList.add('done');
-            }
-            barEl.style.width = '100%';
-          }
-        };
+        return { stop(){ clearInterval(tSteps); clearInterval(tTimer); for(let i=idx;i<steps.length;i++){document.getElementById(`ld_${i}`)?.classList.add('done')} barEl.style.width='100%'; } };
       }
 
-      /* ---------- Show/hide states (uses the loader) ---------- */
       function showState(state, message = '') {
         loader.style.display = 'none';
         errBox.style.display = 'none';
@@ -471,11 +553,9 @@
         }
       }
 
-      /* ---------- Helpers ---------- */
+      // Helpers
       function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
-      function toDomain(url) {
-        try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; }
-      }
+      function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
       function linkifyMaybe(v) {
         if (!v) return 'N/A';
         const s = String(v).trim();
@@ -502,7 +582,58 @@
         `;
       }
 
-      /* ---------- Populate report ---------- */
+      function prettyUrl(u) {
+        try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; }
+        catch { return u; }
+      }
+      function normalizeUrl(u) {
+        try { const url = new URL(u); url.search = ''; if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1); return url.toString(); }
+        catch { return null; }
+      }
+      function collectSources(json, modelSources) {
+        const out = [];
+        const push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+        (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+        (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+        if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+        const w = json?.webPresence || {};
+        if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+        if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+        if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+        (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+        (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+        const seen = new Set();
+        return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+      }
+      function populateSources(links) {
+        const chips = document.getElementById('report-sources-chips');
+        const ul = document.getElementById('report-sources');
+        const box = document.getElementById('report-sources-container');
+        chips.innerHTML = ''; ul.innerHTML = '';
+        if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+        box.style.display = 'block';
+        links.forEach(({ url, title, kind }) => {
+          const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+          const span = document.createElement('span');
+          span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+          span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+          chips.appendChild(span);
+        });
+        links.forEach(({ url, title }) => {
+          const li = document.createElement('li');
+          li.className = 'text-sm';
+          li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                          <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+          ul.appendChild(li);
+        });
+        let open = false;
+        document.getElementById('toggle-sources').onclick = () => {
+          open = !open;
+          ul.classList.toggle('hidden', !open);
+          document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+        };
+      }
+
       function populateReport(data) {
         setText(titleEl, data.summary?.companyName);
         summaryEl.textContent = data.summary?.summary || 'No summary could be found.';
@@ -597,7 +728,6 @@
         });
         if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
 
-        // Charts
         const points = data.chartPoints || {};
         if (Array.isArray(points.revenue) && points.revenue.length > 1) {
           renderLineChart(chartRevenue, points.revenue, '#00C09A');
@@ -611,160 +741,8 @@
         }
       }
 
-      /* ---------- Sources ---------- */
-      function normalizeUrl(u) {
-        try { const url = new URL(u); url.search = ''; if (url.pathname !== '/' && url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1); return url.toString(); }
-        catch { return null; }
-      }
-      function prettyUrl(u) {
-        try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; }
-        catch { return u; }
-      }
-      function collectSources(json, modelSources) {
-        const out = [];
-        const push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-        (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-        (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-        if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-        const w = json?.webPresence || {};
-        if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-        if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-        if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-        (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-        (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-        const seen = new Set();
-        return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-      }
-      function populateSources(links) {
-        const chips = document.getElementById('report-sources-chips');
-        const ul = document.getElementById('report-sources');
-        const box = document.getElementById('report-sources-container');
-        chips.innerHTML = ''; ul.innerHTML = '';
-        if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-        box.style.display = 'block';
-        links.forEach(({ url, title, kind }) => {
-          const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-          const span = document.createElement('span');
-          span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-          span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-          chips.appendChild(span);
-        });
-        links.forEach(({ url, title }) => {
-          const li = document.createElement('li');
-          li.className = 'text-sm';
-          li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                          <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-          ul.appendChild(li);
-        });
-        let open = false;
-        document.getElementById('toggle-sources').onclick = () => {
-          open = !open;
-          ul.classList.toggle('hidden', !open);
-          document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
-        };
-      }
-
-      /* ---------- Networking ---------- */
-      async function fetchWithBackoff(url, options, retries=3, delay=800) {
-        let lastError;
-        for (let i=0;i<retries;i++) {
-          try {
-            const res = await fetch(url, options);
-            if (!res.ok) {
-              let body=null; try{ body = await res.json(); }catch{}
-              const msg = body?.error?.message || res.statusText || 'Request failed';
-              const err = new Error(`${msg} (HTTP ${res.status})`);
-              err.code = body?.error?.status;
-              throw err;
-            }
-            return await res.json();
-          } catch (e) {
-            lastError = e;
-            if (i < retries - 1) await new Promise(r=>setTimeout(r, delay * Math.pow(2,i)));
-          }
-        }
-        throw lastError || new Error('API request failed after retries.');
-      }
-
-      async function callReportAPI(systemPrompt, userQuery) {
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error("Missing API key (zakk). Set it near the top of the file.");
-
-        const payloadBase = {
-          contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] }
-        };
-
-        let lastErr;
-        for (const model of MODEL_CANDIDATES) {
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-          for (const maxTokens of TOKEN_TRIES) {
-            try {
-              const withTool = {
-                ...payloadBase,
-                tools: [{ google_search: {} }],
-                generationConfig: {
-                  maxOutputTokens: maxTokens,
-                  temperature: 0.2,
-                  topP: 0.95,
-                  responseMimeType: "application/json"
-                }
-              };
-              const result = await fetchWithBackoff(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(withTool)
-              });
-              const cand = result?.candidates?.[0];
-              const text = cand?.content?.parts?.[0]?.text;
-              if (!text) throw new Error('Empty response from model.');
-              const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
-              const atts = cand?.groundingMetadata?.groundingAttributions || [];
-              const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
-              return { json, sources };
-            } catch (e) {
-              lastErr = e;
-              const msg = String(e?.message || '').toLowerCase();
-              const isToolProblem  = msg.includes('tool') || msg.includes('invalid_argument') || msg.includes('unsupported');
-              const isTokenProblem = msg.includes('token') || msg.includes('max') || msg.includes('length');
-
-              if (isToolProblem) {
-                try {
-                  const noTool = {
-                    ...payloadBase,
-                    generationConfig: {
-                      maxOutputTokens: maxTokens,
-                      temperature: 0.2,
-                      topP: 0.95,
-                      responseMimeType: "application/json"
-                    }
-                  };
-                  const result = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(noTool)
-                  });
-                  const cand = result?.candidates?.[0];
-                  const text = cand?.content?.parts?.[0]?.text;
-                  if (!text) throw new Error('Empty response from model.');
-                  const json = JSON.parse(text.replace(/```json/g,'').replace(/```/g,'').trim());
-                  return { json, sources: [] };
-                } catch (e2) {
-                  lastErr = e2;
-                  if (!isTokenProblem) break;
-                }
-              }
-              if (isTokenProblem) continue;
-              break;
-            }
-          }
-        }
-        throw lastErr || new Error('All model attempts failed.');
-      }
-
-      function buildSystemPrompt() {
-        return `
+      async function runReport(query) {
+        const systemPrompt = `
 You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary).
 Include:
 1) summary: { companyName, summary }
@@ -784,19 +762,14 @@ Include:
 If unknown, use "N/A" or [].
 Respond ONLY with valid JSON. No markdown fences.
         `.trim();
-      }
 
-      async function runReport(query) {
         results.style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
         showState('loading');
         btn.classList.add('cta-disabled'); btn.disabled = true;
 
-        const systemPrompt = buildSystemPrompt();
-        const userQuery = `Generate a comprehensive AI business report for: "${query}"`;
-
         try {
-          const { json, sources } = await callReportAPI(systemPrompt, userQuery);
+          const { json, sources } = await callReportAPI(systemPrompt, `Generate a comprehensive AI business report for: "${query}"`);
           populateReport(json);
           const links = collectSources(json, sources);
           populateSources(links);
@@ -809,7 +782,6 @@ Respond ONLY with valid JSON. No markdown fences.
         }
       }
 
-      // Submit
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = (input.value || '').trim();
@@ -817,7 +789,6 @@ Respond ONLY with valid JSON. No markdown fences.
         runReport(q);
       });
 
-      // Re-run
       rerunBtn?.addEventListener('click', () => {
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
