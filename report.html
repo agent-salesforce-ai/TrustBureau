@@ -32,10 +32,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- *** Your development API key (per your request) *** -->
+  <!-- *** Dev API key (as requested) *** -->
   <script>
     /* You can also override at runtime:  window.zakk = 'YOUR_KEY' */
-    const zakk = 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
+    const zakk = 'AIzaSyA6YMjWmpLSNKMWuGZk9KNbA0zWTJj2SA4';
     if (typeof window !== 'undefined' && (window.zakk == null || String(window.zakk).trim()==='')) {
       window.zakk = zakk;
     }
@@ -46,7 +46,7 @@
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
     .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 
-    /* CTA (match main site) */
+    /* CTA (match main page) */
     .cta-button { transition: all .3s ease; }
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
@@ -178,9 +178,9 @@
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
-          <div class="flex items-center gap-3">
-            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
-          </div>
+            <div class="flex items-center gap-3">
+              <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
+            </div>
         </div>
 
         <!-- Score + Summary -->
@@ -306,14 +306,18 @@
 
   <script>
     /* ===================== Config ===================== */
-    const MODEL_CANDIDATES = [
-      'gemini-2.5-flash',                // your requested model (first)
-      'gemini-2.5-flash-preview-09-2025',// fallback if preview name is required in your project
-      'gemini-2.0-flash',                // extra fallback
-      'gemini-1.5-flash-002'             // extra fallback
+    const PREFERRED_MODELS = [
+      'gemini-2.5-pro',
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-preview-09-2025',
+      'gemini-2.5-flash-preview',
+      'gemini-2.0-pro',
+      'gemini-2.0-flash',
+      'gemini-1.5-pro',
+      'gemini-1.5-flash'
     ];
-    const USE_SEARCH_TOOL = true;           // per your request
-    const MAX_OUTPUT_TOKENS = 8192;         // safe cap to avoid payload errors
+    const USE_SEARCH_TOOL_DEFAULT = true; // we will retry without it if tool is unsupported
+    const MAX_OUTPUT_TOKENS = 8192;
 
     /* ===================== Utilities ===================== */
     function getApiKey() {
@@ -421,81 +425,6 @@
       }
     }
 
-    /* ===================== Robust JSON parsing ===================== */
-    function parseCandidateJSON(candidate) {
-      const parts = candidate?.content?.parts || [];
-
-      // Try inline_data JSON first
-      for (const p of parts) {
-        if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
-          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
-        }
-      }
-      // Then try text parts
-      for (const p of parts) {
-        if (typeof p?.text === 'string' && p.text.trim()) {
-          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
-          try { return JSON.parse(raw); } catch {}
-          const lastCurly  = raw.lastIndexOf('}');
-          const lastSquare = raw.lastIndexOf(']');
-          const cut = Math.max(lastCurly, lastSquare);
-          if (cut > 0) {
-            const maybe = raw.slice(0, cut + 1);
-            try { return JSON.parse(maybe); } catch {}
-          }
-          const preview = raw.slice(0, 400).replace(/\s+/g,' ');
-          throw new Error(`Model returned non‑JSON (preview): ${preview}`);
-        }
-      }
-      throw new Error('Model returned no JSON content.');
-    }
-
-    /* ===================== Sources helpers ===================== */
-    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
-    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
-    function collectSources(json, modelSources) {
-      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w = json?.webPresence || {};
-      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-      const seen = new Set();
-      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-    }
-    function populateSources(links) {
-      const chips = document.getElementById('report-sources-chips');
-      const ul = document.getElementById('report-sources');
-      const box = document.getElementById('report-sources-container');
-      chips.innerHTML = ''; ul.innerHTML = '';
-      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-      box.style.display = 'block';
-      links.forEach(({ url, title, kind }) => {
-        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-        const span = document.createElement('span');
-        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({ url, title }) => {
-        const li = document.createElement('li');
-        li.className = 'text-sm';
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      let open = false;
-      document.getElementById('toggle-sources').onclick = () => {
-        open = !open;
-        ul.classList.toggle('hidden', !open);
-        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
-      };
-    }
-
     /* ===================== Fetch helper ===================== */
     async function fetchWithBackoff(url, options, retries = 3, delay = 800) {
       let lastError;
@@ -506,7 +435,8 @@
             let body=null; try { body = await res.json(); } catch {}
             const msg = body?.error?.message || res.statusText || 'Request failed';
             const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status;
+            err.code = body?.error?.status || (''+res.status);
+            err.status = res.status;
             throw err;
           }
           return await res.json();
@@ -518,7 +448,50 @@
       throw lastError || new Error('API request failed.');
     }
 
-    /* ===================== API (v1beta, snake_case, google_search) ===================== */
+    /* ===================== Model resolution ===================== */
+    function normSupported(methods) {
+      const a = methods || [];
+      return Array.isArray(a) ? a.map(s => (s || '').toLowerCase()) : [];
+    }
+
+    async function listModelsSafe() {
+      const key = getApiKey();
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`;
+      try {
+        const data = await fetchWithBackoff(url, { method: 'GET' }, 2);
+        const models = data?.models || data?.Models || [];
+        return models.map(m => {
+          const name = (m?.name || '').split('/').pop();
+          const methods = m?.supported_generation_methods || m?.supportedGenerationMethods || [];
+          return { name, methods: normSupported(methods) };
+        }).filter(m => !!m.name);
+      } catch (e) {
+        // If ListModels is blocked/denied, we gracefully fall back
+        return null;
+      }
+    }
+
+    async function resolveModelCandidates() {
+      const listed = await listModelsSafe();
+      if (listed && listed.length) {
+        // Filter by generateContent support
+        const supportsGen = new Set(
+          listed.filter(m => m.methods.includes('generatecontent') || m.methods.includes('generate_content'))
+                .map(m => m.name)
+        );
+        // Start with preferred order intersected with supportsGen
+        const primary = PREFERRED_MODELS.filter(n => supportsGen.has(n));
+        // Then add any other 2.x/1.5 pro/flash models that support generateContent
+        const extras = listed
+          .map(m => m.name)
+          .filter(n => (/^gemini-(2\.5|2\.0|1\.5)-(pro|flash)/.test(n)) && supportsGen.has(n) && !primary.includes(n));
+        if (primary.length || extras.length) return [...primary, ...extras];
+      }
+      // Fallback: static preference list
+      return [...PREFERRED_MODELS];
+    }
+
+    /* ===================== API payload ===================== */
     function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
       const payload = {
         contents: [{ role: 'user', parts: [{ text: userQuery }] }],
@@ -534,48 +507,93 @@
       return payload;
     }
 
+    function parseCandidateJSON(candidate) {
+      const parts = candidate?.content?.parts || [];
+      for (const p of parts) {
+        if (p?.inline_data?.data && String(p.inline_data?.mimeType || '').toLowerCase().includes('json')) {
+          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
+        }
+      }
+      for (const p of parts) {
+        if (typeof p?.text === 'string' && p.text.trim()) {
+          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
+          try { return JSON.parse(raw); } catch {}
+          const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
+          if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
+          const preview = raw.slice(0, 400).replace(/\s+/g,' ');
+          throw new Error(`Model returned non‑JSON (preview): ${preview}`);
+        }
+      }
+      throw new Error('Model returned no JSON content.');
+    }
+
     async function callReportAPI(systemPrompt, userQuery) {
       const key = getApiKey();
       if (!key) throw new Error('Missing API key (zakk).');
 
       const base = 'https://generativelanguage.googleapis.com/v1beta/models';
+      const candidates = await resolveModelCandidates();
+
       let lastErr;
-
-      for (const model of MODEL_CANDIDATES) {
-        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-
-        // Two attempts: normal → stricter JSON-only
-        let payload = makeV1betaPayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
-        for (let attempt = 1; attempt <= 2; attempt++) {
+      for (const model of candidates) {
+        // Try with Search ON first (if desired), then fallback to no tool if unsupported
+        for (const withSearch of [USE_SEARCH_TOOL_DEFAULT, false]) {
           try {
-            const data = await fetchWithBackoff(url, {
+            const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
+            let payload = makeV1betaPayload(systemPrompt, userQuery, withSearch);
+
+            // First attempt
+            let data = await fetchWithBackoff(url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
             });
 
-            const cand = data?.candidates?.[0];
+            let cand = data?.candidates?.[0];
             if (!cand) throw new Error('No candidates in response.');
-
-            const json = parseCandidateJSON(cand);
-
-            const atts = cand?.groundingMetadata?.groundingAttributions || [];
-            const sources = atts
-              .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-              .filter(s => s.uri);
-
-            return { json, sources };
-          } catch (e) {
-            lastErr = e;
-            const parseIssue = /non‑JSON|no JSON|Unexpected end of JSON input|Empty model response/i.test(e.message || '');
-            if (attempt === 1 && parseIssue) {
+            try {
+              const json = parseCandidateJSON(cand);
+              const atts = cand?.groundingMetadata?.groundingAttributions || [];
+              const sources = atts
+                .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+                .filter(s => s.uri);
+              return { json, sources };
+            } catch (parseErr) {
+              // Retry once with stricter system instruction for JSON-only
               const stricter = `${systemPrompt}
 
 IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
-              payload = makeV1betaPayload(stricter, userQuery, USE_SEARCH_TOOL);
+              payload = makeV1betaPayload(stricter, userQuery, withSearch);
+              data = await fetchWithBackoff(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              cand = data?.candidates?.[0];
+              if (!cand) throw new Error('No candidates in response.');
+              const json = parseCandidateJSON(cand);
+              const atts2 = cand?.groundingMetadata?.groundingAttributions || [];
+              const sources2 = atts2
+                .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+                .filter(s => s.uri);
+              return { json, sources: sources2 };
+            }
+          } catch (e) {
+            lastErr = e;
+            const msg = (e.message || '').toLowerCase();
+            const status = (e.status || '').toString();
+            const code = (e.code || '').toString().toUpperCase();
+
+            // If model not found/404, try next model
+            if (status === '404' || code.includes('NOT_FOUND') || /model.*not.*found/i.test(msg)) break;
+
+            // If tools unsupported & we had them ON, the next inner loop (withSearch=false) will try again
+            if (withSearch && (/tool|google_search|unknown.*tool|does not support tools/i.test(msg) || code.includes('INVALID_ARGUMENT'))) {
               continue;
             }
-            break; // next model
+
+            // Permission / quota / generic errors → try next model
+            if (status === '403' || code.includes('PERMISSION') || code.includes('QUOTA')) break;
           }
         }
       }
@@ -605,7 +623,7 @@ Respond ONLY with valid JSON. No markdown fences.
       `.trim();
     }
 
-    /* ===================== DOM refs ===================== */
+    /* ===================== DOM Refs ===================== */
     const titleEl = document.getElementById('report-title');
     const summaryEl = document.getElementById('report-summary');
     const scoreCircle = document.getElementById('report-score-circle');
@@ -734,6 +752,52 @@ Respond ONLY with valid JSON. No markdown fences.
 
       if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
       else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+    }
+
+    /* ===================== Sources helpers ===================== */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      let open = false;
+      document.getElementById('toggle-sources').onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+      };
     }
 
     /* ===================== Wire up UI ===================== */
