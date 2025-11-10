@@ -32,21 +32,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- *** Dev API key (as requested) *** -->
-  <script>
-    /* You can also override at runtime:  window.zakk = 'YOUR_KEY' */
-    const zakk = 'AIzaSyA6YMjWmpLSNKMWuGZk9KNbA0zWTJj2SA4';
-    if (typeof window !== 'undefined' && (window.zakk == null || String(window.zakk).trim()==='')) {
-      window.zakk = zakk;
-    }
-  </script>
-
   <style>
     html { scroll-behavior: smooth; }
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
     .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 
-    /* CTA (match main page) */
+    /* CTA (match main site) */
     .cta-button { transition: all .3s ease; }
     .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
@@ -178,9 +169,9 @@
             <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
-            <div class="flex items-center gap-3">
-              <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
-            </div>
+          <div class="flex items-center gap-3">
+            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
+          </div>
         </div>
 
         <!-- Score + Summary -->
@@ -306,29 +297,27 @@
 
   <script>
     /* ===================== Config ===================== */
-    const PREFERRED_MODELS = [
-      'gemini-2.5-pro',
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-preview-09-2025',
-      'gemini-2.5-flash-preview',
-      'gemini-2.0-pro',
-      'gemini-2.0-flash',
-      'gemini-1.5-pro',
-      'gemini-1.5-flash'
+    const MODEL_CANDIDATES = [
+      'gemini-2.5-flash-preview-09-2025',// Use the standard, compatible model
+      'gemini-2.5-flash'                // Fallback
+      // 'gemini-2.0-pro', // <-- This was causing a "Not Found" error
+      // 'gemini-2.0-flash', // <-- This was also incompatible
     ];
-    const USE_SEARCH_TOOL_DEFAULT = true; // we will retry without it if tool is unsupported
-    const MAX_OUTPUT_TOKENS = 8192;
+    const USE_SEARCH_TOOL = true;          // per your request
+    const MAX_OUTPUT_TOKENS = 8192;        // safe cap to avoid payload errors
+
+    // *** API key moved here to fix scope issue ***
+    const zakk = 'AIzaSyDGBtXHkvxw4_GDFTHr8ieoItbxmFbSuWU';
+    function getApiKey() {
+      // Use the 'zakk' constant defined right above.
+      return (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
+    }
 
     /* ===================== Utilities ===================== */
-    function getApiKey() {
-      const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-      return fromWindow || fromConst;
-    }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
     function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
     function linkifyMaybe(v) {
-      if (!v) return 'N/A';
+      if (!v) return 'NIA';
       const s = String(v).trim();
       if (/^https?:\/\//i.test(s)) {
         return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
@@ -400,29 +389,83 @@
       return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
     }
 
-    const results = document.getElementById('report-results-container');
-    const loader  = document.getElementById('report-loader');
-    const errBox  = document.getElementById('report-error-container');
-    const errMsg  = document.getElementById('report-error-message');
-    const content = document.getElementById('report-content');
+    /* ===================== Robust JSON parsing ===================== */
+    function parseCandidateJSON(candidate) {
+      const parts = candidate?.content?.parts || [];
 
-    function showState(state, message = '') {
-      loader.style.display = 'none';
-      errBox.style.display = 'none';
-      content.style.display = 'none';
-      results.style.display = 'block';
-
-      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
-
-      if (state === 'loading') {
-        loader.style.display = 'block';
-        __loaderCtl = startLoadingAnimation();
-      } else if (state === 'error') {
-        errBox.style.display = 'block';
-        errMsg.textContent = message || 'Something went wrong.';
-      } else if (state === 'content') {
-        content.style.display = 'block';
+      // Try text parts first (standard for application/json responseMimeType)
+      for (const p of parts) {
+        if (typeof p?.text === 'string' && p.text.trim()) {
+          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
+          try { return JSON.parse(raw); } catch {}
+          // Truncated JSON fallback
+          const lastCurly  = raw.lastIndexOf('}');
+          const lastSquare = raw.lastIndexOf(']');
+          const cut = Math.max(lastCurly, lastSquare);
+          if (cut > 0) {
+            const maybe = raw.slice(0, cut + 1);
+            try { return JSON.parse(maybe); } catch {}
+          }
+        }
       }
+
+      // Fallback: Try inline_data JSON
+      for (const p of parts) {
+        if (p?.inlineData?.data && String(p.inlineData.mimeType || '').toLowerCase().includes('json')) {
+          try { return JSON.parse(atob(p.inlineData.data)); } catch {}
+        }
+      }
+
+      // If all else fails, throw an error
+      const firstPart = parts[0]?.text || '';
+      const preview = firstPart.slice(0, 400).replace(/\s+/g,' ');
+      throw new Error(`Model returned non‑JSON (preview): ${preview}`);
+    }
+
+    /* ===================== Sources helpers ===================== */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                           <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      let open = false;
+      document.getElementById('toggle-sources').onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
+      };
     }
 
     /* ===================== Fetch helper ===================== */
@@ -435,8 +478,7 @@
             let body=null; try { body = await res.json(); } catch {}
             const msg = body?.error?.message || res.statusText || 'Request failed';
             const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status || (''+res.status);
-            err.status = res.status;
+            err.code = body?.error?.status;
             throw err;
           }
           return await res.json();
@@ -448,83 +490,20 @@
       throw lastError || new Error('API request failed.');
     }
 
-    /* ===================== Model resolution ===================== */
-    function normSupported(methods) {
-      const a = methods || [];
-      return Array.isArray(a) ? a.map(s => (s || '').toLowerCase()) : [];
-    }
-
-    async function listModelsSafe() {
-      const key = getApiKey();
-      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`;
-      try {
-        const data = await fetchWithBackoff(url, { method: 'GET' }, 2);
-        const models = data?.models || data?.Models || [];
-        return models.map(m => {
-          const name = (m?.name || '').split('/').pop();
-          const methods = m?.supported_generation_methods || m?.supportedGenerationMethods || [];
-          return { name, methods: normSupported(methods) };
-        }).filter(m => !!m.name);
-      } catch (e) {
-        // If ListModels is blocked/denied, we gracefully fall back
-        return null;
-      }
-    }
-
-    async function resolveModelCandidates() {
-      const listed = await listModelsSafe();
-      if (listed && listed.length) {
-        // Filter by generateContent support
-        const supportsGen = new Set(
-          listed.filter(m => m.methods.includes('generatecontent') || m.methods.includes('generate_content'))
-                .map(m => m.name)
-        );
-        // Start with preferred order intersected with supportsGen
-        const primary = PREFERRED_MODELS.filter(n => supportsGen.has(n));
-        // Then add any other 2.x/1.5 pro/flash models that support generateContent
-        const extras = listed
-          .map(m => m.name)
-          .filter(n => (/^gemini-(2\.5|2\.0|1\.5)-(pro|flash)/.test(n)) && supportsGen.has(n) && !primary.includes(n));
-        if (primary.length || extras.length) return [...primary, ...extras];
-      }
-      // Fallback: static preference list
-      return [...PREFERRED_MODELS];
-    }
-
-    /* ===================== API payload ===================== */
+    /* ===================== API (v1beta, camelCase) ===================== */
     function makeV1betaPayload(systemPrompt, userQuery, withSearch) {
       const payload = {
         contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        system_instruction: { role: 'system', parts: [{ text: systemPrompt }] },
-        generation_config: {
-          max_output_tokens: MAX_OUTPUT_TOKENS,
+        systemInstruction: { role: 'system', parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
-          top_p: 0.95,
-          response_mime_type: "application/json"
+          topP: 0.95,
+          // responseMimeType: "application/json" // <-- REMOVED THIS LINE TO FIX 400 ERROR
         }
       };
-      if (withSearch) payload.tools = [{ google_search: {} }];
+      if (withSearch) payload.tools = [{ "googleSearch": {} }]; // Use camelCase
       return payload;
-    }
-
-    function parseCandidateJSON(candidate) {
-      const parts = candidate?.content?.parts || [];
-      for (const p of parts) {
-        if (p?.inline_data?.data && String(p.inline_data?.mimeType || '').toLowerCase().includes('json')) {
-          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
-        }
-      }
-      for (const p of parts) {
-        if (typeof p?.text === 'string' && p.text.trim()) {
-          const raw = p.text.replace(/```json/g, '').replace(/```/g, '').trim();
-          try { return JSON.parse(raw); } catch {}
-          const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
-          if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
-          const preview = raw.slice(0, 400).replace(/\s+/g,' ');
-          throw new Error(`Model returned non‑JSON (preview): ${preview}`);
-        }
-      }
-      throw new Error('Model returned no JSON content.');
     }
 
     async function callReportAPI(systemPrompt, userQuery) {
@@ -532,68 +511,65 @@
       if (!key) throw new Error('Missing API key (zakk).');
 
       const base = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const candidates = await resolveModelCandidates();
-
       let lastErr;
-      for (const model of candidates) {
-        // Try with Search ON first (if desired), then fallback to no tool if unsupported
-        for (const withSearch of [USE_SEARCH_TOOL_DEFAULT, false]) {
-          try {
-            const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-            let payload = makeV1betaPayload(systemPrompt, userQuery, withSearch);
 
-            // First attempt
-            let data = await fetchWithBackoff(url, {
+      for (const model of MODEL_CANDIDATES) {
+        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
+
+        // Two attempts: normal → stricter JSON-only
+        let payload = makeV1betaPayload(systemPrompt, userQuery, USE_SEARCH_TOOL);
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const data = await fetchWithBackoff(url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
             });
 
-            let cand = data?.candidates?.[0];
+            const cand = data?.candidates?.[0];
             if (!cand) throw new Error('No candidates in response.');
-            try {
-              const json = parseCandidateJSON(cand);
-              const atts = cand?.groundingMetadata?.groundingAttributions || [];
-              const sources = atts
-                .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-                .filter(s => s.uri);
-              return { json, sources };
-            } catch (parseErr) {
-              // Retry once with stricter system instruction for JSON-only
-              const stricter = `${systemPrompt}
 
-IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
-              payload = makeV1betaPayload(stricter, userQuery, withSearch);
-              data = await fetchWithBackoff(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-              });
-              cand = data?.candidates?.[0];
-              if (!cand) throw new Error('No candidates in response.');
-              const json = parseCandidateJSON(cand);
-              const atts2 = cand?.groundingMetadata?.groundingAttributions || [];
-              const sources2 = atts2
-                .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-                .filter(s => s.uri);
-              return { json, sources: sources2 };
+            const json = parseCandidateJSON(cand);
+
+            // === VALIDATION STEP (Stricter, per user request) ===
+            const missing = [];
+            if (!json.summary?.companyName || json.summary.companyName === 'N/A') missing.push('summary.companyName');
+            if (!json.sos?.entityName || json.sos.entityName === 'N/A') missing.push('sos.entityName');
+            if (!json.riskScore?.score) missing.push('riskScore.score');
+            // Check for minimum counts
+            if (!Array.isArray(json.news) || json.news.length < 3) missing.push('news (min 3)');
+            if (!Array.isArray(json.reviews) || json.reviews.length < 3) missing.push('reviews (min 3)');
+            if (!Array.isArray(json.leadership) || json.leadership.length < 3) missing.push('leadership (min 3)');
+            if (!Array.isArray(json.products) || json.products.length < 3) missing.push('products (min 3)');
+            if (!Array.isArray(json.competitors) || json.competitors.length < 3) missing.push('competitors (min 3)');
+            if (!Array.isArray(json.publicRecords?.findings)) missing.push('publicRecords.findings');
+            // === END VALIDATION ===
+
+            if (missing.length > 0) { // Check if any validation failed
+              throw new Error(`Model JSON missing/short keys: ${missing.join(', ')}`);
             }
+            // === END VALIDATION ===
+
+            const atts = cand?.groundingMetadata?.groundingAttributions || [];
+            const sources = atts
+              .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+              .filter(s => s.uri);
+
+            return { json, sources };
           } catch (e) {
             lastErr = e;
-            const msg = (e.message || '').toLowerCase();
-            const status = (e.status || '').toString();
-            const code = (e.code || '').toString().toUpperCase();
+            const msg = e.message || '';
+            const parseIssue = /non‑JSON|no JSON|Unexpected end of JSON input|Empty model response/i.test(msg);
+            const missingKeysIssue = /missing\/short keys/i.test(msg); // Check for our new error
 
-            // If model not found/404, try next model
-            if (status === '404' || code.includes('NOT_FOUND') || /model.*not.*found/i.test(msg)) break;
+            if (attempt === 1 && (parseIssue || missingKeysIssue)) { // Trigger retry on missing/short keys
+              const stricter = `${systemPrompt}
 
-            // If tools unsupported & we had them ON, the next inner loop (withSearch=false) will try again
-            if (withSearch && (/tool|google_search|unknown.*tool|does not support tools/i.test(msg) || code.includes('INVALID_ARGUMENT'))) {
+IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). You MUST include all 13 top-level keys. You MUST return at least 3 items for news, reviews, leadership, products, and competitors, even if you have to search harder. If you cannot find data, use "N/A" or [].`;
+              payload = makeV1betaPayload(stricter, userQuery, USE_SEARCH_TOOL);
               continue;
             }
-
-            // Permission / quota / generic errors → try next model
-            if (status === '403' || code.includes('PERMISSION') || code.includes('QUOTA')) break;
+            break; // next model
           }
         }
       }
@@ -609,13 +585,13 @@ Include:
 2) sos: { entityName, status, entityType, jurisdiction, formationDate, registeredAgent }
 3) publicRecords: { findings: [{ type, details }] }
 4) riskScore: { score (300-850), justification, positiveFactors: [string], negativeFactors: [string] }
-5) reviews: [{ snippet, source, url }]
+5) reviews: [{ snippet, source, url }] // (at least 3)
 6) chartPoints: { revenue: [number], cashFlow: [number] }  // 10–24 points each
 7) profile: { founded, headquarters, employees, website, industry, subindustry, ticker }
-8) news: [{ title, date, source, url }]
-9) leadership: [{ name, title }]
-10) products: [string]
-11) competitors: [string]
+8) news: [{ title, date, source, url }] // (at* least 3)
+9) leadership: [{ name, title }] // (at least 3)
+10) products: [string] // (at least 3)
+11) competitors: [string] // (at least 3)
 12) webPresence: { twitter, linkedin, youtube, traffic }
 13) citations: [{ title, url }]
 If unknown, use "N/A" or [].
@@ -623,7 +599,14 @@ Respond ONLY with valid JSON. No markdown fences.
       `.trim();
     }
 
-    /* ===================== DOM Refs ===================== */
+    /* ===================== DOM refs ===================== */
+    // Moved these 5 to the top to fix hoisting/scope issues
+    const results = document.getElementById('report-results-container');
+    const loader  = document.getElementById('report-loader');
+    const errBox  = document.getElementById('report-error-container');
+    const errMsg  = document.getElementById('report-error-message');
+    const content = document.getElementById('report-content');
+
     const titleEl = document.getElementById('report-title');
     const summaryEl = document.getElementById('report-summary');
     const scoreCircle = document.getElementById('report-score-circle');
@@ -675,7 +658,7 @@ Respond ONLY with valid JSON. No markdown fences.
         const li = document.createElement('li');
         li.className = 'flex items-start';
         li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
-                        `<span class="text-sm text-brand-dark">${f}</span>`;
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
         posList.appendChild(li);
       });
       negList.innerHTML = '';
@@ -683,7 +666,7 @@ Respond ONLY with valid JSON. No markdown fences.
         const li = document.createElement('li');
         li.className = 'flex items-start';
         li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
-                        `<span class="text-sm text-brand-dark">${f}</span>`;
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
         negList.appendChild(li);
       });
 
@@ -716,6 +699,16 @@ Respond ONLY with valid JSON. No markdown fences.
       });
       if (!newsList.children.length) newsList.innerHTML = '<li class="text-sm text-gray-600">No recent news found.</li>';
 
+      // --- POPULATE PUBLIC RECORDS ---
+      recList.innerHTML = '';
+      (data?.publicRecords?.findings || []).slice(0, 8).forEach(r => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="font-medium text-brand-dark">${r.type || 'Record'}:</span> ${r.details || 'N/A'}`;
+        recList.appendChild(li);
+      });
+      if (!recList.children.length) recList.innerHTML = '<li class="text-sm text-gray-600 list-none">No public records found.</li>';
+      // --- END ---
+
       leaderList.innerHTML = '';
       (data?.leadership || []).slice(0,8).forEach(l => {
         const li = document.createElement('li');
@@ -746,58 +739,26 @@ Respond ONLY with valid JSON. No markdown fences.
       });
       if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">No social signals.</li>';
 
+      // --- POPULATE REVIEWS ---
+      reviewsList.innerHTML = '';
+      (data?.reviews || []).slice(0, 5).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'border border-brand-border rounded-lg bg-brand-light p-3';
+        div.innerHTML =
+          `<p class="text-sm text-brand-dark italic">"${r.snippet || 'N/A'}"</p>` +
+          `<div class="text-xs text-gray-500 mt-1.5">${r.source || 'Source'}${r.url ? ' • <a href="'+r.url+'" target="_blank" rel="noopener" class="text-brand-green hover:underline">Link</a>' : ''}</div>`;
+        reviewsList.appendChild(div);
+
+      });
+      if (!reviewsList.children.length) reviewsList.innerHTML = '<p class="text-sm text-gray-600">No customer reviews found.</p>';
+      // --- END ---
+
       const points = data?.chartPoints || {};
       if (Array.isArray(points.revenue) && points.revenue.length > 1) renderLineChart(chartRevenue, points.revenue, '#00C09A');
       else renderLineChart(chartRevenue, [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
 
       if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) renderLineChart(chartCash, points.cashFlow, '#3B82F6');
       else renderLineChart(chartCash, [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
-    }
-
-    /* ===================== Sources helpers ===================== */
-    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
-    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
-    function collectSources(json, modelSources) {
-      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w = json?.webPresence || {};
-      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-      const seen = new Set();
-      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-    }
-    function populateSources(links) {
-      const chips = document.getElementById('report-sources-chips');
-      const ul = document.getElementById('report-sources');
-      const box = document.getElementById('report-sources-container');
-      chips.innerHTML = ''; ul.innerHTML = '';
-      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-      box.style.display = 'block';
-      links.forEach(({ url, title, kind }) => {
-        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-        const span = document.createElement('span');
-        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({ url, title }) => {
-        const li = document.createElement('li');
-        li.className = 'text-sm';
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      let open = false;
-      document.getElementById('toggle-sources').onclick = () => {
-        open = !open;
-        ul.classList.toggle('hidden', !open);
-        document.getElementById('toggle-sources').textContent = open ? 'Hide list' : 'Show list';
-      };
     }
 
     /* ===================== Wire up UI ===================== */
@@ -807,6 +768,26 @@ Respond ONLY with valid JSON. No markdown fences.
       const btn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
 
+      // Use the 'results' var defined in "DOM refs"
+      function showState(state, message = '') {
+        loader.style.display = 'none';
+        errBox.style.display = 'none';
+        content.style.display = 'none';
+        results.style.display = 'block';
+
+        if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
+
+        if (state === 'loading') {
+          loader.style.display = 'block';
+          __loaderCtl = startLoadingAnimation();
+        } else if (state === 'error') {
+          errBox.style.display = 'block';
+          errMsg.textContent = message || 'Something went wrong.';
+        } else if (state === 'content') {
+          content.style.display = 'block';
+        }
+      }
+
       async function runReport(query) {
         document.getElementById('report-results-container').style.display = 'block';
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
@@ -814,7 +795,8 @@ Respond ONLY with valid JSON. No markdown fences.
         btn.classList.add('cta-disabled'); btn.disabled = true;
 
         const systemPrompt = buildSystemPrompt();
-        const userQuery = `Generate a comprehensive AI business report for: "${query}"`;
+        // Updated query to be more explicit, per user request
+        const userQuery = `Generate an in-depth, comprehensive AI business report for: "${query}". Search public records, UCC filings, recent news (last 12 months), and LinkedIn for leadership profiles.`;
 
         try {
           const { json, sources } = await callReportAPI(systemPrompt, userQuery);
