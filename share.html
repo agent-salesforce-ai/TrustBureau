@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
 
   <!-- Tailwind (CDN) -->
@@ -12,943 +12,782 @@
       theme: {
         extend: {
           fontFamily: {
-            heading: ['Plus Jakarta Sans', 'system-ui', 'Segoe UI', 'Inter', 'sans-serif'],
-            sans: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+            heading: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif']
           },
           colors: {
-            'brand-green': '#00C09A',
-            'brand-dark':  '#111827',
-            'brand-gray':  '#6B7280',
-            'brand-light': '#F8F9FA',
-            'brand-border':'#E5E7EB',
+            brand: {
+              green: '#00C09A',
+              dark:  '#0F172A',
+              gray:  '#64748B',
+              light: '#F8FAFC',
+              border:'#E5E7EB'
+            }
+          },
+          boxShadow: {
+            subtle: '0 10px 20px rgba(0,0,0,.06)'
           }
         }
       }
     }
   </script>
 
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
 
-  <!-- ===== DEV API KEY PLACEHOLDER (for local testing; do NOT ship with a prod key) ===== -->
-  <script id="tb-dev-key">
-    (function () {
-      // 1) Hard-coded placeholder for quick local testing:
-      const TB_DEV_KEY_PLACEHOLDER = 'AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q'; // <-- PUT YOUR TEST KEY HERE (e.g., 'AIzaSy...')
+  <!-- ===== DEV-ONLY API KEY PLACEHOLDER + OVERRIDES ===== -->
+  <script id="zakk-bootstrap">
+    // 1) Put your temporary test key here while developing.
+    const DEFAULT_ZAKK = 'AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q';
 
-      // 2) Accept key via URL ?key=AI...
-      const qsKey = new URLSearchParams(location.search).get('key');
+    // 2) Resolve key in this order: ?zakk → window.zakk → localStorage → DEFAULT_ZAKK
+    (function bootstrapZakk() {
+      const url = new URL(location.href);
+      const fromParam = url.searchParams.get('zakk') || url.searchParams.get('key');
+      const fromWin   = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+      const fromLS    = (typeof localStorage !== 'undefined' && localStorage.getItem('zakk')) ? localStorage.getItem('zakk').trim() : '';
 
-      // 3) Persist a key in localStorage so reloads keep working.
-      const LS_NAME = 'tb.zakk';
-      const lsKey = localStorage.getItem(LS_NAME);
+      const chosen =
+        (fromParam && fromParam !== 'REPLACE_WITH_TEST_KEY') ? fromParam :
+        (fromWin   && fromWin   !== 'REPLACE_WITH_TEST_KEY') ? fromWin   :
+        (fromLS    && fromLS    !== 'REPLACE_WITH_TEST_KEY') ? fromLS    :
+        DEFAULT_ZAKK;
 
-      // Priority: ?key > localStorage > placeholder
-      let active = (qsKey && qsKey.trim()) || (lsKey && lsKey.trim()) || TB_DEV_KEY_PLACEHOLDER;
+      window.zakk = chosen;
 
-      // If a ?key was provided, store it for next time.
-      if (qsKey && qsKey.trim()) localStorage.setItem(LS_NAME, qsKey.trim());
-
-      // Expose the key for the app. This is what the rest of the code reads.
-      if (!window.zakk || !String(window.zakk).trim()) {
-        window.zakk = active;
-      }
-
-      // Dev helpers — use in the console:
-      //   __setTBKey('AI...')   -> saves to localStorage + sets window.zakk
-      //   __clearTBKey()        -> clears the saved key
-      window.__setTBKey = function (k) {
-        const v = String(k || '').trim();
-        if (v) {
-          localStorage.setItem(LS_NAME, v);
-          window.zakk = v;
-          alert('Dev key saved.');
-        } else {
-          localStorage.removeItem(LS_NAME);
-          window.zakk = '';
-          alert('Key cleared.');
-        }
-      };
-      window.__clearTBKey = function () {
-        localStorage.removeItem(LS_NAME);
-        window.zakk = '';
-        alert('Key cleared.');
-      };
-
-      // Quick keyboard shortcut for testing: Alt+K to enter a key
-      window.addEventListener('keydown', (e) => {
-        if (e.altKey && (e.key === 'k' || e.key === 'K')) {
-          const current = localStorage.getItem(LS_NAME) || '';
-          const next = prompt('Enter DEV API key (saved to localStorage tb.zakk):', current);
-          if (next != null) window.__setTBKey(next);
-        }
-      });
+      if (fromParam) { try { localStorage.setItem('zakk', fromParam); } catch {} }
     })();
-  </script>
-  <!-- ===== /DEV API KEY PLACEHOLDER ===== -->
 
-  <!-- Minimal styling for loader/score/map  -->
+    function getApiKey() {
+      const k = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
+      if (!k || /REPLACE_WITH_TEST_KEY/i.test(k)) {
+        throw new Error('Missing API key (zakk). Set it in DEFAULT_ZAKK, via ?zakk=YOUR_KEY, or run __setDevKey("YOUR_KEY") in DevTools.');
+      }
+      return k;
+    }
+
+    // Quick helper in DevTools:
+    window.__setDevKey = (k) => {
+      if (!k) return alert('Provide a non-empty key string');
+      localStorage.setItem('zakk', k);
+      window.zakk = k;
+      alert('Dev key saved to localStorage and applied to window.zakk');
+    };
+  </script>
+
   <style>
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    .cta { transition: all .25s ease; }
-    .cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,192,154,.15); }
-    .score-circle{width:120px;height:120px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.25rem;border:8px solid}
-    .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
-    .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
-    .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
-
-    /* Loader: spinner + stepper + skeleton */
-    .spinner{width:20px;height:20px;border-radius:9999px;border:3px solid #E5E7EB;border-top-color:#00C09A;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
+    .card { border:1px solid #E5E7EB; border-radius:.75rem; background:#fff; box-shadow: var(--shadow, 0 10px 20px rgba(0,0,0,.04)); }
+    .cta { background:#00C09A; color:#fff; font-weight:700; border-radius:.5rem; transition: transform .15s ease, box-shadow .15s ease; }
+    .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
+    .badge { font-size:.72rem; background:#F1F5F9; padding:.15rem .5rem; border-radius:999px; display:inline-block; }
+    .score-circle { width:120px; height:120px; border-radius:9999px; display:flex; align-items:center; justify-content:center; border:8px solid; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:2.3rem; }
+    .score-red { border-color:#FECACA; color:#DC2626; background:#FEF2F2 }
+    .score-yellow{ border-color:#FDE68A; color:#D97706; background:#FFFBEB }
+    .score-green{ border-color:#A7F3D0; color:#059669; background:#ECFDF5 }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
+    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.1s ease-in-out infinite; border-radius:.5rem; }
   </style>
-
-  <!-- LZ-String (for snapshot compression in URL hash) -->
-  <script>
-  /*! LZ-String (min) - https://pieroxy.net/blog/pages/lz-string/index.html */
-  var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},i={compressToBase64:function(o){if(null==o)return"";var r=i._compress(o,6,function(o){return n.charAt(o)});switch(r.length%4){default:case 0:return r;case 1:return r+"===";case 2:return r+"==";case 3:return r+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(e){return o(n,r.charAt(e))})},compressToEncodedURIComponent:function(o){return null==o?"":i._compress(o,6,function(o){return e.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(n){return o(e,r.charAt(n))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(o,n,e){if(null==o)return"";var t,i,u,s={},p={},c="",a="",f="",l=2,h=3,d=2,v=[],g=0,y=0;for(i=0;i<o.length;i+=1)if(c=o.charAt(i),Object.prototype.hasOwnProperty.call(s,c)||(s[c]=h++,p[c]=!0),a=f+c,Object.prototype.hasOwnProperty.call(s,a))f=a;else{if(Object.prototype.hasOwnProperty.call(p,f)){if(f.charCodeAt(0)<256){for(t=0;t<d;t++)g<<=1,y==n-1?(y=0,v.push(e(g)),g=0):y++;for(u=f.charCodeAt(0),t=0;t<8;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++}else{for(u=1,t=0;t<d;t++)g=g<<1,y==n-1?(y=0,v.push(e(g)),g=0):y++;for(u=f.charCodeAt(0),t=0;t<16;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++}l--,0==l&&(l=Math.pow(2,d),d++),delete p[f]}else for(u=s[f],t=0;t<d;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++;l--,0==l&&(l=Math.pow(2,d),d++),s[a]=h++,f=String(c)}if(""!==f){if(Object.prototype.hasOwnProperty.call(p,f)){if(f.charCodeAt(0)<256){for(t=0;t<d;t++)g<<=1,y==n-1?(y=0,v.push(e(g)),g=0):y++;for(u=f.charCodeAt(0),t=0;t<8;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++}else{for(u=1,t=0;t<d;t++)g=g<<1,y==n-1?(y=0,v.push(e(g)),g=0):y++;for(u=f.charCodeAt(0),t=0;t<16;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++}l--,0==l&&(l=Math.pow(2,d),d++),delete p[f]}else for(u=s[f],t=0;t<d;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++}for(u=2,t=0;t<d;t++)g=g<<1|1&u,y==n-1?(y=0,v.push(e(g)),g=0):y++;for(;;){if(g<<=1,y==n-1){v.push(e(g));break}y++}return v.join("")},decompress:function(o){return null==o?"":""==o?null:i._decompress(o.length,32768,function(r){return o.charCodeAt(r)})},_decompress:function(o,n,e){var t,i,u,s,p,c,a,f,l,h=[],d=4,v=4,g=3,y="",w=[],A={val:e(0),position:n,index:1};for(i=0;i<3;i+=1)h[i]=i;for(u=0,c=Math.pow(2,2),a=1;a!=c;)s=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),u|=(s>0?1:0)*a,a<<=1;switch(t=u){case 0:for(u=0,c=Math.pow(2,8),a=1;a!=c;)s=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),u|=(s>0?1:0)*a,a<<=1;f=r(u);break;case 1:for(u=0,c=Math.pow(2,16),a=1;a!=c;)s=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),u|=(s>0?1:0)*a,a<<=1;f=r(u);break;case 2:return""}for(h[3]=f,p=f,w.push(f);;){if(A.index>o)return"";for(u=0,c=Math.pow(2,g),a=1;a!=c;)s=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),u|=(s>0?1:0)*a,a<<=1;switch(f=u){case 0:for(u=0,c=Math.pow(2,8),a=1;a!=c;)s=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),u|=(s>0?1:0)*a,a<<=1;h[v++]=r(u),f=v-1,d--;break;case 1:for(u=0,c=Math.pow(2,16),a=1;a!=c;)s=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),u|=(s>0?1:0)*a,a<<=1;h[v++]=r(u),f=v-1,d--;break;case 2:return w.join("")}if(0==d&&(d=Math.pow(2,g),g++),h[f])y=h[f];else{if(f!==v)return null;y=p+p.charAt(0)}w.push(y),h[v++]=p+y.charAt(0),d--,p=y,0==d&&(d=Math.pow(2,g),g++)}}
-  }();
-  </script>
 </head>
 
-<body class="font-sans text-brand-dark bg-white">
+<body class="font-sans text-brand-dark">
   <!-- Header -->
-  <header class="bg-white border-b border-brand-border sticky top-0 z-40 backdrop-blur">
-    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2">
+  <header class="sticky top-0 z-50 bg-white/85 border-b border-brand-border backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a class="flex items-center gap-2" href="#" onclick="history.back();return false;" title="Back to Main">
         <svg width="28" height="28" viewBox="0 0 50 50" fill="none" aria-hidden="true">
           <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
           <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="font-heading text-lg md:text-xl font-extrabold">TrustBureau.ai</span>
       </a>
-      <a href="/index.html" class="text-sm text-brand-dark hover:text-brand-green">← Back to Main</a>
+
+      <a href="/" class="text-sm text-brand-gray hover:text-brand-green flex items-center gap-1">
+        <span aria-hidden="true">←</span> Back to Main
+      </a>
     </div>
   </header>
 
-  <!-- Search -->
-  <section class="mx-auto max-w-4xl px-4 pt-8 md:pt-12">
-    <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-center">Live AI Business Report</h1>
-    <p class="text-brand-gray text-center mt-3">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
+  <!-- Hero / Search -->
+  <section class="max-w-4xl mx-auto px-4 pt-10">
+    <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center">Live AI Business Report</h1>
+    <p class="text-center text-brand-gray mt-3">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
 
-    <div class="mt-6">
-      <form id="search-form" class="mx-auto max-w-3xl bg-white shadow rounded-xl border border-brand-border p-3 flex flex-col sm:flex-row gap-3 items-stretch">
-        <input id="business-input" type="text" placeholder="e.g., Tesla, Inc. / Taco Bell Corp. / Aquamark.io"
-               class="flex-1 px-4 py-3 rounded-lg border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-green"
-               value="">
-        <button id="generate-btn" type="submit"
-                class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-semibold rounded-lg px-5 py-3 cta">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-          </svg>
+    <div class="card p-3 md:p-4 mt-6">
+      <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
+        <input id="query" class="flex-1 px-4 py-3 rounded-lg border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-green"
+               placeholder="e.g., Apple Inc., Taco Bell Corp., Aquamark Inc.">
+        <button id="btn-generate" class="cta px-5 py-3 text-lg inline-flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
           Generate
         </button>
-        <p class="text-xs text-brand-gray sm:ml-2 sm:self-center">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
       </form>
+      <p class="text-xs text-brand-gray mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
     </div>
 
-    <div class="mt-2 hidden" id="network-banner">
-      <div class="rounded-lg border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm">
-        Network/CORS error: the browser could not reach the Google Generative Language API.
-        Serve this file via http(s) and temporarily disable extensions that block requests to <code>generativelanguage.googleapis.com</code>.
-      </div>
-    </div>
-
-    <div class="mt-4 flex items-center justify-center">
-      <button id="load-sample" class="text-xs bg-gray-100 hover:bg-gray-200 border border-brand-border rounded-md px-3 py-1">Load sample report</button>
+    <div class="flex justify-center mt-4">
+      <button id="btn-sample" class="text-xs px-3 py-1.5 border border-brand-border rounded hover:bg-brand-light">Load sample report</button>
     </div>
   </section>
 
-  <!-- Results wrapper -->
-  <section id="results" class="mx-auto max-w-7xl px-4 pb-16">
-    <div id="report-container" class="mt-8">
+  <!-- Results -->
+  <section id="results" class="max-w-6xl mx-auto px-4 pb-16 mt-8 hidden">
+    <!-- Controls -->
+    <div class="flex items-center gap-2 mb-4">
+      <button id="btn-rerun" class="px-3 py-1.5 rounded bg-brand-light text-brand-dark border border-brand-border hover:bg-white">Re‑run</button>
 
-      <!-- Loader -->
-      <div id="loader" class="hidden border border-brand-border rounded-xl p-6 bg-white">
-        <div class="flex gap-3 items-center">
-          <div class="spinner" aria-hidden="true"></div>
-          <div class="text-sm text-brand-gray">Generating report…</div>
-          <div class="ml-auto text-xs text-brand-gray" id="loader-timer">00:00</div>
-        </div>
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="rounded-md border border-brand-border p-4">
-            <div class="w-24 h-4 shimmer rounded mb-3"></div>
-            <div class="w-full h-20 shimmer rounded mb-2"></div>
-            <div class="w-3/4 h-3 shimmer rounded"></div>
-          </div>
-          <div class="rounded-md border border-brand-border p-4">
-            <div class="w-28 h-4 shimmer rounded mb-3"></div>
-            <div class="w-full h-20 shimmer rounded mb-2"></div>
-            <div class="w-2/3 h-3 shimmer rounded"></div>
-          </div>
-          <div class="rounded-md border border-brand-border p-4">
-            <div class="w-20 h-4 shimmer rounded mb-3"></div>
-            <div class="w-full h-20 shimmer rounded mb-2"></div>
-            <div class="w-1/2 h-3 shimmer rounded"></div>
-          </div>
+      <div class="relative inline-block">
+        <button id="btn-share" class="px-3 py-1.5 rounded border border-brand-border hover:bg-brand-light">Share ▾</button>
+        <div id="share-menu" class="hidden absolute z-10 mt-1 w-56 bg-white border border-brand-border rounded shadow-subtle">
+          <button class="w-full text-left px-3 py-2 hover:bg-brand-light text-sm" id="share-copy-link">Copy Link (regenerate)</button>
+          <button class="w-full text-left px-3 py-2 hover:bg-brand-light text-sm" id="share-copy-snapshot">Save & Copy Snapshot</button>
         </div>
       </div>
 
-      <!-- Error -->
-      <div id="error" class="hidden mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm"></div>
+      <div class="relative inline-block">
+        <button id="btn-export" class="px-3 py-1.5 rounded border border-brand-border hover:bg-brand-light">Export ▾</button>
+        <div id="export-menu" class="hidden absolute z-10 mt-1 w-48 bg-white border border-brand-border rounded shadow-subtle">
+          <button class="w-full text-left px-3 py-2 hover:bg-brand-light text-sm" id="export-json">Download JSON</button>
+          <button class="w-full text-left px-3 py-2 hover:bg-brand-light text-sm" id="export-print">Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
 
-      <!-- Content -->
-      <div id="content" class="hidden space-y-8">
-
-        <!-- Title + actions -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <h2 id="title" class="font-heading text-2xl md:text-3xl font-extrabold">—</h2>
-            <p class="text-xs text-brand-gray mt-1">Live business verification snapshot</p>
+    <!-- Loader -->
+    <div id="loader" class="card p-6 md:p-8 hidden">
+      <div class="flex items-center gap-4">
+        <svg class="w-8 h-8 text-brand-green spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" stroke-width="2" opacity=".15"></circle>
+          <path d="M22 12a10 10 0 0 1-10 10" stroke-width="2"></path>
+        </svg>
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <div class="font-medium">Building your report…</div>
+            <div id="timer" class="text-xs text-brand-gray">00:00</div>
           </div>
-          <div class="flex items-center gap-2">
-            <button id="rerun" class="px-3 py-2 bg-brand-green text-white rounded-md cta text-sm">Re‑run</button>
-            <div class="relative inline-block">
-              <button id="share-btn" class="px-3 py-2 bg-white border border-brand-border text-brand-dark rounded-md text-sm">Share</button>
-              <button id="export-btn" class="px-3 py-2 bg-white border border-brand-border text-brand-dark rounded-md text-sm">Export</button>
+          <div class="w-full bg-gray-100 rounded-full h-2 mt-2 overflow-hidden">
+            <span id="bar" class="block h-2 bg-brand-green" style="width:8%"></span>
+          </div>
+          <p class="text-xs text-brand-gray mt-2">Usually 10–30s. If you see a CORS error, host via http(s) and temporarily disable extensions that block requests to generativelanguage.googleapis.com.</p>
+        </div>
+      </div>
+
+      <!-- Skeleton grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <div class="p-4 border border-brand-border rounded bg-white">
+          <div class="h-4 w-28 shimmer mb-3"></div>
+          <div class="h-24 shimmer"></div>
+        </div>
+        <div class="p-4 border border-brand-border rounded bg-white">
+          <div class="h-4 w-32 shimmer mb-3"></div>
+          <div class="h-24 shimmer"></div>
+        </div>
+        <div class="p-4 border border-brand-border rounded bg-white">
+          <div class="h-4 w-36 shimmer mb-3"></div>
+          <div class="h-24 shimmer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="card p-5 border-red-200 bg-red-50 text-red-700 hidden"></div>
+
+    <!-- Report content -->
+    <div id="content" class="space-y-8 hidden">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h2 id="title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
+          <p class="text-xs text-brand-gray mt-1">Live business verification snapshot</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Score -->
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">AI Risk Score</h3>
+          <div class="flex flex-col items-center">
+            <div id="score-circle" class="score-circle mb-3"><span id="score-digit">—</span></div>
+            <p id="score-just" class="text-center text-sm text-brand-gray mb-3"></p>
+            <div class="w-full">
+              <h4 class="text-xs font-semibold uppercase text-brand-gray">Key Positives</h4>
+              <ul id="score-pos" class="space-y-1.5 mb-3"></ul>
+              <h4 class="text-xs font-semibold uppercase text-brand-gray">Key Risks</h4>
+              <ul id="score-neg" class="space-y-1.5"></ul>
             </div>
           </div>
         </div>
 
-        <!-- Score + Summary row -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Score -->
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">AI Risk Score</h3>
-            <div class="flex flex-col items-center">
-              <div id="score-circle" class="score-circle mb-4"><span id="score-digit">—</span></div>
-              <p id="score-just" class="text-center text-brand-gray text-sm mb-4 italic"></p>
-              <div class="w-full">
-                <h4 class="text-xs font-semibold uppercase text-brand-gray mb-2">Key Factors</h4>
-                <ul id="factors-pos" class="space-y-1.5 mb-2"></ul>
-                <ul id="factors-neg" class="space-y-1.5"></ul>
-              </div>
-            </div>
-          </div>
-
-          <!-- Business Summary (2 cols) -->
-          <div class="md:col-span-2 border border-brand-border rounded-xl p-6 bg-white">
+        <!-- Summary + Filings/Highlights -->
+        <div class="md:col-span-2 space-y-4">
+          <div class="card p-5">
             <h3 class="font-semibold mb-3">Business Summary</h3>
             <p id="summary" class="text-sm text-brand-dark leading-relaxed"></p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <!-- Corporate Filings (per your request: first column) -->
-              <div class="p-4 border border-brand-border rounded-lg">
-                <h4 class="text-sm font-semibold mb-2">Corporate Filings</h4>
+              <div class="p-4 border border-brand-border rounded bg-brand-light/40">
+                <h4 class="text-sm font-semibold mb-2">Corporate Filings (SOS)</h4>
                 <ul class="text-sm space-y-1">
                   <li><span class="text-brand-gray">Entity Name:</span> <span id="sos-name"></span></li>
                   <li><span class="text-brand-gray">Entity Type:</span> <span id="sos-type"></span></li>
-                  <li><span class="text-brand-gray">Status:</span> <span id="sos-status" class="font-medium"></span></li>
+                  <li><span class="text-brand-gray">Status:</span> <span id="sos-status" class="px-2 py-0.5 rounded badge"></span></li>
                   <li><span class="text-brand-gray">Jurisdiction:</span> <span id="sos-juris"></span></li>
-                  <li><span class="text-brand-gray">Formation Date:</span> <span id="sos-formed"></span></li>
+                  <li><span class="text-brand-gray">Formation Date:</span> <span id="sos-date"></span></li>
                   <li><span class="text-brand-gray">Registered Agent:</span> <span id="sos-agent"></span></li>
+                  <li><span class="text-brand-gray">Registered Address:</span> <span id="sos-addr"></span></li>
                 </ul>
               </div>
-              <!-- Company Facts -->
-              <div class="p-4 border border-brand-border rounded-lg">
-                <h4 class="text-sm font-semibold mb-2">Company Facts</h4>
-                <ul class="text-sm space-y-1">
-                  <li><span class="text-brand-gray">Founded:</span> <span id="facts-founded"></span></li>
-                  <li><span class="text-brand-gray">Headquarters:</span> <span id="facts-hq"></span></li>
-                  <li><span class="text-brand-gray">Employees:</span> <span id="facts-employees"></span></li>
-                  <li><span class="text-brand-gray">Industry:</span> <span id="facts-industry"></span></li>
-                  <li><span class="text-brand-gray">Ticker:</span> <span id="facts-ticker"></span></li>
-                  <li><span class="text-brand-gray">Website:</span> <span id="facts-website"></span></li>
-                </ul>
-              </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div class="p-4 border border-brand-border rounded-lg">
-                <h4 class="text-sm font-semibold mb-2">Recent Headlines</h4>
-                <ul id="news-list" class="space-y-2"></ul>
-              </div>
-              <div class="p-4 border border-brand-border rounded-lg">
+              <div class="p-4 border border-brand-border rounded bg-brand-light/40">
                 <h4 class="text-sm font-semibold mb-2">Operational Highlights</h4>
-                <ul id="ops-list" class="list-disc list-inside text-sm text-brand-dark space-y-1"></ul>
+                <ul id="highlights" class="text-sm space-y-1"></ul>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Contact + Map -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Contact & Location</h3>
-            <ul class="text-sm space-y-1">
-              <li><span class="text-brand-gray">Phone:</span> <span id="contact-phone"></span></li>
-              <li><span class="text-brand-gray">Email:</span> <span id="contact-email"></span></li>
-              <li><span class="text-brand-gray">Address:</span> <span id="contact-address"></span></li>
-            </ul>
-            <div class="mt-2 text-xs">
-              <a id="maps-link" href="#" target="_blank" rel="noopener" class="text-brand-green hover:underline">Open in Google Maps</a>
-            </div>
-          </div>
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Map</h3>
-            <div id="map-embed" class="border border-brand-border rounded-md overflow-hidden" style="height:300px;">
-              <div class="w-full h-full grid place-items-center text-sm text-brand-gray">No address available.</div>
-            </div>
+          <div class="card p-5">
+            <h4 class="text-sm font-semibold mb-2">Recent Headlines</h4>
+            <ul id="news" class="space-y-2"></ul>
           </div>
         </div>
+      </div>
 
-        <!-- Records -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Public Records</h3>
-            <ul id="records-list" class="list-disc list-inside text-sm text-brand-dark space-y-1"></ul>
-          </div>
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Brands & Business Lines</h3>
-            <ul id="brands-list" class="list-disc list-inside text-sm text-brand-dark space-y-1"></ul>
-          </div>
+      <!-- Contact + Map -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Contact & Location</h3>
+          <ul class="text-sm space-y-1">
+            <li><span class="text-brand-gray">Phone:</span> <span id="contact-phone">N/A</span></li>
+            <li><span class="text-brand-gray">Email:</span> <span id="contact-email">N/A</span></li>
+            <li><span class="text-brand-gray">Address:</span> <span id="contact-addr">N/A</span></li>
+          </ul>
+          <a id="maps-link" href="#" target="_blank" rel="noopener" class="inline-block mt-3 text-sm text-brand-green hover:underline">Open in Google Maps</a>
         </div>
 
-        <!-- Leadership / Products / Competitors / Web -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Leadership</h3>
-            <ul id="leaders-list" class="text-sm space-y-1"></ul>
-          </div>
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Products & Services</h3>
-            <ul id="products-list" class="text-sm space-y-1"></ul>
-          </div>
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Competitors</h3>
-            <ul id="competitors-list" class="text-sm space-y-1"></ul>
-          </div>
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Web & Social Signals</h3>
-            <ul id="social-list" class="text-sm space-y-1"></ul>
-          </div>
+        <div class="card p-3">
+          <iframe id="map-embed" title="Map" class="w-full h-[280px] rounded border border-brand-border"
+                  src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+
+      <!-- Public records -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Public Records</h3>
+          <ul id="records" class="text-sm list-disc list-inside space-y-1"></ul>
         </div>
 
-        <!-- Reviews + Charts -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Customer Reviews</h3>
-            <div id="reviews" class="space-y-3 text-sm"></div>
-          </div>
-          <div class="border border-brand-border rounded-xl p-6 bg-white">
-            <h3 class="font-semibold mb-3">Financial Charts (Fictional)</h3>
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Company Facts</h3>
+          <ul class="text-sm space-y-1">
+            <li><span class="text-brand-gray">Founded:</span> <span id="facts-founded">N/A</span></li>
+            <li><span class="text-brand-gray">Headquarters:</span> <span id="facts-hq">N/A</span></li>
+            <li><span class="text-brand-gray">Employees:</span> <span id="facts-employees">N/A</span></li>
+            <li><span class="text-brand-gray">Industry:</span> <span id="facts-industry">N/A</span></li>
+            <li><span class="text-brand-gray">Website:</span> <span id="facts-website">N/A</span></li>
+            <li><span class="text-brand-gray">Ticker:</span> <span id="facts-ticker">N/A</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Leadership / Products / Competitors / Social -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Leadership</h3>
+          <ul id="leadership" class="text-sm space-y-1"></ul>
+        </div>
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Products & Services</h3>
+          <ul id="products" class="text-sm space-y-1"></ul>
+        </div>
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Competitors</h3>
+          <ul id="competitors" class="text-sm space-y-1"></ul>
+        </div>
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Web & Social Signals</h3>
+          <ul id="social" class="text-sm space-y-1"></ul>
+        </div>
+      </div>
+
+      <!-- Reviews + Charts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Customer Reviews</h3>
+          <div id="reviews" class="space-y-3"></div>
+        </div>
+
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Financial Charts (Fictional)</h3>
+          <div class="grid grid-cols-1 gap-4">
             <div>
-              <h5 class="text-sm font-medium mb-1">Revenue Trend</h5>
+              <div class="text-sm font-medium mb-1">Revenue Trend</div>
               <div id="chart-revenue" class="h-24"></div>
             </div>
-            <div class="mt-4">
-              <h5 class="text-sm font-medium mb-1">Cash Flow</h5>
+            <div>
+              <div class="text-sm font-medium mb-1">Cash Flow</div>
               <div id="chart-cash" class="h-24"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- KPIs -->
-        <div class="border border-brand-border rounded-xl p-6 bg-white">
-          <h3 class="font-semibold mb-3">KPIs (Fictional / Derived)</h3>
-          <div class="overflow-x-auto">
-            <table class="min-w-[600px] w-full text-sm border-collapse">
-              <thead>
-                <tr class="text-brand-gray">
-                  <th class="text-left py-2 border-b">Metric</th>
-                  <th class="text-left py-2 border-b">Q1</th>
-                  <th class="text-left py-2 border-b">Q2</th>
-                  <th class="text-left py-2 border-b">Q3</th>
-                  <th class="text-left py-2 border-b">Q4</th>
-                  <th class="text-left py-2 border-b">YoY</th>
-                </tr>
-              </thead>
-              <tbody id="kpis"></tbody>
-            </table>
-          </div>
+      <!-- KPIs -->
+      <div class="card p-5">
+        <h3 class="font-semibold mb-3">KPIs (Fictional / Derived)</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border-collapse">
+            <thead>
+              <tr class="text-left border-b">
+                <th class="py-2 pr-4">Metric</th>
+                <th class="py-2 pr-4">Q1</th>
+                <th class="py-2 pr-4">Q2</th>
+                <th class="py-2 pr-4">Q3</th>
+                <th class="py-2 pr-4">Q4</th>
+                <th class="py-2 pr-4">YoY</th>
+              </tr>
+            </thead>
+            <tbody id="kpis"></tbody>
+          </table>
         </div>
+      </div>
 
-        <!-- Sources -->
-        <div class="border border-brand-border rounded-xl p-6 bg-white">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-semibold text-brand-gray uppercase">Sources & Links</h4>
-            <button id="toggle-sources" class="text-xs text-brand-green hover:underline">Show list</button>
-          </div>
-          <div id="sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
-          <ul id="sources-list" class="mt-4 space-y-1 list-disc list-inside hidden"></ul>
+      <!-- Sources (auto‑expanded) -->
+      <div class="card p-5">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-semibold uppercase text-brand-gray">Sources & Links</h4>
+          <button id="toggle-sources" class="text-xs text-brand-green hover:underline hidden">Show list</button>
         </div>
+        <div id="source-chips" class="flex flex-wrap gap-2 mt-3"></div>
+        <ul id="source-list" class="mt-3 space-y-1"></ul>
       </div>
     </div>
   </section>
 
   <footer class="border-t border-brand-border">
-    <div class="mx-auto max-w-7xl px-4 py-10 text-center text-sm text-brand-gray">
+    <div class="max-w-6xl mx-auto px-4 py-10 text-center text-sm text-brand-gray">
       © 2025 TrustBureau.ai — Live AI Business Report
     </div>
   </footer>
 
+  <!-- =================== APP SCRIPT =================== -->
   <script>
-    /* ------------------ Utilities ------------------ */
-    const MODELS = [
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-preview-09-2025',
-      'gemini-2.0-flash'
-    ];
-    const MAX_TOKENS = 8192;
+  // ------- Small helpers
+  const $ = (id) => document.getElementById(id);
+  const show = (el) => el.classList.remove('hidden');
+  const hide = (el) => el.classList.add('hidden');
+  const txt  = (el, v) => { el.textContent = v && String(v).trim() ? v : 'N/A'; };
 
-    const $ = (id) => document.getElementById(id);
-    const setText = (el, v) => { el.textContent = (v && String(v).trim()) ? v : 'N/A'; };
-    const toDomain = (url) => { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } };
-    const linkify = (s) => {
-      if (!s) return 'N/A';
-      const v = String(s).trim();
-      return /^https?:\/\//i.test(v) ? `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>` : v;
-    };
+  function linkify(url, label) {
+    if (!url) return 'N/A';
+    try {
+      const u = new URL(url);
+      const d = u.hostname.replace(/^www\./,'');
+      return `<a href="${u.toString()}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${label || d}</a>`;
+    } catch { return url; }
+  }
+  function mapEmbedSrc(addr) {
+    if (!addr || !addr.trim()) return '';
+    return 'https://www.google.com/maps?q=' + encodeURIComponent(addr) + '&output=embed';
+  }
 
-    function renderLine(container, values, color) {
-      if (!Array.isArray(values) || values.length < 2) {
-        container.innerHTML = '<div class="text-sm text-brand-gray">Not available.</div>';
-        return;
-      }
-      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
-      const min = Math.min(...nums), max = Math.max(...nums);
-      const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
-      const step = 100 / (norm.length - 1);
-      const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
-      container.innerHTML =
-        `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-           <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
-           <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-         </svg>`;
-    }
+  // ------- Loader timer / bar
+  let __timerInt = null, __barInt = null, __t0 = 0;
+  function startLoader() {
+    $('error').textContent = '';
+    hide($('error'));
+    show($('results'));
+    show($('loader')); hide($('content'));
+    const bar = $('bar'); bar.style.width = '8%';
+    __t0 = Date.now();
+    __timerInt = setInterval(() => {
+      const s = Math.floor((Date.now() - __t0)/1000);
+      const mm = String(Math.floor(s/60)).padStart(2,'0');
+      const ss = String(s%60).padStart(2,'0');
+      $('timer').textContent = `${mm}:${ss}`;
+    }, 200);
+    __barInt = setInterval(() => {
+      let w = parseFloat(bar.style.width);
+      bar.style.width = Math.min(98, w + 1.5) + '%';
+    }, 600);
+  }
+  function stopLoader() {
+    clearInterval(__timerInt); clearInterval(__barInt);
+    $('bar').style.width = '100%';
+    hide($('loader'));
+  }
 
-    function parseCandidateJSON(cand) {
-      const parts = cand?.content?.parts || [];
-      for (const p of parts) {
-        if (typeof p?.text === 'string' && p.text.trim()) {
-          const raw = p.text.replace(/```json/g,'').replace(/```/g,'').trim();
-          try { return JSON.parse(raw); } catch {}
-          const cut = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
-          if (cut > 0) { try { return JSON.parse(raw.slice(0, cut+1)); } catch {} }
+  // ------- JSON parsing (robust)
+  function parseCandidateJSON(candidate) {
+    const parts = candidate?.content?.parts || [];
+    for (const p of parts) {
+      if (p?.text && p.text.trim()) {
+        const raw = p.text.replace(/```json/g,'').replace(/```/g,'').trim();
+        try { return JSON.parse(raw); } catch {}
+        const idx = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
+        if (idx > 0) {
+          try { return JSON.parse(raw.slice(0, idx+1)); } catch {}
         }
       }
-      for (const p of parts) {
-        if (p?.inline_data?.data && String(p.inline_data.mimeType||'').includes('json')) {
-          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
-        }
+    }
+    for (const p of parts) {
+      if (p?.inline_data?.data && String(p.inline_data.mimeType||'').includes('json')) {
+        try { return JSON.parse(atob(p.inline_data.data)); } catch {}
       }
-      const preview = parts.find(p=>p.text)?.text?.slice(0,200)?.replace(/\s+/g,' ') || 'No text';
-      throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
     }
+    const preview = parts.find(p => p?.text)?.text?.slice(0,240)?.replace(/\s+/g,' ') || 'No text content';
+    throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
+  }
 
-    function getApiKey() {
-      const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      const fromQuery = (new URLSearchParams(location.search).get('key') || '').trim();
-      const fromLS = (typeof localStorage !== 'undefined') ? (localStorage.getItem('tb.zakk') || '').trim() : '';
-      return fromWindow || fromQuery || fromLS || '';
+  // ------- Charts
+  function lineChart(container, values, color) {
+    if (!Array.isArray(values) || values.length < 2) {
+      container.innerHTML = '<div class="text-sm text-brand-gray">Chart not available.</div>';
+      return;
     }
+    const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
+    const min = Math.min(...nums), max = Math.max(...nums);
+    const norm = (max - min) > 0 ? nums.map(n => (100*(n - min))/(max-min)) : nums.map(_ => 50);
+    const step = 100/(norm.length - 1);
+    const pts  = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
+    container.innerHTML =
+      `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+        <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+      </svg>`;
+  }
 
-    /* ------------------ Gemini call ------------------ */
-    function makePayload(systemPrompt, userQuery) {
-      // NOTE: do NOT include tools when using responseMimeType to avoid tool+mimeType conflict errors.
-      return {
-        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
+  // ------- Render report
+  function renderReport(d) {
+    stopLoader(); show($('content'));
+
+    txt($('title'), d?.summary?.companyName || '—');
+    $('summary').textContent = d?.summary?.summary || 'No summary provided.';
+
+    const s = d?.riskScore || {};
+    const score = Number(s.score || 0);
+    $('score-digit').textContent = score || '—';
+    $('score-just').textContent  = s.justification || '—';
+    const circle = $('score-circle');
+    circle.className = 'score-circle mb-3';
+    if (score < 550) circle.classList.add('score-red');
+    else if (score < 700) circle.classList.add('score-yellow');
+    else circle.classList.add('score-green');
+
+    const pos = s.positiveFactors || s.positives || [];
+    const neg = s.negativeFactors || s.negatives || [];
+    $('score-pos').innerHTML = pos.map(t => `<li class="flex items-start gap-2"><span>✔</span><span>${t}</span></li>`).join('') || '<li class="text-brand-gray">—</li>';
+    $('score-neg').innerHTML = neg.map(t => `<li class="flex items-start gap-2"><span>⚠</span><span>${t}</span></li>`).join('') || '<li class="text-brand-gray">—</li>';
+
+    const sos = d?.sos || {};
+    txt($('sos-name'), sos.entityName);
+    txt($('sos-type'), sos.entityType);
+    const st = $('sos-status'); st.textContent = sos.status || 'N/A';
+    st.style.background = (String(sos.status||'').toLowerCase() === 'active') ? '#DCFCE7' : '#F1F5F9';
+    txt($('sos-juris'), sos.jurisdiction);
+    txt($('sos-date'), sos.formationDate);
+    txt($('sos-agent'), sos.registeredAgent);
+    txt($('sos-addr'), sos.registeredAddress);
+
+    const hi = d?.highlights || [];
+    $('highlights').innerHTML = hi.map(h => `<li>• ${h}</li>`).join('') || '<li class="text-brand-gray">—</li>';
+
+    const n = Array.isArray(d?.news) ? d.news.slice(0,6) : [];
+    $('news').innerHTML = n.map(item => {
+      const src = item.source || 'Source';
+      const date= item.date ? ` • ${item.date}` : '';
+      const url = item.url ? ` href="${item.url}" target="_blank" rel="noopener"` : '';
+      return `<li><a class="text-brand-dark hover:text-brand-green font-medium" ${url}>${item.title || 'Untitled'}</a><div class="text-xs text-brand-gray">${src}${date}</div></li>`;
+    }).join('') || '<li class="text-brand-gray">No recent headlines.</li>';
+
+    // Contact & map
+    const addr = sos.registeredAddress || d?.profile?.headquarters || '';
+    txt($('contact-addr'), addr || 'N/A');
+    txt($('contact-phone'), d?.profile?.phone || 'N/A');
+    txt($('contact-email'), d?.profile?.email || 'N/A');
+    const mapSrc = mapEmbedSrc(addr);
+    $('map-embed').src = mapSrc || 'about:blank';
+    const openMaps = addr ? `https://www.google.com/maps?q=${encodeURIComponent(addr)}` : '#';
+    $('maps-link').href = openMaps;
+
+    // Public records
+    const recs = d?.publicRecords || d?.public_records || d?.records || [];
+    $('records').innerHTML = recs.map(r => `<li><span class="font-medium">${r.type||'Record'}:</span> ${r.details||''}</li>`).join('') || '<li class="text-brand-gray">No public records found.</li>';
+
+    // Facts
+    const p = d?.profile || {};
+    txt($('facts-founded'), p.founded);
+    txt($('facts-hq'), p.headquarters);
+    txt($('facts-employees'), p.employees);
+    txt($('facts-industry'), p.industry || p.subindustry);
+    $('facts-website').innerHTML = p.website ? linkify(p.website) : 'N/A';
+    txt($('facts-ticker'), p.ticker);
+
+    // Leadership
+    const leaders = d?.leadership || [];
+    $('leadership').innerHTML = leaders.map(l => {
+      const ln = l.linkedin ? ` — <a class="text-brand-green hover:underline" href="${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>` : '';
+      return `<li><span class="font-medium">${l.name||'N/A'}</span> — <span>${l.title||''}</span>${ln}</li>`;
+    }).join('') || '<li class="text-brand-gray">—</li>';
+
+    // Products, Competitors, Social
+    $('products').innerHTML = (d?.products || []).map(i => `<li>• ${i}</li>`).join('') || '<li class="text-brand-gray">—</li>';
+    $('competitors').innerHTML = (d?.competitors || []).map(i => `<li>• ${i}</li>`).join('') || '<li class="text-brand-gray">—</li>';
+    const w = d?.webPresence || {};
+    $('social').innerHTML = [
+      ['Website Traffic', w.traffic],
+      ['Twitter/X', w.twitter ? linkify(w.twitter,'twitter.com') : 'N/A'],
+      ['LinkedIn', w.linkedin ? linkify(w.linkedin,'linkedin.com') : 'N/A'],
+      ['YouTube', w.youtube ? linkify(w.youtube,'youtube.com') : 'N/A'],
+      ['Facebook', w.facebook ? linkify(w.facebook,'facebook.com') : 'N/A'],
+    ].map(([k,v])=>`<li><span class="text-brand-gray">${k}:</span> <span class="font-medium">${typeof v==='string'?v:v}</span></li>`).join('');
+
+    // Reviews
+    $('reviews').innerHTML = (d?.reviews || []).map(r => {
+      const src = r.source ? `<span class="text-xs text-brand-gray">— ${r.source}</span>` : '';
+      const link = r.url ? ` <a href="${r.url}" class="text-xs text-brand-green hover:underline" target="_blank" rel="noopener">Link</a>` : '';
+      return `<blockquote class="p-3 border border-brand-border rounded bg-white"><div class="text-sm">${r.snippet||''}</div><div class="mt-1">${src}${link}</div></blockquote>`;
+    }).join('') || '<div class="text-sm text-brand-gray">No recent customer reviews found.</div>';
+
+    // Charts
+    const cp = d?.chartPoints || {};
+    lineChart($('chart-revenue'), Array.isArray(cp.revenue)&&cp.revenue.length>1 ? cp.revenue : [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
+    lineChart($('chart-cash'),    Array.isArray(cp.cashFlow)&&cp.cashFlow.length>1 ? cp.cashFlow : [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+
+    // KPIs
+    const kpis = Array.isArray(d?.kpis) ? d.kpis : [];
+    $('kpis').innerHTML = kpis.map(k =>
+      `<tr class="border-t"><td class="py-2 pr-4">${k.metric||'—'}</td><td class="py-2 pr-4">${k.q1||'—'}</td><td class="py-2 pr-4">${k.q2||'—'}</td><td class="py-2 pr-4">${k.q3||'—'}</td><td class="py-2 pr-4">${k.q4||'—'}</td><td class="py-2 pr-4">${k.yoy||'—'}</td></tr>`
+    ).join('') || `<tr class="border-t"><td colspan="6" class="py-3 text-brand-gray">No KPIs supplied.</td></tr>`;
+
+    // Sources (auto‑expanded)
+    const cites = Array.isArray(d?.citations) ? d.citations : [];
+    const chips = $('source-chips'), list = $('source-list');
+    chips.innerHTML = ''; list.innerHTML = '';
+    if (cites.length) {
+      cites.forEach(c => {
+        const url = c.url || c.uri;
+        if (!url) return;
+        const a = document.createElement('span');
+        a.className = 'px-2 py-1 border border-brand-border rounded-full bg-brand-light text-xs';
+        a.innerHTML = `🔗 <a href="${url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${c.title || new URL(url).hostname}</a>`;
+        chips.appendChild(a);
+
+        const li = document.createElement('li');
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${c.title || url}</a>
+                        <span class="text-xs text-brand-gray ml-1">(${(new URL(url)).hostname})</span>`;
+        list.appendChild(li);
+      });
+    } else {
+      chips.innerHTML = '<span class="text-sm text-brand-gray">No links captured.</span>';
+    }
+  }
+
+  // ------- Prompt & API
+  const MODEL_FALLBACKS = [
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-preview-09-2025',
+    'gemini-2.0-flash'
+  ];
+
+  function buildPrompt(q) {
+    return `
+You are an AI business analyst. Return ONE JSON object ONLY (no code fences, no commentary).
+Focus on the US company that best matches "${q}". Prefer US Secretary-of-State (SOS) identity fields for filings.
+Fields to include:
+
+1) summary: { companyName, summary }
+2) sos: { entityName, entityType, status, jurisdiction, formationDate, registeredAgent, registeredAddress }
+3) riskScore: { score (300-850), justification, positiveFactors:[string], negativeFactors:[string] }
+4) profile: { founded, headquarters, employees, industry, website, ticker, phone, email }
+5) highlights: [string]
+6) news: [{ title, date, source, url }]
+7) publicRecords: [{ type, details }]
+8) leadership: [{ name, title, linkedin }]
+9) products: [string]
+10) competitors: [string]
+11) webPresence: { twitter, linkedin, youtube, facebook, traffic }
+12) reviews: [{ snippet, source, url }]
+13) chartPoints: { revenue:[number], cashFlow:[number] }   // 10–24 points each
+14) kpis: [{ metric, q1, q2, q3, q4, yoy }]
+15) citations: [{ title, url }]
+
+If unknown, use "N/A" or [].
+Respond ONLY with valid JSON.`;
+  }
+
+  async function generateReport(query) {
+    const API_KEY = getApiKey(); // throws if missing
+    const base = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+    startLoader();
+    let lastErr = null;
+
+    for (const model of MODEL_FALLBACKS) {
+      const payload = {
+        contents: [{ role: 'user', parts: [{ text: buildPrompt(query) }] }],
         generationConfig: {
-          maxOutputTokens: MAX_TOKENS,
+          maxOutputTokens: 8192,
           temperature: 0.2,
           topP: 0.95,
-          responseMimeType: "application/json"
+          responseMimeType: 'application/json'
         }
+        // Do NOT attach tools when forcing responseMimeType json
       };
-    }
 
-    async function fetchWithRetry(url, options, tries=2) {
-      let last;
-      for (let i=0;i<tries;i++) {
-        try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body=null; try { body = await res.json(); } catch {}
-            const msg = body?.error?.message || res.statusText;
-            const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status; throw err;
-          }
-          return await res.json();
-        } catch(e) { last = e; await new Promise(r=>setTimeout(r, (i+1)*500)); }
-      }
-      throw last || new Error('Request failed.');
-    }
-
-    async function callGemini(systemPrompt, userQuery) {
-      const key = getApiKey();
-      if (!key) throw new Error('Missing API key. Set it via ?key=, Alt+K, or the DEV placeholder.');
-
-      const base = 'https://generativelanguage.googleapis.com/v1beta/models';
-      let lastErr;
-      for (const model of MODELS) {
-        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(key)}`;
-        try {
-          const data = await fetchWithRetry(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(makePayload(systemPrompt, userQuery))
-          }, 1);
-
-          const cand = data?.candidates?.[0];
-          if (!cand) throw new Error('No candidates returned.');
-          const json = parseCandidateJSON(cand);
-
-          // Model may also return grounding attributions
-          const atts = cand?.groundingMetadata?.groundingAttributions || [];
-          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s=>s.uri);
-          return { json, sources };
-        } catch (e) { lastErr = e; }
-      }
-      throw lastErr || new Error('All models failed.');
-    }
-
-    /* ------------------ Prompt ------------------ */
-    function buildSystemPrompt() {
-      return `
-You are an AI business analyst. Return a SINGLE JSON object (no extra text). Focus on **US companies only**; if the queried name is not US, find the US legal entity or use N/A where appropriate.
-
-Schema:
-{
-  "summary": { "companyName": string, "summary": string, "brands": [string] },
-  "riskScore": { "score": number (300-850), "justification": string, "positiveFactors": [string], "negativeFactors": [string] },
-  "sos": { "entityName": string, "entityType": string, "status": string, "jurisdiction": string, "formationDate": string, "registeredAgent": string, "businessAddress": string },
-  "profile": { "founded": string, "headquarters": string, "employees": string, "industry": string, "ticker": string, "website": string },
-  "contact": { "phone": string, "email": string, "address": string },
-  "operationalHighlights": [string],
-  "brandsAndLines": [string],
-  "publicRecords": [{ "type": string, "details": string }],
-  "news": [{ "title": string, "date": string, "source": string, "url": string }],
-  "leadership": [{ "name": string, "title": string, "link": string }],
-  "products": [string],
-  "competitors": [string],
-  "webPresence": { "traffic": string, "twitter": string, "linkedin": string, "youtube": string, "facebook": string },
-  "reviews": [{ "snippet": string, "source": string, "url": string }],
-  "chartPoints": { "revenue": [number], "cashFlow": [number] },
-  "kpis": [{ "metric": string, "q1": string, "q2": string, "q3": string, "q4": string, "yoy": string }],
-  "citations": [{ "title": string, "url": string }]
-}
-
-Rules:
-- Be comprehensive: fill out as many fields as possible. If unknown, put "N/A" or [].
-- Favor **US Secretary-of-State**, official websites, and major publications.
-- The "businessAddress" in sos is the best address for the map.
-- Keep news and sources recent and relevant.
-- Return only JSON, no code fences.
-`.trim();
-    }
-
-    /* ------------------ Populate UI ------------------ */
-    function colorScore(score) {
-      const sc = $('score-circle');
-      sc.className = 'score-circle mb-4';
-      if (score < 550) sc.classList.add('score-red');
-      else if (score < 700) sc.classList.add('score-yellow');
-      else sc.classList.add('score-green');
-    }
-
-    function fillChips(container, links) {
-      container.innerHTML = '';
-      links.forEach(({url, title, kind}) => {
-        const span = document.createElement('span');
-        span.className = 'border border-brand-border rounded-full bg-brand-light px-2.5 py-1 text-xs';
-        span.innerHTML = `🔗 <a href="${url}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${title || toDomain(url)}</a>`;
-        container.appendChild(span);
-      });
-    }
-
-    function populateSources(json, modelSources) {
-      const links = [];
-      const push = (title,url,kind) => { try { const u = new URL(url); links.push({ title: title || (u.hostname + u.pathname), url: u.toString(), kind }); } catch {} };
-      (json?.citations || []).forEach(c => c?.url && push(c.title, c.url, 'citation'));
-      (modelSources || []).forEach(s => s?.uri && push(s.title, s.uri, 'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w = json?.webPresence || {};
-      if (w.twitter) push('Twitter/X', w.twitter, 'social');
-      if (w.linkedin) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube) push('YouTube', w.youtube, 'social');
-
-      // dedupe
-      const seen = new Set();
-      const unique = links.filter(l => !seen.has(l.url) && seen.add(l.url));
-      fillChips($('sources-chips'), unique);
-
-      // detailed list
-      const ul = $('sources-list');
-      ul.innerHTML = '';
-      unique.forEach(({url, title}) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || toDomain(url)}</a>
-                        <span class="text-xs text-brand-gray ml-1">(${toDomain(url)})</span>`;
-        ul.appendChild(li);
-      });
-      return unique;
-    }
-
-    function setMap(address) {
-      const c = $('map-embed');
-      if (!address || address === 'N/A') {
-        c.innerHTML = '<div class="w-full h-full grid place-items-center text-sm text-brand-gray">No address available.</div>';
-        $('maps-link').href = '#';
-        $('maps-link').classList.add('pointer-events-none','opacity-50');
-        return;
-      }
-      $('maps-link').href = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
-      $('maps-link').classList.remove('pointer-events-none','opacity-50');
-
-      // Safe embed using a simple q=URL (no API key required)
-      c.innerHTML = `<iframe title="Map" referrerpolicy="no-referrer-when-downgrade" loading="lazy"
-                        src="https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed"
-                        class="w-full h-full"></iframe>`;
-    }
-
-    function populateReport(data, sources=[]) {
-      setText($('title'), data?.summary?.companyName || 'N/A');
-      $('summary').textContent = data?.summary?.summary || 'N/A';
-
-      // Score
-      const score = Number(data?.riskScore?.score) || 0;
-      $('score-digit').textContent = String(score || '—');
-      $('score-just').textContent = data?.riskScore?.justification || 'N/A';
-      colorScore(score);
-
-      // Factors
-      const pos = data?.riskScore?.positiveFactors || [];
-      const neg = data?.riskScore?.negativeFactors || [];
-      $('factors-pos').innerHTML = pos.map(f => `<li class="flex items-start"><span class="text-green-600 mr-2 mt-0.5">●</span><span>${f}</span></li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-      $('factors-neg').innerHTML = neg.map(f => `<li class="flex items-start"><span class="text-red-600 mr-2 mt-0.5">●</span><span>${f}</span></li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      // Corporate filings
-      const sos = data?.sos || {};
-      setText($('sos-name'), sos.entityName);
-      setText($('sos-type'), sos.entityType);
-      setText($('sos-status'), sos.status);
-      setText($('sos-juris'), sos.jurisdiction);
-      setText($('sos-formed'), sos.formationDate);
-      setText($('sos-agent'), sos.registeredAgent);
-
-      // Company facts
-      const p = data?.profile || {};
-      setText($('facts-founded'), p.founded);
-      setText($('facts-hq'), p.headquarters);
-      setText($('facts-employees'), p.employees);
-      setText($('facts-industry'), p.industry);
-      setText($('facts-ticker'), p.ticker);
-      $('facts-website').innerHTML = linkify(p.website);
-
-      // News
-      const news = data?.news || [];
-      $('news-list').innerHTML =
-        news.slice(0,6).map(n =>
-          `<li>
-            <a href="${n.url || '#'}" target="_blank" rel="noopener" class="text-brand-dark hover:text-brand-green font-medium">${n.title || 'Untitled'}</a>
-            <div class="text-xs text-brand-gray">${n.source || ''}${n.date ? ' • ' + n.date : ''}</div>
-           </li>`
-        ).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      // Operational highlights & brands
-      const ops = data?.operationalHighlights || [];
-      $('ops-list').innerHTML = ops.map(s => `<li>${s}</li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-      const bl = data?.brandsAndLines || [];
-      $('brands-list').innerHTML = bl.map(s => `<li>${s}</li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      // Contact
-      const con = data?.contact || {};
-      setText($('contact-phone'), con.phone);
-      setText($('contact-email'), con.email);
-      const addr = con.address || sos.businessAddress || 'N/A';
-      setText($('contact-address'), addr);
-      setMap(addr);
-
-      // Public records
-      const rec = data?.publicRecords || [];
-      $('records-list').innerHTML =
-        rec.map(r => `<li><span class="font-medium">${r.type || 'Record'}:</span> ${r.details || ''}</li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      // Leadership, products, competitors, social
-      const leaders = data?.leadership || [];
-      $('leaders-list').innerHTML =
-        leaders.map(l => `<li>${l.name || 'N/A'} — <span class="text-brand-gray">${l.title || ''}</span>${l.link ? ` — <a class="text-brand-green hover:underline" target="_blank" rel="noopener" href="${l.link}">Profile</a>` : ''}</li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      const prods = data?.products || [];
-      $('products-list').innerHTML = prods.map(x => `<li>${x}</li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      const comps = data?.competitors || [];
-      $('competitors-list').innerHTML = comps.map(x => `<li>${x}</li>`).join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-
-      const w = data?.webPresence || {};
-      $('social-list').innerHTML = (function(){
-        const items = [];
-        if (w.traffic) items.push(`<li><span class="text-brand-gray">Website Traffic:</span> <span class="font-medium">${w.traffic}</span></li>`);
-        if (w.twitter) items.push(`<li><span class="text-brand-gray">Twitter/X:</span> <a class="text-brand-green hover:underline" href="${w.twitter}" target="_blank" rel="noopener">${toDomain(w.twitter)}</a></li>`);
-        if (w.linkedin) items.push(`<li><span class="text-brand-gray">LinkedIn:</span> <a class="text-brand-green hover:underline" href="${w.linkedin}" target="_blank" rel="noopener">${toDomain(w.linkedin)}</a></li>`);
-        if (w.youtube) items.push(`<li><span class="text-brand-gray">YouTube:</span> <a class="text-brand-green hover:underline" href="${w.youtube}" target="_blank" rel="noopener">${toDomain(w.youtube)}</a></li>`);
-        if (w.facebook) items.push(`<li><span class="text-brand-gray">Facebook:</span> ${w.facebook}</li>`);
-        return items.join('') || '<li class="text-sm text-brand-gray">N/A</li>';
-      })();
-
-      // Reviews
-      const reviews = data?.reviews || [];
-      $('reviews').innerHTML =
-        reviews.map(r => `<blockquote class="border border-brand-border rounded p-3"><p>“${r.snippet || 'N/A'}”</p><div class="text-xs mt-1 text-brand-gray">${r.source || ''} ${r.url ? '— <a class="text-brand-green hover:underline" target="_blank" rel="noopener" href="'+r.url+'">Link</a>' : ''}</div></blockquote>`).join('') || '<div class="text-sm text-brand-gray">No recent customer reviews found.</div>';
-
-      // Charts
-      const cp = data?.chartPoints || {};
-      renderLine($('chart-revenue'), Array.isArray(cp.revenue) && cp.revenue.length ? cp.revenue : [35,37,39,42,44,50,55,57,60,63,65], '#00C09A');
-      renderLine($('chart-cash'), Array.isArray(cp.cashFlow) && cp.cashFlow.length ? cp.cashFlow : [60,58,57,56,55,54,53,52,51,50], '#3B82F6');
-
-      // KPIs
-      const k = data?.kpis || [];
-      $('kpis').innerHTML = k.map(row =>
-        `<tr>
-           <td class="py-2 border-b">${row.metric || 'N/A'}</td>
-           <td class="py-2 border-b">${row.q1 || 'N/A'}</td>
-           <td class="py-2 border-b">${row.q2 || 'N/A'}</td>
-           <td class="py-2 border-b">${row.q3 || 'N/A'}</td>
-           <td class="py-2 border-b">${row.q4 || 'N/A'}</td>
-           <td class="py-2 border-b">${row.yoy || 'N/A'}</td>
-         </tr>`).join('') || '<tr><td colspan="6" class="py-2 text-brand-gray">N/A</td></tr>';
-
-      // Sources
-      populateSources(data, sources);
-    }
-
-    /* ------------------ Loader state ------------------ */
-    let loaderTimer;
-    function showState(which, msg='') {
-      $('loader').classList.add('hidden');
-      $('error').classList.add('hidden');
-      $('content').classList.add('hidden');
-
-      if (which === 'loading') {
-        $('loader').classList.remove('hidden');
-        let elapsed = 0;
-        clearInterval(loaderTimer);
-        loaderTimer = setInterval(()=>{
-          elapsed += 200;
-          const m = Math.floor(elapsed/1000/60);
-          const s = Math.floor((elapsed/1000)%60);
-          $('loader-timer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }, 200);
-      } else {
-        clearInterval(loaderTimer);
-      }
-
-      if (which === 'error') {
-        $('error').textContent = msg || 'Something went wrong.';
-        $('error').classList.remove('hidden');
-      } else if (which === 'content') {
-        $('content').classList.remove('hidden');
-      }
-    }
-
-    /* ------------------ Share & Export ------------------ */
-    function copy(text) { navigator.clipboard?.writeText(text); }
-
-    function copyRegenerateLink(q) {
-      const url = new URL(location.href);
-      url.searchParams.set('q', q);
-      url.hash = ''; // ensure no snapshot
-      copy(url.toString());
-      alert('Link copied. Anyone opening it will regenerate the report for that company.');
-    }
-
-    function copySnapshotLink(snapshotObj) {
-      const json = JSON.stringify(snapshotObj);
-      const compressed = LZString.compressToEncodedURIComponent(json);
-      const url = new URL(location.href);
-      url.hash = 'snap=' + compressed;
-      // Remove ?q= so we DON'T regenerate
-      url.searchParams.delete('q');
-      copy(url.toString());
-      alert('Snapshot link copied. It opens this frozen report without an API call.');
-    }
-
-    function downloadJSON(obj, filename='report.json') {
-      const blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-    }
-
-    /* ------------------ Main action ------------------ */
-    const qInput = $('business-input');
-
-    function buildUserQuery(q) {
-      return `Generate a thorough US-only AI business report for: "${q}". Populate all fields.`;
-    }
-
-    async function runReport(q) {
-      // clear network banner
-      $('network-banner').classList.add('hidden');
-
-      showState('loading');
       try {
-        const system = buildSystemPrompt();
-        const user = buildUserQuery(q);
-        const { json, sources } = await callGemini(system, user);
-
-        populateReport(json, sources);
-        showState('content');
-
-        // wire share/export buttons
-        $('share-btn').onclick = () => {
-          const choice = prompt('Share options:\n1 = Copy Link (regenerates)\n2 = Save & Copy Snapshot', '1');
-          if (choice === '2') copySnapshotLink(json);
-          else copyRegenerateLink(q);
-        };
-        $('export-btn').onclick = () => {
-          const choice = prompt('Export options:\n1 = Download JSON snapshot\n2 = Copy JSON to clipboard', '1');
-          if (choice === '2') { copy(JSON.stringify(json)); alert('JSON copied to clipboard.'); }
-          else downloadJSON(json, `${(json?.summary?.companyName||'report').replace(/\s+/g,'_')}.json`);
-        };
-      } catch (e) {
-        console.error(e);
-        if (/Failed to fetch|NetworkError|TypeError: Failed to fetch/i.test(String(e))) {
-          $('network-banner').classList.remove('hidden');
+        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(API_KEY)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const body = await res.text().catch(()=> '');
+          throw new Error(`Gemini error ${res.status} ${res.statusText}${body ? ': '+body : ''}`);
         }
-        showState('error', e.message || 'Failed to generate report.');
+        const data = await res.json();
+        const cand = data?.candidates?.[0];
+        if (!cand) throw new Error('No candidates in response');
+
+        const json = parseCandidateJSON(cand);
+        renderReport(json);
+        window.__lastReportJSON = json; // share/export
+        return;
+      } catch (e) {
+        lastErr = e;
+        // try next model
       }
     }
 
-    /* ------------------ Events ------------------ */
-    $('search-form').addEventListener('submit', (ev) => {
+    stopLoader();
+    $('error').innerHTML = `
+      <div class="font-medium mb-1">Failed to generate report.</div>
+      <div class="text-sm">${(lastErr && lastErr.message) || 'Unknown error'}</div>
+      <div class="text-xs mt-2 text-brand-gray">If you see "Network/CORS", host this file via http(s) and temporarily disable extensions that block third‑party requests to generativelanguage.googleapis.com.</div>
+    `;
+    show($('error'));
+  }
+
+  // ------- Share / Export (no server required)
+  function copy(text) {
+    return navigator.clipboard?.writeText(text).catch(()=> {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    });
+  }
+  function copyLinkRegenerate() {
+    const q = ($('query').value || '').trim();
+    const url = new URL(location.href);
+    url.searchParams.set('q', q);
+    url.searchParams.delete('snapshot');
+    copy(url.toString()).then(()=> alert('Link copied. It regenerates the report on open.'));
+  }
+  function copySnapshotLink() {
+    const json = window.__lastReportJSON;
+    if (!json) return alert('No report to snapshot yet.');
+    const enc = btoa(unescape(encodeURIComponent(JSON.stringify(json))));
+    const url = new URL(location.href);
+    url.searchParams.set('snapshot', enc);
+    copy(url.toString()).then(()=> alert('Snapshot link copied (JSON embedded in URL).'));
+  }
+  function downloadJSON() {
+    const json = window.__lastReportJSON;
+    if (!json) return alert('No report to export.');
+    const blob = new Blob([JSON.stringify(json, null, 2)], { type:'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'live-business-report.json'; a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ------- Sample data (offline test)
+  const SAMPLE = {
+    "summary":{"companyName":"AOL Inc.","summary":"AOL (America Online) was a pioneering internet services company with dial-up access, email, and messaging, later evolving into a digital media brand."},
+    "sos":{"entityName":"AOL LLC","entityType":"Limited Liability Company","status":"Active","jurisdiction":"Delaware","formationDate":"2005-08-01","registeredAgent":"Corporation Service Company","registeredAddress":"770 Broadway, New York, NY 10003"},
+    "riskScore":{"score":580,"justification":"Mature legacy brand; diversified parent support; portal usage has declined.","positiveFactors":["Established brand recognition","Part of a larger organization"],"negativeFactors":["Declining relevance in core portal","High reliance on advertising revenue"]},
+    "profile":{"founded":"1985","headquarters":"New York, NY","employees":"N/A (integrated within Yahoo)","industry":"Internet Services / Media","website":"https://aol.com"},
+    "highlights":["Iconic dial-up and AIM history","Continues as media/email brand under Yahoo!"],
+    "news":[{"title":"Verizon to Rebrand Oath as Verizon Media Group","date":"2018-12-10","source":"Reuters","url":"https://www.reuters.com/article/us-verizon-oath-rebrand-idUSKBN1O92QU"}],
+    "publicRecords":[{"type":"FTC Settlement","details":"2005: AOL paid $1.25 million for unsolicited pop-up advertisements case."}],
+    "leadership":[{"name":"Jim Lanzone","title":"CEO, Yahoo Inc. (parent)","linkedin":"https://www.linkedin.com/in/jimlanzone/"}],
+    "products":["AOL Mail","AOL.com portal (news, finance, entertainment)"],
+    "competitors":["Google (Gmail, News)","Microsoft (Outlook, MSN)","Yahoo (news portal)","CNN"],
+    "webPresence":{"twitter":"https://twitter.com/aol","linkedin":"https://www.linkedin.com/company/aol/","youtube":"https://youtube.com/user/aol","traffic":"Significant, but declining portal traffic"},
+    "reviews":[{"snippet":"\"AOL Mail is simple, but can feel dated compared to Gmail or Outlook.\"","source":"User reviews","url":"https://www.trustpilot.com/review/mail.aol.com"}],
+    "chartPoints":{"revenue":[45,46,47,49,50,51,52,53,54,56,57,58],"cashFlow":[52,51,50,51,50,49,48,47,47,46,45,45]},
+    "kpis":[{"metric":"Portal Visits (MM)","q1":"120","q2":"118","q3":"115","q4":"113","yoy":"-6%"}],
+    "citations":[
+      {"title":"Delaware SOS — Entity Search","url":"https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx"},
+      {"title":"Wikipedia — AOL","url":"https://en.wikipedia.org/wiki/AOL"}
+    ]
+  };
+
+  // ------- UI wire‑up
+  function toggleMenu(btnId, menuId) {
+    const btn = $(btnId), menu = $(menuId);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
+    });
+    document.addEventListener('click', () => menu.classList.add('hidden'));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = $('search-form');
+    const qEl  = $('query');
+
+    toggleMenu('btn-share','share-menu');
+    toggleMenu('btn-export','export-menu');
+
+    $('share-copy-link').onclick = copyLinkRegenerate;
+    $('share-copy-snapshot').onclick = copySnapshotLink;
+    $('export-json').onclick = downloadJSON;
+    $('export-print').onclick = () => window.print();
+
+    $('btn-rerun').onclick = () => {
+      const q = (qEl.value || '').trim();
+      if (!q) return alert('Enter a business name.');
+      $('results').classList.remove('hidden');
+      generateReport(q);
+    };
+
+    $('btn-sample').onclick = () => {
+      $('results').classList.remove('hidden');
+      startLoader();
+      setTimeout(() => { renderReport(SAMPLE); window.__lastReportJSON = SAMPLE; }, 500);
+    };
+
+    form.addEventListener('submit', (ev) => {
       ev.preventDefault();
-      const q = (qInput.value||'').trim();
-      if (!q) return;
-      const url = new URL(location.href);
-      url.searchParams.set('q', q);
-      history.replaceState(null, '', url.toString());
-      runReport(q);
+      const q = (qEl.value || '').trim();
+      if (!q) return alert('Enter a business name.');
+      $('results').classList.remove('hidden');
+      generateReport(q);
     });
 
-    $('rerun').addEventListener('click', () => {
-      const q = (qInput.value||'').trim();
-      if (!q) { alert('Enter a company name.'); return; }
-      runReport(q);
-    });
-
-    $('toggle-sources').addEventListener('click', () => {
-      const ul = $('sources-list');
-      const open = ul.classList.toggle('hidden');
-      $('toggle-sources').textContent = open ? 'Show list' : 'Hide list';
-    });
-
-    // Sample data (for demos / offline)
-    $('load-sample').addEventListener('click', () => {
-      const sample = {
-        summary: {
-          companyName: "Aquamark.io",
-          summary: "A US-based SaaS/FinTech company providing defensive document watermarking for alternative lending and MCA workflows.",
-          brands: ["Secure Funder Tools"]
-        },
-        riskScore: {
-          score: 750,
-          justification: "Early-stage but focused product-market fit, strong domain expertise, limited financial data.",
-          positiveFactors: [
-            "Founder domain expertise",
-            "API-first product",
-            "Clear problem/solution fit"
-          ],
-          negativeFactors: [
-            "Limited operating history",
-            "Narrow segment (MCA/alt lending)",
-            "Limited public financials"
-          ]
-        },
-        sos: {
-          entityName: "Aquamark, Inc.",
-          entityType: "Corporation",
-          status: "Active",
-          jurisdiction: "California",
-          formationDate: "2022-09-20",
-          registeredAgent: "Sridhar Sunkad",
-          businessAddress: "900 S Murphy Ave, Sunnyvale, CA 94086"
-        },
-        profile: {
-          founded: "2022",
-          headquarters: "Sunnyvale, CA, USA",
-          employees: "11-50 (estimate)",
-          industry: "FinTech / SaaS",
-          ticker: "N/A",
-          website: "https://aquamark.io"
-        },
-        contact: {
-          phone: "N/A",
-          email: "info@aquamark.io",
-          address: "900 S Murphy Ave, Sunnyvale, CA 94086"
-        },
-        operationalHighlights: [
-          "Watermarking at upload + verification tools",
-          "Self-serve + CRM integration",
-          "Browser-based & API integration"
-        ],
-        brandsAndLines: ["Secure Funder™ (verification list)", "Broker Tools (internal defense)", "Funder Tools (checklists)"],
-        publicRecords: [
-          { type: "Corporate Filings", details: "Incorporated in California as a domestic corporation on September 20, 2022." }
-        ],
-        news: [
-          { title: "Aquamark Launches AI‑Powered Watermarking", date: "2023‑10‑17", source: "PR Newswire", url: "https://example.com/aquamark-launch" }
-        ],
-        leadership: [
-          { name: "Sridhar Sunkad", title: "CEO & Co‑founder", link: "https://www.linkedin.com/in/sridharsunkad/" }
-        ],
-        products: [
-          "AI-powered watermarking",
-          "Upload + verification portal",
-          "CRM integrations"
-        ],
-        competitors: ["Xylem (subset)", "Suez (subset)"],
-        webPresence: {
-          traffic: "Low (niche B2B)",
-          twitter: "https://twitter.com/aquamark_io",
-          linkedin: "https://www.linkedin.com/company/aquamark-io/",
-          youtube: "",
-          facebook: ""
-        },
-        reviews: [],
-        chartPoints: { revenue: [30,32,35,38,40,44,48,52], cashFlow: [55,54,53,51,50,49,48,47] },
-        kpis: [
-          { metric: "New Logos", q1: "8", q2: "12", q3: "14", q4: "18", yoy: "+45%" },
-          { metric: "Churn", q1: "2%", q2: "1.8%", q3: "1.5%", q4: "1.2%", yoy: "‑0.8pp" }
-        ],
-        citations: [
-          { title: "California SOS — Business Search", url: "https://bizfileonline.sos.ca.gov/search/business" }
-        ]
-      };
-      populateReport(sample, []);
-      showState('content');
-    });
-
-    // On load: handle ?q= and #snap=
-    (function initFromURL(){
-      const params = new URLSearchParams(location.search);
-      const q = (params.get('q') || '').trim();
-      // Snapshot hash?
-      if (location.hash.startsWith('#snap=')) {
-        try {
-          const enc = location.hash.slice(6);
-          const json = LZString.decompressFromEncodedURIComponent(enc);
-          const data = JSON.parse(json);
-          populateReport(data, []);
-          showState('content');
-          return;
-        } catch (e) {
-          console.warn('Snapshot decode failed', e);
-        }
+    // Auto-run if ?q= or ?snapshot= present
+    const url = new URL(location.href);
+    const q   = url.searchParams.get('q');
+    const snap= url.searchParams.get('snapshot');
+    if (snap) {
+      try {
+        const json = JSON.parse(decodeURIComponent(escape(atob(snap))));
+        $('results').classList.remove('hidden');
+        startLoader();
+        setTimeout(() => { renderReport(json); window.__lastReportJSON = json; }, 300);
+      } catch {
+        // ignore; fall back to q
       }
-      if (q) {
-        qInput.value = q;
-        runReport(q);
-      }
-    })();
+    } else if (q) {
+      qEl.value = q;
+      $('results').classList.remove('hidden');
+      generateReport(q);
+    }
+  });
   </script>
 </body>
 </html>
