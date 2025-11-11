@@ -4,395 +4,276 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
-
-  <meta name="theme-color" content="#00C09A">
-  <meta name="description" content="Live AI-powered business verification and reports">
-
+  <meta name="description" content="Standalone AI-powered business report generator by agent-salesforce-ai">
+  
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: {
-            heading: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-            sans: ['Inter', 'system-ui', 'sans-serif']
-          },
-          colors: {
-            brand: {
-              green: '#00C09A',
-              dark:  '#0F172A',
-              gray:  '#64748B',
-              light: '#F8FAFC',
-              border:'#E5E7EB'
-            }
-          }
+          fontFamily: { heading: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'], sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: { brand: { green: '#00C09A', dark: '#0F172A', gray: '#64748B', light: '#F8FAFC', border: '#E5E7EB' } }
         }
       }
     }
   </script>
-
   <style>
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
-    .dark body { background: #0F172A; }
+    body { -webkit-font-smoothing: antialiased; background:#fff; }
     .card { border:1px solid #E5E7EB; border-radius:.75rem; background:#fff; box-shadow: 0 10px 20px rgba(0,0,0,.04); }
-    .dark .card { background: #1E293B; border-color: #334155; }
-    .cta { background:#00C09A; color:#fff; font-weight:700; border-radius:.5rem; transition: all .15s ease; }
-    .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
+    .cta { background:#00C09A; color:#fff; font-weight:700; border-radius:.5rem; }
     .score-circle { width:120px; height:120px; border-radius:9999px; display:flex; align-items:center; justify-content:center; border:8px solid; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:2.3rem; }
     .score-red { border-color:#FECACA; color:#DC2626; background:#FEF2F2 }
     .score-yellow{ border-color:#FDE68A; color:#D97706; background:#FFFBEB }
     .score-green{ border-color:#A7F3D0; color:#059669; background:#ECFDF5 }
     .spin { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .dark { color: #F1F5F9; }
-    .dark .text-brand-gray { color: #94A3B8; }
-    .kbd{border:1px solid #cbd5e1;border-bottom-width:3px;border-radius:.375rem;padding:.15rem .35rem;font-size:.75rem;background:#f8fafc}
   </style>
 </head>
-
 <body class="font-sans text-brand-dark">
   <!-- Header -->
   <header class="sticky top-0 z-40 bg-white/85 border-b border-brand-border backdrop-blur">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <svg width="28" height="28" viewBox="0 0 50 50" fill="none">
-          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="font-heading text-lg md:text-xl font-extrabold">TrustBureau.ai</span>
+        <svg width="28" height="28" viewBox="0 0 50 50" fill="none"><path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/><path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="font-heading text-lg font-extrabold">TrustBureau.ai</span>
       </div>
-
-      <nav class="flex items-center gap-2 sm:gap-3">
-        <span id="api-status" class="hidden text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-          🔑 API Ready
-        </span>
-        <button id="test-api-btn" class="text-xs px-2 py-1 border rounded">Test API</button>
-        <button id="settings-btn" class="text-sm text-brand-gray hover:text-brand-green">⚙️</button>
+      <nav class="flex items-center gap-3">
+        <span id="api-status" class="hidden text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">🔑 API Ready</span>
+        <button id="settings-btn" class="text-sm text-brand-gray hover:text-brand-green">⚙️ Settings</button>
       </nav>
     </div>
   </header>
 
   <!-- Main Section -->
   <section class="max-w-4xl mx-auto px-4 pt-10">
-    <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center">Live AI Business Report</h1>
-    <p class="text-center text-brand-gray mt-3">User: agent-salesforce-ai • <span id="now"></span> UTC</p>
-
+    <h1 class="text-3xl font-heading font-extrabold text-center">Live AI Business Report</h1>
+    <p class="text-center text-brand-gray mt-3">User: agent-salesforce-ai • 2025-11-11 23:53:53 UTC</p>
     <div class="card p-4 mt-6">
       <form id="search-form">
         <div class="flex gap-3">
-          <input id="query" class="flex-1 px-4 py-3 border rounded-lg" placeholder="Enter company name" autofocus>
+          <input id="query" class="flex-1 px-4 py-3 border rounded-lg" placeholder="Enter company name (e.g., Salesforce, AOL)" autofocus>
           <button type="submit" class="cta px-6 py-3">Generate</button>
         </div>
       </form>
-    </div>
-
-    <div class="text-center mt-4">
-      <button id="btn-sample" class="text-sm text-brand-green hover:underline">Load sample (no API)</button>
     </div>
   </section>
 
   <!-- Results -->
   <section id="results" class="max-w-6xl mx-auto px-4 py-8 hidden">
-    <div id="loader" class="card p-6 hidden">
-      <svg class="w-8 h-8 text-brand-green spin inline" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <circle cx="12" cy="12" r="10" stroke-width="2" opacity=".15"></circle>
-        <path d="M22 12a10 10 0 0 1-10 10" stroke-width="2"></path>
-      </svg>
-      <span class="ml-3">Generating...</span>
-    </div>
-
+    <div id="loader" class="card p-6 hidden flex items-center gap-3"><svg class="w-8 h-8 text-brand-green spin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2" opacity=".15"></circle><path d="M22 12a10 10 0 0 1-10 10" stroke-width="2"></path></svg><span>Generating comprehensive report... This may take a moment.</span></div>
     <div id="error" class="card p-5 border-red-200 bg-red-50 text-red-700 hidden"></div>
-
-    <div id="content" class="hidden space-y-6">
-      <h2 id="title" class="text-2xl font-bold"></h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card p-5">
-          <h3 class="font-semibold mb-3">Risk Score</h3>
-          <div id="score-circle" class="score-circle mx-auto">
-            <span id="score">—</span>
-          </div>
-        </div>
-
-        <div class="md:col-span-2 card p-5">
-          <h3 class="font-semibold mb-3">Summary</h3>
-          <p id="summary"></p>
-          <div id="profile" class="mt-4 p-3 bg-gray-50 dark:bg-slate-800 rounded"></div>
-        </div>
-      </div>
-
-      <div class="text-xs text-brand-gray">
-        Tip: Press <span class="kbd">Ctrl</span>+<span class="kbd">D</span> to toggle the debug console.
-      </div>
-    </div>
+    <div id="content" class="hidden space-y-6"></div>
   </section>
 
-  <!-- Debug Console -->
-  <div id="debug" class="fixed bottom-0 left-0 right-0 bg-black text-green-400 text-xs font-mono p-2 max-h-40 overflow-y-auto hidden"></div>
-
   <script>
-    // ---------- Helpers ----------
-    const nowEl = document.getElementById('now');
-    nowEl.textContent = new Date().toISOString().replace('T',' ').slice(0,19);
+    // =================== CONFIGURATION ===================
+    const HARDCODED_KEY = 'YOUR_API_KEY_HERE'; 
 
-    const debug = (msg) => {
-      console.log(msg);
-      const el = document.getElementById('debug');
-      el.innerHTML += `[${new Date().toTimeString().slice(0,8)}] ${msg}<br>`;
-      el.scrollTop = el.scrollHeight;
-    };
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 'd' && e.ctrlKey) {
-        document.getElementById('debug').classList.toggle('hidden');
-      }
-    });
-
-    // ---------- API Key & Model Management ----------
+    // =================== API KEY MANAGEMENT ===================
     const API = {
+      STORAGE_KEY: 'trustbureau_gemini_key_standalone_v3',
       getKey() {
-        const key = localStorage.getItem('gemini_key');
-        debug(`Retrieved key: ${key ? key.substring(0,10) + '…' : 'none'}`);
-        return key;
+        if (HARDCODED_KEY && HARDCODED_KEY !== 'YOUR_API_KEY_HERE') return HARDCODED_KEY;
+        return localStorage.getItem(this.STORAGE_KEY);
       },
-      setKey(key) {
-        localStorage.setItem('gemini_key', key);
-        debug(`Saved key: ${key.substring(0,10)}…`);
-        this.updateStatus();
-      },
-      getModel() {
-        const m = localStorage.getItem('gemini_model');
-        if (m) debug(`Using saved model: ${m}`);
-        return m;
-      },
-      setModel(model) {
-        localStorage.setItem('gemini_model', model);
-        debug(`Saved model: ${model}`);
-      },
-      updateStatus() {
-        const hasKey = !!this.getKey();
-        document.getElementById('api-status').classList.toggle('hidden', !hasKey);
+      setKey(key) { localStorage.setItem(this.STORAGE_KEY, key); this.updateStatus(); },
+      updateStatus() { document.getElementById('api-status').classList.toggle('hidden', !this.getKey()); }
+    };
+
+    // =================== SETTINGS ===================
+    document.getElementById('settings-btn').onclick = () => {
+      const newKey = prompt('Enter your Gemini API key:', API.getKey() || '');
+      if (newKey && newKey.trim()) {
+        API.setKey(newKey.trim());
+        alert('✅ API key saved!');
       }
     };
 
-    // Pick an available model that supports generateContent
-    async function resolveBestModel(key) {
-      const prefer = [
-        /gemini-2\.5-flash-lite/i,
-        /gemini-2\.5-flash/i,
-        /gemini-2\.0-flash/i,
-        /gemini-1\.5-flash/i,
-        /gemini-1\.5-pro/i
-      ];
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(key)}`;
-        debug(`Listing models: ${url}`);
-        const res = await fetch(url);
-        debug(`List models response: ${res.status}`);
-        if (!res.ok) throw new Error(`models.list failed: ${res.status}`);
-        const data = await res.json();
-        const models = (data.models || []).filter(m => (m.supportedGenerationMethods || m.supported_generation_methods || []).includes('generateContent'));
-        for (const pat of prefer) {
-          const found = models.find(m => pat.test(m.name) || pat.test(m.baseModelId || ''));
-          if (found) return found.name.replace(/^models\//,'');
-        }
-        if (models[0]?.name) return models[0].name.replace(/^models\//,'');
-      } catch (e) {
-        debug(`Model resolution error: ${e.message}`);
-      }
-      return 'gemini-2.0-flash';
-    }
-
-    // ---------- UI Buttons ----------
-    document.getElementById('test-api-btn').onclick = async () => {
-      const key = API.getKey();
-      if (!key) { alert('No API key set. Click settings to add one.'); return; }
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(key)}`;
-        debug(`Testing URL: ${url}`);
-        const res = await fetch(url);
-        debug(`Test response: ${res.status}`);
-        if (!res.ok) {
-          const txt = await res.text();
-          alert(`❌ API key test failed: ${res.status}\n${txt.slice(0,400)}`);
-          return;
-        }
-        const data = await res.json();
-        const gcModels = (data.models || []).filter(m => (m.supportedGenerationMethods || m.supported_generation_methods || []).includes('generateContent'));
-        const chosen = gcModels.find(m => /gemini-2\.[05]-flash(-lite)?/i.test(m.name)) || gcModels[0];
-        if (chosen?.name) {
-          const name = chosen.name.replace(/^models\//,'');
-          API.setModel(name);
-          alert(`✅ API key works. Selected model: ${name}`);
-        } else {
-          alert('✅ API key works, but no suitable model with generateContent found. You may need to enable access.');
-        }
-      } catch (e) {
-        alert(`❌ Test failed: ${e.message}`);
-        debug(`Test error: ${e.message}`);
-      }
-    };
-
-    document.getElementById('settings-btn').onclick = async () => {
-      const currentKey = API.getKey() || '';
-      const newKey = prompt('Enter your Gemini API key:', currentKey);
-      if (newKey && newKey !== currentKey) API.setKey(newKey);
-      const currentModel = API.getModel() || '';
-      const newModel = prompt('Optional: Enter a specific model (e.g., gemini-2.5-flash-lite). Leave blank to auto-detect:', currentModel);
-      if (newModel && newModel !== currentModel) API.setModel(newModel);
-      alert('Settings saved.');
-    };
-
-    // ---------- Report Generation ----------
+    // =================== REPORT GENERATION ===================
     async function generateReport(query) {
-      const key = API.getKey();
-      if (!key) { alert('Please add your API key in Settings first'); return; }
+      const apiKey = API.getKey();
+      if (!apiKey) { return alert('API key is required. Click the Settings button (⚙️) to add one.'); }
 
-      document.getElementById('results').classList.remove('hidden');
-      document.getElementById('loader').classList.remove('hidden');
-      document.getElementById('content').classList.add('hidden');
-      document.getElementById('error').classList.add('hidden');
+      const ui = {
+        results: document.getElementById('results'),
+        loader: document.getElementById('loader'),
+        content: document.getElementById('content'),
+        error: document.getElementById('error'),
+      };
+      
+      ui.results.classList.remove('hidden');
+      ui.loader.classList.remove('hidden');
+      ui.content.classList.add('hidden');
+      ui.error.classList.add('hidden');
 
       try {
-        let model = API.getModel();
-        if (!model) { model = await resolveBestModel(key); API.setModel(model); }
-        debug(`Using model: ${model}`);
-
-        const apiBaseV1 = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
-        const apiBaseV1b = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
-
+        const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        // THIS IS THE NEW, MORE DETAILED PROMPT
         const requestBody = {
-          contents: [{
-            role: 'user',
-            parts: [{ text: `Create a business report for ${query}. Return ONLY JSON with this shape:\n{\n  "summary": {"companyName": string, "summary": string},\n  "riskScore": {"score": number, "justification": string},\n  "profile": {"founded": string, "headquarters": string, "employees": string, "industry": string, "website": string}\n}\nRespond strictly as JSON.` }]
-          }],
-          generationConfig: {
-            // JSON Mode (snake_case per REST)
-            response_mime_type: 'application/json'
-          }
+          contents: [{ parts: [{ text: `
+            Generate a comprehensive business report for "${query}".
+            Return ONLY a valid JSON object with the exact structure below. Do not include markdown formatting.
+            {
+              "summary": {
+                "companyName": "Full official company name",
+                "tagline": "A short, descriptive tagline for the company",
+                "fullSummary": "A 3-4 sentence detailed paragraph about the company, its mission, and market position."
+              },
+              "riskScore": {
+                "score": 750,
+                "justification": "One sentence explanation for the score, considering its age, market position, and financial health."
+              },
+              "profile": {
+                "founded": "Year",
+                "headquarters": "City, State/Country",
+                "employees": "Approximate number as a string (e.g., '70,000+')",
+                "industry": "Primary Industry",
+                "website": "Official website URL",
+                "stockTicker": "Stock Ticker (e.g., 'CRM') or 'Private' if not applicable"
+              },
+              "financials": {
+                "revenue": "Latest annual revenue (e.g., '$31.4B USD')",
+                "netIncome": "Latest annual net income (e.g., '$2.2B USD' or '-$500M USD')",
+                "marketCap": "Current market capitalization (e.g., '$200B USD') or 'N/A'"
+              },
+              "swot": {
+                "strengths": ["At least 2 key strengths"],
+                "weaknesses": ["At least 2 key weaknesses"],
+                "opportunities": ["At least 2 potential opportunities"],
+                "threats": ["At least 2 key threats"]
+              },
+              "news": [
+                {
+                  "title": "A recent, relevant news headline",
+                  "source": "News source (e.g., 'Reuters')",
+                  "date": "YYYY-MM-DD"
+                },
+                {
+                  "title": "Another recent news headline",
+                  "source": "News source",
+                  "date": "YYYY-MM-DD"
+                }
+              ],
+              "competitors": ["Top competitor 1", "Top competitor 2", "Top competitor 3"]
+            }
+          `}] }]
         };
 
-        // --- First attempt: v1 with JSON Mode ---
-        debug('Sending request (v1)…');
-        let res = await fetch(apiBaseV1, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(requestBody) });
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
 
-        if (res.status === 404) {
-          const errText = await res.text();
-          debug(`404 on ${model}. Body: ${errText.slice(0,200)}…`);
-          const autoModel = await resolveBestModel(key);
-          if (autoModel && autoModel !== model) {
-            API.setModel(autoModel);
-            debug(`Retrying v1 with detected model: ${autoModel}`);
-            res = await fetch(`https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(autoModel)}:generateContent?key=${encodeURIComponent(key)}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(requestBody) });
-          }
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          throw new Error(errorResponse.error.message);
         }
 
-        // --- If v1 rejects response_mime_type (400), try v1beta (historically accepted it sooner) ---
-        if (res.status === 400) {
-          const body = await res.text();
-          if (/response_mime_type|generation_config|Unknown name/i.test(body)) {
-            debug('400 due to JSON Mode field — retrying on v1beta…');
-            res = await fetch(apiBaseV1b, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(requestBody) });
-          } else {
-            throw new Error(`API Error 400: ${body.slice(0,400)}`);
-          }
-        }
-
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`API Error ${res.status}: ${errorText.slice(0,400)}`);
-        }
-
-        const data = await res.json();
-        debug('Response received successfully');
-
-        // JSON Mode should return a JSON string in parts[0].text
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-        let report = null;
-        try { report = text ? JSON.parse(text) : null; } catch(_) {
-          const match = text.match(/\{[\s\S]*\}/);
-          report = match ? JSON.parse(match[0]) : null;
-        }
-        if (!report) throw new Error('Could not parse JSON from model response.');
-
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) { throw new Error('API returned an empty response.'); }
+        
+        const report = JSON.parse(text);
         displayReport(report);
 
       } catch (error) {
-        debug(`Error: ${error.message}`);
-        document.getElementById('error').innerHTML = `
-          <strong>Error:</strong> ${error.message}<br>
-          <small>Press Ctrl+D to see debug log</small>
-        `;
-        document.getElementById('error').classList.remove('hidden');
+        ui.error.innerHTML = `<strong>Error:</strong> ${error.message}<br><small>Ensure your API key is correct and the Generative Language API is enabled in Google Cloud.</small>`;
+        ui.error.classList.remove('hidden');
       } finally {
-        document.getElementById('loader').classList.add('hidden');
+        ui.loader.classList.add('hidden');
       }
     }
 
+    // =================== DISPLAY & FORM ===================
     function displayReport(data) {
-      debug('Displaying report');
-      document.getElementById('content').classList.remove('hidden');
+      const contentEl = document.getElementById('content');
+      
+      const renderList = (items) => items && items.length > 0 
+        ? `<ul>${items.map(item => `<li class="mt-1">• ${item}</li>`).join('')}</ul>` 
+        : '<p class="text-sm text-brand-gray">Not available</p>';
 
-      document.getElementById('title').textContent = data?.summary?.companyName || 'Report';
-      document.getElementById('summary').textContent = data?.summary?.summary || '';
+      const renderNews = (items) => items && items.length > 0
+        ? `<ul>${items.map(item => `
+            <li class="mt-2">
+              <p class="font-medium">${item.title}</p>
+              <p class="text-xs text-brand-gray">${item.source} • ${item.date}</p>
+            </li>
+          `).join('')}</ul>`
+        : '<p class="text-sm text-brand-gray">No recent news available</p>';
 
-      const score = Number(data?.riskScore?.score ?? 0);
-      document.getElementById('score').textContent = Number.isFinite(score) && score > 0 ? score : '—';
+      contentEl.innerHTML = `
+        <!-- Header -->
+        <div>
+          <h2 class="text-3xl font-bold font-heading">${data.summary?.companyName || 'Report'}</h2>
+          <p class="text-lg text-brand-gray">${data.summary?.tagline || ''}</p>
+        </div>
 
-      const circle = document.getElementById('score-circle');
-      circle.className = 'score-circle mx-auto';
-      if (score && score < 550) circle.classList.add('score-red');
-      else if (score && score < 700) circle.classList.add('score-yellow');
-      else if (score) circle.classList.add('score-green');
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Left Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <div class="card p-5">
+              <h3 class="font-semibold mb-2">Executive Summary</h3>
+              <p>${data.summary?.fullSummary || ''}</p>
+            </div>
+            <div class="card p-5">
+              <h3 class="font-semibold mb-3">SWOT Analysis</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div><h4 class="font-medium text-green-600">Strengths</h4>${renderList(data.swot?.strengths)}</div>
+                <div><h4 class="font-medium text-red-600">Weaknesses</h4>${renderList(data.swot?.weaknesses)}</div>
+                <div><h4 class="font-medium text-blue-600">Opportunities</h4>${renderList(data.swot?.opportunities)}</div>
+                <div><h4 class="font-medium text-yellow-600">Threats</h4>${renderList(data.swot?.threats)}</div>
+              </div>
+            </div>
+            <div class="card p-5">
+              <h3 class="font-semibold mb-3">Recent News</h3>
+              ${renderNews(data.news)}
+            </div>
+          </div>
+          
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <div class="card p-5">
+              <h3 class="font-semibold mb-3">AI Risk Score</h3>
+              <div class="score-circle mx-auto ${data.riskScore?.score < 550 ? 'score-red' : data.riskScore?.score < 700 ? 'score-yellow' : 'score-green'}">
+                <span>${data.riskScore?.score || '—'}</span>
+              </div>
+              <p class="text-center text-sm text-brand-gray mt-3">${data.riskScore?.justification || ''}</p>
+            </div>
+            <div class="card p-5 text-sm">
+              <h3 class="font-semibold mb-3">Company Profile</h3>
+              ${Object.entries(data.profile || {}).map(([k,v]) => `<div class="flex justify-between py-1 border-b"><span class="text-brand-gray">${k.charAt(0).toUpperCase() + k.slice(1)}</span><span class="font-medium">${v}</span></div>`).join('')}
+            </div>
+            <div class="card p-5 text-sm">
+              <h3 class="font-semibold mb-3">Key Financials</h3>
+              ${Object.entries(data.financials || {}).map(([k,v]) => `<div class="flex justify-between py-1 border-b"><span class="text-brand-gray">${k.charAt(0).toUpperCase() + k.slice(1)}</span><span class="font-medium">${v}</span></div>`).join('')}
+            </div>
+            <div class="card p-5">
+              <h3 class="font-semibold mb-3">Top Competitors</h3>
+              ${renderList(data.competitors)}
+            </div>
+          </div>
 
-      const prof = data?.profile || {};
-      document.getElementById('profile').innerHTML = Object.entries(prof)
-        .map(([k,v]) => `<div><strong>${k}:</strong> ${v ?? ''}</div>`)
-        .join('');
+        </div>
+      `;
+      contentEl.classList.remove('hidden');
     }
 
-    // ---------- Sample Button ----------
-    document.getElementById('btn-sample').onclick = () => {
-      debug('Loading sample report');
-      displayReport({
-        summary: {
-          companyName: 'Salesforce, Inc.',
-          summary: 'Leading CRM platform company founded in 1999.'
-        },
-        riskScore: {
-          score: 820,
-          justification: 'Strong market position'
-        },
-        profile: {
-          founded: '1999',
-          headquarters: 'San Francisco, CA',
-          employees: '73,000+',
-          industry: 'Cloud Software',
-          website: 'https://salesforce.com'
-        }
-      });
-      document.getElementById('results').classList.remove('hidden');
-      document.getElementById('content').classList.remove('hidden');
-    };
-
-    // ---------- Form Handler ----------
     document.getElementById('search-form').onsubmit = (e) => {
       e.preventDefault();
       const query = document.getElementById('query').value.trim();
       if (query) generateReport(query);
     };
 
-    // ---------- Init ----------
-    API.updateStatus();
-    debug('App ready');
+    // =================== INIT ===================
+    window.addEventListener('DOMContentLoaded', () => {
+      API.updateStatus();
+      console.log(`App Initialized | User: agent-salesforce-ai | UTC: 2025-11-11 23:53:53`);
+    });
   </script>
 </body>
 </html>
