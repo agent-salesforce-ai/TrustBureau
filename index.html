@@ -1050,7 +1050,9 @@
       /**
       
        */
-      const zakk = "AIzaSyBwEUdyg3lGWzF745xQbX-RpIMMREEbkL4"; // )
+      // ⚠️ REQUIRED: Get your FREE Gemini API key from https://aistudio.google.com/app/apikey
+      // Then replace "YOUR_GEMINI_API_KEY_HERE" below with your actual key
+      const zakk = "YOUR_GEMINI_API_KEY_HERE"; // or set window.zakk at runtime
 
       // --- UI elements ---
       const generateReportBtn = document.getElementById('generate-report-btn');
@@ -1331,7 +1333,12 @@
 
       // --- Direct Google API calls using `zakk` ---
       async function callReportAPI(systemPrompt, userQuery, logId = 'report') {
-        if (!zakk) throw new Error("Missing key: set `zakk` in the script near the bottom of the HTML.");
+        if (!zakk || zakk === 'YOUR_GEMINI_API_KEY_HERE') {
+          throw new Error('❌ API Key Required!\n\n' +
+            '1. Get a FREE Gemini API key from:\n   https://aistudio.google.com/app/apikey\n\n' +
+            '2. Replace "YOUR_GEMINI_API_KEY_HERE" on line 1056 with your key\n\n' +
+            '3. Or set it via browser console:\n   window.zakk = "your-key-here"');
+        }
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${zakk}`;
 
         const payload = {
