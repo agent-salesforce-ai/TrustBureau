@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Live AI Business Report — Shareable</title>
 
-  <!-- Tailwind (CDN) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            heading: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui'],
-            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
           },
           colors: {
             'brand-green': '#00C09A',
-            'brand-dark': '#111827',
-            'brand-gray': '#6B7280',
+            'brand-dark':  '#1A1A1A',
+            'brand-gray':  '#666666',
             'brand-light': '#F8F9FA',
-            'brand-border': '#E5E7EB',
+            'brand-border':'#E5E7EB',
           }
         }
       }
@@ -28,531 +28,453 @@
   </script>
 
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- LZ-String: snapshot-in-URL (no server needed) -->
+  <!-- Compression for snapshot links -->
   <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
+  <!-- API key placeholder (keep empty while testing / no proxy) -->
+  <script>
+    // Set or override at runtime if you wire a real model:
+    // window.zakk = 'YOUR_API_KEY';
+    window.zakk = 'AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q';
+  </script>
+
   <style>
-    html { scroll-behavior: smooth }
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff }
+    html { scroll-behavior: smooth; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
-    .cta{transition:all .2s ease}
-    .cta:hover{transform:translateY(-1px)}
-    @media print{
-      #search, #buttons-bar, #error-box, #loader { display:none!important }
-      .widget-card { break-inside: avoid }
-      body{ background:#fff }
+    .cta-button { transition: all .25s ease; }
+    .cta-button:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.12); }
+
+    /* ===== Loading UI ===== */
+    .spinner {
+      width: 20px; height: 20px; border: 2px solid #d1fae5; border-top-color: #00C09A; border-radius: 9999px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
+    .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
+    .step-icon{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border-radius:9999px;background:#E5E7EB;color:#fff;flex:none;margin-top:2px}
+    .step-icon.done{background:#059669}
+    .step-icon>svg{width:.7rem;height:.7rem;display:none}
+    .step-icon.done>svg{display:block}
+
+    @media print {
+      header, #search-form, #export-menu, #share-btn, #toggle-sources, #demo-buttons { display:none !important; }
+      .widget-card { box-shadow: none !important; border-color: #ddd !important; }
+      body { color: #111 !important; }
     }
   </style>
 </head>
 <body class="font-sans text-brand-dark">
 
-  <!-- ======= TOP NAV / HEADER ======= -->
-  <header class="border-b border-brand-border bg-white/90 sticky top-0 z-40 backdrop-blur">
-    <div class="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2">
-        <svg width="32" height="32" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+  <!-- Header (restored) -->
+  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
+    <nav class="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
         <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
+      </div>
+      <a href="/" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
+        ← Back to Main
       </a>
-      <a href="/index.html" class="text-sm md:text-base text-brand-dark hover:text-brand-green">← Back to Main</a>
-    </div>
-    <div class="container mx-auto px-4 md:px-6 pb-6">
-      <h1 class="font-heading text-3xl md:text-5xl font-extrabold text-center">Live AI Business Report</h1>
-      <p class="text-center text-brand-gray mt-3">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
-
-      <!-- SEARCH (centered) -->
-      <section id="search" class="max-w-4xl mx-auto mt-6">
-        <div class="widget-card p-4">
-          <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
-            <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
-              class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
-            <button id="generate-btn" type="submit"
-              class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-              </svg>
-              Generate
-            </button>
-          </form>
-          <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
-        </div>
-      </section>
-    </div>
+    </nav>
   </header>
 
-  <!-- ======= MAIN ======= -->
-  <main class="container mx-auto px-4 md:px-6 py-8">
+  <!-- Search (centered) -->
+  <section class="container mx-auto px-4 md:px-6 py-10 md:py-14">
+    <div class="max-w-3xl mx-auto text-center">
+      <h1 class="font-heading text-3xl md:text-5xl font-extrabold leading-tight">Live AI Business Report</h1>
+      <p class="text-gray-500 mt-3 md:mt-4">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
 
-    <!-- Loader -->
-    <div id="loader" class="widget-card p-5 text-sm text-gray-700 hidden">Generating report…</div>
+      <div class="widget-card p-3 md:p-4 mt-6">
+        <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
+          <input id="business-name" type="text" placeholder="e.g., Taco Bell Corp., Tesla, Inc."
+                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
+          <button id="generate-report-btn" type="submit"
+                  class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
+            <span class="hidden sm:inline">Generate</span><span class="sm:hidden">Go</span>
+          </button>
+        </form>
+        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
+      </div>
 
-    <!-- Error -->
-    <div id="error-box" class="widget-card border-red-200 bg-red-50 p-5 text-red-700 hidden">
-      <span id="error-text"></span>
+      <!-- Demo helper (so page works without API) -->
+      <div id="demo-buttons" class="mt-4 flex items-center justify-center gap-3">
+        <button id="load-sample" class="px-3 py-2 border rounded-md">Load sample report</button>
+      </div>
     </div>
+  </section>
 
-    <!-- CONTENT -->
-    <section id="content" class="space-y-8 hidden">
+  <!-- Results -->
+  <section id="results" class="container mx-auto px-4 md:px-6 pb-16">
+    <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
 
-      <!-- Title + actions -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-          <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
+      <!-- LOADER (restored) -->
+      <div id="report-loader" class="widget-card p-6 md:p-8 space-y-6" style="display:none;" role="status" aria-live="polite" aria-busy="true">
+        <div class="flex items-center gap-4">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="text-sm text-gray-700">Generating report…</div>
         </div>
 
-        <div id="buttons-bar" class="flex flex-wrap items-center gap-2">
-          <button id="rerun-btn" class="inline-flex items-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta">Re‑run</button>
-          <button id="copy-live-btn" class="inline-flex items-center gap-2 border border-brand-border rounded-lg px-4 py-2 hover:bg-brand-light">Copy Link (regenerate)</button>
-          <button id="copy-snap-btn" class="inline-flex items-center gap-2 border border-brand-border rounded-lg px-4 py-2 hover:bg-brand-light">Save &amp; Copy Snapshot</button>
-          <button id="json-btn" class="inline-flex items-center gap-2 border border-brand-border rounded-lg px-4 py-2 hover:bg-brand-light">JSON</button>
-          <button id="print-btn" class="inline-flex items-center gap-2 border border-brand-border rounded-lg px-4 py-2 hover:bg-brand-light">Print / PDF</button>
-        </div>
+        <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
+
+        <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
       </div>
 
-      <!-- Score + Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Score -->
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
-          <div class="flex flex-col items-center">
-            <div id="score-badge" class="rounded-full w-28 h-28 flex items-center justify-center text-3xl font-extrabold border-8 text-emerald-700 bg-emerald-50">—</div>
-            <p id="score-justification" class="text-center text-gray-600 text-sm mt-3"></p>
+      <!-- Error -->
+      <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
+        <p id="report-error-message" class="text-sm text-red-700"></p>
+      </div>
+
+      <!-- Content -->
+      <div id="report-content" style="display:none;" class="space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
+            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
+          </div>
+
+          <!-- Share / Export controls -->
+          <div class="flex items-center gap-3">
+            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">
+              Re‑run
+            </button>
+
+            <button id="share-btn" class="inline-flex items-center justify-center gap-2 border border-brand-border rounded-lg px-3 py-2 hover:bg-brand-light">
+              Share
+            </button>
+
+            <div class="relative">
+              <button id="export-menu-btn" class="inline-flex items-center justify-center gap-2 border border-brand-border rounded-lg px-3 py-2 hover:bg-brand-light">
+                Export ▾
+              </button>
+              <div id="export-menu" class="absolute right-0 mt-2 w-48 bg-white border border-brand-border rounded-md shadow-lg z-10 hidden">
+                <button id="copy-link-btn" class="block w-full text-left px-3 py-2 text-sm hover:bg-brand-light">Copy Link</button>
+                <button id="share-native-btn" class="block w-full text-left px-3 py-2 text-sm hover:bg-brand-light">Share… (native)</button>
+                <button id="export-pdf-btn" class="block w-full text-left px-3 py-2 text-sm hover:bg-brand-light">Export PDF</button>
+                <button id="download-json-btn" class="block w-full text-left px-3 py-2 text-sm hover:bg-brand-light">Download JSON</button>
+              </div>
+            </div>
+          </div>
+          <!-- /Share / Export controls -->
+        </div>
+
+        <!-- Report body (compact) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
+            <div class="text-5xl font-extrabold text-brand-green" id="score-digit">—</div>
+            <p id="score-just" class="text-sm text-gray-600 mt-2"></p>
+          </div>
+
+          <div class="md:col-span-2 widget-card p-5 md:p-6">
+            <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
+            <p id="report-summary" class="text-sm text-gray-700 leading-relaxed"></p>
           </div>
         </div>
 
-        <!-- Summary + (left) Corporate Filings + (right) Company Facts -->
-        <div class="md:col-span-2 widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
-          <p id="summary-text" class="text-sm text-gray-700 leading-relaxed"></p>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <!-- Corporate Filings (LEFT) -->
-            <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-              <h4 class="text-sm font-semibold text-brand-dark mb-3">Corporate Filings</h4>
-              <ul class="text-sm text-gray-700 space-y-1">
-                <li><span class="text-gray-500">Entity Name:</span> <span id="filings-name"></span></li>
-                <li><span class="text-gray-500">Entity Type:</span> <span id="filings-type"></span></li>
-                <li><span class="text-gray-500">Status:</span> <span id="filings-status" class="font-medium"></span></li>
-                <li><span class="text-gray-500">Jurisdiction:</span> <span id="filings-juris"></span></li>
-                <li><span class="text-gray-500">Formation Date:</span> <span id="filings-date"></span></li>
-                <li><span class="text-gray-500">Registered Agent:</span> <span id="filings-agent"></span></li>
-              </ul>
-            </div>
-
-            <!-- Company Facts (RIGHT) -->
-            <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-              <h4 class="text-sm font-semibold text-brand-dark mb-3">Company Facts</h4>
-              <ul class="text-sm text-gray-700 space-y-1">
-                <li><span class="text-gray-500">Founded:</span> <span id="facts-founded"></span></li>
-                <li><span class="text-gray-500">Headquarters:</span> <span id="facts-hq"></span></li>
-                <li><span class="text-gray-500">Employees:</span> <span id="facts-employees"></span></li>
-                <li><span class="text-gray-500">Industry:</span> <span id="facts-industry"></span></li>
-                <li><span class="text-gray-500">Ticker:</span> <span id="facts-ticker"></span></li>
-                <li><span class="text-gray-500">Website:</span> <span id="facts-website"></span></li>
-              </ul>
-            </div>
-
-            <!-- Operational Highlights -->
-            <div class="p-4 border border-brand-border rounded-lg bg-brand-light md:col-span-2">
-              <h4 class="text-sm font-semibold text-brand-dark mb-3">Operational Highlights</h4>
-              <ul id="highlights-list" class="list-disc list-inside text-sm text-gray-700 space-y-1"></ul>
-            </div>
-
-            <!-- Recent Headlines -->
-            <div class="p-4 border border-brand-border rounded-lg bg-brand-light md:col-span-2">
-              <h4 class="text-sm font-semibold text-brand-dark mb-3">Recent Headlines</h4>
-              <ul id="news-list" class="space-y-2"></ul>
-            </div>
+        <!-- Sources -->
+        <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources & Links</h4>
+            <button id="toggle-sources" type="button" class="text-xs text-brand-green hover:underline">Show list</button>
           </div>
+          <div id="report-sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
+          <ul id="report-sources" class="mt-4 space-y-1 list-disc list-inside hidden"></ul>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Contact + Map -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Contact &amp; Location</h3>
-          <ul class="text-sm text-gray-700 space-y-1">
-            <li><span class="text-gray-500">Phone:</span> <span id="contact-phone"></span></li>
-            <li><span class="text-gray-500">Email:</span> <span id="contact-email"></span></li>
-            <li><span class="text-gray-500">Address:</span> <span id="contact-address"></span></li>
-          </ul>
-          <a id="maps-link" href="#" target="_blank" rel="noopener" class="inline-block text-xs text-brand-green mt-2">Open in Google Maps</a>
-        </div>
-
-        <div class="widget-card p-2 md:p-3">
-          <iframe id="map-embed" title="Map" class="w-full h-72 rounded-md border border-brand-border"
-            referrerpolicy="no-referrer-when-downgrade" loading="lazy"></iframe>
-        </div>
-      </div>
-
-      <!-- Leadership / Products / Competitors / Social -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Leadership</h3>
-          <ul id="leadership-list" class="space-y-1 text-sm text-gray-700"></ul>
-        </div>
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Products &amp; Services</h3>
-          <ul id="products-list" class="space-y-1 text-sm text-gray-700"></ul>
-        </div>
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Competitors</h3>
-          <ul id="competitors-list" class="space-y-1 text-sm text-gray-700"></ul>
-        </div>
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Web &amp; Social Signals</h3>
-          <ul id="social-list" class="space-y-1 text-sm text-gray-700"></ul>
-        </div>
-      </div>
-
-      <!-- Reviews + Charts -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Customer Reviews</h3>
-          <div id="reviews-list" class="space-y-3 text-sm text-gray-700"></div>
-        </div>
-
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Financial Charts (Fictional)</h3>
-          <div class="grid grid-cols-1 gap-4">
-            <div>
-              <h5 class="text-sm font-medium text-brand-dark mb-1">Revenue Trend</h5>
-              <div id="chart-revenue" class="h-24"></div>
-            </div>
-            <div>
-              <h5 class="text-sm font-medium text-brand-dark mb-1">Cash Flow</h5>
-              <div id="chart-cashflow" class="h-24"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sources (auto-expanded) -->
-      <div id="sources-box" class="widget-card p-5 md:p-6">
-        <div class="flex items-center justify-between">
-          <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources &amp; Links</h4>
-          <button id="toggle-sources" class="text-xs text-brand-green hover:underline">Hide list</button>
-        </div>
-        <div id="sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
-        <ul id="sources-list" class="mt-4 space-y-1 list-disc list-inside"></ul>
-      </div>
-    </section>
-  </main>
-
-  <footer class="border-t border-brand-border">
+  <footer class="border-top border-brand-border">
     <div class="container mx-auto px-4 md:px-6 py-10 text-center text-sm text-gray-500">
       &copy; 2025 TrustBureau.ai — Live AI Business Report
     </div>
   </footer>
 
-  <!-- ================== APP SCRIPT ================== -->
   <script>
-    /* ===== API KEY SLOT (fill or set window.zakk before this script) ===== */
-    const zakk = 'AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q'; // e.g. 'AIza...'
+  /* =========================================================
+     LOADER (restored)
+     ========================================================= */
+  let __loaderTimer = null, __loaderStepTimer = null;
+  const LOADER_STEPS = [
+    'Matching business identity',
+    'Searching the web',
+    'Pulling SOS / corporate filings',
+    'Parsing entity metadata',
+    'Checking public records',
+    'Gathering leadership',
+    'Mapping products & services',
+    'Finding competitors',
+    'Collecting web & social signals',
+    'Crawling recent headlines',
+    'Reading customer reviews',
+    'Synthesizing risk score'
+  ];
 
-    /* ===== Models / options ===== */
-    const MODEL_CANDIDATES = ['gemini-2.5-flash','gemini-2.5-flash-preview-09-2025'];
-    const USE_SEARCH_TOOL = false; // keep false unless your project has the Google Search tool enabled
+  function buildLoaderSteps(){
+    const stepsOl = document.getElementById('loader-steps');
+    stepsOl.innerHTML = LOADER_STEPS.map((s,i)=>`
+      <li class="flex items-start gap-2">
+        <span class="step-icon" id="ld_${i}">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+        </span>
+        <span>${s}</span>
+      </li>`).join('');
+  }
 
-    /* ===== Small helpers ===== */
-    const $ = s => document.querySelector(s);
-    function set(el, v, fb='N/A'){ el.textContent = (v && String(v).trim()) ? v : fb; }
-    const nl = v => Array.isArray(v) ? v : (v ? [v] : []);
-    function linkifyMaybe(v){
-      if(!v) return 'N/A';
-      const s=String(v).trim();
-      if(/^https?:\/\//i.test(s)){ try{ const h=new URL(s).hostname.replace(/^www\./,''); return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${h}</a>`;}catch{return s;} }
-      return s;
+  function showLoading(){
+    clearInterval(__loaderTimer); clearInterval(__loaderStepTimer);
+    document.getElementById('report-results-container').style.display='block';
+    document.getElementById('report-loader').style.display='block';
+    document.getElementById('report-error-container').style.display='none';
+    document.getElementById('report-content').style.display='none';
+
+    buildLoaderSteps();
+    const bar = document.getElementById('loader-bar');
+    let pct = 6, stepIdx = 0;
+    bar.style.width = pct + '%';
+
+    __loaderTimer = setInterval(()=>{
+      pct = Math.min(99, pct + Math.random()*3);
+      bar.style.width = pct + '%';
+    }, 600);
+
+    __loaderStepTimer = setInterval(()=>{
+      const el = document.getElementById(`ld_${stepIdx}`);
+      if(el) el.classList.add('done');
+      stepIdx++;
+      if(stepIdx >= LOADER_STEPS.length) clearInterval(__loaderStepTimer);
+    }, 1400);
+  }
+
+  function hideLoading(){
+    clearInterval(__loaderTimer); clearInterval(__loaderStepTimer);
+    document.getElementById('report-loader').style.display='none';
+  }
+
+  /* =========================================================
+     SHARE LINKS (Permalink + Snapshot) & EXPORTS
+     ========================================================= */
+  let __lastReport = null;
+  function setLastReport(json){ __lastReport = json; }
+
+  function buildPermalink(company){
+    const base = `${location.origin}${location.pathname}`;
+    const params = new URLSearchParams(location.search);
+    if(company) params.set('q', company); else params.delete('q');
+    return `${base}?${params.toString()}`;
+  }
+  function pushPermalink(company){ history.replaceState(null,'',buildPermalink(company)); }
+
+  function buildSnapshotLink(json){
+    const base = `${location.origin}${location.pathname}`;
+    const params = new URLSearchParams(location.search);
+    params.set('view','snapshot');
+    const packed = LZString.compressToEncodedURIComponent(JSON.stringify(json));
+    return `${base}?${params.toString()}#r=${packed}`;
+  }
+
+  async function copyToClipboard(text){
+    try{ await navigator.clipboard.writeText(text); alert('Link copied to clipboard'); }
+    catch{
+      const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove(); alert('Link copied to clipboard');
     }
-    function getApiKey(){ return (window.zakk && String(window.zakk).trim()) || (zakk && String(zakk).trim()) || ''; }
-    function show(el){ el.classList.remove('hidden') }
-    function hide(el){ el.classList.add('hidden') }
-    function setState(state, msg=''){
-      hide($('#loader')); hide($('#error-box')); hide($('#content'));
-      if(state==='loading'){ $('#error-text').textContent=''; show($('#loader')); }
-      else if(state==='error'){ $('#error-text').textContent=msg||'Something went wrong.'; show($('#error-box')); }
-      else if(state==='content'){ show($('#content')); }
-    }
+  }
 
-    /* ===== Simple SVG sparkline ===== */
-    function renderLineChart(container, values, color){
-      container.innerHTML='';
-      if(!Array.isArray(values)||values.length<2){ container.innerHTML='<p class="text-sm text-gray-600">Chart not available.</p>'; return; }
-      const nums=values.map(v=>Number.isFinite(+v)?+v:0);
-      const min=Math.min(...nums), max=Math.max(...nums);
-      const norm=(max-min)>0?nums.map(n=>100*(n-min)/(max-min)):nums.map(()=>50);
-      const step=100/(norm.length-1);
-      const pts=norm.map((v,i)=>`${(i*step).toFixed(2)},${(50-(v/100)*44-3).toFixed(2)}`).join(' ');
-      container.innerHTML=`<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-        <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
-        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1"/>
-      </svg>`;
-    }
-
-    /* ===== Sources ===== */
-    function normalizeUrl(u){ try{ const url=new URL(u); url.search=''; if(url.pathname!=='/'&&url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); }catch{return null;} }
-    function prettyUrl(u){ try{ const url=new URL(u); let out=url.hostname.replace(/^www\./,''); if(url.pathname&&url.pathname!=='/') out+=url.pathname; return out.length>60?out.slice(0,57)+'…':out; }catch{return u;} }
-    function collectSources(json, modelSources){
-      const out=[], push=(title,url,kind)=>{ const norm=normalizeUrl(url); if(!norm)return; out.push({title:title||prettyUrl(norm), url:norm, kind}); };
-      (json?.citations||[]).forEach(c=>push(c.title||c.url,c.url,'citation'));
-      (modelSources||[]).forEach(s=>push(s.title||s.uri,s.uri,'source'));
-      if(json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w=json?.webPresence||{};
-      if(w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter,'social');
-      if(w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin,'social');
-      if(w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube,'social');
-      (json?.news||[]).forEach(n=>n?.url&&push(n.title||n.source||'News', n.url, 'news'));
-      (json?.reviews||[]).forEach(r=>r?.url&&push(r.source||'Review', r.url, 'review'));
-      const seen=new Set(); return out.filter(({url})=>!seen.has(url)&&seen.add(url));
-    }
-    function populateSources(links){
-      const chips=$('#sources-chips'), ul=$('#sources-list'), box=$('#sources-box');
-      chips.innerHTML=''; ul.innerHTML='';
-      if(!Array.isArray(links)||!links.length){ hide(box); return; }
-      show(box);
-      links.forEach(({url,title,kind})=>{
-        const emoji=kind==='news'?'📰':kind==='review'?'⭐':kind==='social'?'🔗':kind==='site'?'🏢':kind==='citation'?'📚':'🔗';
-        const span=document.createElement('span');
-        span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML=`${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({url,title})=>{
-        const li=document.createElement('li');
-        li.className='text-sm';
-        li.innerHTML=`<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||prettyUrl(url)}</a>
-                      <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      let open=true;
-      $('#toggle-sources').onclick=()=>{ open=!open; ul.classList.toggle('hidden',!open); $('#toggle-sources').textContent=open?'Hide list':'Show list'; };
-    }
-
-    /* ===== API calls (v1beta) ===== */
-    function makePayload(systemPrompt, userQuery){
-      const p = {
-        contents:[{role:'user',parts:[{text:userQuery}]}],
-        systemInstruction:{parts:[{text:systemPrompt}]},
-        generationConfig:{ maxOutputTokens:8192, temperature:0.2, topP:0.95, responseMimeType:'application/json' }
-      };
-      if(USE_SEARCH_TOOL) p.tools=[{googleSearch:{}}];
-      return p;
-    }
-    function parseCandidateJSON(candidate){
-      const parts=candidate?.content?.parts||[];
-      for(const p of parts){
-        if(typeof p?.text==='string' && p.text.trim()){
-          const raw=p.text.replace(/```json/g,'').replace(/```/g,'').trim();
-          try{return JSON.parse(raw);}catch{}
-          const lastCurly=raw.lastIndexOf('}'), lastSquare=raw.lastIndexOf(']'), cut=Math.max(lastCurly,lastSquare);
-          if(cut>0){ const maybe=raw.slice(0,cut+1); try{return JSON.parse(maybe);}catch{} }
-        }
-      }
-      for(const p of parts){
-        if(p?.inline_data?.data && String(p.inline_data.mimeType||'').toLowerCase().includes('json')){
-          try{return JSON.parse(atob(p.inline_data.data));}catch{}
-        }
-      }
-      const preview=parts.find(p=>p.text)?.text?.slice(0,300)?.replace(/\s+/g,' ')||'No text';
-      throw new Error('Model returned no parseable JSON (preview: '+preview+')');
-    }
-    async function callReportAPI(systemPrompt, userQuery){
-      const key=getApiKey(); if(!key) throw new Error('Missing API key. Set it in the file (const zakk) or `window.zakk`.');
-      let lastErr;
-      for(const model of MODEL_CANDIDATES){
-        const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
-        try{
-          const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(makePayload(systemPrompt,userQuery))});
-          if(!res.ok){ let body=null; try{body=await res.json()}catch{}; const msg=body?.error?.message||res.statusText||'Request failed'; const err=new Error(`${msg} (HTTP ${res.status})`); err.code=body?.error?.status; throw err; }
-          const data=await res.json();
-          const cand=data?.candidates?.[0]; if(!cand) throw new Error('No candidates in response.');
-          const json=parseCandidateJSON(cand);
-          const atts=cand?.groundingMetadata?.groundingAttributions||[];
-          const sources=atts.map(a=>({uri:a.web?.uri,title:a.web?.title})).filter(s=>s.uri);
-          return {json, sources};
-        }catch(e){ lastErr=e; }
-      }
-      throw lastErr||new Error('All model attempts failed.');
-    }
-
-    /* ===== Prompt ===== */
-    function buildPrompt(){
-      return `You are an AI business analyst. Return a SINGLE JSON object ONLY (no commentary). Focus on US companies.
-Fields:
-summary:{companyName,summary}
-sos:{entityName,entityType,status,jurisdiction,formationDate,registeredAgent,address,phone,email}
-riskScore:{score(300-850),justification,positives:[string],negatives:[string]}
-highlights:[string]
-profile:{website,founded,headquarters,employees,industry,ticker}
-leadership:[{name,title,linkedin?}]
-products:[string]
-competitors:[string]
-webPresence:{twitter,linkedin,youtube,facebook,traffic}
-reviews:[{snippet,source,url}]
-chartPoints:{revenue:[number],cashFlow:[number]}
-news:[{title,source,date,url}]
-citations:[{title,url}]
-If unknown, use "N/A" or []. Respond ONLY with JSON.`;
-    }
-
-    /* ===== Populate ===== */
-    function populateReport(data){
-      set($('#report-title'), data?.summary?.companyName || 'Business Report');
-      $('#summary-text').textContent = data?.summary?.summary || '—';
-
-      const score = data?.riskScore?.score || 0;
-      const badge = $('#score-badge'); badge.textContent = score || '—';
-      badge.className='rounded-full w-28 h-28 flex items-center justify-center text-3xl font-extrabold border-8';
-      if(score<550){ badge.classList.add('border-red-200','text-red-700','bg-red-50'); }
-      else if(score<700){ badge.classList.add('border-yellow-200','text-yellow-700','bg-yellow-50'); }
-      else{ badge.classList.add('border-emerald-200','text-emerald-700','bg-emerald-50'); }
-      $('#score-justification').textContent = data?.riskScore?.justification || '';
-
-      const sos=data?.sos||{};
-      set($('#filings-name'), sos.entityName);
-      set($('#filings-type'), sos.entityType);
-      const st=$('#filings-status'); st.textContent=sos.status||'N/A'; st.className='font-medium '+(((sos.status||'').toLowerCase()==='active')?'text-green-600':'text-gray-700');
-      set($('#filings-juris'), sos.jurisdiction);
-      set($('#filings-date'), sos.formationDate);
-      set($('#filings-agent'), sos.registeredAgent);
-
-      const p=data?.profile||{};
-      set($('#facts-founded'), p.founded);
-      set($('#facts-hq'), p.headquarters || p.hq);
-      set($('#facts-employees'), p.employees);
-      set($('#facts-industry'), p.industry);
-      set($('#facts-ticker'), p.ticker);
-      $('#facts-website').innerHTML = p.website ? linkifyMaybe(p.website) : 'N/A';
-
-      const hl=$('#highlights-list'); hl.innerHTML='';
-      (nl(data?.highlights).length?nl(data?.highlights):['No operational highlights found.']).forEach(x=>{ const li=document.createElement('li'); li.textContent=x; hl.appendChild(li); });
-
-      const news=$('#news-list'); news.innerHTML='';
-      (data?.news||[]).slice(0,6).forEach(n=>{
-        const li=document.createElement('li');
-        li.innerHTML = `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Untitled'}</a>
-                        <div class="text-xs text-gray-500">${n.source||'Source'}${n.date?' • '+n.date:''}</div>`;
-        news.appendChild(li);
-      });
-
-      set($('#contact-phone'), sos.phone);
-      set($('#contact-email'), sos.email);
-      const addr=sos.address||'';
-      set($('#contact-address'), addr);
-      const mapsUrl = addr ? `https://www.google.com/maps?q=${encodeURIComponent(addr)}` : '#';
-      $('#maps-link').setAttribute('href', mapsUrl);
-      $('#map-embed').src = addr ? `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed` : 'about:blank';
-
-      const fill=(ul,arr,empty='No data')=>{
-        ul.innerHTML=''; (arr&&arr.length?arr:[empty]).forEach(t=>{
-          const li=document.createElement('li');
-          li.textContent=(typeof t==='string')?t:(t?.name?`${t.name} — ${t.title||''}`:JSON.stringify(t));
-          ul.appendChild(li);
-        });
-      };
-      fill($('#leadership-list'), (data?.leadership||[]).map(p=>p?.name?`${p.name} — ${p.title||''}`:''));
-      fill($('#products-list'), data?.products);
-      fill($('#competitors-list'), data?.competitors);
-
-      const ws=data?.webPresence||{}, social=$('#social-list'); social.innerHTML='';
-      [['Website Traffic',ws.traffic],['Twitter/X',ws.twitter],['LinkedIn',ws.linkedin],['YouTube',ws.youtube],['Facebook',ws.facebook]].forEach(([k,v])=>{
-        if(!v) return; const li=document.createElement('li'); li.innerHTML=`<span class="text-gray-500">${k}:</span> <span class="font-medium">${linkifyMaybe(v)}</span>`; social.appendChild(li);
-      });
-
-      const rev=nl(data?.reviews), rv=$('#reviews-list'); rv.innerHTML='';
-      if(rev.length){
-        rev.forEach(r=>{
-          const card=document.createElement('div'); card.className='border border-brand-border rounded-md p-3';
-          card.innerHTML=`<p class="italic text-gray-700">“${(r?.snippet||'').replace(/^"|"$|^'|'$/g,'')}”</p>
-                          <div class="text-xs text-gray-500 mt-1">${r?.source||''}${r?.url?` — <a href="${r.url}" target="_blank" rel="noopener" class="text-brand-green hover:underline">link</a>`:''}</div>`;
-          rv.appendChild(card);
-        });
-      } else {
-        rv.innerHTML='<p class="text-sm text-gray-600">No recent customer reviews found.</p>';
-      }
-
-      const cp=data?.chartPoints||{};
-      renderLineChart($('#chart-revenue'), Array.isArray(cp.revenue)&&cp.revenue.length?cp.revenue:[30,35,33,40,38,45,50,55], '#00C09A');
-      renderLineChart($('#chart-cashflow'), Array.isArray(cp.cashFlow)&&cp.cashFlow.length?cp.cashFlow:[65,60,58,62,59,57,55,54], '#3B82F6');
-    }
-
-    /* ===== Share: live + snapshot (no server) ===== */
-    let __LAST_REPORT=null, __LAST_QUERY='';
-    function liveLink(q){ const url=new URL(location.href); url.searchParams.set('q',q); url.hash=''; return url.toString(); }
-    function snapshotLink(report){ const packed=LZString.compressToEncodedURIComponent(JSON.stringify(report)); const url=new URL(location.href); url.search=''; url.hash=`#r=${packed}`; return url.toString(); }
-
-    async function copy(text){
-      try{ await navigator.clipboard.writeText(text); alert('Link copied to clipboard.'); }
-      catch{ prompt('Copy this link:', text); }
-    }
-
-    /* ===== Run / hydrate ===== */
-    function promptText(){ return buildPrompt(); }
-    async function runReport(query){
-      hide($('#content')); setState('loading'); $('#generate-btn').disabled=true;
-      try{
-        const {json,sources}=await callReportAPI(promptText(), `Generate a comprehensive US-focused AI business report for: "${query}"`);
-        __LAST_REPORT=json; __LAST_QUERY=query;
-        populateReport(json); populateSources(collectSources(json,sources));
-        setState('content');
-      }catch(e){
-        console.error(e);
-        const msg=/TypeError:|Failed to fetch|fetch/i.test(String(e))
-          ? 'Network/CORS error: the browser could not reach the Google Generative Language API. Serve this page via http(s) and temporarily disable extensions that block third‑party requests for generativelanguage.googleapis.com.'
-          : (e.message||'Failed to generate report.');
-        setState('error', msg);
-      }finally{
-        $('#generate-btn').disabled=false;
-      }
-    }
-
-    async function hydrateFromUrlOrRun(run){
-      const hash=location.hash||''; const params=new URLSearchParams(location.search); const q=(params.get('q')||'').trim();
-      if(hash.startsWith('#r=')){
-        try{
-          const json = JSON.parse(LZString.decompressFromEncodedURIComponent(hash.slice(3)) || '{}');
-          __LAST_REPORT=json; __LAST_QUERY=json?.summary?.companyName || q || '';
-          $('#business-name').value=__LAST_QUERY;
-          populateReport(json); populateSources(collectSources(json,[])); setState('content');
-          const badge=document.createElement('span'); badge.className='ml-2 inline-flex items-center px-2 py-0.5 rounded bg-yellow-50 text-yellow-700 text-xs font-semibold'; badge.textContent='Snapshot'; $('#report-title').appendChild(badge);
-          return;
-        }catch(e){ console.warn('Snapshot parse failed; falling back', e); }
-      }
-      if(q){ $('#business-name').value=q; run(q); }
-    }
-
-    /* ===== Events ===== */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const form=$('#search-form'), input=$('#business-name');
-      form.addEventListener('submit', e=>{ e.preventDefault(); const q=(input.value||'').trim(); if(!q){ setState('error','Please enter a business name.'); return; } runReport(q); });
-      $('#rerun-btn').addEventListener('click', ()=>{ const q=(input.value||'').trim(); if(!q){ setState('error','Please enter a business name.'); return; } runReport(q); });
-
-      $('#copy-live-btn').addEventListener('click', ()=>{ if(!__LAST_QUERY){ alert('Generate a report first.'); return; } copy(liveLink(__LAST_QUERY)); });
-      $('#copy-snap-btn').addEventListener('click', ()=>{
-        if(!__LAST_REPORT){ alert('Generate a report first.'); return; }
-        const url=snapshotLink(__LAST_REPORT);
-        // if hash link is too long for some contexts, fall back to live link
-        copy(url.length<1900?url:liveLink(__LAST_QUERY));
-      });
-
-      $('#print-btn').addEventListener('click', ()=>window.print());
-      $('#json-btn').addEventListener('click', ()=>{
-        if(!__LAST_REPORT){ alert('Generate a report first.'); return; }
-        const blob=new Blob([JSON.stringify(__LAST_REPORT,null,2)],{type:'application/json'});
-        const url=URL.createObjectURL(blob);
-        const a=Object.assign(document.createElement('a'),{href:url,download:`${(__LAST_QUERY||'report').replace(/\s+/g,'_')}.json`});
-        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      });
-
-      hydrateFromUrlOrRun(runReport);
+  function wireExportMenu(){
+    const btn  = document.getElementById('export-menu-btn');
+    const menu = document.getElementById('export-menu');
+    if(!btn || !menu) return;
+    btn.addEventListener('click',()=>menu.classList.toggle('hidden'));
+    document.addEventListener('click',e=>{
+      if(!menu.contains(e.target) && e.target!==btn) menu.classList.add('hidden');
     });
+    document.getElementById('copy-link-btn')?.addEventListener('click',()=>{
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      copyToClipboard(buildPermalink(q));
+    });
+    document.getElementById('share-native-btn')?.addEventListener('click', async()=>{
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      const url = __lastReport ? buildSnapshotLink(__lastReport) : buildPermalink(q);
+      if(navigator.share){
+        try { await navigator.share({title:`Business Report — ${q||'Company'}`, text:'View this report', url}); }
+        catch { /* ignore */ }
+      } else copyToClipboard(url);
+    });
+    document.getElementById('export-pdf-btn')?.addEventListener('click',()=>window.print());
+    document.getElementById('download-json-btn')?.addEventListener('click',()=>{
+      if(!__lastReport) return alert('Generate a report first.');
+      const blob=new Blob([JSON.stringify(__lastReport,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      const name=(__lastReport?.summary?.companyName||'report').replace(/[^\w\-]+/g,'_');
+      a.href=url; a.download=`${name}_report.json`; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  function wireShareButton(){
+    const btn=document.getElementById('share-btn');
+    if(!btn) return;
+    btn.addEventListener('click', async ()=>{
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      const url = __lastReport ? buildSnapshotLink(__lastReport) : buildPermalink(q);
+      if(navigator.share){
+        try { await navigator.share({title:'Business Report', text:'View this report', url}); }
+        catch { copyToClipboard(url); }
+      } else copyToClipboard(url);
+    });
+  }
+
+  async function hydrateFromURL(){
+    const h = location.hash || '';
+    const m = h.match(/^#r=(.+)$/);
+    if(m){
+      try{
+        showLoading();
+        const raw = LZString.decompressFromEncodedURIComponent(m[1]);
+        const json = JSON.parse(raw);
+        await new Promise(r=>setTimeout(r, 900)); // tiny delay so loader is visible
+        hideLoading(); populateReport(json); setLastReport(json);
+        const c = json?.summary?.companyName || '';
+        const input = document.getElementById('business-name'); if(input) input.value=c;
+        return;
+      }catch(e){ console.warn('Snapshot decode failed', e); }
+    }
+    const q = new URLSearchParams(location.search).get('q') || '';
+    if(q){ const input=document.getElementById('business-name'); if(input) input.value=q; runReport(q); }
+  }
+
+  /* =========================================================
+     VIEW HELPERS & RENDER
+     ========================================================= */
+  function showError(msg){
+    hideLoading();
+    const err=document.getElementById('report-error-container');
+    const txt=document.getElementById('report-error-message');
+    const content=document.getElementById('report-content');
+    document.getElementById('report-results-container').style.display='block';
+    err.style.display='block'; content.style.display='none';
+    txt.textContent=msg||'Something went wrong.';
+  }
+  function showContent(){
+    const err=document.getElementById('report-error-container');
+    const content=document.getElementById('report-content');
+    document.getElementById('report-results-container').style.display='block';
+    err.style.display='none'; content.style.display='block';
+  }
+
+  function populateSources(links){
+    const chips=document.getElementById('report-sources-chips');
+    const ul=document.getElementById('report-sources');
+    const box=document.getElementById('report-sources-container');
+    chips.innerHTML=''; ul.innerHTML='';
+    if(!Array.isArray(links)||!links.length){ box.style.display='none'; return; }
+    box.style.display='block';
+    links.forEach(({title,url})=>{
+      const span=document.createElement('span');
+      span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+      span.innerHTML=`🔗 <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||url}</a>`;
+      chips.appendChild(span);
+    });
+    links.forEach(({title,url})=>{
+      const li=document.createElement('li');
+      li.className='text-sm';
+      li.innerHTML=`<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||url}</a>`;
+      ul.appendChild(li);
+    });
+    let open=false;
+    document.getElementById('toggle-sources').onclick=()=>{
+      open=!open; ul.classList.toggle('hidden',!open);
+      document.getElementById('toggle-sources').textContent=open?'Hide list':'Show list';
+    };
+  }
+
+  function populateReport(data){
+    document.getElementById('report-title').textContent = data?.summary?.companyName || '—';
+    document.getElementById('report-summary').textContent = data?.summary?.summary || '—';
+    document.getElementById('score-digit').textContent = data?.riskScore?.score ?? '—';
+    document.getElementById('score-just').textContent = data?.riskScore?.justification || '';
+    const links = (data?.citations||[]).map(c=>({title:c.title,url:c.url}));
+    populateSources(links);
+    showContent();
+  }
+
+  /* =========================================================
+     runReport() — STUB WHILE TESTING (no proxy, no API)
+     Replace with your real API call later; on success call:
+        populateReport(json);
+        setLastReport(json);
+        pushPermalink(companyName);
+        hideLoading();
+     ========================================================= */
+  const DEMO_JSON = {
+    summary: {
+      companyName: "AOL Inc.",
+      summary: "AOL (America Online) was a pioneering internet services company that popularized dial‑up access, email, and messaging, later evolving into a digital media brand."
+    },
+    riskScore: {
+      score: 580,
+      justification: "Mature legacy brand; diversified parent support; core portal usage has declined."
+    },
+    citations: [
+      {title:"Wikipedia — AOL", url:"https://en.wikipedia.org/wiki/AOL"},
+      {title:"Delaware SOS — Entity Search", url:"https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx"}
+    ]
+  };
+
+  async function runReport(query){
+    try{
+      showLoading();
+      // Simulate network latency so loader is visible
+      await new Promise(r=>setTimeout(r, 1800));
+      const json = JSON.parse(JSON.stringify(DEMO_JSON));
+      json.summary.companyName = query || DEMO_JSON.summary.companyName;
+
+      // TODO: replace everything above with your real API call.
+      // After you get 'json', call:
+      // populateReport(json); setLastReport(json); pushPermalink(query); hideLoading();
+
+      populateReport(json);
+      setLastReport(json);
+      pushPermalink(query);
+      hideLoading();
+    }catch(e){ showError(e.message || 'Failed to generate report.'); }
+  }
+
+  /* =========================================================
+     BOOT
+     ========================================================= */
+  document.addEventListener('DOMContentLoaded', ()=>{
+    wireShareButton();
+    wireExportMenu();
+    hydrateFromURL();
+
+    document.getElementById('load-sample')?.addEventListener('click', ()=>{
+      const q=(document.getElementById('business-name')?.value||'Sample Co.').trim();
+      runReport(q);
+    });
+
+    document.getElementById('search-form')?.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      if(!q) return showError('Please enter a business name.');
+      runReport(q);
+    });
+
+    document.getElementById('rerun')?.addEventListener('click', ()=>{
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      if(!q) return showError('Please enter a business name.');
+      runReport(q);
+    });
+  });
   </script>
 </body>
 </html>
