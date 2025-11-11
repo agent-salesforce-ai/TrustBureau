@@ -153,7 +153,7 @@
 
       <!-- Error -->
       <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
-        <p id="report-error-message" class="text-sm text-red-700"></p>
+        <p id="report-error-message" class="text-sm text-red-700 whitespace-pre-line"></p>
       </div>
 
       <!-- REPORT CONTENT -->
@@ -947,10 +947,18 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
           showState('content');
         } catch (e) {
           console.error(e);
-          const corsHint = (!PROXY_BASE && /Failed to fetch|NetworkError|CORS|TypeError: fetch/i.test(String(e))) 
-            ? 'Network/CORS error: serve this page via http(s) and/or use a tiny proxy (set PROXY_BASE in code).' 
-            : '';
-          showState('error', e.message || corsHint || 'Failed to generate report.');
+          let errorMsg = e.message || 'Failed to generate report.';
+          
+          // Better error messages for common issues
+          if (!PROXY_BASE && /Failed to fetch|NetworkError|CORS|TypeError: fetch|ERR_BLOCKED/i.test(String(e))) {
+            errorMsg = 'Unable to connect to the AI service. This could be due to:\n\n' +
+                       '• Network restrictions or ad blockers\n' +
+                       '• CORS policy (serve via https:// or use a proxy)\n' +
+                       '• API key configuration\n\n' +
+                       'The report sharing and viewing features work normally. Only live report generation requires API access.';
+          }
+          
+          showState('error', errorMsg);
         } finally {
           btn.disabled = false; btn.classList.remove('cta-disabled');
         }

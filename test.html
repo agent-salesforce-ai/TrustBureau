@@ -175,7 +175,7 @@
 
       <!-- Error -->
       <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
-        <p id="report-error-message" class="text-sm text-red-700 dark:text-red-400"></p>
+        <p id="report-error-message" class="text-sm text-red-700 dark:text-red-400 whitespace-pre-line"></p>
       </div>
 
       <!-- Content -->
@@ -859,9 +859,18 @@ Return valid JSON only.
           showState('content');
         } catch (e) {
           console.error(e);
-          const hint = /fetch|network|cors/i.test(String(e)) ?
-            'Network/CORS: serve this file via http(s) and temporarily disable extensions that block requests to generativelanguage.googleapis.com.' : '';
-          showState('error', e.message || hint || 'Failed to generate report.');
+          let errorMsg = e.message || 'Failed to generate report.';
+          
+          // Better error messages for common issues
+          if (/fetch|network|cors|ERR_BLOCKED/i.test(String(e))) {
+            errorMsg = 'Unable to connect to the AI service. This could be due to:\n\n' +
+                       '• Network restrictions or ad blockers\n' +
+                       '• CORS policy (serve via https:// or use a proxy)\n' +
+                       '• API key configuration\n\n' +
+                       'Note: This is a test/demo page. The report generation requires API access.';
+          }
+          
+          showState('error', errorMsg);
         } finally {
           btn.disabled = false; btn.classList.remove('cta-disabled');
         }
