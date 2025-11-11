@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shared Business Report — TrustBureau.ai</title>
-  <meta name="description" content="View shared business verification report">
+  <title>Business Report Tool — TrustBureau.ai</title>
+  <meta name="description" content="Generate and view business reports">
   
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -25,29 +25,11 @@
               light: '#F8FAFC',
               border:'#E5E7EB'
             }
-          },
-          boxShadow: {
-            subtle: '0 10px 20px rgba(0,0,0,.06)'
-          },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'spin': 'spin 1s linear infinite'
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-10px)' }
-            }
           }
         }
       }
     }
   </script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
 
   <style>
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
@@ -56,121 +38,39 @@
     .dark .card { background: #1E293B; border-color: #334155; }
     .cta { background:#00C09A; color:#fff; font-weight:700; border-radius:.5rem; transition: all .15s ease; }
     .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
-    .cta:active { transform: translateY(0); }
-    .badge { font-size:.72rem; background:#F1F5F9; padding:.15rem .5rem; border-radius:999px; display:inline-block; }
-    .dark .badge { background: #334155; color: #E5E7EB; }
     .score-circle { width:120px; height:120px; border-radius:9999px; display:flex; align-items:center; justify-content:center; border:8px solid; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:2.3rem; }
     .score-red { border-color:#FECACA; color:#DC2626; background:#FEF2F2 }
     .score-yellow{ border-color:#FDE68A; color:#D97706; background:#FFFBEB }
     .score-green{ border-color:#A7F3D0; color:#059669; background:#ECFDF5 }
-    
-    /* Dark mode specific styles */
-    .dark { color: #F1F5F9; }
-    .dark .text-brand-dark { color: #F1F5F9; }
-    .dark .text-brand-gray { color: #94A3B8; }
-    .dark .bg-brand-light { background: #1E293B; }
-    .dark .border-brand-border { border-color: #334155; }
-    .dark header { background: rgba(15, 23, 42, 0.85); }
-    
-    /* Print styles */
-    @media print {
-      header, footer, #search-prompt, #theme-toggle, #settings-modal, .no-print { display: none !important; }
-      .card { box-shadow: none; border: 1px solid #ddd; }
-      body { background: white; color: black; }
-    }
-    
-    /* Chart styles */
-    .mini-chart { height: 60px; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body class="font-sans text-brand-dark">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/85 border-b border-brand-border backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg width="28" height="28" viewBox="0 0 50 50" fill="none">
+          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="font-heading text-lg md:text-xl font-extrabold">TrustBureau.ai</span>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <span id="api-status" class="hidden text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">API Ready</span>
+        <button id="settings-btn" class="p-2 hover:bg-gray-100 rounded">⚙️</button>
+      </div>
+    </div>
+  </header>
+
   <!-- Settings Modal -->
   <div id="settings-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
     <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold">Settings</h3>
-          <button id="close-settings" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="space-y-4">
-          <!-- API Key Section -->
-          <div class="pb-4 border-b dark:border-gray-700">
-            <label class="block text-sm font-medium mb-2">API Key for New Reports</label>
-            <div id="api-key-status" class="space-y-2">
-              <!-- Dynamically populated -->
-            </div>
-            <p class="text-xs text-brand-gray mt-2">
-              Add your Gemini API key to generate new reports directly from this page
-            </p>
-          </div>
-          
-          <!-- Display Options -->
-          <div class="pb-4 border-b dark:border-gray-700">
-            <label class="block text-sm font-medium mb-2">Display Options</label>
-            <div class="space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="auto-expand" class="rounded" checked>
-                <span class="text-sm">Auto-expand all sections</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="show-sources" class="rounded" checked>
-                <span class="text-sm">Show data sources</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="show-search-prompt" class="rounded">
-                <span class="text-sm">Show search suggestions</span>
-              </label>
-            </div>
-          </div>
-          
-          <!-- Data Management -->
-          <div class="pb-4 border-b dark:border-gray-700">
-            <label class="block text-sm font-medium mb-2">Data Management</label>
-            <div class="space-y-2">
-              <button id="export-settings" class="w-full px-3 py-2 text-sm border border-brand-border rounded hover:bg-brand-light dark:hover:bg-gray-700 text-left">
-                Export Settings & Data
-              </button>
-              <button id="clear-local" class="w-full px-3 py-2 text-sm border border-brand-border rounded hover:bg-brand-light dark:hover:bg-gray-700 text-left">
-                Clear Local Storage
-              </button>
-            </div>
-          </div>
-          
-          <!-- About -->
-          <div class="text-xs text-brand-gray">
-            <p>TrustBureau.ai Share Viewer</p>
-            <p>Version: 1.0.0</p>
-            <p>User: agent-salesforce-ai</p>
-            <p>Last updated: 2025-11-11</p>
-          </div>
-        </div>
-        
-        <button id="save-settings" class="mt-6 w-full cta px-4 py-2">
-          Save Settings
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- API Key Input Modal -->
-  <div id="api-key-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-        <div class="flex items-start gap-3 mb-4">
-          <svg class="w-8 h-8 text-brand-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-          </svg>
-          <div class="flex-1">
-            <h3 class="text-lg font-bold">Add API Key</h3>
-            <p class="text-sm text-brand-gray mt-1">Enter your Gemini API key to generate new reports</p>
-          </div>
-        </div>
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <h3 class="text-lg font-bold mb-4">API Configuration</h3>
         
         <div class="space-y-4">
           <div>
@@ -178,371 +78,258 @@
             <input 
               id="api-key-input" 
               type="password" 
-              class="w-full px-3 py-2 border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green dark:bg-gray-700 dark:border-gray-600"
-              placeholder="AIzaSy..."
-              autocomplete="off">
-            <p class="text-xs text-brand-gray mt-1">
-              Get your key at 
-              <a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-brand-green hover:underline">
-                Google AI Studio
-              </a>
+              class="w-full px-3 py-2 border rounded-lg"
+              placeholder="AIzaSy...">
+            <p class="text-xs text-gray-500 mt-1">
+              Get key at: <a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-brand-green">Google AI Studio</a>
             </p>
           </div>
           
-          <div class="flex items-start gap-2">
-            <input type="checkbox" id="remember-api-key" class="mt-1" checked>
-            <label for="remember-api-key" class="text-sm">
-              <span class="font-medium">Remember my key</span>
-              <span class="text-brand-gray block">Stored securely in your browser only</span>
-            </label>
-          </div>
-          
-          <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-            <div class="flex gap-2">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-              </svg>
-              <div class="text-xs text-amber-700 dark:text-amber-300">
-                <p class="font-semibold">Security Note</p>
-                <p>Your API key stays local and is never sent to our servers.</p>
-              </div>
-            </div>
-          </div>
-          
           <div class="flex gap-3">
-            <button id="save-api-key" class="flex-1 cta px-4 py-2">
-              Save Key
-            </button>
-            <button id="cancel-api-key" class="flex-1 px-4 py-2 border border-brand-border rounded hover:bg-brand-light dark:hover:bg-gray-700">
-              Cancel
-            </button>
+            <button id="save-key" class="flex-1 cta px-4 py-2">Save</button>
+            <button id="cancel-key" class="flex-1 px-4 py-2 border rounded">Cancel</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/85 border-b border-brand-border backdrop-blur dark:bg-brand-dark/85">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a class="flex items-center gap-2" href="/" title="Go to Search">
-        <svg width="28" height="28" viewBox="0 0 50 50" fill="none" aria-hidden="true">
-          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="font-heading text-lg md:text-xl font-extrabold">TrustBureau.ai</span>
-      </a>
+  <!-- Main Search Section -->
+  <section class="max-w-4xl mx-auto px-4 pt-10">
+    <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center">Business Report Generator</h1>
+    <p class="text-center text-gray-600 mt-3">Standalone tool by agent-salesforce-ai • 2025-11-11</p>
 
-      <div class="flex items-center gap-3">
-        <span id="api-status-badge" class="hidden text-xs px-2 py-1 rounded-full"></span>
-        
-        <button id="settings-btn" class="text-sm text-brand-gray hover:text-brand-green" title="Settings">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </button>
-        
-        <button id="help-btn" class="text-sm text-brand-gray hover:text-brand-green" title="About this report">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </button>
-        
-        <a href="/" class="cta px-4 py-2 text-sm flex items-center gap-2">
-          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
-          </svg>
-          New Search
-        </a>
+    <div class="card p-4 mt-6">
+      <form id="search-form" class="flex gap-3">
+        <input 
+          id="query" 
+          class="flex-1 px-4 py-3 border rounded-lg"
+          placeholder="Enter company name (e.g., Salesforce, Apple, Microsoft)"
+          autofocus>
+        <button type="submit" class="cta px-6 py-3">Generate Report</button>
+      </form>
+    </div>
+
+    <div class="text-center mt-4">
+      <button id="sample-btn" class="text-sm text-brand-green hover:underline">Load sample report</button>
+    </div>
+  </section>
+
+  <!-- Results Section -->
+  <section id="results" class="max-w-6xl mx-auto px-4 py-8 hidden">
+    <!-- Loader -->
+    <div id="loader" class="card p-6 hidden">
+      <div class="flex items-center gap-4">
+        <svg class="w-8 h-8 text-brand-green spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" stroke-width="2" opacity=".15"></circle>
+          <path d="M22 12a10 10 0 0 1-10 10" stroke-width="2"></path>
+        </svg>
+        <div>Generating report...</div>
       </div>
     </div>
-  </header>
 
-  <!-- [Rest of the HTML content remains the same...] -->
+    <!-- Report Content -->
+    <div id="content" class="hidden space-y-6">
+      <h2 id="company-name" class="text-2xl font-bold"></h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Risk Score</h3>
+          <div id="score-circle" class="score-circle mx-auto">
+            <span id="score">—</span>
+          </div>
+        </div>
+        
+        <div class="md:col-span-2 card p-5">
+          <h3 class="font-semibold mb-3">Summary</h3>
+          <p id="summary"></p>
+        </div>
+      </div>
+      
+      <div id="details" class="card p-5"></div>
+    </div>
+  </section>
 
-  <!-- Application Script -->
   <script>
-    // API Key Manager
-    const APIKeyManager = {
-      STORAGE_KEY: 'trustbureau_share_gemini_key',
-      
-      obfuscate(str) {
-        return btoa(str.split('').reverse().join(''));
-      },
-      
-      deobfuscate(str) {
-        try {
-          return atob(str).split('').reverse().join('');
-        } catch {
-          return null;
-        }
-      },
-      
-      save(apiKey, remember = true) {
-        if (remember) {
-          const obfuscated = 'enc_' + this.obfuscate(apiKey);
-          localStorage.setItem(this.STORAGE_KEY, obfuscated);
-        } else {
-          sessionStorage.setItem(this.STORAGE_KEY, apiKey);
-        }
-        this.updateStatus(true);
-      },
-      
+    // ============= STANDALONE API KEY MANAGEMENT =============
+    const API_KEY = {
       get() {
-        const sessionKey = sessionStorage.getItem(this.STORAGE_KEY);
-        if (sessionKey) return sessionKey;
-        
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        if (!stored) return null;
-        
-        if (stored.startsWith('enc_')) {
-          return this.deobfuscate(stored.substring(4));
-        }
-        return stored;
+        return localStorage.getItem('share_gemini_key');
       },
       
-      clear() {
-        localStorage.removeItem(this.STORAGE_KEY);
-        sessionStorage.removeItem(this.STORAGE_KEY);
-        this.updateStatus(false);
+      set(key) {
+        localStorage.setItem('share_gemini_key', key);
+        this.updateStatus();
       },
       
       exists() {
         return !!this.get();
       },
       
-      updateStatus(hasKey) {
-        const badge = document.getElementById('api-status-badge');
-        const statusDiv = document.getElementById('api-key-status');
-        
-        if (hasKey) {
-          badge.textContent = '🔑 API Key Set';
-          badge.className = 'text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-          badge.style.display = 'inline-block';
-          
-          if (statusDiv) {
-            statusDiv.innerHTML = `
-              <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded">
-                <div class="flex items-center gap-2">
-                  <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 0016 0zM13.707 7.293a1 1 0 00-1.414-1.414L9 9.172 7.707 7.879a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="text-sm">API Key configured</span>
-                </div>
-                <button id="change-api-key" class="text-sm text-brand-green hover:underline">Change</button>
-              </div>
-              <button id="clear-api-key" class="w-full px-3 py-2 text-sm border border-red-200 text-red-600 rounded hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 mt-2">
-                Remove API Key
-              </button>
-            `;
-          }
+      updateStatus() {
+        const status = document.getElementById('api-status');
+        if (this.exists()) {
+          status.classList.remove('hidden');
         } else {
-          badge.style.display = 'none';
-          
-          if (statusDiv) {
-            statusDiv.innerHTML = `
-              <button id="add-api-key" class="w-full cta px-3 py-2 text-sm">
-                Add API Key
-              </button>
-            `;
-          }
+          status.classList.add('hidden');
         }
-      },
-      
-      showModal() {
-        const modal = document.getElementById('api-key-modal');
-        const input = document.getElementById('api-key-input');
-        const rememberCheck = document.getElementById('remember-api-key');
-        
-        const existing = this.get();
-        if (existing) {
-          input.value = existing;
-        }
-        
-        modal.classList.remove('hidden');
-        input.focus();
-        
-        return new Promise((resolve) => {
-          const save = () => {
-            const key = input.value.trim();
-            if (!key) {
-              alert('Please enter an API key');
-              return;
-            }
-            
-            if (!key.startsWith('AIza')) {
-              if (!confirm('This doesn\'t look like a valid Gemini API key. Continue anyway?')) {
-                return;
-              }
-            }
-            
-            this.save(key, rememberCheck.checked);
-            modal.classList.add('hidden');
-            resolve(key);
-          };
-          
-          const cancel = () => {
-            modal.classList.add('hidden');
-            resolve(null);
-          };
-          
-          document.getElementById('save-api-key').onclick = save;
-          document.getElementById('cancel-api-key').onclick = cancel;
-          
-          input.onkeydown = (e) => {
-            if (e.key === 'Enter') save();
-            if (e.key === 'Escape') cancel();
-          };
-        });
       }
     };
 
-    // Settings Manager
-    const SettingsManager = {
-      STORAGE_KEY: 'trustbureau_share_settings',
+    // ============= SETTINGS =============
+    document.getElementById('settings-btn').onclick = () => {
+      const modal = document.getElementById('settings-modal');
+      const input = document.getElementById('api-key-input');
       
-      defaults: {
-        autoExpand: true,
-        showSources: true,
-        showSearchPrompt: false
-      },
+      // Pre-fill if exists
+      if (API_KEY.exists()) {
+        input.value = API_KEY.get();
+      }
       
-      get() {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        return stored ? { ...this.defaults, ...JSON.parse(stored) } : this.defaults;
-      },
-      
-      save(settings) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(settings));
-      },
-      
-      show() {
-        const modal = document.getElementById('settings-modal');
-        const settings = this.get();
-        
-        // Load current settings
-        document.getElementById('auto-expand').checked = settings.autoExpand;
-        document.getElementById('show-sources').checked = settings.showSources;
-        document.getElementById('show-search-prompt').checked = settings.showSearchPrompt;
-        
-        // Update API key status
-        APIKeyManager.updateStatus(APIKeyManager.exists());
-        
-        modal.classList.remove('hidden');
-      },
-      
-      hide() {
+      modal.classList.remove('hidden');
+    };
+
+    document.getElementById('save-key').onclick = () => {
+      const key = document.getElementById('api-key-input').value.trim();
+      if (key) {
+        API_KEY.set(key);
         document.getElementById('settings-modal').classList.add('hidden');
-      },
-      
-      apply() {
-        const settings = {
-          autoExpand: document.getElementById('auto-expand').checked,
-          showSources: document.getElementById('show-sources').checked,
-          showSearchPrompt: document.getElementById('show-search-prompt').checked
-        };
-        
-        this.save(settings);
-        
-        // Apply settings immediately
-        if (settings.showSearchPrompt) {
-          const prompt = document.getElementById('search-prompt');
-          if (prompt && !sessionStorage.getItem('search_prompt_closed')) {
-            prompt.classList.remove('hidden');
-          }
-        } else {
-          document.getElementById('search-prompt')?.classList.add('hidden');
-        }
-        
-        // Show/hide sources section
-        const sourcesSection = document.querySelector('#source-chips')?.parentElement;
-        if (sourcesSection) {
-          sourcesSection.style.display = settings.showSources ? 'block' : 'none';
-        }
-        
-        this.hide();
+        alert('API key saved!');
       }
     };
 
-    // Initialize settings
-    function initSettings() {
-      // Settings button
-      document.getElementById('settings-btn').onclick = () => SettingsManager.show();
-      document.getElementById('close-settings').onclick = () => SettingsManager.hide();
-      document.getElementById('save-settings').onclick = () => SettingsManager.apply();
-      
-      // API key management
-      document.addEventListener('click', (e) => {
-        if (e.target.id === 'add-api-key' || e.target.id === 'change-api-key') {
-          APIKeyManager.showModal().then(() => {
-            APIKeyManager.updateStatus(APIKeyManager.exists());
-          });
+    document.getElementById('cancel-key').onclick = () => {
+      document.getElementById('settings-modal').classList.add('hidden');
+    };
+
+    // ============= REPORT GENERATION =============
+    async function generateReport(query) {
+      // Check for API key
+      const apiKey = API_KEY.get();
+      if (!apiKey) {
+        if (confirm('No API key set. Would you like to add one now?')) {
+          document.getElementById('settings-btn').click();
         }
+        return;
+      }
+
+      // Show loader
+      document.getElementById('results').classList.remove('hidden');
+      document.getElementById('loader').classList.remove('hidden');
+      document.getElementById('content').classList.add('hidden');
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Generate a business report for "${query}" with this exact JSON structure:
+{
+  "summary": {
+    "companyName": "Official name",
+    "summary": "2-3 sentence overview"
+  },
+  "riskScore": {
+    "score": 300-850,
+    "justification": "Brief explanation"
+  },
+  "profile": {
+    "founded": "Year",
+    "headquarters": "Location",
+    "employees": "Number",
+    "industry": "Industry",
+    "website": "URL"
+  }
+}
+Return ONLY valid JSON.`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2000,
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
         
-        if (e.target.id === 'clear-api-key') {
-          if (confirm('Remove your API key? You\'ll need to enter it again to generate new reports.')) {
-            APIKeyManager.clear();
-            APIKeyManager.updateStatus(false);
-          }
+        const data = await response.json();
+        const report = JSON.parse(data.candidates[0].content.parts[0].text);
+        
+        displayReport(report);
+        
+      } catch (error) {
+        alert('Error: ' + error.message);
+        console.error(error);
+      } finally {
+        document.getElementById('loader').classList.add('hidden');
+      }
+    }
+
+    function displayReport(data) {
+      document.getElementById('content').classList.remove('hidden');
+      
+      // Basic info
+      document.getElementById('company-name').textContent = data.summary?.companyName || 'Unknown';
+      document.getElementById('summary').textContent = data.summary?.summary || '';
+      
+      // Score
+      const score = data.riskScore?.score || 0;
+      document.getElementById('score').textContent = score;
+      const circle = document.getElementById('score-circle');
+      circle.className = 'score-circle mx-auto';
+      if (score < 550) circle.classList.add('score-red');
+      else if (score < 700) circle.classList.add('score-yellow');
+      else circle.classList.add('score-green');
+      
+      // Details
+      const details = document.getElementById('details');
+      if (data.profile) {
+        details.innerHTML = `
+          <h3 class="font-semibold mb-3">Company Profile</h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            ${Object.entries(data.profile).map(([k,v]) => 
+              `<div><span class="text-gray-600">${k}:</span> ${v}</div>`
+            ).join('')}
+          </div>
+        `;
+      }
+    }
+
+    // ============= SAMPLE REPORT =============
+    document.getElementById('sample-btn').onclick = () => {
+      displayReport({
+        summary: {
+          companyName: "Salesforce, Inc.",
+          summary: "Leading CRM platform serving millions of users worldwide."
+        },
+        riskScore: {
+          score: 820,
+          justification: "Strong market position and financials"
+        },
+        profile: {
+          founded: "1999",
+          headquarters: "San Francisco, CA",
+          employees: "70,000+",
+          industry: "Cloud Software",
+          website: "salesforce.com"
         }
       });
-      
-      // Export settings
-      document.getElementById('export-settings').onclick = () => {
-        const data = {
-          settings: SettingsManager.get(),
-          hasApiKey: APIKeyManager.exists(),
-          exportDate: new Date().toISOString(),
-          user: 'agent-salesforce-ai'
-        };
-        
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `trustbureau_settings_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      };
-      
-      // Clear local storage
-      document.getElementById('clear-local').onclick = () => {
-        if (confirm('Clear all local data? This will remove your API key and settings.')) {
-          const shareReports = Object.keys(localStorage).filter(k => k.startsWith('share_'));
-          shareReports.forEach(k => localStorage.removeItem(k));
-          APIKeyManager.clear();
-          localStorage.removeItem(SettingsManager.STORAGE_KEY);
-          alert('Local storage cleared');
-          SettingsManager.hide();
-          location.reload();
-        }
-      };
-      
-      // Apply initial settings
-      const settings = SettingsManager.get();
-      if (!settings.showSearchPrompt) {
-        document.getElementById('search-prompt')?.classList.add('hidden');
-      }
-      
-      // Update API status on load
-      APIKeyManager.updateStatus(APIKeyManager.exists());
-    }
+      document.getElementById('results').classList.remove('hidden');
+    };
 
-    // [Rest of the existing JavaScript code...]
-    
-    // Utilities
-    const $ = (id) => document.getElementById(id);
-    const show = (el) => el?.classList.remove('hidden');
-    const hide = (el) => el?.classList.add('hidden');
-    
-    // Initialize
-    function init() {
-      initSettings(); // Initialize settings first
-      // [Rest of initialization code...]
-    }
+    // ============= FORM HANDLER =============
+    document.getElementById('search-form').onsubmit = (e) => {
+      e.preventDefault();
+      const query = document.getElementById('query').value.trim();
+      if (query) generateReport(query);
+    };
 
-    document.addEventListener('DOMContentLoaded', init);
+    // ============= INITIALIZATION =============
+    API_KEY.updateStatus();
   </script>
 </body>
 </html>
