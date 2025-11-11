@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-TrustBureau.ai is a static HTML website that provides AI verification standards and business verification reports. The project consists of several HTML pages that form a complete web application.
+TrustBureau.ai is a client-side web application that provides AI verification standards and business verification reports. While the HTML files are statically hosted (no server-side rendering), the site features dynamic functionality through JavaScript that makes API calls to external services for live AI-powered business verification and reporting.
 
 ## Project Structure
 
@@ -16,10 +16,12 @@ TrustBureau.ai is a static HTML website that provides AI verification standards 
 ## Technology Stack
 
 - **Frontend Framework**: Static HTML with Tailwind CSS (via CDN)
-- **JavaScript Library**: Alpine.js (via CDN)
+- **JavaScript Library**: Alpine.js (via CDN) for UI interactivity
+- **External APIs**: Google Gemini API for AI processing, OpenCorporates API for business data
+- **Client-side Dynamic Features**: JavaScript makes API calls to external services for live data
 - **Fonts**: Google Fonts (Inter, Plus Jakarta Sans)
-- **Hosting**: GitHub Pages
-- **No build process**: This is a pure static site with no compilation or bundling required
+- **Hosting**: GitHub Pages (static file hosting)
+- **No build process**: Files are served directly without compilation or bundling
 
 ## Brand Guidelines
 
@@ -97,8 +99,8 @@ When asked to:
 
 - **No package.json**: This project intentionally has no npm dependencies
 - **No build tools**: Changes take effect immediately without compilation
-- **Pure static site**: Keep it simple - avoid introducing complexity
-- **GitHub Pages**: The site is hosted on GitHub Pages and serves static files directly
+- **Static hosting, dynamic functionality**: HTML files are served statically via GitHub Pages, but the site uses client-side JavaScript to make API calls to external services (Google Gemini, OpenCorporates) for dynamic content
+- **Keep it simple**: Avoid introducing build complexity or server-side dependencies
 - **Minimal changes**: When making updates, change only what's necessary to accomplish the task
 
 ## Quality Standards
