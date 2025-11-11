@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -36,8 +37,10 @@
   <style>
     html { scroll-behavior: smooth; }
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:white; }
+    .dark body { background: #0F172A; color: #F1F5F9; }
 
     .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
+    .dark .widget-card { background: #1E293B; border-color: #334155; }
     .cta-button { transition: all .25s ease; }
     .cta-button:hover { transform: translateY(-1px); box-shadow:0 12px 20px rgba(0,192,154,.15); }
     .cta-disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
@@ -53,48 +56,73 @@
     .step-icon.done>svg{display:block}
     .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
     .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
+    .dark .loader-bar{background:#334155}
 
     .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
       background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
                  conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
       animation: radar-spin 1.5s linear infinite; }
     .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
+    .dark .radar { border-color: #334155; }
 
     @keyframes radar-spin { to { transform: rotate(360deg); } }
 
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
+    .dark .shimmer { background: linear-gradient(100deg,#334155 40%,#475569 50%,#334155 60%); }
     .skeleton-card { border:1px solid #E5E7EB; border-radius:.75rem; padding:1rem; background:#fff; }
+    .dark .skeleton-card { background: #1E293B; border-color: #334155; }
+
+    /* Dark mode text colors */
+    .dark .text-brand-dark { color: #F1F5F9; }
+    .dark .text-brand-gray { color: #94A3B8; }
+    .dark .text-gray-500 { color: #94A3B8; }
+    .dark .text-gray-600 { color: #94A3B8; }
+    .dark .text-gray-700 { color: #CBD5E1; }
+    .dark .text-gray-800 { color: #E2E8F0; }
+    .dark .bg-brand-light { background: #1E293B; }
+    .dark .border-brand-border { border-color: #334155; }
+    .dark header { background: rgba(15, 23, 42, 0.85); border-color: #334155; }
   </style>
 </head>
 
 <body class="font-sans text-brand-dark">
   <!-- Header -->
-  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
+  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md dark:bg-brand-dark/80 dark:border-gray-700">
     <nav class="max-w-6xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
       <a href="#" class="flex items-center gap-2.5">
         <svg width="34" height="34" viewBox="0 0 50 50" fill="none" aria-hidden="true">
           <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
           <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
+        <span class="font-heading text-xl md:text-2xl font-extrabold dark:text-gray-100">TrustBureau.ai</span>
       </a>
-      <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
-        <span aria-hidden="true">←</span> Back to Main
-      </a>
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-brand-light dark:hover:bg-gray-700 transition-colors" title="Toggle dark mode">
+          <svg class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+          </svg>
+          <svg class="w-5 h-5 hidden dark:block text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors dark:text-gray-300">
+          <span aria-hidden="true">←</span> Back to Main
+        </a>
+      </div>
     </nav>
   </header>
 
   <!-- Centered Search -->
   <section class="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14">
     <div class="max-w-3xl mx-auto text-center">
-      <h1 class="font-heading text-4xl md:text-6xl font-extrabold leading-tight">Live AI Business Report</h1>
-      <p class="text-brand-gray mt-3 md:mt-4">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
+      <h1 class="font-heading text-4xl md:text-6xl font-extrabold leading-tight dark:text-gray-100">Live AI Business Report</h1>
+      <p class="text-brand-gray mt-3 md:mt-4 dark:text-gray-300">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
 
       <div class="widget-card mt-7 p-4">
         <form id="search-form" class="w-full flex flex-col sm:flex-row gap-3 justify-center" autocomplete="off">
           <input id="business-name" type="text" placeholder="e.g., Apple Inc.; Costco Wholesale Corp.; Aquamark.io"
-                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
+                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400" />
           <button id="generate-report-btn" type="submit"
                   class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -103,7 +131,7 @@
             Generate
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
+        <p class="text-xs text-gray-500 mt-2 dark:text-gray-400">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
       </div>
     </div>
   </section>
@@ -146,8 +174,8 @@
       </div>
 
       <!-- Error -->
-      <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
-        <p id="report-error-message" class="text-sm text-red-700"></p>
+      <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+        <p id="report-error-message" class="text-sm text-red-700 dark:text-red-400"></p>
       </div>
 
       <!-- Content -->
@@ -305,8 +333,8 @@
     </div>
   </section>
 
-  <footer class="border-t border-brand-border">
-    <div class="max-w-6xl mx-auto px-4 md:px-6 py-10 text-center text-sm text-gray-500">
+  <footer class="border-t border-brand-border dark:border-gray-700">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
       &copy; 2025 TrustBureau.ai — Live AI Business Report
     </div>
   </footer>
@@ -787,8 +815,29 @@ Return valid JSON only.
       }
     }
 
+    /* Dark Mode */
+    function initDarkMode() {
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      const toggle = document.getElementById('theme-toggle');
+      if (toggle) {
+        toggle.onclick = () => {
+          document.documentElement.classList.toggle('dark');
+          const isDark = document.documentElement.classList.contains('dark');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        };
+      }
+    }
+
     /* Wire up */
     document.addEventListener('DOMContentLoaded', () => {
+      initDarkMode();
+      
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
