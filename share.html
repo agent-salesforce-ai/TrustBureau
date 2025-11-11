@@ -451,89 +451,6 @@ Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
       `;
     }
 
-    //===========================================
-    // Event Handlers
-    //===========================================
-    document.getElementById('generateBtn').addEventListener('click', async () => {
-      const companyInput = document.getElementById('companyInput');
-      const companyName = companyInput.value.trim();
-      
-      if (!companyName) {
-        showError('Please enter a company name');
-        return;
-      }
-
-      const generateBtn = document.getElementById('generateBtn');
-      const searchError = document.getElementById('searchError');
-      const searchLoading = document.getElementById('searchLoading');
-      
-      // Reset UI
-      generateBtn.disabled = true;
-      searchError.classList.add('hidden');
-      searchLoading.classList.remove('hidden');
-      
-      try {
-        // Call API
-        newSearchData = await callGeminiAPI(companyName);
-        
-        // Save to localStorage
-        const shareId = 'new_' + Date.now();
-        localStorage.setItem(`trustbureau_share_${shareId}`, JSON.stringify(newSearchData));
-        localStorage.setItem('trustbureau_last_report', JSON.stringify(newSearchData));
-        
-        // Render new report
-        renderReport(newSearchData, 'newReportContent');
-        document.getElementById('newReportSection').classList.remove('hidden');
-        document.getElementById('noDataMessage').classList.add('hidden');
-        
-        // Scroll to results
-        document.getElementById('newReportSection').scrollIntoView({ behavior: 'smooth' });
-        
-      } catch (error) {
-        showError(error.message);
-      } finally {
-        generateBtn.disabled = false;
-        searchLoading.classList.add('hidden');
-      }
-    });
-
-    // Print buttons
-    document.getElementById('btnPrintNew')?.addEventListener('click', () => {
-      window.print();
-    });
-    
-    document.getElementById('btnPrintShared')?.addEventListener('click', () => {
-      window.print();
-    });
-    
-    // Copy Link buttons
-    document.getElementById('btnCopyLinkNew')?.addEventListener('click', () => {
-      if (!newSearchData) return;
-      
-      const shareId = 'share_' + Date.now();
-      localStorage.setItem(`trustbureau_share_${shareId}`, JSON.stringify(newSearchData));
-      
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${shareId}`;
-      
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        const btn = document.getElementById('btnCopyLinkNew');
-        const originalText = btn.textContent;
-        btn.textContent = '✓ Link Copied!';
-        setTimeout(() => { btn.textContent = originalText; }, 2000);
-      });
-    });
-    
-    document.getElementById('btnCopyLinkShared')?.addEventListener('click', () => {
-      const currentUrl = window.location.href;
-      
-      navigator.clipboard.writeText(currentUrl).then(() => {
-        const btn = document.getElementById('btnCopyLinkShared');
-        const originalText = btn.textContent;
-        btn.textContent = '✓ Link Copied!';
-        setTimeout(() => { btn.textContent = originalText; }, 2000);
-      });
-    });
-
     function showError(message) {
       const searchError = document.getElementById('searchError');
       searchError.textContent = message;
@@ -544,6 +461,92 @@ Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
     // Initialization
     //===========================================
     document.addEventListener('DOMContentLoaded', () => {
+      //===========================================
+      // Event Handlers
+      //===========================================
+      document.getElementById('generateBtn').addEventListener('click', async () => {
+        const companyInput = document.getElementById('companyInput');
+        const companyName = companyInput.value.trim();
+        
+        if (!companyName) {
+          showError('Please enter a company name');
+          return;
+        }
+
+        const generateBtn = document.getElementById('generateBtn');
+        const searchError = document.getElementById('searchError');
+        const searchLoading = document.getElementById('searchLoading');
+        
+        // Reset UI
+        generateBtn.disabled = true;
+        searchError.classList.add('hidden');
+        searchLoading.classList.remove('hidden');
+        
+        try {
+          // Call API
+          newSearchData = await callGeminiAPI(companyName);
+          
+          // Save to localStorage
+          const shareId = 'new_' + Date.now();
+          localStorage.setItem(`trustbureau_share_${shareId}`, JSON.stringify(newSearchData));
+          localStorage.setItem('trustbureau_last_report', JSON.stringify(newSearchData));
+          
+          // Render new report
+          renderReport(newSearchData, 'newReportContent');
+          document.getElementById('newReportSection').classList.remove('hidden');
+          document.getElementById('noDataMessage').classList.add('hidden');
+          
+          // Scroll to results
+          document.getElementById('newReportSection').scrollIntoView({ behavior: 'smooth' });
+          
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          generateBtn.disabled = false;
+          searchLoading.classList.add('hidden');
+        }
+      });
+
+      // Print buttons
+      document.getElementById('btnPrintNew')?.addEventListener('click', () => {
+        window.print();
+      });
+      
+      document.getElementById('btnPrintShared')?.addEventListener('click', () => {
+        window.print();
+      });
+      
+      // Copy Link buttons
+      document.getElementById('btnCopyLinkNew')?.addEventListener('click', () => {
+        if (!newSearchData) return;
+        
+        const shareId = 'share_' + Date.now();
+        localStorage.setItem(`trustbureau_share_${shareId}`, JSON.stringify(newSearchData));
+        
+        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${shareId}`;
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          const btn = document.getElementById('btnCopyLinkNew');
+          const originalText = btn.textContent;
+          btn.textContent = '✓ Link Copied!';
+          setTimeout(() => { btn.textContent = originalText; }, 2000);
+        });
+      });
+      
+      document.getElementById('btnCopyLinkShared')?.addEventListener('click', () => {
+        const currentUrl = window.location.href;
+        
+        navigator.clipboard.writeText(currentUrl).then(() => {
+          const btn = document.getElementById('btnCopyLinkShared');
+          const originalText = btn.textContent;
+          btn.textContent = '✓ Link Copied!';
+          setTimeout(() => { btn.textContent = originalText; }, 2000);
+        });
+      });
+      
+      //===========================================
+      // Load shared report if ID in URL
+      //===========================================
       // Check for shared report ID in URL
       const urlParams = new URLSearchParams(window.location.search);
       const shareId = urlParams.get('id');
