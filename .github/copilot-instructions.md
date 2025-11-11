@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-TrustBureau.ai is a static website project that serves as "The AI Verification Standard" platform. The website is built with plain HTML, CSS, and JavaScript, utilizing modern CDN-based libraries for styling and interactivity.
+TrustBureau.ai is a client-side web application that provides AI verification standards and business verification reports. While the HTML files are statically hosted (no server-side rendering), the site features dynamic functionality through JavaScript that makes API calls to external services for live AI-powered business verification and reporting (using Google Gemini API for AI processing and OpenCorporates API for business data). The website is built with plain HTML, CSS, and JavaScript, utilizing modern CDN-based libraries for styling and interactivity.
 
 ## Project Structure
 
@@ -23,6 +23,9 @@ TrustBureau.ai is a static website project that serves as "The AI Verification S
 - **Tailwind CSS**: Utility-first CSS framework (via CDN: `https://cdn.tailwindcss.com`)
 - **Alpine.js**: Lightweight JavaScript framework for interactivity (via CDN)
 - **Google Fonts**: Plus Jakarta Sans and Inter font families
+- **Google Gemini API**: For AI-powered business verification and reporting (external service)
+- **OpenCorporates API**: For business data (external service)
+- **Domains DB API**: For domain verification (external service)
 
 ## Brand Guidelines
 
@@ -56,8 +59,9 @@ Since this is a static website:
 1. Open the HTML files in a browser to preview changes
 2. Test on multiple screen sizes (mobile, tablet, desktop)
 3. Verify all interactive elements work correctly
-4. Check that fonts and styles load properly from CDNs
-5. Ensure accessibility standards are maintained
+4. Verify API integrations work correctly, especially for pages like report.html and search.html that depend on external API calls (e.g., Google Gemini, OpenCorporates)
+5. Check that fonts and styles load properly from CDNs
+6. Ensure accessibility standards are maintained
 
 ### Code Style
 
@@ -82,12 +86,26 @@ The website is hosted on GitHub Pages with a custom domain (trustbureau.ai) conf
 - Adding new interactive components with Alpine.js
 - Content updates and copywriting improvements
 
+### Tasks Requiring Careful Attention
+
+- **API Key Management**: The codebase contains hardcoded API keys (in report.html and search.html). Any changes involving API integration or API key management require extreme caution to avoid exposing or mishandling credentials
+- Changes to API integration logic should preserve security best practices
+
+### Security Warnings
+
+- **CRITICAL**: The codebase contains hardcoded API keys in report.html (line 328) and search.html (line 391). This is a security risk. When modifying these files:
+  - Never expose these keys in logs, comments, or documentation
+  - Be cautious when making changes near API key definitions
+  - Consider suggesting migration to environment variables or secure key management solutions
+  - Avoid accidentally committing changes that further expose or duplicate these keys
+
 ### Tasks to Approach Carefully
 
 - Major structural changes to the website
 - Changes to the CNAME or domain configuration
 - Removing or significantly altering existing functionality
 - Changes that might impact SEO or page performance
+- Modifications to API integration code or key management
 
 ### When Making Changes
 
