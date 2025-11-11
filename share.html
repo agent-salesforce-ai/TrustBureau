@@ -75,18 +75,18 @@
   <!-- Hero / Search -->
   <section class="max-w-4xl mx-auto px-4 pt-10">
     <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center">Live AI Business Report</h1>
-    <p class="text-center text-brand-gray mt-3">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
+    <p class="text-center text-brand-gray mt-3">Search by <span class="font-semibold">company name or website</span> • Real-time data</p>
 
     <div class="card p-3 md:p-4 mt-6">
       <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
         <input id="query" class="flex-1 px-4 py-3 rounded-lg border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-green"
-               placeholder="e.g., Apple Inc., Taco Bell Corp., Aquamark Inc.">
+               placeholder="e.g., Apple Inc., aquamark.io, tesla.com, microsoft.com">
         <button id="btn-generate" class="cta px-5 py-3 text-lg inline-flex items-center justify-center gap-2">
           <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
           Generate
         </button>
       </form>
-      <p class="text-xs text-brand-gray mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
+      <p class="text-xs text-brand-gray mt-2">Tip: Enter a company name OR website domain for best results</p>
     </div>
 
     <div class="flex justify-center mt-4">
@@ -335,8 +335,8 @@
 
   <!-- =================== APP SCRIPT =================== -->
   <script>
-  //  =======
-  const ZAKK = 'AIzaSyDX6uyW_C49YlQ25hss9-Qelk_jkIdrNHo'; 
+  // ======= SIMPLE API KEY (no bootstrap; set here) =======
+  const ZAKK = 'AIzaSyDX6uyW_C49YlQ25hss9-Qelk_jkIdrNHo'; // <— put your key here
   function getApiKey() {
     if (!ZAKK || /YOUR_GEMINI_API_KEY_HERE/.test(ZAKK)) {
       throw new Error('Missing API key. Set const ZAKK near the top of the file.');
@@ -433,7 +433,20 @@
   function renderReport(d) {
     stopLoader(); show($('content'));
 
+    // Add generation timestamp
+    const genTime = new Date().toLocaleString('en-US', { 
+      dateStyle: 'medium', 
+      timeStyle: 'short' 
+    });
+    
     txt($('title'), d?.summary?.companyName || '—');
+    
+    // Update subtitle with timestamp
+    const subtitleEl = document.querySelector('#content .text-xs.text-brand-gray');
+    if (subtitleEl) {
+      subtitleEl.textContent = `Live business verification snapshot • Generated: ${genTime}`;
+    }
+    
     $('summary').textContent = d?.summary?.summary || 'No summary provided.';
 
     const s = d?.riskScore || {};
@@ -555,7 +568,7 @@
     }
   }
 
-  // ------- Prompt & API
+  // ------- Prompt & API (UPDATED FOR BETTER WEBSITE/NAME SEARCHING)
   const MODEL_FALLBACKS = [
     'gemini-2.5-flash',
     'gemini-2.5-flash-preview-09-2025',
@@ -563,26 +576,54 @@
   ];
 
   function buildPrompt(q) {
+    // Detect if input looks like a website
+    const isWebsite = q.includes('.') && (q.includes('.com') || q.includes('.io') || q.includes('.org') || q.includes('.net') || q.includes('.co'));
+    
+    const searchInstruction = isWebsite 
+      ? `Find the company that operates the website "${q}". First identify the company behind this domain, then provide all information about that company.`
+      : `Focus on the US company that best matches "${q}". This could be a legal name, DBA, or common name.`;
+
+    // Get current date for context
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+
     return `
-You are an AI business analyst. Return ONE JSON object ONLY (no code fences, no commentary).
-Focus on the US company that best matches "${q}". Prefer US Secretary-of-State (SOS) identity fields for filings.
+You are an AI business analyst. Current date: ${currentDate}. Return ONE JSON object ONLY (no code fences, no commentary).
+
+${searchInstruction}
+
+Search strategy:
+- If given a website (like aquamark.io), identify the company that owns/operates it
+- If given a company name, match against legal names, DBAs, and common trade names
+- For startups/tech companies, website domain is often the best identifier
+- Prefer US Secretary-of-State (SOS) identity fields for official filings when available
+- Prioritize recent information (2024-2025) over older data
+- For news and updates, focus on the most recent 6 months
+
 Fields to include:
 
 1) summary: { companyName, summary }
 2) sos: { entityName, entityType, status, jurisdiction, formationDate, registeredAgent, registeredAddress }
 3) riskScore: { score (300-850), justification, positiveFactors:[string], negativeFactors:[string] }
 4) profile: { founded, headquarters, employees, industry, website, ticker, phone, email }
-5) highlights: [string]
-6) news: [{ title, date, source, url }]
+5) highlights: [string] // Recent developments and key facts as of ${currentDate}
+6) news: [{ title, date, source, url }] // Most recent news, prioritize 2024-2025
 7) publicRecords: [{ type, details }]
-8) leadership: [{ name, title, linkedin }]
+8) leadership: [{ name, title, linkedin }] // Current leadership as of ${currentDate}
 9) products: [string]
 10) competitors: [string]
 11) webPresence: { twitter, linkedin, youtube, facebook, traffic }
-12) reviews: [{ snippet, source, url }]
-13) chartPoints: { revenue:[number], cashFlow:[number] }   // 10–24 points each
-14) kpis: [{ metric, q1, q2, q3, q4, yoy }]
+12) reviews: [{ snippet, source, url }] // Recent reviews from last 12 months
+13) chartPoints: { revenue:[number], cashFlow:[number] }   // 10–24 points each, latest available data
+14) kpis: [{ metric, q1, q2, q3, q4, yoy }] // Most recent fiscal year or quarters
 15) citations: [{ title, url }]
+
+Important: 
+- If searching by website, ensure the 'profile.website' field matches the searched domain
+- The 'summary.companyName' should be the actual company name, not the domain
+- For tech startups, the legal entity name in 'sos.entityName' might differ from the brand name
+- All data should be as current as possible (as of ${currentDate})
+- For financial data and KPIs, indicate the year/quarter being reported
 
 If unknown, use "N/A" or [].
 Respond ONLY with valid JSON.`;
