@@ -385,7 +385,7 @@
   <script>
   //
   const ZAKK = 'AIzaSyBnqELMSwalpd6M2rlx4W6NapzwUuPUU1s'; // 
-  const MODEL_CANDIDATES = ['gemini-2.0-flash-exp', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+  const MODEL_CANDIDATES = ['gemini-1.5-flash-latest', 'gemini-1.5-pro-latest'];
   const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
   const MAX_OUTPUT_TOKENS = 8192;
 
@@ -620,7 +620,7 @@
     });
     
     document.addEventListener('click', (e) => {
-      if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+      if (input && !input.contains(e.target) && suggestions && !suggestions.contains(e.target)) {
         suggestions.classList.add('hidden');
       }
     });
@@ -1119,7 +1119,6 @@ Return valid JSON only.
   // ------- API Call
   async function callReportAPI(systemPrompt, userQuery) {
     const key = getApiKey();
-    if (!key) throw new Error('Missing API key (ZAKK). Set it near the top of the file.');
     
     let lastErr;
     for (const model of MODEL_CANDIDATES) {
@@ -1158,12 +1157,11 @@ Return valid JSON only.
     throw lastErr || new Error('All model attempts failed.');
   }
 
-  // ------- Render report  
+  // ------- Render report (with defensive checks)
   function renderReport(d, fromCache = false) {
     stopLoader(); 
     show($('content'));
 
-    // Add generation timestamp
     const genTime = new Date().toLocaleString('en-US', { 
       dateStyle: 'medium', 
       timeStyle: 'short' 
@@ -1171,7 +1169,6 @@ Return valid JSON only.
     
     txt($('title'), d?.summary?.companyName || '—');
     
-    // Update subtitle with timestamp and cache status
     const subtitleEl = document.querySelector('#content .text-xs.text-brand-gray');
     if (subtitleEl) {
       subtitleEl.innerHTML = \`Live business verification snapshot • Generated: \${genTime}\${fromCache ? ' <span class="text-brand-green">(cached)</span>' : ''}\`;
@@ -1186,7 +1183,7 @@ Return valid JSON only.
 
     const s = d?.riskScore || {};
     const score = Number(s.score || 0);
-    txt($('score-digit'), score);
+    txt($('score-digit'), score || '—');
     txt($('score-just'), s.justification);
     const circle = $('score-circle');
     if(circle){
@@ -1209,7 +1206,7 @@ Return valid JSON only.
     const st = $('sos-status'); 
     if(st) {
         st.textContent = sos.status || 'N/A';
-        st.style.background = (String(sos.status||'').toLowerCase() === 'active') ? '#DCFCE7' : '#F1F5F9';
+        st.style.background = (String(sos.status||'').toLowerCase().includes('active')) ? '#DCFCE7' : '#F1F5F9';
     }
     txt($('sos-juris'), sos.jurisdiction);
     txt($('sos-date'), sos.formationDate);
@@ -1229,7 +1226,6 @@ Return valid JSON only.
       return \`<li><a class="text-brand-dark hover:text-brand-green font-medium dark:text-gray-200" \${url}>\${item.title || 'Untitled'}</a><div class="text-xs text-brand-gray">\${src}\${date}</div></li>\`;
     }).join('') || '<li class="text-brand-gray">No recent headlines.</li>';
 
-    // Contact & map
     const addr = sos.registeredAddress || d?.profile?.headquarters || d?.contact?.address || '';
     txt($('contact-addr'), addr || 'N/A');
     txt($('contact-phone'), d?.profile?.phone || d?.contact?.phone || 'N/A');
@@ -1241,12 +1237,10 @@ Return valid JSON only.
     const mapsLink = $('maps-link');
     if(mapsLink) mapsLink.href = openMaps;
 
-    // Public records
-    const recs = d?.publicRecords || d?.public_records || d?.records || [];
+    const recs = d?.publicRecords || [];
     const records = $('records');
     if(records) records.innerHTML = recs.map(r => \`<li><span class="font-medium">\${r.type||'Record'}:</span> \${r.details||''}</li>\`).join('') || '<li class="text-brand-gray">No public records found.</li>';
 
-    // Facts
     const p = d?.profile || {};
     txt($('facts-founded'), p.founded);
     txt($('facts-hq'), p.headquarters);
@@ -1256,15 +1250,13 @@ Return valid JSON only.
     if(factsWebsite) factsWebsite.innerHTML = p.website ? linkify(p.website) : 'N/A';
     txt($('facts-ticker'), p.ticker);
 
-    // Leadership
     const leaders = d?.leadership || [];
     const leadership = $('leadership');
     if (leadership) leadership.innerHTML = leaders.map(l => {
       const ln = l.linkedin ? \` — <a class="text-brand-green hover:underline" href="\${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>\` : '';
       return \`<li><span class="font-medium">\${l.name||'N/A'}</span> — <span>\${l.title||''}</span>\${ln}</li>\`;
     }).join('') || '<li class="text-brand-gray">—</li>';
-
-    // Products, Competitors, Social
+    
     const products = $('products');
     if(products) products.innerHTML = (d?.products || []).map(i => \`<li>• \${i}</li>\`).join('') || '<li class="text-brand-gray">—</li>';
     const competitors = $('competitors');
@@ -1279,7 +1271,6 @@ Return valid JSON only.
       ['YouTube', w.youtube ? linkify(w.youtube,'youtube.com') : 'N/A']
     ].filter(([,v]) => v).map(([k,v]) => \`<li><span class="text-brand-gray">\${k}:</span> <span class="font-medium">\${v}</span></li>\`).join('') || '<li class="text-brand-gray">—</li>';
 
-    // Reviews
     const reviews = $('reviews');
     if(reviews) reviews.innerHTML = (d?.reviews || []).map(r => {
       const url = r.url && /^https?:\/\//.test(r.url) ? 
@@ -1291,12 +1282,10 @@ Return valid JSON only.
       </div>\`;
     }).join('') || '<p class="text-sm text-brand-gray">No reviews found.</p>';
 
-    // Charts
     const pts = d?.chartPoints || {};
-    lineChart($('chart-revenue'), pts.revenue || [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
-    lineChart($('chart-cash'), pts.cashFlow || [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+    lineChart($('chart-revenue'), pts.revenue || [], '#00C09A');
+    lineChart($('chart-cash'), pts.cashFlow || [], '#3B82F6');
 
-    // KPIs
     const kpis = d?.kpis || [];
     const kpisEl = $('kpis');
     if(kpisEl) kpisEl.innerHTML = kpis.map(k => \`
@@ -1310,7 +1299,6 @@ Return valid JSON only.
       </tr>
     \`).join('') || '<tr><td colspan="6" class="py-4 text-center text-brand-gray">No KPI data available</td></tr>';
 
-    // Sources
     const citations = d?.citations || [];
     const sourceChips = $('source-chips');
     const sourceList = $('source-list');
@@ -1331,13 +1319,8 @@ Return valid JSON only.
       });
     }
 
-    // Store for export
     window.__lastReportJSON = d;
-    
-    // Add to comparison mode
     ComparisonMode.add(d);
-    
-    // Track analytics
     Analytics.track('report_generated', {
       query: $('query').value,
       company: d?.summary?.companyName,
@@ -1345,7 +1328,6 @@ Return valid JSON only.
       fromCache
     });
     
-    // Add to history
     if (d?.summary?.companyName) {
       SearchHistory.add($('query').value, d.summary.companyName);
     }
@@ -1505,10 +1487,10 @@ Return valid JSON only.
     });
     
     document.addEventListener('click', (e) => {
-      if (!shareBtn?.contains(e.target) && !shareMenu?.contains(e.target)) {
+      if (shareBtn && !shareBtn.contains(e.target) && shareMenu && !shareMenu.contains(e.target)) {
         hide(shareMenu);
       }
-      if (!exportBtn?.contains(e.target) && !exportMenu?.contains(e.target)) {
+      if (exportBtn && !exportBtn.contains(e.target) && exportMenu && !exportMenu.contains(e.target)) {
         hide(exportMenu);
       }
     });
