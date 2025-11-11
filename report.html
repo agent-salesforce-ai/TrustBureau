@@ -164,6 +164,12 @@
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
           <div class="flex items-center gap-3">
+            <button id="btn-share-report" class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-brand-border rounded-lg hover:bg-brand-light text-sm font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+              </svg>
+              Share
+            </button>
             <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
           </div>
         </div>
@@ -899,11 +905,15 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
     }
 
     /* ===================== Run + Reviews fallback glue ===================== */
+    // Global variable to store the current report data
+    let currentReportData = null;
+
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('search-form');
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
+      const shareBtn = document.getElementById('btn-share-report');
 
       async function runReport(query) {
         document.getElementById('report-results-container').style.display = 'block';
@@ -922,6 +932,14 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
           if (reviewsNeeded(json)) {
             json = await supplementReviews(json?.summary?.companyName || query, json);
           }
+
+          // Add timestamp and store report data
+          json.timestamp = new Date().toISOString();
+          json.generatedAt = new Date().toISOString();
+          currentReportData = json;
+          
+          // Save to localStorage for sharing
+          localStorage.setItem('trustbureau_last_report', JSON.stringify(json));
 
           populateReport(json);
           const links = collectSources(json, sources);
@@ -949,6 +967,46 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
         const q = (input.value || '').trim();
         if (!q) { showState('error', 'Please enter a business name.'); return; }
         runReport(q);
+      });
+
+      shareBtn?.addEventListener('click', async () => {
+        if (!currentReportData) {
+          alert('No report to share. Please generate a report first.');
+          return;
+        }
+
+        try {
+          // Generate a unique ID for this report
+          const shareId = Math.random().toString(36).substring(2, 15);
+          const storageKey = `trustbureau_share_${shareId}`;
+          
+          // Store in localStorage with the share ID
+          localStorage.setItem(storageKey, JSON.stringify(currentReportData));
+          
+          // Create share URL
+          const shareUrl = `${window.location.origin}/share.html?id=${shareId}`;
+          
+          // Copy to clipboard
+          await navigator.clipboard.writeText(shareUrl);
+          
+          // Show success message
+          const originalText = shareBtn.innerHTML;
+          shareBtn.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Link Copied!`;
+          shareBtn.classList.add('bg-green-600', 'text-white', 'border-green-600');
+          shareBtn.classList.remove('border-brand-border', 'hover:bg-brand-light');
+          
+          setTimeout(() => {
+            shareBtn.innerHTML = originalText;
+            shareBtn.classList.remove('bg-green-600', 'text-white', 'border-green-600');
+            shareBtn.classList.add('border-brand-border', 'hover:bg-brand-light');
+          }, 3000);
+          
+          // Optional: Show the share URL in a modal
+          console.log('Share URL:', shareUrl);
+        } catch (e) {
+          console.error('Failed to share:', e);
+          alert('Failed to create share link. Please try again.');
+        }
       });
     });
   </script>
