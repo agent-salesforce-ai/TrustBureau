@@ -341,7 +341,9 @@
 
   <script>
     /* ===================== Config ===================== */
-    const zakk = "AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q";                       // ← put your dev key here or set window.zakk at runtime
+    // ⚠️ REQUIRED: Get your FREE Gemini API key from https://aistudio.google.com/app/apikey
+    // Then replace "YOUR_GEMINI_API_KEY_HERE" below with your actual key
+    const zakk = "YOUR_GEMINI_API_KEY_HERE";                       // ← put your dev key here or set window.zakk at runtime
     const MODEL_CANDIDATES = ['gemini-2.5-flash','gemini-2.5-flash-preview-09-2025'];
     const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
     const MAX_OUTPUT_TOKENS = 8192;
@@ -349,7 +351,16 @@
     function getApiKey() {
       const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
       const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-      return fromWindow || fromConst;
+      const key = fromWindow || fromConst;
+      
+      if (!key || key === 'YOUR_GEMINI_API_KEY_HERE') {
+        throw new Error('❌ API Key Required!\n\n' +
+          '1. Get a FREE Gemini API key from:\n   https://aistudio.google.com/app/apikey\n\n' +
+          '2. Replace "YOUR_GEMINI_API_KEY_HERE" on line 347 with your key\n\n' +
+          '3. Or set it via browser console:\n   window.zakk = "your-key-here"');
+      }
+      
+      return key;
     }
     function makeUrl(model, key) {
       return `${DIRECT_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`;
@@ -862,7 +873,13 @@ Return valid JSON only.
           let errorMsg = e.message || 'Failed to generate report.';
           
           // Better error messages for common issues
-          if (/fetch|network|cors|ERR_BLOCKED/i.test(String(e))) {
+          if (/API key|expired|invalid.*key|400/i.test(String(e))) {
+            errorMsg = '❌ API Key Issue!\n\n' +
+                       '1. Get a FREE Gemini API key:\n   https://aistudio.google.com/app/apikey\n\n' +
+                       '2. Update line 347 in test.html:\n   const zakk = "your-key-here";\n\n' +
+                       '3. Or use browser console (F12):\n   window.zakk = "your-key-here";\n\n' +
+                       'Then refresh and try again.';
+          } else if (/fetch|network|cors|ERR_BLOCKED/i.test(String(e))) {
             errorMsg = 'Unable to connect to the AI service. This could be due to:\n\n' +
                        '• Network restrictions or ad blockers\n' +
                        '• CORS policy (serve via https:// or use a proxy)\n' +
