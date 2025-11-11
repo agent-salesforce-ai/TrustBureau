@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
-  
+
   <meta name="theme-color" content="#00C09A">
   <meta name="description" content="Live AI-powered business verification and reports">
-  
+
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -48,6 +48,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .dark { color: #F1F5F9; }
     .dark .text-brand-gray { color: #94A3B8; }
+    .kbd{border:1px solid #cbd5e1;border-bottom-width:3px;border-radius:.375rem;padding:.15rem .35rem;font-size:.75rem;background:#f8fafc}
   </style>
 </head>
 
@@ -63,7 +64,7 @@
         <span class="font-heading text-lg md:text-xl font-extrabold">TrustBureau.ai</span>
       </div>
 
-      <nav class="flex items-center gap-3">
+      <nav class="flex items-center gap-2 sm:gap-3">
         <span id="api-status" class="hidden text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
           🔑 API Ready
         </span>
@@ -76,7 +77,7 @@
   <!-- Main Section -->
   <section class="max-w-4xl mx-auto px-4 pt-10">
     <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center">Live AI Business Report</h1>
-    <p class="text-center text-brand-gray mt-3">User: agent-salesforce-ai • 2025-11-11 23:24:21 UTC</p>
+    <p class="text-center text-brand-gray mt-3">User: agent-salesforce-ai • <span id="now"></span> UTC</p>
 
     <div class="card p-4 mt-6">
       <form id="search-form">
@@ -106,7 +107,7 @@
 
     <div id="content" class="hidden space-y-6">
       <h2 id="title" class="text-2xl font-bold"></h2>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="card p-5">
           <h3 class="font-semibold mb-3">Risk Score</h3>
@@ -114,77 +115,125 @@
             <span id="score">—</span>
           </div>
         </div>
-        
+
         <div class="md:col-span-2 card p-5">
           <h3 class="font-semibold mb-3">Summary</h3>
           <p id="summary"></p>
           <div id="profile" class="mt-4 p-3 bg-gray-50 rounded"></div>
         </div>
       </div>
+
+      <div class="text-xs text-brand-gray">
+        Tip: Press <span class="kbd">Ctrl</span>+<span class="kbd">D</span> to toggle the debug console.
+      </div>
     </div>
   </section>
 
   <!-- Debug Console -->
-  <div id="debug" class="fixed bottom-0 left-0 right-0 bg-black text-green-400 text-xs font-mono p-2 max-h-32 overflow-y-auto hidden"></div>
+  <div id="debug" class="fixed bottom-0 left-0 right-0 bg-black text-green-400 text-xs font-mono p-2 max-h-40 overflow-y-auto hidden"></div>
 
   <script>
-    // Debug logger
+    // ---------- Helpers ----------
+    const nowEl = document.getElementById('now');
+    nowEl.textContent = new Date().toISOString().replace('T',' ').slice(0,19);
+
     const debug = (msg) => {
       console.log(msg);
-      const debugEl = document.getElementById('debug');
-      debugEl.innerHTML += `[${new Date().toTimeString().slice(0,8)}] ${msg}<br>`;
-      debugEl.scrollTop = debugEl.scrollHeight;
+      const el = document.getElementById('debug');
+      el.innerHTML += `[${new Date().toTimeString().slice(0,8)}] ${msg}<br>`;
+      el.scrollTop = el.scrollHeight;
     };
 
-    // Show debug console
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'd' && e.ctrlKey) {
+      if (e.key.toLowerCase() === 'd' && e.ctrlKey) {
         document.getElementById('debug').classList.toggle('hidden');
       }
     });
 
-    // API Key Management
+    // ---------- API Key & Model Management ----------
     const API = {
       getKey() {
         const key = localStorage.getItem('gemini_key');
-        debug(`Retrieved key: ${key ? key.substring(0,10) + '...' : 'none'}`);
+        debug(`Retrieved key: ${key ? key.substring(0,10) + '…' : 'none'}`);
         return key;
       },
-      
       setKey(key) {
         localStorage.setItem('gemini_key', key);
-        debug(`Saved key: ${key.substring(0,10)}...`);
+        debug(`Saved key: ${key.substring(0,10)}…`);
         this.updateStatus();
       },
-      
+      getModel() {
+        const m = localStorage.getItem('gemini_model');
+        if (m) debug(`Using saved model: ${m}`);
+        return m;
+      },
+      setModel(model) {
+        localStorage.setItem('gemini_model', model);
+        debug(`Saved model: ${model}`);
+      },
       updateStatus() {
         const hasKey = !!this.getKey();
         document.getElementById('api-status').classList.toggle('hidden', !hasKey);
       }
     };
 
-    // Test API button
+    // Pick an available model that supports generateContent
+    async function resolveBestModel(key) {
+      const prefer = [
+        /gemini-2\.5-flash-lite/i,
+        /gemini-2\.5-flash/i,
+        /gemini-2\.0-flash/i,
+        /gemini-2\.0-pro/i,
+        /gemini-1\.5-flash/i,
+        /gemini-1\.5-pro/i
+      ];
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(key)}`;
+        debug(`Listing models: ${url}`);
+        const res = await fetch(url);
+        debug(`List models response: ${res.status}`);
+        if (!res.ok) throw new Error(`models.list failed: ${res.status}`);
+        const data = await res.json();
+        const models = (data.models || []).filter(m => (m.supportedGenerationMethods || m.supported_generation_methods || []).includes('generateContent'));
+        for (const pat of prefer) {
+          const found = models.find(m => pat.test(m.name) || pat.test(m.baseModelId || ''));
+          if (found) return found.name.replace(/^models\//,'');
+        }
+        // Fallback to first generateContent-capable model
+        if (models[0]?.name) return models[0].name.replace(/^models\//,'');
+      } catch (e) {
+        debug(`Model resolution error: ${e.message}`);
+      }
+      // Final fallback
+      return 'gemini-2.0-flash';
+    }
+
+    // ---------- UI Buttons ----------
     document.getElementById('test-api-btn').onclick = async () => {
       const key = API.getKey();
       if (!key) {
         alert('No API key set. Click settings to add one.');
         return;
       }
-      
-      debug('Testing API key...');
-      
       try {
-        const testUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
-        debug(`Testing URL: ${testUrl}`);
-        
-        const response = await fetch(testUrl);
-        debug(`Test response: ${response.status}`);
-        
-        if (response.ok) {
-          alert('✅ API key is working!');
+        const url = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(key)}`;
+        debug(`Testing URL: ${url}`);
+        const res = await fetch(url);
+        debug(`Test response: ${res.status}`);
+        if (!res.ok) {
+          const txt = await res.text();
+          alert(`❌ API key test failed: ${res.status}\n${txt.slice(0,400)}`);
+          return;
+        }
+        const data = await res.json();
+        const gcModels = (data.models || []).filter(m => (m.supportedGenerationMethods || m.supported_generation_methods || []).includes('generateContent'));
+        const chosen = gcModels.find(m => /gemini-2\.[05]-flash(-lite)?/i.test(m.name)) || gcModels[0];
+        if (chosen?.name) {
+          const name = chosen.name.replace(/^models\//,'');
+          API.setModel(name);
+          alert(`✅ API key works. Selected model: ${name}`);
         } else {
-          const error = await response.text();
-          alert(`❌ API key test failed: ${response.status}\n${error}`);
+          alert('✅ API key works, but no suitable model with generateContent found in list. You may need to enable billing or access.');
         }
       } catch (e) {
         alert(`❌ Test failed: ${e.message}`);
@@ -192,17 +241,17 @@
       }
     };
 
-    // Settings
-    document.getElementById('settings-btn').onclick = () => {
-      const current = API.getKey();
-      const newKey = prompt('Enter your Gemini API key:', current || '');
-      if (newKey && newKey !== current) {
-        API.setKey(newKey);
-        alert('API key saved!');
-      }
+    document.getElementById('settings-btn').onclick = async () => {
+      const currentKey = API.getKey() || '';
+      const newKey = prompt('Enter your Gemini API key:', currentKey);
+      if (newKey && newKey !== currentKey) API.setKey(newKey);
+      const currentModel = API.getModel() || '';
+      const newModel = prompt('Optional: Enter a specific model (e.g., gemini-2.5-flash-lite). Leave blank to auto-detect:', currentModel);
+      if (newModel && newModel !== currentModel) API.setModel(newModel);
+      alert('Settings saved.');
     };
 
-    // Generate Report
+    // ---------- Report Generation ----------
     async function generateReport(query) {
       const key = API.getKey();
       if (!key) {
@@ -210,66 +259,84 @@
         return;
       }
 
-      debug(`Generating report for: ${query}`);
-      
       document.getElementById('results').classList.remove('hidden');
       document.getElementById('loader').classList.remove('hidden');
       document.getElementById('content').classList.add('hidden');
       document.getElementById('error').classList.add('hidden');
 
       try {
-        // Build the API URL
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`;
-        debug(`API URL: ${apiUrl.substring(0,80)}...`);
-        
+        // Resolve a working model
+        let model = API.getModel();
+        if (!model) {
+          model = await resolveBestModel(key);
+          API.setModel(model);
+        }
+        debug(`Using model: ${model}`);
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+        debug(`API URL: ${apiUrl}`);
+
+        // Ask for JSON directly via JSON Mode
         const requestBody = {
           contents: [{
+            role: 'user',
             parts: [{
-              text: `Create a business report for ${query}. Return a JSON object with: summary (companyName, summary), riskScore (score 300-850, justification), profile (founded, headquarters, employees, industry, website). JSON only, no markdown.`
+              text: `Create a business report for ${query}. Return ONLY JSON with this shape:\n{\n  "summary": {"companyName": string, "summary": string},\n  "riskScore": {"score": number, "justification": string},\n  "profile": {"founded": string, "headquarters": string, "employees": string, "industry": string, "website": string}\n}\nRespond strictly as JSON.`
             }]
-          }]
+          }],
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
         };
-        
-        debug('Sending request...');
-        
-        const response = await fetch(apiUrl, {
+
+        debug('Sending request…');
+        let res = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)
         });
-        
-        debug(`Response status: ${response.status}`);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          debug(`Error response: ${errorText}`);
-          
-          if (response.status === 400) {
-            throw new Error('Invalid request. The API key might be incorrect or the model name is wrong.');
-          } else if (response.status === 403) {
-            throw new Error('API key is invalid or doesn\'t have permission.');
-          } else if (response.status === 404) {
-            // Try different model endpoint
-            debug('Trying alternate model...');
-            return generateReportAlternate(query);
-          } else {
-            throw new Error(`API Error ${response.status}: ${errorText.substring(0,200)}`);
+
+        // If model not found, auto-refresh model and retry once
+        if (res.status === 404) {
+          const errText = await res.text();
+          debug(`404 on ${model}. Body: ${errText.slice(0,200)}…`);
+          debug('Attempting auto-detect model and retry…');
+          const autoModel = await resolveBestModel(key);
+          if (autoModel && autoModel !== model) {
+            API.setModel(autoModel);
+            const retryUrl = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(autoModel)}:generateContent?key=${encodeURIComponent(key)}`;
+            debug(`Retry API URL: ${retryUrl}`);
+            res = await fetch(retryUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestBody)
+            });
           }
         }
-        
-        const data = await response.json();
-        debug('Response received successfully');
-        
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        
-        if (jsonMatch) {
-          const report = JSON.parse(jsonMatch[0]);
-          displayReport(report);
-        } else {
-          throw new Error('Could not parse response');
+
+        debug(`Response status: ${res.status}`);
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`API Error ${res.status}: ${errorText.slice(0,400)}`);
         }
-        
+
+        const data = await res.json();
+        debug('Response received successfully');
+
+        // JSON Mode: directly parse candidate text as JSON
+        const jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        let report;
+        try {
+          report = jsonText ? JSON.parse(jsonText) : null;
+        } catch (e) {
+          // Fallback: extract first JSON object from text
+          const match = jsonText.match(/\{[\s\S]*\}/);
+          report = match ? JSON.parse(match[0]) : null;
+        }
+
+        if (!report) throw new Error('Could not parse JSON from model response.');
+        displayReport(report);
+
       } catch (error) {
         debug(`Error: ${error.message}`);
         document.getElementById('error').innerHTML = `
@@ -282,101 +349,62 @@
       }
     }
 
-    // Alternate generation with different model
-    async function generateReportAlternate(query) {
-      const key = API.getKey();
-      debug('Trying gemini-1.5-flash model...');
-      
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-      
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Business report for ${query}: Return JSON with summary, riskScore (300-850), and profile.`
-            }]
-          }]
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`All API attempts failed. Status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      
-      // Try to extract JSON
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        displayReport(JSON.parse(jsonMatch[0]));
-      } else {
-        // Fallback to sample-like data
-        displayReport({
-          summary: { companyName: query, summary: "Generated report" },
-          riskScore: { score: 700, justification: "API response parsing failed, showing placeholder" },
-          profile: { industry: "Unknown" }
-        });
-      }
-    }
-
     function displayReport(data) {
       debug('Displaying report');
       document.getElementById('content').classList.remove('hidden');
-      
-      document.getElementById('title').textContent = data.summary?.companyName || 'Report';
-      document.getElementById('summary').textContent = data.summary?.summary || '';
-      
-      const score = data.riskScore?.score || 0;
-      document.getElementById('score').textContent = score;
-      
+
+      document.getElementById('title').textContent = data?.summary?.companyName || 'Report';
+      document.getElementById('summary').textContent = data?.summary?.summary || '';
+
+      const score = Number(data?.riskScore?.score ?? 0);
+      document.getElementById('score').textContent = Number.isFinite(score) && score > 0 ? score : '—';
+
       const circle = document.getElementById('score-circle');
       circle.className = 'score-circle mx-auto';
-      if (score < 550) circle.classList.add('score-red');
-      else if (score < 700) circle.classList.add('score-yellow');
-      else circle.classList.add('score-green');
-      
-      if (data.profile) {
-        document.getElementById('profile').innerHTML = Object.entries(data.profile)
-          .map(([k,v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
-      }
+      if (score && score < 550) circle.classList.add('score-red');
+      else if (score && score < 700) circle.classList.add('score-yellow');
+      else if (score) circle.classList.add('score-green');
+
+      const prof = data?.profile || {};
+      document.getElementById('profile').innerHTML = Object.entries(prof)
+        .map(([k,v]) => `<div><strong>${k}:</strong> ${v ?? ''}</div>`)
+        .join('');
     }
 
-    // Sample Report
+    // ---------- Sample Button ----------
     document.getElementById('btn-sample').onclick = () => {
       debug('Loading sample report');
       displayReport({
         summary: {
-          companyName: "Salesforce, Inc.",
-          summary: "Leading CRM platform company founded in 1999."
+          companyName: 'Salesforce, Inc.',
+          summary: 'Leading CRM platform company founded in 1999.'
         },
         riskScore: {
           score: 820,
-          justification: "Strong market position"
+          justification: 'Strong market position'
         },
         profile: {
-          founded: "1999",
-          headquarters: "San Francisco, CA",
-          employees: "73,000+",
-          industry: "Cloud Software"
+          founded: '1999',
+          headquarters: 'San Francisco, CA',
+          employees: '73,000+',
+          industry: 'Cloud Software',
+          website: 'https://salesforce.com'
         }
       });
       document.getElementById('results').classList.remove('hidden');
       document.getElementById('content').classList.remove('hidden');
     };
 
-    // Form Handler
+    // ---------- Form Handler ----------
     document.getElementById('search-form').onsubmit = (e) => {
       e.preventDefault();
       const query = document.getElementById('query').value.trim();
       if (query) generateReport(query);
     };
 
-    // Initialize
+    // ---------- Init ----------
     API.updateStatus();
-    debug('App ready - agent-salesforce-ai @ 2025-11-11 23:24:21');
+    debug('App ready');
   </script>
 </body>
 </html>
