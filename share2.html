@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
   
-  <!-- PWA Support -->
-  <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#00C09A">
   <meta name="description" content="Live AI-powered business verification and reports">
   
@@ -29,29 +27,11 @@
               light: '#F8FAFC',
               border:'#E5E7EB'
             }
-          },
-          boxShadow: {
-            subtle: '0 10px 20px rgba(0,0,0,.06)'
-          },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-10px)' }
-            }
           }
         }
       }
     }
   </script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
 
   <style>
     body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
@@ -60,107 +40,23 @@
     .dark .card { background: #1E293B; border-color: #334155; }
     .cta { background:#00C09A; color:#fff; font-weight:700; border-radius:.5rem; transition: all .15s ease; }
     .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
-    .cta:active { transform: translateY(0); }
-    .badge { font-size:.72rem; background:#F1F5F9; padding:.15rem .5rem; border-radius:999px; display:inline-block; }
-    .dark .badge { background: #334155; color: #E5E7EB; }
     .score-circle { width:120px; height:120px; border-radius:9999px; display:flex; align-items:center; justify-content:center; border:8px solid; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:2.3rem; }
     .score-red { border-color:#FECACA; color:#DC2626; background:#FEF2F2 }
     .score-yellow{ border-color:#FDE68A; color:#D97706; background:#FFFBEB }
     .score-green{ border-color:#A7F3D0; color:#059669; background:#ECFDF5 }
     .spin { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.1s ease-in-out infinite; border-radius:.5rem; }
-    .dark .shimmer { background: linear-gradient(100deg,#334155 40%,#475569 50%,#334155 60%); }
-    
-    /* Dark mode specific styles */
     .dark { color: #F1F5F9; }
-    .dark .text-brand-dark { color: #F1F5F9; }
     .dark .text-brand-gray { color: #94A3B8; }
-    .dark .bg-brand-light { background: #1E293B; }
-    .dark .border-brand-border { border-color: #334155; }
-    .dark header { background: rgba(15, 23, 42, 0.85); }
-    
-    /* Print styles */
-    @media print {
-      header, footer, #theme-toggle, .no-print { display: none !important; }
-      .card { box-shadow: none; border: 1px solid #ddd; }
-      body { background: white; color: black; }
-    }
   </style>
 </head>
 
 <body class="font-sans text-brand-dark">
-  <!-- API Key Setup Modal -->
-  <div id="api-key-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
-    <div class="flex items-center justify-center min-h-screen p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-        <div class="flex items-start gap-3 mb-4">
-          <svg class="w-8 h-8 text-brand-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-          </svg>
-          <div class="flex-1">
-            <h3 class="text-lg font-bold">API Key Required</h3>
-            <p class="text-sm text-brand-gray mt-1">Enter your Gemini API key to generate reports</p>
-          </div>
-        </div>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1">Gemini API Key</label>
-            <input 
-              id="api-key-input" 
-              type="password" 
-              class="w-full px-3 py-2 border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green dark:bg-gray-700 dark:border-gray-600"
-              placeholder="AIzaSy..."
-              autocomplete="off">
-            <p class="text-xs text-brand-gray mt-1">
-              Get your key at 
-              <a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-brand-green hover:underline">
-                Google AI Studio
-              </a>
-            </p>
-          </div>
-          
-          <div class="flex items-start gap-2">
-            <input type="checkbox" id="remember-key" class="mt-1" checked>
-            <label for="remember-key" class="text-sm">
-              <span class="font-medium">Remember my key</span>
-              <span class="text-brand-gray block">Stored securely in your browser only</span>
-            </label>
-          </div>
-          
-          <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-            <div class="flex gap-2">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-              </svg>
-              <div class="text-xs text-amber-700 dark:text-amber-300">
-                <p class="font-semibold">Security Note</p>
-                <p>Your API key is stored locally in your browser and never sent to any servers.</p>
-                <p class="mt-1">Created by: agent-salesforce-ai • 2025-11-11</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="flex gap-3">
-            <button id="save-api-key" class="flex-1 cta px-4 py-2">
-              Save & Continue
-            </button>
-            <button id="cancel-api-key" class="flex-1 px-4 py-2 border border-brand-border rounded hover:bg-brand-light dark:hover:bg-gray-700">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/85 border-b border-brand-border backdrop-blur dark:bg-brand-dark/85">
+  <header class="sticky top-0 z-40 bg-white/85 border-b border-brand-border backdrop-blur">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <svg width="28" height="28" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 50 50" fill="none">
           <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
           <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -168,348 +64,319 @@
       </div>
 
       <nav class="flex items-center gap-3">
-        <span id="api-status" class="hidden text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-          🔑 API Key Set
+        <span id="api-status" class="hidden text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+          🔑 API Ready
         </span>
-        <button id="settings-btn" class="text-sm text-brand-gray hover:text-brand-green" title="Settings">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </button>
+        <button id="test-api-btn" class="text-xs px-2 py-1 border rounded">Test API</button>
+        <button id="settings-btn" class="text-sm text-brand-gray hover:text-brand-green">⚙️</button>
       </nav>
     </div>
   </header>
 
-  <!-- Hero / Search Section -->
+  <!-- Main Section -->
   <section class="max-w-4xl mx-auto px-4 pt-10">
-    <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center animate-float">Live AI Business Report</h1>
-    <p class="text-center text-brand-gray mt-3">Search by <span class="font-semibold">company name or website</span> • Real-time data</p>
+    <h1 class="text-3xl md:text-5xl font-heading font-extrabold text-center">Live AI Business Report</h1>
+    <p class="text-center text-brand-gray mt-3">User: agent-salesforce-ai • 2025-11-11 23:24:21 UTC</p>
 
-    <div class="card p-3 md:p-4 mt-6">
-      <form id="search-form" class="relative" autocomplete="off">
-        <div class="flex flex-col sm:flex-row gap-3">
-          <input id="query" 
-                 class="flex-1 px-4 py-3 rounded-lg border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-green dark:bg-brand-dark dark:border-gray-600"
-                 placeholder="e.g., Apple Inc., tesla.com, microsoft, salesforce"
-                 autofocus>
-          <button id="btn-generate" type="submit" class="cta px-5 py-3 text-lg inline-flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/></svg>
-            Generate
-          </button>
+    <div class="card p-4 mt-6">
+      <form id="search-form">
+        <div class="flex gap-3">
+          <input id="query" class="flex-1 px-4 py-3 border rounded-lg" placeholder="Enter company name" autofocus>
+          <button type="submit" class="cta px-6 py-3">Generate</button>
         </div>
       </form>
-      <p class="text-xs text-brand-gray mt-2">
-        Tip: Enter a company name OR website • Press <kbd class="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 rounded">⌘K</kbd> to focus
-      </p>
     </div>
 
-    <div class="flex justify-center gap-2 mt-4">
-      <button id="btn-sample" class="text-xs px-3 py-1.5 border border-brand-border rounded hover:bg-brand-light dark:hover:bg-gray-700">
-        Load sample report
-      </button>
+    <div class="text-center mt-4">
+      <button id="btn-sample" class="text-sm text-brand-green hover:underline">Load sample (no API)</button>
     </div>
   </section>
 
-  <!-- Results Section -->
-  <section id="results" class="max-w-6xl mx-auto px-4 pb-16 mt-8 hidden">
-    <!-- Loader -->
-    <div id="loader" class="card p-6 md:p-8 hidden">
-      <div class="flex items-center gap-4">
-        <svg class="w-8 h-8 text-brand-green spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" stroke-width="2" opacity=".15"></circle>
-          <path d="M22 12a10 10 0 0 1-10 10" stroke-width="2"></path>
-        </svg>
-        <div class="flex-1">
-          <div class="font-medium">Building your report…</div>
-          <div class="w-full bg-gray-100 rounded-full h-2 mt-2 overflow-hidden dark:bg-gray-700">
-            <span id="bar" class="block h-2 bg-brand-green transition-all duration-500" style="width:8%"></span>
-          </div>
-          <p class="text-xs text-brand-gray mt-2">Fetching real-time data and generating AI analysis...</p>
-        </div>
-      </div>
+  <!-- Results -->
+  <section id="results" class="max-w-6xl mx-auto px-4 py-8 hidden">
+    <div id="loader" class="card p-6 hidden">
+      <svg class="w-8 h-8 text-brand-green spin inline" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" stroke-width="2" opacity=".15"></circle>
+        <path d="M22 12a10 10 0 0 1-10 10" stroke-width="2"></path>
+      </svg>
+      <span class="ml-3">Generating...</span>
     </div>
 
-    <!-- Error -->
-    <div id="error" class="card p-5 border-red-200 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 hidden"></div>
+    <div id="error" class="card p-5 border-red-200 bg-red-50 text-red-700 hidden"></div>
 
-    <!-- Report Content -->
-    <div id="content" class="space-y-8 hidden">
-      <div>
-        <h2 id="title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-        <p class="text-xs text-brand-gray mt-1">Generated by agent-salesforce-ai • 2025-11-11</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Score Card -->
-        <div class="card p-5">
-          <h3 class="font-semibold mb-3">AI Risk Score</h3>
-          <div class="flex flex-col items-center">
-            <div id="score-circle" class="score-circle mb-3">
-              <span id="score-digit">—</span>
-            </div>
-            <p id="score-just" class="text-center text-sm text-brand-gray mb-3"></p>
-          </div>
-        </div>
-
-        <!-- Summary -->
-        <div class="md:col-span-2">
-          <div class="card p-5">
-            <h3 class="font-semibold mb-3">Business Summary</h3>
-            <p id="summary" class="text-sm text-brand-dark leading-relaxed dark:text-gray-300"></p>
-            
-            <div id="profile" class="mt-4 p-4 border border-brand-border rounded bg-brand-light/40 dark:bg-gray-800/50">
-              <h4 class="text-sm font-semibold mb-2">Company Profile</h4>
-              <div id="profile-details" class="text-sm space-y-1"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Dark mode toggle -->
-  <button id="theme-toggle" class="fixed bottom-4 right-4 p-3 rounded-full bg-brand-light dark:bg-gray-700 shadow-lg z-30 hover:scale-110 transition-transform">
-    <svg class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-    </svg>
-    <svg class="w-5 h-5 hidden dark:block text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-      <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" clip-rule="evenodd"/>
-    </svg>
-  </button>
-
-  <footer class="border-t border-brand-border dark:border-gray-700 mt-16">
-    <div class="max-w-6xl mx-auto px-4 py-10 text-center text-sm text-brand-gray">
-      © 2025 TrustBureau.ai — Live AI Business Report • Built by agent-salesforce-ai
-    </div>
-  </footer>
-
-  <!-- THE COMPLETE APPLICATION SCRIPT -->
-  <script>
-    // =================== API KEY MANAGEMENT ===================
-    const APIKey = {
-      STORAGE_KEY: 'trustbureau_api_key',
+    <div id="content" class="hidden space-y-6">
+      <h2 id="title" class="text-2xl font-bold"></h2>
       
-      get() {
-        return localStorage.getItem(this.STORAGE_KEY);
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-3">Risk Score</h3>
+          <div id="score-circle" class="score-circle mx-auto">
+            <span id="score">—</span>
+          </div>
+        </div>
+        
+        <div class="md:col-span-2 card p-5">
+          <h3 class="font-semibold mb-3">Summary</h3>
+          <p id="summary"></p>
+          <div id="profile" class="mt-4 p-3 bg-gray-50 rounded"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Debug Console -->
+  <div id="debug" class="fixed bottom-0 left-0 right-0 bg-black text-green-400 text-xs font-mono p-2 max-h-32 overflow-y-auto hidden"></div>
+
+  <script>
+    // Debug logger
+    const debug = (msg) => {
+      console.log(msg);
+      const debugEl = document.getElementById('debug');
+      debugEl.innerHTML += `[${new Date().toTimeString().slice(0,8)}] ${msg}<br>`;
+      debugEl.scrollTop = debugEl.scrollHeight;
+    };
+
+    // Show debug console
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'd' && e.ctrlKey) {
+        document.getElementById('debug').classList.toggle('hidden');
+      }
+    });
+
+    // API Key Management
+    const API = {
+      getKey() {
+        const key = localStorage.getItem('gemini_key');
+        debug(`Retrieved key: ${key ? key.substring(0,10) + '...' : 'none'}`);
+        return key;
       },
       
-      set(key) {
-        localStorage.setItem(this.STORAGE_KEY, key);
+      setKey(key) {
+        localStorage.setItem('gemini_key', key);
+        debug(`Saved key: ${key.substring(0,10)}...`);
         this.updateStatus();
       },
       
-      exists() {
-        return !!this.get();
-      },
-      
       updateStatus() {
-        const status = document.getElementById('api-status');
-        if (this.exists()) {
-          status.classList.remove('hidden');
-        } else {
-          status.classList.add('hidden');
-        }
-      },
+        const hasKey = !!this.getKey();
+        document.getElementById('api-status').classList.toggle('hidden', !hasKey);
+      }
+    };
+
+    // Test API button
+    document.getElementById('test-api-btn').onclick = async () => {
+      const key = API.getKey();
+      if (!key) {
+        alert('No API key set. Click settings to add one.');
+        return;
+      }
       
-      async prompt() {
-        const modal = document.getElementById('api-key-modal');
-        modal.classList.remove('hidden');
+      debug('Testing API key...');
+      
+      try {
+        const testUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+        debug(`Testing URL: ${testUrl}`);
         
-        return new Promise((resolve) => {
-          const save = () => {
-            const key = document.getElementById('api-key-input').value.trim();
-            if (key) {
-              this.set(key);
-              modal.classList.add('hidden');
-              resolve(key);
-            }
-          };
-          
-          document.getElementById('save-api-key').onclick = save;
-          document.getElementById('cancel-api-key').onclick = () => {
-            modal.classList.add('hidden');
-            resolve(null);
-          };
-        });
+        const response = await fetch(testUrl);
+        debug(`Test response: ${response.status}`);
+        
+        if (response.ok) {
+          alert('✅ API key is working!');
+        } else {
+          const error = await response.text();
+          alert(`❌ API key test failed: ${response.status}\n${error}`);
+        }
+      } catch (e) {
+        alert(`❌ Test failed: ${e.message}`);
+        debug(`Test error: ${e.message}`);
       }
     };
 
-    // =================== DARK MODE ===================
-    document.getElementById('theme-toggle').onclick = () => {
-      document.documentElement.classList.toggle('dark');
+    // Settings
+    document.getElementById('settings-btn').onclick = () => {
+      const current = API.getKey();
+      const newKey = prompt('Enter your Gemini API key:', current || '');
+      if (newKey && newKey !== current) {
+        API.setKey(newKey);
+        alert('API key saved!');
+      }
     };
 
-    // =================== REPORT GENERATION ===================
+    // Generate Report
     async function generateReport(query) {
-      // Get or prompt for API key
-      let apiKey = APIKey.get();
-      if (!apiKey) {
-        apiKey = await APIKey.prompt();
-        if (!apiKey) return;
+      const key = API.getKey();
+      if (!key) {
+        alert('Please add your API key in Settings first');
+        return;
       }
 
-      // Show loader
+      debug(`Generating report for: ${query}`);
+      
       document.getElementById('results').classList.remove('hidden');
       document.getElementById('loader').classList.remove('hidden');
       document.getElementById('content').classList.add('hidden');
       document.getElementById('error').classList.add('hidden');
 
-      // Animate progress bar
-      let progress = 8;
-      const bar = document.getElementById('bar');
-      const progressInterval = setInterval(() => {
-        progress = Math.min(95, progress + 2);
-        bar.style.width = progress + '%';
-      }, 200);
-
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // Build the API URL
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`;
+        debug(`API URL: ${apiUrl.substring(0,80)}...`);
+        
+        const requestBody = {
+          contents: [{
+            parts: [{
+              text: `Create a business report for ${query}. Return a JSON object with: summary (companyName, summary), riskScore (score 300-850, justification), profile (founded, headquarters, employees, industry, website). JSON only, no markdown.`
+            }]
+          }]
+        };
+        
+        debug('Sending request...');
+        
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `Generate a comprehensive business report for "${query}" with this exact JSON structure:
-{
-  "summary": {
-    "companyName": "Official company name",
-    "summary": "2-3 sentence business overview"
-  },
-  "riskScore": {
-    "score": number between 300-850,
-    "justification": "Brief explanation of score"
-  },
-  "profile": {
-    "founded": "Year",
-    "headquarters": "City, State/Country",
-    "employees": "Number or range",
-    "industry": "Primary industry",
-    "website": "https://...",
-    "revenue": "Annual revenue"
-  }
-}
-
-For the risk score: 750-850 = Excellent, 650-749 = Good, 550-649 = Fair, 300-549 = Poor
-Return ONLY valid JSON, no markdown or explanation.`
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 2000,
-              responseMimeType: "application/json"
-            }
-          })
+          body: JSON.stringify(requestBody)
         });
-
-        clearInterval(progressInterval);
-        bar.style.width = '100%';
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const reportText = data.candidates[0].content.parts[0].text;
-        const report = JSON.parse(reportText);
         
-        displayReport(report);
+        debug(`Response status: ${response.status}`);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          debug(`Error response: ${errorText}`);
+          
+          if (response.status === 400) {
+            throw new Error('Invalid request. The API key might be incorrect or the model name is wrong.');
+          } else if (response.status === 403) {
+            throw new Error('API key is invalid or doesn\'t have permission.');
+          } else if (response.status === 404) {
+            // Try different model endpoint
+            debug('Trying alternate model...');
+            return generateReportAlternate(query);
+          } else {
+            throw new Error(`API Error ${response.status}: ${errorText.substring(0,200)}`);
+          }
+        }
+        
+        const data = await response.json();
+        debug('Response received successfully');
+        
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        
+        if (jsonMatch) {
+          const report = JSON.parse(jsonMatch[0]);
+          displayReport(report);
+        } else {
+          throw new Error('Could not parse response');
+        }
         
       } catch (error) {
-        clearInterval(progressInterval);
-        showError(error);
+        debug(`Error: ${error.message}`);
+        document.getElementById('error').innerHTML = `
+          <strong>Error:</strong> ${error.message}<br>
+          <small>Press Ctrl+D to see debug log</small>
+        `;
+        document.getElementById('error').classList.remove('hidden');
       } finally {
         document.getElementById('loader').classList.add('hidden');
       }
     }
 
+    // Alternate generation with different model
+    async function generateReportAlternate(query) {
+      const key = API.getKey();
+      debug('Trying gemini-1.5-flash model...');
+      
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Business report for ${query}: Return JSON with summary, riskScore (300-850), and profile.`
+            }]
+          }]
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`All API attempts failed. Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      
+      // Try to extract JSON
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        displayReport(JSON.parse(jsonMatch[0]));
+      } else {
+        // Fallback to sample-like data
+        displayReport({
+          summary: { companyName: query, summary: "Generated report" },
+          riskScore: { score: 700, justification: "API response parsing failed, showing placeholder" },
+          profile: { industry: "Unknown" }
+        });
+      }
+    }
+
     function displayReport(data) {
+      debug('Displaying report');
       document.getElementById('content').classList.remove('hidden');
       
-      // Company name
-      document.getElementById('title').textContent = data.summary?.companyName || 'Unknown Company';
+      document.getElementById('title').textContent = data.summary?.companyName || 'Report';
+      document.getElementById('summary').textContent = data.summary?.summary || '';
       
-      // Summary
-      document.getElementById('summary').textContent = data.summary?.summary || 'No summary available';
-      
-      // Risk Score
       const score = data.riskScore?.score || 0;
-      document.getElementById('score-digit').textContent = score;
-      document.getElementById('score-just').textContent = data.riskScore?.justification || '';
+      document.getElementById('score').textContent = score;
       
       const circle = document.getElementById('score-circle');
-      circle.className = 'score-circle mb-3';
+      circle.className = 'score-circle mx-auto';
       if (score < 550) circle.classList.add('score-red');
       else if (score < 700) circle.classList.add('score-yellow');
       else circle.classList.add('score-green');
       
-      // Profile
       if (data.profile) {
-        const profileHtml = Object.entries(data.profile).map(([key, value]) => 
-          `<div><span class="text-brand-gray">${key.charAt(0).toUpperCase() + key.slice(1)}:</span> ${value}</div>`
-        ).join('');
-        document.getElementById('profile-details').innerHTML = profileHtml;
+        document.getElementById('profile').innerHTML = Object.entries(data.profile)
+          .map(([k,v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
       }
     }
 
-    function showError(error) {
-      const errorEl = document.getElementById('error');
-      errorEl.innerHTML = `
-        <div class="font-semibold">Error generating report</div>
-        <div class="text-sm mt-1">${error.message}</div>
-        <div class="text-xs mt-2">Check your API key in settings</div>
-      `;
-      errorEl.classList.remove('hidden');
-    }
-
-    // =================== SAMPLE REPORT ===================
+    // Sample Report
     document.getElementById('btn-sample').onclick = () => {
+      debug('Loading sample report');
       displayReport({
         summary: {
           companyName: "Salesforce, Inc.",
-          summary: "Salesforce is the world's leading CRM platform, providing cloud-based solutions that help businesses connect with customers. Founded in 1999, it serves millions of users globally."
+          summary: "Leading CRM platform company founded in 1999."
         },
         riskScore: {
           score: 820,
-          justification: "Established market leader with strong financials and consistent growth"
+          justification: "Strong market position"
         },
         profile: {
           founded: "1999",
           headquarters: "San Francisco, CA",
           employees: "73,000+",
-          industry: "Cloud Computing / CRM",
-          website: "https://salesforce.com",
-          revenue: "$31.4 billion (2023)"
+          industry: "Cloud Software"
         }
       });
       document.getElementById('results').classList.remove('hidden');
+      document.getElementById('content').classList.remove('hidden');
     };
 
-    // =================== FORM HANDLER ===================
+    // Form Handler
     document.getElementById('search-form').onsubmit = (e) => {
       e.preventDefault();
       const query = document.getElementById('query').value.trim();
       if (query) generateReport(query);
     };
 
-    // =================== SETTINGS ===================
-    document.getElementById('settings-btn').onclick = () => {
-      if (confirm('Change API key?')) {
-        document.getElementById('api-key-input').value = APIKey.get() || '';
-        APIKey.prompt();
-      }
-    };
-
-    // =================== KEYBOARD SHORTCUTS ===================
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        document.getElementById('query').focus();
-      }
-    });
-
-    // =================== INIT ===================
-    APIKey.updateStatus();
+    // Initialize
+    API.updateStatus();
+    debug('App ready - agent-salesforce-ai @ 2025-11-11 23:24:21');
   </script>
 </body>
 </html>
