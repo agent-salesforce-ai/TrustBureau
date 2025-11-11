@@ -27,19 +27,19 @@
     }
   </script>
 
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- Snapshot compression -->
+  <!-- Compression for snapshot links -->
   <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
-  <!-- API KEY placeholder (keep empty while testing) -->
+  <!-- API key placeholder (keep empty while testing / no proxy) -->
   <script>
-    // When you wire the live model, set this at runtime or here:
+    // TODO: when you wire the real model, set the key here
     // window.zakk = 'AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q';
-    window.zakk = ''; // keep empty while testing — page will use demo data
+    window.zakk = 'AIzaSyCVuxGsUOiPubpcrMmURUUSPXAedNKr_3Q'; // 
   </script>
 
   <style>
@@ -50,10 +50,7 @@
     .cta-button:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.12); }
 
     /* Loader */
-    .spinner {
-      width: 20px; height: 20px; border: 2px solid #d1fae5; border-top-color: #00C09A; border-radius: 9999px;
-      animation: spin 0.8s linear infinite;
-    }
+    .spinner { width: 20px; height: 20px; border: 2px solid #d1fae5; border-top-color: #00C09A; border-radius: 9999px; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
     .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
@@ -101,7 +98,6 @@
         <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
       </div>
 
-      <!-- Demo helper -->
       <div id="demo-buttons" class="mt-4 flex items-center justify-center gap-3">
         <button id="load-sample" class="px-3 py-2 border rounded-md">Load sample report</button>
       </div>
@@ -135,6 +131,7 @@
             <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
           </div>
 
+          <!-- Share / Export -->
           <div class="flex items-center gap-3">
             <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">
               Re‑run
@@ -158,6 +155,7 @@
           </div>
         </div>
 
+        <!-- Body (compact demo) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="widget-card p-5 md:p-6">
             <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
@@ -190,300 +188,150 @@
     </div>
   </footer>
 
-<script>
-/* ============================ Loader ============================ */
-let __loaderTimer = null, __loaderStepTimer = null;
-const LOADER_STEPS = [
-  'Matching business identity',
-  'Searching the web',
-  'Pulling SOS / corporate filings',
-  'Parsing entity metadata',
-  'Checking public records',
-  'Gathering leadership',
-  'Mapping products & services',
-  'Finding competitors',
-  'Collecting web & social signals',
-  'Crawling recent headlines',
-  'Reading customer reviews',
-  'Synthesizing risk score'
-];
-function buildLoaderSteps(){
-  const stepsOl = document.getElementById('loader-steps');
-  stepsOl.innerHTML = LOADER_STEPS.map((s,i)=>`
-    <li class="flex items-start gap-2">
-      <span class="step-icon" id="ld_${i}">
-        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-        </svg>
-      </span>
-      <span>${s}</span>
-    </li>`).join('');
-}
-function showLoading(){
-  clearInterval(__loaderTimer); clearInterval(__loaderStepTimer);
-  document.getElementById('report-results-container').style.display='block';
-  document.getElementById('report-loader').style.display='block';
-  document.getElementById('report-error-container').style.display='none';
-  document.getElementById('report-content').style.display='none';
-  buildLoaderSteps();
-  const bar = document.getElementById('loader-bar');
-  let pct = 6, stepIdx = 0; bar.style.width = pct + '%';
-  __loaderTimer = setInterval(()=>{ pct = Math.min(99, pct + Math.random()*3); bar.style.width = pct + '%'; }, 600);
-  __loaderStepTimer = setInterval(()=>{
-    const el = document.getElementById(`ld_${stepIdx}`); if(el) el.classList.add('done');
-    stepIdx++; if(stepIdx >= LOADER_STEPS.length) clearInterval(__loaderStepTimer);
-  }, 1200);
-}
-function hideLoading(){ clearInterval(__loaderTimer); clearInterval(__loaderStepTimer); document.getElementById('report-loader').style.display='none'; }
-
-/* ============================ View Helpers ============================ */
-function showError(msg){
-  hideLoading();
-  const err=document.getElementById('report-error-container');
-  const txt=document.getElementById('report-error-message');
-  const content=document.getElementById('report-content');
-  document.getElementById('report-results-container').style.display='block';
-  err.style.display='block'; content.style.display='none';
-  txt.textContent = msg || 'Something went wrong.';
-}
-function showContent(){
-  const err=document.getElementById('report-error-container');
-  const content=document.getElementById('report-content');
-  document.getElementById('report-results-container').style.display='block';
-  err.style.display='none'; content.style.display='block';
-}
-function toLinks(list){
-  if(!Array.isArray(list)) return [];
-  return list.filter(x=>x && x.url).map(x=>({title:x.title || x.url, url:x.url}));
-}
-function populateSources(links){
-  const chips=document.getElementById('report-sources-chips');
-  const ul=document.getElementById('report-sources');
-  const box=document.getElementById('report-sources-container');
-  chips.innerHTML=''; ul.innerHTML='';
-  if(!Array.isArray(links)||!links.length){ box.style.display='none'; return; }
-  box.style.display='block';
-  links.forEach(({title,url})=>{
-    const span=document.createElement('span');
-    span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-    span.innerHTML=`🔗 <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||url}</a>`;
-    chips.appendChild(span);
-  });
-  links.forEach(({title,url})=>{
-    const li=document.createElement('li');
-    li.className='text-sm';
-    li.innerHTML=`<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||url}</a>`;
-    ul.appendChild(li);
-  });
-  let open=false;
-  document.getElementById('toggle-sources').onclick=()=>{
-    open=!open; ul.classList.toggle('hidden',!open);
-    document.getElementById('toggle-sources').textContent=open?'Hide list':'Show list';
-  };
-}
-function populateReport(data){
-  try{
-    const title = data?.summary?.companyName || '—';
-    document.getElementById('report-title').textContent = title;
-    document.getElementById('report-summary').textContent = data?.summary?.summary || '—';
-    document.getElementById('score-digit').textContent = data?.riskScore?.score ?? '—';
-    document.getElementById('score-just').textContent = data?.riskScore?.justification || '';
-    populateSources(toLinks(data?.citations||[]));
-    showContent();
-  }catch(e){
-    console.error('populateReport error', e);
-    showError('Could not render the report.');
-  }
-}
-
-/* ============================ Share / Export ============================ */
-let __lastReport = null;
-function setLastReport(j){ __lastReport = j; }
-function buildPermalink(company){
-  const base = `${location.origin}${location.pathname}`;
-  const params = new URLSearchParams(location.search);
-  company ? params.set('q', company) : params.delete('q');
-  return `${base}?${params.toString()}`;
-}
-function pushPermalink(company){ history.replaceState(null,'',buildPermalink(company)); }
-function buildSnapshotLink(json){
-  const base = `${location.origin}${location.pathname}`;
-  const params = new URLSearchParams(location.search);
-  params.set('view','snapshot');
-  const packed = LZString.compressToEncodedURIComponent(JSON.stringify(json));
-  return `${base}?${params.toString()}#r=${packed}`;
-}
-async function copyToClipboard(text){
-  try{ await navigator.clipboard.writeText(text); alert('Link copied to clipboard'); }
-  catch{
-    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy'); ta.remove(); alert('Link copied to clipboard');
-  }
-}
-function wireExportMenu(){
-  const btn  = document.getElementById('export-menu-btn');
-  const menu = document.getElementById('export-menu');
-  if(!btn || !menu) return;
-  btn.addEventListener('click',()=>menu.classList.toggle('hidden'));
-  document.addEventListener('click',e=>{
-    if(!menu.contains(e.target) && e.target!==btn) menu.classList.add('hidden');
-  });
-  document.getElementById('copy-link-btn')?.addEventListener('click',()=>{
-    const q=(document.getElementById('business-name')?.value||'').trim();
-    copyToClipboard(buildPermalink(q));
-  });
-  document.getElementById('share-native-btn')?.addEventListener('click', async()=>{
-    const q=(document.getElementById('business-name')?.value||'').trim();
-    const url = __lastReport ? buildSnapshotLink(__lastReport) : buildPermalink(q);
-    if(navigator.share){
-      try { await navigator.share({title:`Business Report — ${q||'Company'}`, text:'View this report', url}); }
-      catch { /* ignore */ }
-    } else copyToClipboard(url);
-  });
-  document.getElementById('export-pdf-btn')?.addEventListener('click',()=>window.print());
-  document.getElementById('download-json-btn')?.addEventListener('click',()=>{
-    if(!__lastReport) return alert('Generate a report first.');
-    const blob=new Blob([JSON.stringify(__lastReport,null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    const name=(__lastReport?.summary?.companyName||'report').replace(/[^\w\-]+/g,'_');
-    a.href=url; a.download=`${name}_report.json`; document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  });
-}
-function wireShareButton(){
-  const btn=document.getElementById('share-btn');
-  if(!btn) return;
-  btn.addEventListener('click', async ()=>{
-    const q=(document.getElementById('business-name')?.value||'').trim();
-    const url = __lastReport ? buildSnapshotLink(__lastReport) : buildPermalink(q);
-    if(navigator.share){
-      try { await navigator.share({title:'Business Report', text:'View this report', url}); }
-      catch { copyToClipboard(url); }
-    } else copyToClipboard(url);
-  });
-}
-
-/* ============================ Data: DEMO + Model Hook ============================ */
-const DEMO_JSON = {
-  summary: {
-    companyName: "AOL Inc.",
-    summary: "AOL (America Online) was a pioneering internet services company that popularized dial‑up access, email, and messaging, later evolving into a digital media brand."
-  },
-  riskScore: {
-    score: 580,
-    justification: "Mature legacy brand; diversified parent support; core portal usage has declined."
-  },
-  citations: [
-    {title:"Wikipedia — AOL", url:"https://en.wikipedia.org/wiki/AOL"},
-    {title:"Delaware SOS — Entity Search", url:"https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx"}
-  ]
-};
-
-// OPTIONAL: wire your real model here later.
-// Returns JSON in the shape used by populateReport() or throws on failure.
-async function fetchGeminiReport(query){
-  // If you don’t have a proxy and you call Google’s API from the browser,
-  // you will likely hit CORS. We intentionally throw here when no key exists,
-  // so the caller can fall back to the demo JSON.
-  if(!window.zakk || !String(window.zakk).trim()){
-    throw new Error('No API key (zakk) set — falling back to demo data.');
-  }
-
-  const base='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-  const url = `${base}?key=${encodeURIComponent(window.zakk)}`;
-  const systemPrompt = `
-  You are an AI business analyst. Return ONE JSON object only, with:
-  summary: { companyName, summary },
-  riskScore: { score, justification },
-  citations: [{ title, url }]
-  `.trim();
-
-  const payload = {
-    contents: [{ role:'user', parts:[{ text:`Make a brief business snapshot for "${query}".` }] }],
-    systemInstruction: { parts:[{ text: systemPrompt }] },
-    generationConfig: { maxOutputTokens: 2048, temperature: 0.2, topP: 0.95, responseMimeType: "application/json" }
-  };
-
-  const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-  if(!res.ok){
-    let body=null; try{ body=await res.json(); }catch{}
-    const msg = body?.error?.message || res.statusText || 'Model request failed';
-    throw new Error(msg);
-  }
-  const data = await res.json();
-  const cand = data?.candidates?.[0];
-  const raw  = cand?.content?.parts?.map(p=>p.text).filter(Boolean).join('\n') || '';
-  if(!raw) throw new Error('Empty model response');
-  try{ return JSON.parse(raw); }catch{ throw new Error('Model returned non‑JSON'); }
-}
-
-/* ============================ Run ============================ */
-async function runReport(query){
-  showLoading();
-  try{
-    let json;
-    try{
-      // Try the model first (if key/proxy available)
-      json = await fetchGeminiReport(query);
-    }catch(e){
-      console.warn('Model call failed or skipped:', e.message);
-      // Fallback to demo data so the page still renders content
-      json = JSON.parse(JSON.stringify(DEMO_JSON));
-      json.summary.companyName = query || DEMO_JSON.summary.companyName;
+  <script>
+  /* Error surface */
+  window.addEventListener('error', (e)=>{
+    console.error(e.error || e.message || e);
+    const box=document.getElementById('report-error-container');
+    const msg=document.getElementById('report-error-message');
+    if(box && msg){
+      document.getElementById('report-results-container').style.display='block';
+      document.getElementById('report-loader').style.display='none';
+      document.getElementById('report-content').style.display='none';
+      box.style.display='block';
+      msg.textContent = 'Script error: ' + (e.message || 'Unknown error, check console.');
     }
-    // Render
-    populateReport(json);
-    setLastReport(json);
-    pushPermalink(query);
-  }catch(e){
-    console.error(e);
-    showError(e.message || 'Failed to generate report.');
-  }finally{
-    hideLoading();
-  }
-}
+  });
 
-/* ============================ Hydration / Events ============================ */
-async function hydrateFromURL(){
-  const hash = location.hash || '';
-  const m = hash.match(/^#r=(.+)$/);
-  if(m){
+  /* Loader */
+  let __loaderTimer=null, __loaderStepTimer=null;
+  const LOADER_STEPS = [
+    'Matching business identity','Searching the web','Pulling SOS / corporate filings',
+    'Parsing entity metadata','Checking public records','Gathering leadership',
+    'Mapping products & services','Finding competitors','Collecting web & social signals',
+    'Crawling recent headlines','Reading customer reviews','Synthesizing risk score'
+  ];
+  function buildLoaderSteps(){
+    const stepsOl = document.getElementById('loader-steps');
+    stepsOl.innerHTML = LOADER_STEPS.map((s,i)=>`
+      <li class="flex items-start gap-2">
+        <span class="step-icon" id="ld_${i}">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+        </span>
+        <span>${s}</span>
+      </li>`).join('');
+  }
+  function showLoading(){
+    clearInterval(__loaderTimer); clearInterval(__loaderStepTimer);
+    document.getElementById('report-results-container').style.display='block';
+    document.getElementById('report-loader').style.display='block';
+    document.getElementById('report-error-container').style.display='none';
+    document.getElementById('report-content').style.display='none';
+    buildLoaderSteps();
+    const bar=document.getElementById('loader-bar');
+    let pct=6, idx=0; bar.style.width=pct+'%';
+    __loaderTimer=setInterval(()=>{ pct=Math.min(99,pct+Math.random()*3); bar.style.width=pct+'%'; },600);
+    __loaderStepTimer=setInterval(()=>{ const el=document.getElementById('ld_'+idx); if(el) el.classList.add('done'); idx++; if(idx>=LOADER_STEPS.length) clearInterval(__loaderStepTimer); },1200);
+  }
+  function hideLoading(){ clearInterval(__loaderTimer); clearInterval(__loaderStepTimer); document.getElementById('report-loader').style.display='none'; }
+
+  /* Share / Export */
+  let __lastReport=null; function setLastReport(j){ __lastReport=j; }
+  function buildPermalink(company){ const base=`${location.origin}${location.pathname}`; const p=new URLSearchParams(location.search); company?p.set('q',company):p.delete('q'); return `${base}?${p.toString()}`; }
+  function pushPermalink(c){ history.replaceState(null,'',buildPermalink(c)); }
+  function buildSnapshotLink(json){ const base=`${location.origin}${location.pathname}`; const p=new URLSearchParams(location.search); p.set('view','snapshot'); const packed=LZString.compressToEncodedURIComponent(JSON.stringify(json)); return `${base}?${p.toString()}#r=${packed}`; }
+  async function copyToClipboard(text){ try{ await navigator.clipboard.writeText(text); alert('Link copied to clipboard'); } catch{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); alert('Link copied to clipboard'); } }
+  function wireExportMenu(){
+    const btn=document.getElementById('export-menu-btn'); const menu=document.getElementById('export-menu'); if(!btn||!menu) return;
+    btn.addEventListener('click',()=>menu.classList.toggle('hidden'));
+    document.addEventListener('click',e=>{ if(!menu.contains(e.target) && e.target!==btn) menu.classList.add('hidden');});
+    document.getElementById('copy-link-btn')?.addEventListener('click',()=>{ const q=(document.getElementById('business-name')?.value||'').trim(); copyToClipboard(buildPermalink(q)); });
+    document.getElementById('share-native-btn')?.addEventListener('click',async()=>{ const q=(document.getElementById('business-name')?.value||'').trim(); const url=__lastReport?buildSnapshotLink(__lastReport):buildPermalink(q); if(navigator.share){ try{ await navigator.share({title:'Business Report', text:'View this report', url}); }catch{} } else copyToClipboard(url); });
+    document.getElementById('export-pdf-btn')?.addEventListener('click',()=>window.print());
+    document.getElementById('download-json-btn')?.addEventListener('click',()=>{ if(!__lastReport) return alert('Generate a report first.'); const blob=new Blob([JSON.stringify(__lastReport,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${(__lastReport.summary?.companyName||'report').replace(/[^\w\-]+/g,'_')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+  }
+  function wireShareButton(){ document.getElementById('share-btn')?.addEventListener('click',async()=>{ const q=(document.getElementById('business-name')?.value||'').trim(); const url=__lastReport?buildSnapshotLink(__lastReport):buildPermalink(q); if(navigator.share){ try{ await navigator.share({title:'Business Report', text:'View this report', url}); }catch{ copyToClipboard(url); } } else copyToClipboard(url); }); }
+
+  /* Render helpers */
+  function showError(msg){ hideLoading(); const err=document.getElementById('report-error-container'); const txt=document.getElementById('report-error-message'); const content=document.getElementById('report-content'); document.getElementById('report-results-container').style.display='block'; err.style.display='block'; content.style.display='none'; txt.textContent=msg||'Something went wrong.'; }
+  function showContent(){ document.getElementById('report-error-container').style.display='none'; document.getElementById('report-content').style.display='block'; document.getElementById('report-results-container').style.display='block'; }
+  function populateSources(links){ const chips=document.getElementById('report-sources-chips'); const ul=document.getElementById('report-sources'); const box=document.getElementById('report-sources-container'); chips.innerHTML=''; ul.innerHTML=''; if(!Array.isArray(links)||!links.length){ box.style.display='none'; return; } box.style.display='block'; links.forEach(({title,url})=>{ const span=document.createElement('span'); span.className='border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs'; span.innerHTML=`🔗 <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title||url}</a>`; chips.appendChild(span); }); links.forEach(({title,url})=>{ const li=document.createElement('li'); li.className='text-sm'; li.innerHTML=`<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title||url}</a>`; ul.appendChild(li); }); let open=false; document.getElementById('toggle-sources').onclick=()=>{ open=!open; ul.classList.toggle('hidden',!open); document.getElementById('toggle-sources').textContent=open?'Hide list':'Show list'; }; }
+  function populateReport(data){ document.getElementById('report-title').textContent = data?.summary?.companyName || '—'; document.getElementById('report-summary').textContent = data?.summary?.summary || '—'; document.getElementById('score-digit').textContent = data?.riskScore?.score ?? '—'; document.getElementById('score-just').textContent = data?.riskScore?.justification || ''; const links=(data?.citations||[]).map(c=>({title:c.title,url:c.url})); populateSources(links); showContent(); }
+
+  /* Demo JSON */
+  const DEMO_JSON = {
+    summary: { companyName: "Sample Company, Inc.", summary: "A concise, illustrative report used for testing the page without any API. Replace this with live content once your proxy/API is ready." },
+    riskScore: { score: 695, justification: "Established brand recognition with diversified services; some industry headwinds." },
+    citations: [ {title:"Wikipedia", url:"https://en.wikipedia.org/wiki/Company"}, {title:"State SOS — Entity Search", url:"https://www.nass.org/business-services/corporations"} ]
+  };
+
+  /* runReport (demo-first) */
+  async function runReport(query){
     try{
       showLoading();
-      const raw = LZString.decompressFromEncodedURIComponent(m[1]);
-      const json = JSON.parse(raw);
-      await new Promise(r=>setTimeout(r, 400)); // ensure loader visible
-      populateReport(json); setLastReport(json); hideLoading();
-      const input=document.getElementById('business-name'); if(input) input.value=json?.summary?.companyName||'';
-      return;
-    }catch(e){ console.warn('Snapshot decode failed', e); hideLoading(); }
+      await new Promise(r=>setTimeout(r, 900)); // show loader briefly
+
+      // DEMO: always use local JSON while testing
+      const json = JSON.parse(JSON.stringify(DEMO_JSON));
+      if(query) json.summary.companyName = query;
+
+      // TODO (real API): replace the three lines above with your proxy call,
+      // then call populateReport(json), setLastReport(json), pushPermalink(query), hideLoading().
+
+      populateReport(json);
+      setLastReport(json);
+      pushPermalink(query);
+      hideLoading();
+    }catch(e){
+      console.error(e);
+      showError(e.message || 'Failed to generate report.');
+    }
   }
-  const q = new URLSearchParams(location.search).get('q') || '';
-  if(q){ const input=document.getElementById('business-name'); if(input) input.value=q; runReport(q); }
-}
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  wireShareButton(); wireExportMenu(); hydrateFromURL();
+  /* Hydration */
+  async function hydrateFromURL(){
+    const snapMatch = (location.hash||'').match(/^#r=(.+)$/);
+    if(snapMatch){
+      try{
+        showLoading();
+        const raw=LZString.decompressFromEncodedURIComponent(snapMatch[1]);
+        const json=JSON.parse(raw);
+        await new Promise(r=>setTimeout(r, 300));
+        hideLoading(); populateReport(json); setLastReport(json);
+        const c=json?.summary?.companyName||''; const input=document.getElementById('business-name'); if(input) input.value=c;
+        return;
+      }catch(e){ console.warn('Snapshot decode failed', e); }
+    }
+    const q = new URLSearchParams(location.search).get('q') || '';
+    if(q){ const input=document.getElementById('business-name'); if(input) input.value=q; runReport(q); }
+  }
 
-  document.getElementById('load-sample')?.addEventListener('click', ()=>{
-    const q=(document.getElementById('business-name')?.value||'AOL Inc.').trim();
-    runReport(q);
+  /* Boot */
+  document.addEventListener('DOMContentLoaded', ()=>{
+    wireShareButton();
+    wireExportMenu();
+    hydrateFromURL();
+
+    document.getElementById('load-sample')?.addEventListener('click', ()=>{
+      const q=(document.getElementById('business-name')?.value||'Sample Co.').trim();
+      runReport(q);
+    });
+
+    document.getElementById('search-form')?.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      if(!q) return showError('Please enter a business name.');
+      runReport(q);
+    });
+
+    document.getElementById('rerun')?.addEventListener('click', ()=>{
+      const q=(document.getElementById('business-name')?.value||'').trim();
+      if(!q) return showError('Please enter a business name.');
+      runReport(q);
+    });
   });
-
-  document.getElementById('search-form')?.addEventListener('submit',(e)=>{
-    e.preventDefault();
-    const q=(document.getElementById('business-name')?.value||'').trim();
-    if(!q) return showError('Please enter a business name.');
-    runReport(q);
-  });
-
-  document.getElementById('rerun')?.addEventListener('click', ()=>{
-    const q=(document.getElementById('business-name')?.value||'').trim();
-    if(!q) return showError('Please enter a business name.');
-    runReport(q);
-  });
-});
-</script>
+  </script>
 </body>
 </html>
