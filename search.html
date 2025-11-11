@@ -1127,4 +1127,93 @@ I'll help you implement those specific enhancements (1,2,3,4,6,7,8,9,10) into yo
     $('social').innerHTML = [
       ['Website Traffic', w.traffic],
       ['Twitter/X', w.twitter ? linkify(w.twitter,'twitter.com') : 'N/A'],
-      ['LinkedIn', w.linkedin ? linkify(w.linkedin,'linkedin.com') : 'N
+      ['LinkedIn', w.linkedin ? linkify(w.linkedin,'linkedin.com') : 'N/A'],
+      ['YouTube', w.youtube ? linkify(w.youtube,'youtube.com') : 'N/A'],
+      ['Facebook', w.facebook ? linkify(w.facebook,'facebook.com') : 'N/A']
+    ].map(([k,v]) => `<li><span class="text-gray-500">${k}:</span> ${v}</li>`).join('');
+
+    // Reviews
+    $('reviews').innerHTML = (d?.reviews || []).map(r => {
+      const src = r.source ? ` — ${r.source}` : '';
+      const url = r.url ? ` <a href="${r.url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">Link</a>` : '';
+      return `<blockquote class="border-l-4 border-brand-green pl-4 italic">${r.snippet||''}${src}${url}</blockquote>`;
+    }).join('') || '<p class="text-brand-gray">No recent customer reviews found.</p>';
+
+    // Charts
+    const cp = d?.chartPoints || {};
+    lineChart($('chart-revenue'), Array.isArray(cp.revenue)&&cp.revenue.length>1 ? cp.revenue : [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
+    lineChart($('chart-cash'), Array.isArray(cp.cashFlow)&&cp.cashFlow.length>1 ? cp.cashFlow : [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+
+    // News
+    const news = d?.news || [];
+    $('news-roll').innerHTML = news.map(n => {
+      const url = n.url && /^https?:\/\//.test(n.url) ? n.url : '#';
+      const dat = n.date ? ` • ${n.date}` : '';
+      return `<li><a class="text-brand-dark hover:text-brand-green font-medium" href="${url}" target="_blank" rel="noopener">${n.title||'Untitled'}</a>
+              <div class="text-xs text-gray-500">${n.source||'Source'}${dat}</div></li>`;
+    }).join('') || '<li class="text-brand-gray">No recent headlines found.</li>';
+
+    // Sources
+    const cites = d?.citations || [];
+    const chips = $('source-chips'), list = $('source-list');
+    chips.innerHTML = ''; list.innerHTML = '';
+    if (cites.length) {
+      cites.forEach(c => {
+        const url = c.url || c.uri;
+        if (!url) return;
+        const span = document.createElement('span');
+        span.className = 'px-2 py-1 border border-brand-border rounded-full bg-brand-light text-xs';
+        span.innerHTML = `🔗 <a href="${url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${c.title || new URL(url).hostname}</a>`;
+        chips.appendChild(span);
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${c.title || url}</a> (${new URL(url).hostname})`;
+        list.appendChild(li);
+      });
+    } else {
+      chips.innerHTML = '<span class="text-brand-gray text-xs">No links captured.</span>';
+    }
+  }
+
+  // Wire up
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = $('search-form');
+    const input = $('business-name');
+    const btn = $('generate-report-btn');
+    const rerunBtn = $('rerun');
+
+    async function runReport(query) {
+      $('report-results-container').style.display = 'block';
+      $('results')?.scrollIntoView({ behavior: 'smooth' });
+      showState('loading');
+      btn.classList.add('cta-disabled');
+      btn.disabled = true;
+
+      try {
+        const json = await generateReport(query);
+        renderReport(json);
+        showState('content');
+      } catch (e) {
+        console.error('Report generation failed:', e);
+        showState('error', e.message || 'Failed to generate report. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('cta-disabled');
+      }
+    }
+
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const q = (input.value || '').trim();
+      if (!q) { showState('error', 'Please enter a business name or website.'); return; }
+      runReport(q);
+    });
+
+    rerunBtn?.addEventListener('click', () => {
+      const q = (input.value || '').trim();
+      if (!q) { showState('error', 'Please enter a business name or website.'); return; }
+      runReport(q);
+    });
+  });
+</script>
+</body>
+</html>
