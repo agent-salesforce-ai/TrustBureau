@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shared Report — TrustBureau.ai</title>
+  <title>Shared Report & Search — TrustBureau.ai</title>
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -48,701 +48,535 @@
     .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
     .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
     .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
+    
+    .dark .score-red { border-color: #991B1B; background: #7F1D1D; }
+    .dark .score-yellow { border-color: #92400E; background: #78350F; }
+    .dark .score-green { border-color: #065F46; background: #064E3B; }
 
-    .dark .text-brand-dark { color: #F1F5F9; }
-    .dark .text-brand-gray { color: #94A3B8; }
-    .dark .bg-brand-light { background: #1E293B; }
-    .dark .border-brand-border { border-color: #334155; }
-    .dark header { background: rgba(15, 23, 42, 0.85); border-color: #334155; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 1s linear infinite; }
+    
+    /* Loading states */
+    @keyframes shimmer { 0% {background-position: 200% 0} 100% {background-position: -200% 0} }
+    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.1s ease-in-out infinite; border-radius:.5rem; }
+    .dark .shimmer { background: linear-gradient(100deg,#334155 40%,#475569 50%,#334155 60%); }
   </style>
 </head>
 
-<body class="font-sans text-brand-dark">
+<body class="font-sans">
   <!-- Header -->
-  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md dark:bg-brand-dark/80">
-    <nav class="max-w-6xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-      <a href="/index.html" class="flex items-center gap-2.5">
-        <svg width="34" height="34" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-brand-border dark:bg-brand-dark/90 dark:border-gray-700">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <svg class="w-7 h-7" viewBox="0 0 50 50" fill="none">
           <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
           <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
+        <span class="font-heading text-xl font-extrabold text-brand-dark dark:text-white">TrustBureau.ai</span>
       </a>
-      <div class="flex items-center gap-3">
-        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-brand-light dark:hover:bg-gray-700 transition-colors" title="Toggle dark mode">
-          <svg class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-          </svg>
-          <svg class="w-5 h-5 hidden dark:block text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
-          </svg>
-        </button>
-        <a href="/report.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors dark:text-gray-300">
-          Generate New Report
-        </a>
-      </div>
-    </nav>
+
+      <button id="darkModeToggle" class="p-2 rounded-lg hover:bg-brand-light dark:hover:bg-gray-800 transition-colors">
+        <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
-  <!-- Loading State -->
-  <div id="loading-state" class="max-w-6xl mx-auto px-4 md:px-6 py-10">
-    <div class="text-center">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green"></div>
-      <p class="mt-4 text-brand-gray">Loading shared report...</p>
-    </div>
-  </div>
-
-  <!-- Error State -->
-  <div id="error-state" class="max-w-6xl mx-auto px-4 md:px-6 py-10" style="display:none;">
-    <div class="widget-card p-6 md:p-8 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
-      <div class="flex items-start gap-3">
-        <svg class="w-6 h-6 text-red-600 dark:text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-        </svg>
-        <div class="flex-1">
-          <h3 class="font-heading font-bold text-lg text-red-700 dark:text-red-400">Unable to Load Report</h3>
-          <p id="error-message" class="mt-2 text-sm text-red-600 dark:text-red-300"></p>
-          <a href="/report.html" class="inline-block mt-4 px-4 py-2 bg-brand-green text-white font-bold rounded-lg hover:bg-green-600 transition-colors">
-            Generate New Report
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Report Content -->
-  <section id="report-section" class="max-w-6xl mx-auto px-4 md:px-6 py-10" style="display:none;">
-    <div class="space-y-8">
-      <!-- Title and Actions -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <h1 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h1>
-          <p class="text-xs text-brand-gray mt-1">
-            Shared report snapshot • Generated: <span id="report-timestamp">—</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button id="btn-print" class="px-4 py-2 border border-brand-border rounded-lg hover:bg-brand-light dark:hover:bg-gray-700 text-sm font-medium transition-colors">
-            Print / PDF
-          </button>
-          <button id="btn-copy-link" class="px-4 py-2 bg-brand-green text-white font-bold rounded-lg hover:bg-green-600 transition-colors text-sm">
-            Copy Link
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    
+    <!-- Search Section -->
+    <section class="mb-8">
+      <div class="widget-card p-6">
+        <h2 class="text-2xl font-heading font-bold mb-4 text-brand-dark dark:text-white">Search for a Company</h2>
+        <p class="text-brand-gray dark:text-gray-400 mb-4">Generate a new AI-powered business report</p>
+        
+        <div class="flex gap-3 mb-4">
+          <input 
+            type="text" 
+            id="companyInput" 
+            placeholder="Enter company name (e.g., Apple Inc., Microsoft)" 
+            class="flex-1 px-4 py-3 border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          />
+          <button 
+            id="generateBtn"
+            class="px-6 py-3 bg-brand-green text-white font-bold rounded-lg cta-button hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Generate
           </button>
         </div>
-      </div>
-
-      <!-- Score + Summary -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Score -->
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
-          <div class="flex flex-col items-center">
-            <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">…</span></div>
-            <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-3 italic"></p>
-            <div class="w-full text-left">
-              <h4 class="text-xs font-semibold uppercase text-brand-gray mb-2">Key Positives</h4>
-              <ul id="report-score-positives" class="space-y-1.5 mb-3"></ul>
-              <h4 class="text-xs font-semibold uppercase text-brand-gray mb-2">Key Risks</h4>
-              <ul id="report-score-negatives" class="space-y-1.5"></ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Summary -->
-        <div class="lg:col-span-2 widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
-          <p id="report-summary" class="text-sm text-brand-dark dark:text-gray-300 leading-relaxed"></p>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <!-- Corporate Filings -->
-            <div class="p-4 border border-brand-border rounded-lg bg-brand-light dark:bg-gray-800/50">
-              <h4 class="text-sm font-semibold text-brand-dark dark:text-gray-200 mb-3">Corporate Filings (SOS)</h4>
-              <ul class="text-sm text-brand-dark dark:text-gray-300 space-y-1">
-                <li><span class="text-brand-gray">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
-                <li><span class="text-brand-gray">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
-                <li><span class="text-brand-gray">Status:</span> <span id="report-sos-status" class="ml-1"></span></li>
-                <li><span class="text-brand-gray">Jurisdiction:</span> <span id="report-sos-jurisdiction" class="ml-1"></span></li>
-                <li><span class="text-brand-gray">Formation Date:</span> <span id="report-sos-date" class="ml-1"></span></li>
-                <li><span class="text-brand-gray">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
-              </ul>
-            </div>
-
-            <!-- Operational Highlights -->
-            <div class="p-4 border border-brand-border rounded-lg bg-brand-light dark:bg-gray-800/50">
-              <h4 class="text-sm font-semibold text-brand-dark dark:text-gray-200 mb-3">Operational Highlights</h4>
-              <ul id="report-highlights" class="space-y-2 text-sm text-brand-dark dark:text-gray-300"></ul>
-            </div>
-
-            <!-- Headlines -->
-            <div class="md:col-span-2 p-4 border border-brand-border rounded-lg bg-white dark:bg-gray-800">
-              <h4 class="text-sm font-semibold text-brand-dark dark:text-gray-200 mb-2">Recent Headlines</h4>
-              <ul id="report-news-list" class="space-y-2"></ul>
-            </div>
+        
+        <div id="searchError" class="hidden p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm"></div>
+        <div id="searchLoading" class="hidden p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-700 dark:text-blue-300 text-sm">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Generating report... This may take 30-60 seconds.</span>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Contact & Map -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
-          <ul class="text-sm text-brand-dark dark:text-gray-300 space-y-1">
-            <li><span class="text-brand-gray">Phone:</span> <span id="contact-phone" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Email:</span> <span id="contact-email" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Address:</span> <span id="contact-address" class="ml-1"></span></li>
-            <li class="mt-2"><a id="contact-maplink" class="text-brand-green hover:underline text-sm" target="_blank" rel="noopener">Open in Google Maps</a></li>
-          </ul>
-        </div>
-        <div class="widget-card p-0 overflow-hidden">
-          <iframe id="map-iframe" title="Map" class="w-full h-[300px] border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </div>
-      </div>
-
-      <!-- Company Facts + Public Records -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Company Facts</h3>
-          <ul class="text-sm text-brand-dark dark:text-gray-300 space-y-1">
-            <li><span class="text-brand-gray">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
-            <li><span class="text-brand-gray">Website:</span> <span id="facts-website" class="ml-1"></span></li>
-          </ul>
-        </div>
-
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Public Records</h3>
-          <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-dark dark:text-gray-300 leading-relaxed"></ul>
-        </div>
-      </div>
-
-      <!-- Leadership / Products / Competitors / Web Signals -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Leadership</h3>
-          <ul id="report-leadership-list" class="space-y-2 text-sm text-brand-dark dark:text-gray-300"></ul>
-        </div>
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Products &amp; Services</h3>
-          <ul id="report-products-list" class="space-y-2 text-sm text-brand-dark dark:text-gray-300"></ul>
-        </div>
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Competitors</h3>
-          <ul id="report-competitors-list" class="space-y-2 text-sm text-brand-dark dark:text-gray-300"></ul>
-        </div>
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Web &amp; Social Signals</h3>
-          <ul id="report-social-list" class="space-y-1.5 text-sm text-brand-dark dark:text-gray-300"></ul>
-        </div>
-      </div>
-
-      <!-- Reviews + Charts -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Customer Reviews</h3>
-          <div id="report-reviews-list" class="space-y-3"></div>
-        </div>
-
-        <div class="widget-card p-5 md:p-6">
-          <h3 class="font-heading font-semibold mb-3">Financial Charts (Fictional)</h3>
-          <div class="grid grid-cols-1 gap-4">
-            <div>
-              <h5 class="text-sm font-medium text-brand-dark dark:text-gray-200 mb-1">Revenue Trend</h5>
-              <div id="report-chart-revenue" class="h-24"></div>
-            </div>
-            <div>
-              <h5 class="text-sm font-medium text-brand-dark dark:text-gray-200 mb-1">Cash Flow</h5>
-              <div id="report-chart-cashflow" class="h-24"></div>
-            </div>
+    <!-- New Search Results -->
+    <section id="newReportSection" class="hidden mb-8">
+      <div class="widget-card p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-heading font-bold text-brand-dark dark:text-white">New Search Results</h2>
+            <p class="text-xs text-brand-gray dark:text-gray-400 mt-1">Generated report</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btnPrintNew" class="px-4 py-2 border border-brand-border rounded-lg hover:bg-brand-light dark:hover:bg-gray-700 dark:border-gray-600 text-sm font-medium transition-colors">
+              Print / PDF
+            </button>
+            <button id="btnCopyLinkNew" class="px-4 py-2 bg-brand-green text-white font-bold rounded-lg hover:bg-green-600 transition-colors text-sm">
+              Copy Link
+            </button>
           </div>
         </div>
+        <div id="newReportContent"></div>
       </div>
+    </section>
 
-      <!-- Sources -->
-      <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
-        <h4 class="text-xs font-semibold text-brand-gray uppercase mb-3">Sources &amp; Links</h4>
-        <div id="report-sources-chips" class="flex flex-wrap gap-2 mb-3"></div>
-        <ul id="report-sources" class="space-y-1 list-disc list-inside text-sm"></ul>
+    <!-- Shared Report -->
+    <section id="sharedReportSection" class="hidden">
+      <div class="widget-card p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-heading font-bold text-brand-dark dark:text-white">Shared Report</h2>
+            <p class="text-xs text-brand-gray dark:text-gray-400 mt-1" id="sharedReportTimestamp">Shared report snapshot</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btnPrintShared" class="px-4 py-2 border border-brand-border rounded-lg hover:bg-brand-light dark:hover:bg-gray-700 dark:border-gray-600 text-sm font-medium transition-colors">
+              Print / PDF
+            </button>
+            <button id="btnCopyLinkShared" class="px-4 py-2 bg-brand-green text-white font-bold rounded-lg hover:bg-green-600 transition-colors text-sm">
+              Copy Link
+            </button>
+          </div>
+        </div>
+        <div id="sharedReportContent"></div>
       </div>
+    </section>
+
+    <!-- No Data Message -->
+    <div id="noDataMessage" class="hidden text-center py-12">
+      <svg class="w-16 h-16 mx-auto mb-4 text-brand-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="text-xl font-heading font-bold text-brand-dark dark:text-white mb-2">No Report Available</h3>
+      <p class="text-brand-gray dark:text-gray-400">Search for a company above to generate a new report.</p>
     </div>
-  </section>
 
-  <footer class="border-t border-brand-border dark:border-gray-700 mt-16">
-    <div class="max-w-6xl mx-auto px-4 md:px-6 py-10 text-center text-sm text-brand-gray">
-      &copy; 2025 TrustBureau.ai — Shared Business Report
-    </div>
-  </footer>
+  </main>
 
   <script>
-    /* ===================== Utilities ===================== */
-    function setText(el, v) { 
-      if (el) el.textContent = (v && String(v).trim()) ? v : 'N/A'; 
+    // ⚠️ REQUIRED: Get your FREE Gemini API key from https://aistudio.google.com/app/apikey
+    // Then replace "YOUR_GEMINI_API_KEY_HERE" below with your actual key
+    const zakk = "YOUR_GEMINI_API_KEY_HERE"; // or set window.zakk at runtime
+
+    //===========================================
+    // Dark Mode
+    //===========================================
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const html = document.documentElement;
+    
+    // Initialize dark mode from localStorage
+    if (localStorage.getItem('darkMode') === 'true' || 
+        (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
     }
     
-    function toDomain(url) { 
-      try { return new URL(url).hostname.replace(/^www\./, ''); } 
-      catch { return url; } 
-    }
-    
-    function linkifyMaybe(v) {
-      if (!v) return 'N/A';
-      const s = String(v).trim();
-      if (/^https?:\/\//i.test(s)) {
-        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
+    darkModeToggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('darkMode', html.classList.contains('dark'));
+    });
+
+    //===========================================
+    // State Management
+    //===========================================
+    let sharedReportData = null;
+    let newSearchData = null;
+
+    //===========================================
+    // API Integration
+    //===========================================
+    async function callGeminiAPI(companyName) {
+      // Validate API key
+      if (!zakk || zakk === 'YOUR_GEMINI_API_KEY_HERE') {
+        throw new Error('❌ API Key Required!\n\n' +
+          '1. Get a FREE Gemini API key from:\n   https://aistudio.google.com/app/apikey\n\n' +
+          '2. Replace "YOUR_GEMINI_API_KEY_HERE" on line 176 with your key\n\n' +
+          '3. Or set it via browser console:\n   window.zakk = "your-key-here"');
       }
-      return s;
+
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${zakk}`;
+      
+      const prompt = `Generate a comprehensive business verification report for: ${companyName}
+
+Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
+{
+  "company_name": "Official company name",
+  "ai_risk_score": 750,
+  "positive_factors": ["factor1", "factor2", "factor3"],
+  "negative_factors": ["factor1", "factor2"],
+  "business_summary": "2-3 sentence overview",
+  "corporate_filings": ["filing1", "filing2"],
+  "operational_highlights": ["highlight1", "highlight2"],
+  "headlines": ["headline1", "headline2"],
+  "contact": {
+    "address": "Full address",
+    "phone": "Phone number",
+    "email": "Email",
+    "website": "Website URL",
+    "lat": 37.7749,
+    "lng": -122.4194
+  },
+  "company_facts": ["fact1", "fact2", "fact3"],
+  "public_records": ["record1", "record2"],
+  "leadership": ["Name - Title", "Name - Title"],
+  "products_services": ["product1", "product2"],
+  "competitors": ["Competitor 1", "Competitor 2"],
+  "web_social": {
+    "website_status": "Active",
+    "social_presence": "Strong",
+    "online_reviews": "4.5/5"
+  },
+  "customer_reviews": [
+    {"rating": 5, "text": "Great company", "source": "Google"},
+    {"rating": 4, "text": "Good service", "source": "Yelp"}
+  ],
+  "sources": ["https://example.com/source1", "https://example.com/source2"]
+}`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        if (response.status === 400 && errorData?.error?.message?.includes('API key')) {
+          throw new Error('API key expired or invalid. Please get a new key from https://aistudio.google.com/app/apikey');
+        }
+        throw new Error(`API Error: ${response.status} - ${errorData?.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      
+      // Parse JSON from response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Failed to extract JSON from API response');
+      }
+      
+      const reportData = JSON.parse(jsonMatch[0]);
+      reportData.timestamp = new Date().toISOString();
+      
+      return reportData;
     }
-    
-    function renderLineChart(container, values, color) {
-      if (!container) return;
-      if (!Array.isArray(values) || values.length < 2) {
-        container.innerHTML = '<p class="text-sm text-brand-gray dark:text-gray-400">Chart not available.</p>';
+
+    //===========================================
+    // Report Rendering
+    //===========================================
+    function renderReport(data, containerId) {
+      const container = document.getElementById(containerId);
+      if (!data || !container) return;
+
+      const scoreClass = data.ai_risk_score >= 700 ? 'score-green' : 
+                         data.ai_risk_score >= 500 ? 'score-yellow' : 'score-red';
+
+      container.innerHTML = `
+        <!-- Company Header -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-heading font-extrabold text-brand-dark dark:text-white mb-2">
+            ${data.company_name || 'Company Report'}
+          </h1>
+          ${data.timestamp ? `<p class="text-sm text-brand-gray dark:text-gray-400">Generated: ${new Date(data.timestamp).toLocaleString()}</p>` : ''}
+        </div>
+
+        <!-- AI Risk Score -->
+        <div class="mb-8 p-6 bg-brand-light dark:bg-gray-800 rounded-lg">
+          <div class="flex items-center gap-6">
+            <div class="${scoreClass} score-circle">
+              ${data.ai_risk_score || 'N/A'}
+            </div>
+            <div class="flex-1">
+              <h3 class="text-xl font-heading font-bold mb-2 text-brand-dark dark:text-white">AI Risk Score</h3>
+              ${data.positive_factors?.length ? `
+                <div class="mb-2">
+                  <span class="text-sm font-semibold text-green-700 dark:text-green-400">Positive Factors:</span>
+                  <ul class="text-sm text-brand-gray dark:text-gray-400 ml-4">
+                    ${data.positive_factors.map(f => `<li>• ${f}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+              ${data.negative_factors?.length ? `
+                <div>
+                  <span class="text-sm font-semibold text-red-700 dark:text-red-400">Negative Factors:</span>
+                  <ul class="text-sm text-brand-gray dark:text-gray-400 ml-4">
+                    ${data.negative_factors.map(f => `<li>• ${f}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Summary -->
+        ${data.business_summary ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Business Summary</h3>
+            <p class="text-brand-gray dark:text-gray-400">${data.business_summary}</p>
+          </div>
+        ` : ''}
+
+        <!-- Corporate Filings -->
+        ${data.corporate_filings?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Corporate Filings</h3>
+            <ul class="text-brand-gray dark:text-gray-400">
+              ${data.corporate_filings.map(f => `<li>• ${f}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- Contact & Location -->
+        ${data.contact ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Contact & Location</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                ${data.contact.address ? `<p class="text-sm mb-1 text-brand-gray dark:text-gray-400"><strong>Address:</strong> ${data.contact.address}</p>` : ''}
+                ${data.contact.phone ? `<p class="text-sm mb-1 text-brand-gray dark:text-gray-400"><strong>Phone:</strong> ${data.contact.phone}</p>` : ''}
+                ${data.contact.email ? `<p class="text-sm mb-1 text-brand-gray dark:text-gray-400"><strong>Email:</strong> ${data.contact.email}</p>` : ''}
+                ${data.contact.website ? `<p class="text-sm text-brand-gray dark:text-gray-400"><strong>Website:</strong> <a href="${data.contact.website}" target="_blank" class="text-brand-green hover:underline">${data.contact.website}</a></p>` : ''}
+              </div>
+              ${data.contact.lat && data.contact.lng ? `
+                <div>
+                  <iframe 
+                    width="100%" 
+                    height="200" 
+                    frameborder="0" 
+                    style="border:0;border-radius:0.5rem;" 
+                    src="https://www.google.com/maps?q=${data.contact.lat},${data.contact.lng}&output=embed"
+                    allowfullscreen>
+                  </iframe>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Company Facts -->
+        ${data.company_facts?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Company Facts</h3>
+            <ul class="text-brand-gray dark:text-gray-400">
+              ${data.company_facts.map(f => `<li>• ${f}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- Leadership -->
+        ${data.leadership?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Leadership</h3>
+            <ul class="text-brand-gray dark:text-gray-400">
+              ${data.leadership.map(l => `<li>• ${l}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- Products & Services -->
+        ${data.products_services?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Products & Services</h3>
+            <ul class="text-brand-gray dark:text-gray-400">
+              ${data.products_services.map(p => `<li>• ${p}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- Competitors -->
+        ${data.competitors?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Competitors</h3>
+            <ul class="text-brand-gray dark:text-gray-400">
+              ${data.competitors.map(c => `<li>• ${c}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- Customer Reviews -->
+        ${data.customer_reviews?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Customer Reviews</h3>
+            ${data.customer_reviews.map(r => `
+              <div class="mb-3 p-3 bg-brand-light dark:bg-gray-800 rounded-lg">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-yellow-500">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                  <span class="text-xs text-brand-gray dark:text-gray-400">${r.source || 'Unknown'}</span>
+                </div>
+                <p class="text-sm text-brand-gray dark:text-gray-400">${r.text}</p>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Sources -->
+        ${data.sources?.length ? `
+          <div class="mb-6">
+            <h3 class="text-lg font-heading font-bold mb-2 text-brand-dark dark:text-white">Sources</h3>
+            <ul class="text-brand-gray dark:text-gray-400 text-sm">
+              ${data.sources.map(s => `<li>• <a href="${s}" target="_blank" class="text-brand-green hover:underline">${s}</a></li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    //===========================================
+    // Event Handlers
+    //===========================================
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      const companyInput = document.getElementById('companyInput');
+      const companyName = companyInput.value.trim();
+      
+      if (!companyName) {
+        showError('Please enter a company name');
         return;
       }
-      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
-      const min = Math.min(...nums), max = Math.max(...nums);
-      const norm = (max - min) > 0 ? nums.map(n => (100 * (n - min)) / (max - min)) : nums.map(() => 50);
-      const step = 100 / (norm.length - 1);
-      const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
-      container.innerHTML =
-        `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-          <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
-          <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-        </svg>`;
-    }
 
-    /* ===================== Data Loading ===================== */
-    function getSharedData() {
-      // Try URL parameter first (for ?data=base64encoded)
-      const params = new URLSearchParams(window.location.search);
-      const dataParam = params.get('data');
+      const generateBtn = document.getElementById('generateBtn');
+      const searchError = document.getElementById('searchError');
+      const searchLoading = document.getElementById('searchLoading');
       
-      if (dataParam) {
-        try {
-          const decoded = atob(dataParam);
-          return JSON.parse(decoded);
-        } catch (e) {
-          console.error('Failed to decode URL data:', e);
-        }
-      }
+      // Reset UI
+      generateBtn.disabled = true;
+      searchError.classList.add('hidden');
+      searchLoading.classList.remove('hidden');
       
-      // Try localStorage fallback (for ?id=xxx)
-      const idParam = params.get('id');
-      if (idParam) {
-        const key = `trustbureau_share_${idParam}`;
-        const stored = localStorage.getItem(key);
-        if (stored) {
-          try {
-            return JSON.parse(stored);
-          } catch (e) {
-            console.error('Failed to parse localStorage data:', e);
-          }
-        }
-      }
-      
-      // Try last generated report as ultimate fallback
-      const lastReport = localStorage.getItem('trustbureau_last_report');
-      if (lastReport) {
-        try {
-          return JSON.parse(lastReport);
-        } catch (e) {
-          console.error('Failed to parse last report:', e);
-        }
-      }
-      
-      return null;
-    }
-
-    /* ===================== Report Rendering ===================== */
-    function populateReport(data) {
-      if (!data) return;
-
-      // Title and timestamp
-      setText(document.getElementById('report-title'), data?.summary?.companyName);
-      const timestamp = data?.timestamp || data?.generatedAt || new Date().toISOString();
-      const timestampEl = document.getElementById('report-timestamp');
-      if (timestampEl) {
-        try {
-          const date = new Date(timestamp);
-          timestampEl.textContent = date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
-        } catch {
-          timestampEl.textContent = 'Unknown';
-        }
-      }
-
-      // Summary
-      const summaryEl = document.getElementById('report-summary');
-      if (summaryEl) summaryEl.textContent = data?.summary?.summary || 'No summary provided.';
-
-      // Score
-      const score = data?.riskScore?.score || 0;
-      const scoreDigit = document.getElementById('report-score-digit');
-      const scoreJust = document.getElementById('report-score-justification');
-      const scoreCircle = document.getElementById('report-score-circle');
-      
-      if (scoreDigit) scoreDigit.textContent = score || '—';
-      if (scoreJust) scoreJust.textContent = data?.riskScore?.justification || 'No justification provided.';
-      if (scoreCircle) {
-        scoreCircle.className = 'score-circle mb-4';
-        if (score < 550) scoreCircle.classList.add('score-red');
-        else if (score < 700) scoreCircle.classList.add('score-yellow');
-        else scoreCircle.classList.add('score-green');
-      }
-
-      // Positive/Negative factors
-      const posList = document.getElementById('report-score-positives');
-      const negList = document.getElementById('report-score-negatives');
-      
-      if (posList) {
-        posList.innerHTML = '';
-        (data?.riskScore?.positiveFactors || []).forEach(f => {
-          const li = document.createElement('li');
-          li.className = 'flex items-start';
-          li.innerHTML = `<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                          <span class="text-sm text-brand-dark dark:text-gray-300">${f}</span>`;
-          posList.appendChild(li);
-        });
-        if (!posList.children.length) {
-          posList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">None listed</li>';
-        }
-      }
-      
-      if (negList) {
-        negList.innerHTML = '';
-        (data?.riskScore?.negativeFactors || []).forEach(f => {
-          const li = document.createElement('li');
-          li.className = 'flex items-start';
-          li.innerHTML = `<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
-                          <span class="text-sm text-brand-dark dark:text-gray-300">${f}</span>`;
-          negList.appendChild(li);
-        });
-        if (!negList.children.length) {
-          negList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">None listed</li>';
-        }
-      }
-
-      // Corporate Filings
-      const sos = data?.sos || {};
-      setText(document.getElementById('report-sos-name'), sos.entityName);
-      setText(document.getElementById('report-sos-entity'), sos.entityType);
-      setText(document.getElementById('report-sos-status'), sos.status);
-      setText(document.getElementById('report-sos-jurisdiction'), sos.jurisdiction);
-      setText(document.getElementById('report-sos-date'), sos.formationDate);
-      setText(document.getElementById('report-sos-agent'), sos.registeredAgent);
-
-      // Highlights
-      const highlightsList = document.getElementById('report-highlights');
-      if (highlightsList) {
-        const highlights = (data?.highlights || []).slice(0, 8);
-        highlightsList.innerHTML = highlights.length ? '' : '<li class="text-sm text-brand-gray dark:text-gray-400">No highlights available.</li>';
-        highlights.forEach(t => {
-          const li = document.createElement('li');
-          li.textContent = t;
-          li.className = 'text-sm';
-          highlightsList.appendChild(li);
-        });
-      }
-
-      // News
-      const newsRoll = document.getElementById('report-news-list');
-      if (newsRoll) {
-        const news = (data?.news || []).slice(0, 8);
-        newsRoll.innerHTML = '';
-        if (news.length) {
-          news.forEach(n => {
-            const li = document.createElement('li');
-            const href = n.url && /^https?:\/\//.test(n.url) ? n.url : '#';
-            const dat = n.date ? ` • ${n.date}` : '';
-            li.innerHTML = `<a class="text-brand-dark dark:text-gray-200 hover:text-brand-green font-medium leading-tight" href="${href}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
-                           <div class="text-xs text-brand-gray">${n.source || 'Source'}${dat}</div>`;
-            newsRoll.appendChild(li);
-          });
-        } else {
-          newsRoll.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">No recent headlines found.</li>';
-        }
-      }
-
-      // Contact & Map
-      const c = data?.contact || {};
-      const p = data?.profile || {};
-      const sosAddress = sos.principalAddress || sos.registeredAddress || sos.address || '';
-      const bestAddress = sosAddress || c.address || p.headquarters || p.hq || '';
-
-      setText(document.getElementById('contact-phone'), c.phone);
-      setText(document.getElementById('contact-email'), c.email);
-      setText(document.getElementById('contact-address'), bestAddress || 'N/A');
-
-      const contactMap = document.getElementById('contact-maplink');
-      const mapIframe = document.getElementById('map-iframe');
-      
-      if (bestAddress && contactMap) {
-        contactMap.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(bestAddress)}`;
-        contactMap.style.pointerEvents = 'auto';
-      } else if (contactMap) {
-        contactMap.href = '#';
-        contactMap.style.pointerEvents = 'none';
-      }
-      
-      if (bestAddress && mapIframe) {
-        mapIframe.src = `https://www.google.com/maps?q=${encodeURIComponent(bestAddress)}&output=embed`;
-      } else if (mapIframe) {
-        mapIframe.src = 'about:blank';
-      }
-
-      // Company Facts
-      setText(document.getElementById('facts-founded'), p.founded);
-      setText(document.getElementById('facts-hq'), p.headquarters || p.hq);
-      setText(document.getElementById('facts-employees'), p.employees);
-      setText(document.getElementById('facts-industry'), p.industry || p.subindustry);
-      setText(document.getElementById('facts-ticker'), p.ticker);
-      
-      const websiteEl = document.getElementById('facts-website');
-      if (websiteEl) {
-        if (p.website && /^https?:\/\//.test(p.website)) {
-          websiteEl.innerHTML = linkifyMaybe(p.website);
-        } else {
-          setText(websiteEl, p.website);
-        }
-      }
-
-      // Public Records
-      const recList = document.getElementById('report-records-list');
-      if (recList) {
-        recList.innerHTML = '';
-        (data?.publicRecords?.findings || []).forEach(r => {
-          const li = document.createElement('li');
-          li.textContent = `${r.type || 'Record'}: ${r.details || ''}`;
-          recList.appendChild(li);
-        });
-        if (!recList.children.length) {
-          recList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">No public records found.</li>';
-        }
-      }
-
-      // Leadership
-      const leaderList = document.getElementById('report-leadership-list');
-      if (leaderList) {
-        leaderList.innerHTML = '';
-        (data?.leadership || []).slice(0, 8).forEach(l => {
-          const li = document.createElement('li');
-          const linked = l.linkedin && /^https?:\/\//.test(l.linkedin)
-            ? ` — <a class="text-brand-green hover:underline" href="${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>`
-            : '';
-          li.innerHTML = `<span class="font-medium text-brand-dark dark:text-gray-200">${l.name || 'N/A'}</span> — <span class="text-brand-gray dark:text-gray-400">${l.title || ''}</span>${linked}`;
-          leaderList.appendChild(li);
-        });
-        if (!leaderList.children.length) {
-          leaderList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">No leadership data.</li>';
-        }
-      }
-
-      // Products
-      const productsList = document.getElementById('report-products-list');
-      if (productsList) {
-        productsList.innerHTML = '';
-        (data?.products || []).slice(0, 12).forEach(t => {
-          const li = document.createElement('li');
-          li.textContent = t;
-          productsList.appendChild(li);
-        });
-        if (!productsList.children.length) {
-          productsList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">No products listed.</li>';
-        }
-      }
-
-      // Competitors
-      const compList = document.getElementById('report-competitors-list');
-      if (compList) {
-        compList.innerHTML = '';
-        (data?.competitors || []).slice(0, 12).forEach(cmp => {
-          const li = document.createElement('li');
-          li.textContent = cmp;
-          compList.appendChild(li);
-        });
-        if (!compList.children.length) {
-          compList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">No competitors identified.</li>';
-        }
-      }
-
-      // Social Presence
-      const socialList = document.getElementById('report-social-list');
-      if (socialList) {
-        socialList.innerHTML = '';
-        const w = data?.webPresence || {};
-        [
-          ['Website Traffic', w.traffic],
-          ['Twitter/X', w.twitter],
-          ['LinkedIn', w.linkedin],
-          ['YouTube', w.youtube]
-        ].forEach(([k, v]) => {
-          if (!v) return;
-          const li = document.createElement('li');
-          let valueHtml = v;
-          if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-            valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-          }
-          li.innerHTML = `<span class="text-brand-gray">${k}:</span> <span class="font-medium text-brand-dark dark:text-gray-200">${valueHtml}</span>`;
-          socialList.appendChild(li);
-        });
-        if (!socialList.children.length) {
-          socialList.innerHTML = '<li class="text-sm text-brand-gray dark:text-gray-400">No social signals.</li>';
-        }
-      }
-
-      // Reviews
-      const reviewsList = document.getElementById('report-reviews-list');
-      if (reviewsList) {
-        reviewsList.innerHTML = '';
-        (data?.reviews || []).slice(0, 4).forEach(r => {
-          const card = document.createElement('div');
-          card.className = 'border border-brand-border rounded-lg p-3 bg-white dark:bg-gray-800';
-          const url = r.url && /^https?:\/\//.test(r.url)
-            ? `<a href="${r.url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${r.source || 'Source'}</a>`
-            : (r.source || 'Source');
-          card.innerHTML = `<p class="text-sm text-brand-dark dark:text-gray-300">&ldquo;${r.snippet || ''}&rdquo;</p>
-                           <div class="text-xs text-brand-gray mt-1">${url}</div>`;
-          reviewsList.appendChild(card);
-        });
-        if (!reviewsList.children.length) {
-          reviewsList.innerHTML = '<p class="text-sm text-brand-gray dark:text-gray-400">No customer reviews found.</p>';
-        }
-      }
-
-      // Charts
-      const points = data?.chartPoints || {};
-      const chartRevenue = document.getElementById('report-chart-revenue');
-      const chartCash = document.getElementById('report-chart-cashflow');
-      
-      if (chartRevenue) {
-        if (Array.isArray(points.revenue) && points.revenue.length > 1) {
-          renderLineChart(chartRevenue, points.revenue, '#00C09A');
-        } else {
-          renderLineChart(chartRevenue, [30, 35, 33, 40, 38, 45, 50, 55, 60, 62, 65, 70], '#00C09A');
-        }
-      }
-      
-      if (chartCash) {
-        if (Array.isArray(points.cashFlow) && points.cashFlow.length > 1) {
-          renderLineChart(chartCash, points.cashFlow, '#3B82F6');
-        } else {
-          renderLineChart(chartCash, [65, 60, 58, 62, 59, 57, 55, 54, 53, 52, 51, 50], '#3B82F6');
-        }
-      }
-
-      // Sources
-      const citations = data?.citations || [];
-      if (citations.length > 0) {
-        const sourcesContainer = document.getElementById('report-sources-container');
-        const sourcesChips = document.getElementById('report-sources-chips');
-        const sourcesList = document.getElementById('report-sources');
-        
-        if (sourcesContainer) sourcesContainer.style.display = 'block';
-        
-        if (sourcesChips) {
-          sourcesChips.innerHTML = '';
-          citations.slice(0, 10).forEach(c => {
-            const span = document.createElement('span');
-            span.className = 'border border-brand-border rounded-full bg-brand-light dark:bg-gray-800 px-2 py-1 text-xs';
-            span.innerHTML = `🔗 <a href="${c.url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${c.title || toDomain(c.url)}</a>`;
-            sourcesChips.appendChild(span);
-          });
-        }
-        
-        if (sourcesList) {
-          sourcesList.innerHTML = '';
-          citations.forEach(c => {
-            const li = document.createElement('li');
-            li.innerHTML = `<a class="text-brand-green hover:underline" href="${c.url}" target="_blank" rel="noopener">${c.title || c.url}</a>`;
-            sourcesList.appendChild(li);
-          });
-        }
-      }
-    }
-
-    /* ===================== Dark Mode ===================== */
-    function initDarkMode() {
-      const saved = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      
-      if (saved === 'dark' || (!saved && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      }
-      
-      const toggle = document.getElementById('theme-toggle');
-      if (toggle) {
-        toggle.onclick = () => {
-          document.documentElement.classList.toggle('dark');
-          const isDark = document.documentElement.classList.contains('dark');
-          localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        };
-      }
-    }
-
-    /* ===================== Button Actions ===================== */
-    function initButtons() {
-      const btnPrint = document.getElementById('btn-print');
-      if (btnPrint) {
-        btnPrint.onclick = () => window.print();
-      }
-      
-      const btnCopyLink = document.getElementById('btn-copy-link');
-      if (btnCopyLink) {
-        btnCopyLink.onclick = async () => {
-          try {
-            await navigator.clipboard.writeText(window.location.href);
-            const originalText = btnCopyLink.textContent;
-            btnCopyLink.textContent = '✓ Copied!';
-            btnCopyLink.classList.add('bg-green-700');
-            setTimeout(() => {
-              btnCopyLink.textContent = originalText;
-              btnCopyLink.classList.remove('bg-green-700');
-            }, 2000);
-          } catch (e) {
-            alert('Failed to copy link. Please copy manually: ' + window.location.href);
-          }
-        };
-      }
-    }
-
-    /* ===================== Main Init ===================== */
-    document.addEventListener('DOMContentLoaded', () => {
-      initDarkMode();
-      initButtons();
-      
-      const loadingState = document.getElementById('loading-state');
-      const errorState = document.getElementById('error-state');
-      const errorMessage = document.getElementById('error-message');
-      const reportSection = document.getElementById('report-section');
-      
-      // Try to load shared data
-      const data = getSharedData();
-      
-      if (!data) {
-        // Show error
-        if (loadingState) loadingState.style.display = 'none';
-        if (errorState) errorState.style.display = 'block';
-        if (errorMessage) {
-          errorMessage.textContent = 'No shared report data found. The link may be invalid, expired, or the data may have been cleared from storage.';
-        }
-        return;
-      }
-      
-      // Populate report
       try {
-        populateReport(data);
+        // Call API
+        newSearchData = await callGeminiAPI(companyName);
         
-        // Show report
-        if (loadingState) loadingState.style.display = 'none';
-        if (reportSection) reportSection.style.display = 'block';
-      } catch (e) {
-        console.error('Error populating report:', e);
-        if (loadingState) loadingState.style.display = 'none';
-        if (errorState) errorState.style.display = 'block';
-        if (errorMessage) {
-          errorMessage.textContent = 'Failed to load report: ' + (e.message || 'Unknown error');
+        // Save to localStorage
+        const shareId = 'new_' + Date.now();
+        localStorage.setItem(`trustbureau_share_${shareId}`, JSON.stringify(newSearchData));
+        localStorage.setItem('trustbureau_last_report', JSON.stringify(newSearchData));
+        
+        // Render new report
+        renderReport(newSearchData, 'newReportContent');
+        document.getElementById('newReportSection').classList.remove('hidden');
+        document.getElementById('noDataMessage').classList.add('hidden');
+        
+        // Scroll to results
+        document.getElementById('newReportSection').scrollIntoView({ behavior: 'smooth' });
+        
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        generateBtn.disabled = false;
+        searchLoading.classList.add('hidden');
+      }
+    });
+
+    // Print buttons
+    document.getElementById('btnPrintNew')?.addEventListener('click', () => {
+      window.print();
+    });
+    
+    document.getElementById('btnPrintShared')?.addEventListener('click', () => {
+      window.print();
+    });
+    
+    // Copy Link buttons
+    document.getElementById('btnCopyLinkNew')?.addEventListener('click', () => {
+      if (!newSearchData) return;
+      
+      const shareId = 'share_' + Date.now();
+      localStorage.setItem(`trustbureau_share_${shareId}`, JSON.stringify(newSearchData));
+      
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${shareId}`;
+      
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        const btn = document.getElementById('btnCopyLinkNew');
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Link Copied!';
+        setTimeout(() => { btn.textContent = originalText; }, 2000);
+      });
+    });
+    
+    document.getElementById('btnCopyLinkShared')?.addEventListener('click', () => {
+      const currentUrl = window.location.href;
+      
+      navigator.clipboard.writeText(currentUrl).then(() => {
+        const btn = document.getElementById('btnCopyLinkShared');
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Link Copied!';
+        setTimeout(() => { btn.textContent = originalText; }, 2000);
+      });
+    });
+
+    function showError(message) {
+      const searchError = document.getElementById('searchError');
+      searchError.textContent = message;
+      searchError.classList.remove('hidden');
+    }
+
+    //===========================================
+    // Initialization
+    //===========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check for shared report ID in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const shareId = urlParams.get('id');
+      
+      if (shareId) {
+        // Try to load shared report
+        const sharedDataStr = localStorage.getItem(`trustbureau_share_${shareId}`) || 
+                             localStorage.getItem('trustbureau_last_report');
+        
+        if (sharedDataStr) {
+          try {
+            sharedReportData = JSON.parse(sharedDataStr);
+            renderReport(sharedReportData, 'sharedReportContent');
+            document.getElementById('sharedReportSection').classList.remove('hidden');
+            document.getElementById('noDataMessage').classList.add('hidden');
+            
+            // Update timestamp if available
+            if (sharedReportData.timestamp) {
+              const timestampEl = document.getElementById('sharedReportTimestamp');
+              if (timestampEl) {
+                timestampEl.textContent = `Shared report snapshot • Generated: ${new Date(sharedReportData.timestamp).toLocaleString()}`;
+              }
+            }
+          } catch (e) {
+            console.error('Failed to parse shared report data:', e);
+            document.getElementById('noDataMessage').classList.add('hidden');
+          }
+        } else {
+          document.getElementById('noDataMessage').classList.remove('hidden');
         }
+      } else {
+        // No share ID, show no data message
+        document.getElementById('noDataMessage').classList.remove('hidden');
       }
     });
   </script>
