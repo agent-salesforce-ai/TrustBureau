@@ -10,6 +10,12 @@
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -119,7 +125,7 @@
         <div class="md:col-span-2 card p-5">
           <h3 class="font-semibold mb-3">Summary</h3>
           <p id="summary"></p>
-          <div id="profile" class="mt-4 p-3 bg-gray-50 rounded"></div>
+          <div id="profile" class="mt-4 p-3 bg-gray-50 dark:bg-slate-800 rounded"></div>
         </div>
       </div>
 
@@ -183,7 +189,6 @@
         /gemini-2\.5-flash-lite/i,
         /gemini-2\.5-flash/i,
         /gemini-2\.0-flash/i,
-        /gemini-2\.0-pro/i,
         /gemini-1\.5-flash/i,
         /gemini-1\.5-pro/i
       ];
@@ -199,22 +204,17 @@
           const found = models.find(m => pat.test(m.name) || pat.test(m.baseModelId || ''));
           if (found) return found.name.replace(/^models\//,'');
         }
-        // Fallback to first generateContent-capable model
         if (models[0]?.name) return models[0].name.replace(/^models\//,'');
       } catch (e) {
         debug(`Model resolution error: ${e.message}`);
       }
-      // Final fallback
       return 'gemini-2.0-flash';
     }
 
     // ---------- UI Buttons ----------
     document.getElementById('test-api-btn').onclick = async () => {
       const key = API.getKey();
-      if (!key) {
-        alert('No API key set. Click settings to add one.');
-        return;
-      }
+      if (!key) { alert('No API key set. Click settings to add one.'); return; }
       try {
         const url = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(key)}`;
         debug(`Testing URL: ${url}`);
@@ -233,7 +233,7 @@
           API.setModel(name);
           alert(`✅ API key works. Selected model: ${name}`);
         } else {
-          alert('✅ API key works, but no suitable model with generateContent found in list. You may need to enable billing or access.');
+          alert('✅ API key works, but no suitable model with generateContent found. You may need to enable access.');
         }
       } catch (e) {
         alert(`❌ Test failed: ${e.message}`);
@@ -254,10 +254,7 @@
     // ---------- Report Generation ----------
     async function generateReport(query) {
       const key = API.getKey();
-      if (!key) {
-        alert('Please add your API key in Settings first');
-        return;
-      }
+      if (!key) { alert('Please add your API key in Settings first'); return; }
 
       document.getElementById('results').classList.remove('hidden');
       document.getElementById('loader').classList.remove('hidden');
@@ -265,56 +262,50 @@
       document.getElementById('error').classList.add('hidden');
 
       try {
-        // Resolve a working model
         let model = API.getModel();
-        if (!model) {
-          model = await resolveBestModel(key);
-          API.setModel(model);
-        }
+        if (!model) { model = await resolveBestModel(key); API.setModel(model); }
         debug(`Using model: ${model}`);
 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
-        debug(`API URL: ${apiUrl}`);
+        const apiBaseV1 = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+        const apiBaseV1b = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
 
-        // Ask for JSON directly via JSON Mode
         const requestBody = {
           contents: [{
             role: 'user',
-            parts: [{
-              text: `Create a business report for ${query}. Return ONLY JSON with this shape:\n{\n  "summary": {"companyName": string, "summary": string},\n  "riskScore": {"score": number, "justification": string},\n  "profile": {"founded": string, "headquarters": string, "employees": string, "industry": string, "website": string}\n}\nRespond strictly as JSON.`
-            }]
+            parts: [{ text: `Create a business report for ${query}. Return ONLY JSON with this shape:\n{\n  "summary": {"companyName": string, "summary": string},\n  "riskScore": {"score": number, "justification": string},\n  "profile": {"founded": string, "headquarters": string, "employees": string, "industry": string, "website": string}\n}\nRespond strictly as JSON.` }]
           }],
           generationConfig: {
-            responseMimeType: 'application/json'
+            // JSON Mode (snake_case per REST)
+            response_mime_type: 'application/json'
           }
         };
 
-        debug('Sending request…');
-        let res = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
-        });
+        // --- First attempt: v1 with JSON Mode ---
+        debug('Sending request (v1)…');
+        let res = await fetch(apiBaseV1, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(requestBody) });
 
-        // If model not found, auto-refresh model and retry once
         if (res.status === 404) {
           const errText = await res.text();
           debug(`404 on ${model}. Body: ${errText.slice(0,200)}…`);
-          debug('Attempting auto-detect model and retry…');
           const autoModel = await resolveBestModel(key);
           if (autoModel && autoModel !== model) {
             API.setModel(autoModel);
-            const retryUrl = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(autoModel)}:generateContent?key=${encodeURIComponent(key)}`;
-            debug(`Retry API URL: ${retryUrl}`);
-            res = await fetch(retryUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(requestBody)
-            });
+            debug(`Retrying v1 with detected model: ${autoModel}`);
+            res = await fetch(`https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(autoModel)}:generateContent?key=${encodeURIComponent(key)}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(requestBody) });
           }
         }
 
-        debug(`Response status: ${res.status}`);
+        // --- If v1 rejects response_mime_type (400), try v1beta (historically accepted it sooner) ---
+        if (res.status === 400) {
+          const body = await res.text();
+          if (/response_mime_type|generation_config|Unknown name/i.test(body)) {
+            debug('400 due to JSON Mode field — retrying on v1beta…');
+            res = await fetch(apiBaseV1b, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(requestBody) });
+          } else {
+            throw new Error(`API Error 400: ${body.slice(0,400)}`);
+          }
+        }
+
         if (!res.ok) {
           const errorText = await res.text();
           throw new Error(`API Error ${res.status}: ${errorText.slice(0,400)}`);
@@ -323,18 +314,15 @@
         const data = await res.json();
         debug('Response received successfully');
 
-        // JSON Mode: directly parse candidate text as JSON
-        const jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-        let report;
-        try {
-          report = jsonText ? JSON.parse(jsonText) : null;
-        } catch (e) {
-          // Fallback: extract first JSON object from text
-          const match = jsonText.match(/\{[\s\S]*\}/);
+        // JSON Mode should return a JSON string in parts[0].text
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        let report = null;
+        try { report = text ? JSON.parse(text) : null; } catch(_) {
+          const match = text.match(/\{[\s\S]*\}/);
           report = match ? JSON.parse(match[0]) : null;
         }
-
         if (!report) throw new Error('Could not parse JSON from model response.');
+
         displayReport(report);
 
       } catch (error) {
