@@ -132,7 +132,7 @@
           <div class="w-full bg-gray-100 rounded-full h-2 mt-2 overflow-hidden">
             <span id="bar" class="block h-2 bg-brand-green" style="width:8%"></span>
           </div>
-          <p class="text-xs text-brand-gray mt-2">Usually 10–30s. If you see a CORS error, host via http(s) and temporarily disable extensions that block requests to generativelanguage.googleapis.com.</p>
+          <p class="text-xs text-brand-gray mt-2">Usually 10–30s. Having trouble? <a href="#" onclick="alert('Troubleshooting tips:\n\n1. Check your internet connection\n2. Try refreshing the page\n3. Contact support if the issue persists'); return false;" class="underline text-brand-green">View troubleshooting tips</a>.</p>
         </div>
       </div>
 
@@ -334,11 +334,13 @@
 
   <script>
   // ======= API KEY =======
-  const ZAKK = 'AIzaSyDX6uyW_C49YlQ25hss9-Qelk_jkIdrNHo';
+  // SECURITY: Do NOT hardcode API keys in production.
+  // Set window.GEMINI_API_KEY at runtime via server-side injection or secure configuration.
+  const ZAKK = window.GEMINI_API_KEY || '';
   
   function getApiKey() {
     if (!ZAKK || /YOUR_GEMINI_API_KEY_HERE/.test(ZAKK)) {
-      throw new Error('Missing API key. Set const ZAKK with your Gemini API key.');
+      throw new Error('API key not configured. Please contact support.');
     }
     return ZAKK;
   }
@@ -636,8 +638,20 @@ Use "N/A" or [] for unknowns. No markdown, just JSON.`;
       stopLoader();
       const errEl = $('error');
       if(errEl) {
-        errEl.innerHTML = `<div class="font-medium">Error: ${e.message}</div>
-          <div class="text-xs mt-2">Check console for details. Make sure your API key is set.</div>`;
+        // Clear existing content
+        errEl.innerHTML = '';
+        
+        // Create elements safely to prevent XSS
+        const errorTitle = document.createElement('div');
+        errorTitle.className = 'font-medium';
+        errorTitle.textContent = 'Error: ' + (e.message || 'An unexpected error occurred');
+        
+        const errorDetails = document.createElement('div');
+        errorDetails.className = 'text-xs mt-2';
+        errorDetails.textContent = 'Unable to generate report. Please try again later or contact support if the problem persists.';
+        
+        errEl.appendChild(errorTitle);
+        errEl.appendChild(errorDetails);
         show(errEl);
       }
       console.error('Error:', e);
