@@ -181,21 +181,15 @@
     const zakk = "YOUR_GEMINI_API_KEY_HERE"; // or set window.zakk at runtime
 
     //===========================================
-    // Dark Mode
+    // Dark Mode - Initialize early to prevent flash
     //===========================================
-    const darkModeToggle = document.getElementById('darkModeToggle');
     const html = document.documentElement;
     
-    // Initialize dark mode from localStorage
+    // Initialize dark mode from localStorage BEFORE DOM loads
     if (localStorage.getItem('darkMode') === 'true' || 
         (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       html.classList.add('dark');
     }
-    
-    darkModeToggle.addEventListener('click', () => {
-      html.classList.toggle('dark');
-      localStorage.setItem('darkMode', html.classList.contains('dark'));
-    });
 
     //===========================================
     // State Management
@@ -461,6 +455,15 @@ Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
     // Initialization
     //===========================================
     document.addEventListener('DOMContentLoaded', () => {
+      //===========================================
+      // Dark Mode Toggle - Must be inside DOMContentLoaded
+      //===========================================
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      darkModeToggle.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        localStorage.setItem('darkMode', html.classList.contains('dark'));
+      });
+
       //===========================================
       // Event Handlers
       //===========================================
