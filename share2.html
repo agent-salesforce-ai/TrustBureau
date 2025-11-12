@@ -356,13 +356,9 @@
     /* ===================== Config ===================== */
     const zakk = "AIzaSyBnqELMSwalpd6M2rlx4W6NapzwUuPUU1s";    // or set window.zakk at runtime
     const PROXY_BASE = "";                 // optional proxy base (leave empty for direct)
-    // CORRECTED: Remove 'models/' prefix for v1 API
     const MODEL_CANDIDATES = [
       'gemini-1.5-flash-latest',
-      'gemini-1.5-flash',
-      'gemini-1.5-pro-latest', 
-      'gemini-1.5-pro',
-      'gemini-1.0-pro'
+      'gemini-1.5-pro-latest'
     ];
     const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1/models';
     const MAX_OUTPUT_TOKENS = 8192;
@@ -491,11 +487,6 @@
           if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
         }
       }
-      for (const p of parts) { // inline_data fallback
-        if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
-          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
-        }
-      }
       const preview = parts.find(p => p.text)?.text?.slice(0, 300)?.replace(/\s+/g,' ') || 'No text';
       throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
     }
@@ -524,14 +515,15 @@
 
     /* ===================== API (v1, JSON response) ===================== */
     function makePayload(systemPrompt, userQuery) {
-      const fullPrompt = `${systemPrompt}\n\n${userQuery}\n\nReturn JSON only.`;
+      // For v1, combine system and user prompts into a single user message.
+      const fullPrompt = `${systemPrompt}\n\n${userQuery}\n\nIMPORTANT: Respond with a single, valid JSON object only. Do not include any commentary or code fences.`;
 
       return {
         contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
         generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          // CORRECTED: Simplified config for v1 API.
           temperature: 0.2,
-          topP: 0.95
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
         }
       };
     }
@@ -557,18 +549,19 @@
             if (!cand) throw new Error('No candidates in response.');
             const json = parseCandidateJSON(cand);
 
-            const sources = []; // v1 API does not return grounding metadata in the same way.
+            const sources = []; // v1 API does not provide grounding metadata.
 
             return { json, sources };
           } catch (e) {
             lastErr = e;
             const parseIssue = /no parseable JSON|Unexpected end of JSON|Unexpected token|Invalid or unexpected/i.test(e.message || '');
             if (attempt === 1 && parseIssue) {
-              const stricter = `${systemPrompt}\n\nIMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
-              payload = makePayload(stricter, userQuery);
-              continue;
+              const stricterSystem = `${systemPrompt}\n\nIMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field. Your entire response must be valid JSON.`;
+              payload = makePayload(stricterSystem, userQuery);
+              continue; // Retry with a stricter prompt on parse failure
             }
-            break; // next model
+            // For other errors (like 404 model not found), break to try the next model.
+            break; 
           }
         }
       }
