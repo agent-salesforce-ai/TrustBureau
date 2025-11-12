@@ -1,0 +1,178 @@
+<script>
+/* ===================== Config (force v1beta + modern models) ===================== */
+const zakk = "";              // key can also be set at window.zakk or in localStorage('apiKey')
+const PROXY_BASE = "";        // if you use a reverse proxy, it MUST forward /v1beta unchanged
+
+// Only include CURRENT models that support generateContent
+const MODEL_CANDIDATES = [
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash'
+];
+
+const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+const MAX_OUTPUT_TOKENS = 8192;
+
+/* ===================== Key, URLs, and headers ===================== */
+function getApiKey() {
+  const s = localStorage.getItem('apiKey');
+  if (s && s.trim()) return s.trim();
+  if (typeof window !== 'undefined' && window.zakk) return String(window.zakk).trim();
+  if (typeof zakk !== 'undefined' && zakk) return String(zakk).trim();
+  return "";
+}
+
+// ALWAYS use /v1beta and send key in header (not query string)
+function makeUrl(model) {
+  if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models/${model}:generateContent`;
+  return `${DIRECT_BASE}/${model}:generateContent`;
+}
+
+function listModelsUrl() {
+  if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models`;
+  return `https://generativelanguage.googleapis.com/v1beta/models`;
+}
+
+/* ===================== Helpers ===================== */
+async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
+  let lastError;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        let body=null; try { body = await res.json(); } catch {}
+        const msg = body?.error?.message || res.statusText || 'Request failed';
+        const err = new Error(`${msg} (HTTP ${res.status})`);
+        err.httpStatus = res.status;
+        err.code = body?.error?.status; // e.g., NOT_FOUND
+        throw err;
+      }
+      return await res.json();
+    } catch (e) {
+      lastError = e;
+      // Don't retry on 4xx (bad model names, permission, etc.)
+      if ((e.httpStatus && e.httpStatus < 500) || (e.code && String(e.code).startsWith('4'))) break;
+      if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+    }
+  }
+  throw lastError || new Error('API request failed.');
+}
+
+// Treat any 1.0/1.5 model names as retired & skip them
+const isRetired = (name) => /^gemini-(1(\.0|\.5)|0)\b/i.test(name);
+
+// Choose a usable model for this key/runtime; auto‑lists if needed
+async function resolveUsableModel(candidates, apiHeaders) {
+  // Prefer the declared candidates (filter out retired)
+  for (const m of candidates.filter(m => !isRetired(m))) {
+    try {
+      const ping = await fetchWithBackoff(makeUrl(m), {
+        method: 'POST',
+        headers: apiHeaders,
+        body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
+      });
+      if (Array.isArray(ping?.candidates)) return m;
+    } catch (e) {
+      // try next candidate
+    }
+  }
+  // Fall back: list models and pick the first that supports generateContent
+  try {
+    const res = await fetch(listModelsUrl(), { headers: apiHeaders });
+    const data = await res.json();
+    const models = data?.models || [];
+    // Prefer 2.5 Flash if visible; else any model with generateContent
+    const prefer = models.find(x => /gemini-2\.5-flash/i.test(x.name || x.baseModelId || ''));
+    if (prefer) return (prefer.baseModelId || prefer.name).replace(/^models\//,'');
+    const anyGC = models.find(x => (x.supportedGenerationMethods || []).includes('generateContent'));
+    if (anyGC) return (anyGC.baseModelId || anyGC.name).replace(/^models\//,'');
+  } catch (e) {
+    console.warn('Model listing failed:', e);
+  }
+  // Hard fallback
+  return 'gemini-2.5-flash';
+}
+
+/* ===================== JSON schema config (v1beta) ===================== */
+const responseJsonSchema = {
+  type: "object",
+  properties: {
+    summary: { type: "object", properties: { companyName: { type: "string" }, summary: { type: "string" } } },
+    sos: { type: "object", properties: { entityName: { type: "string" }, status: { type: "string" }, entityType: { type: "string" }, jurisdiction: { type: "string" }, formationDate: { type: "string" }, registeredAgent: { type: "string" }, principalAddress: { type: "string" } } },
+    publicRecords: { type: "object", properties: { findings: { type: "array", items: { type: "object", properties: { type: { type: "string" }, details: { type: "string" } } } } } },
+    riskScore: { type: "object", properties: { score: { type: "number" }, justification: { type: "string" }, positiveFactors: { type: "array", items: { type: "string" } }, negativeFactors: { type: "array", items: { type: "string" } } } },
+    reviews: { type: "array", items: { type: "object", properties: { snippet: { type: "string" }, source: { type: "string" }, url: { type: "string" } } } },
+    chartPoints: { type: "object", properties: { revenue: { type: "array", items: { type: "number" } }, cashFlow: { type: "array", items: { type: "number" } } } },
+    profile: { type: "object", properties: { founded: { type: "string" }, headquarters: { type: "string" }, employees: { type: "string" }, website: { type: "string" }, industry: { type: "string" }, subindustry: { type: "string" }, ticker: { type: "string" } } },
+    news: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, source: { type: "string" }, url: { type: "string" } } } },
+    leadership: { type: "array", items: { type: "object", properties: { name: { type: "string" }, title: { type: "string" }, linkedin: { type: "string" } } } },
+    products: { type: "array", items: { type: "string" } },
+    competitors: { type: "array", items: { type: "string" } },
+    webPresence: { type: "object", properties: { twitter: { type: "string" }, linkedin: { type: "string" }, youtube: { type: "string" }, traffic: { type: "string" } } },
+    contact: { type: "object", properties: { phone: { type: "string" }, email: { type: "string" }, address: { type: "string" }, lat: { type: "number" }, lng: { type: "number" }, mapsLink: { type: "string" } } },
+    highlights: { type: "array", items: { type: "string" } },
+    kpis: { type: "array", items: { type: "object", properties: { metric: { type: "string" }, q1: { type: "string" }, q2: { type: "string" }, q3: { type: "string" }, q4: { type: "string" }, yoy: { type: "string" } } } },
+    citations: { type: "array", items: { type: "object", properties: { title: { type: "string" }, url: { type: "string" } } } }
+  }
+};
+
+function makePayload(systemPrompt, userQuery) {
+  return {
+    contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+    tools: [{ "google_search": {} }],                       // v1beta tools
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseJsonSchema: responseJsonSchema,               // v1beta JSON schema
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
+      temperature: 0.2,
+      topP: 0.95
+    }
+  };
+}
+
+/* ===================== Main API call (now v1beta + header auth) ===================== */
+async function callReportAPI(systemPrompt, userQuery) {
+  const key = getApiKey();
+  if (!PROXY_BASE && !key) throw new Error('Missing API key. Please add it in Settings.');
+
+  const apiHeaders = { 'Content-Type': 'application/json' };
+  if (key) apiHeaders['x-goog-api-key'] = key;             // required on v1beta
+
+  // pick a working model (skips retired) and call it
+  const model = await resolveUsableModel(MODEL_CANDIDATES, apiHeaders);
+  const url = makeUrl(model);
+  console.info('[Gemini] using model:', model, 'url:', url);
+
+  const payload = makePayload(systemPrompt, userQuery);
+  const data = await fetchWithBackoff(url, { method: 'POST', headers: apiHeaders, body: JSON.stringify(payload) });
+
+  const cand = data?.candidates?.[0];
+  if (!cand) {
+    if (data?.promptFeedback?.blockReason) throw new Error(`Request blocked: ${data.promptFeedback.blockReason}`);
+    throw new Error('No candidates in API response.');
+  }
+  if (cand.finishReason && cand.finishReason !== 'STOP') throw new Error(`Generation stopped: ${cand.finishReason}`);
+
+  // Parse structured JSON from v1beta
+  const part = cand?.content?.parts?.[0];
+  let json;
+  try { json = part && part.text ? JSON.parse(part.text) : null; } catch {}
+  if (!json) {
+    // Fallback cleanup if model wrapped JSON in markdown
+    const raw = (part?.text || '').trim().replace(/```json|```/g, '');
+    try { json = JSON.parse(raw); } catch {}
+  }
+  if (!json) throw new Error('Model returned no parseable JSON payload.');
+
+  // Optional: collect grounding sources for your sources panel
+  let sources = [];
+  const gm = cand.groundingMetadata;
+  if (gm && gm.groundingAttributions) {
+    sources = gm.groundingAttributions
+      .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+      .filter(s => s.uri && s.title);
+  }
+  return { json, sources };
+}
+</script>
