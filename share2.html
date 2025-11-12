@@ -173,6 +173,7 @@
           </div>
           <div class="flex items-center gap-3">
             <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
+            <button id="share-btn" class="inline-flex items-center justify-center gap-2 bg-gray-200 text-brand-dark font-bold rounded-lg px-4 py-2 cta-button">Share</button>
           </div>
         </div>
 
@@ -912,6 +913,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
       const input = document.getElementById('business-name');
       const btn = document.getElementById('generate-report-btn');
       const rerunBtn = document.getElementById('rerun');
+      const shareBtn = document.getElementById('share-btn');
 
       // Settings Modal Logic
       const settingsModal = document.getElementById('settings-modal');
@@ -940,7 +942,6 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
         const key = apiKeyInput.value.trim();
         if (key) {
           localStorage.setItem('apiKey', key);
-          // Update runtime key if needed
           window.zakk = key;
         } else {
           localStorage.removeItem('apiKey');
@@ -969,7 +970,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
 
           populateReport(json);
           const links = collectSources(json, sources);
-          populateSources(links);     // auto‑expanded
+          populateSources(links);
           showState('content');
         } catch (e) {
           console.error(e);
@@ -982,18 +983,50 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
         }
       }
 
+      function handleSearch(query) {
+        if (!query) {
+          showState('error', 'Please enter a business name.');
+          return;
+        }
+        // Set the URL hash, which becomes the shareable link
+        window.location.hash = encodeURIComponent(query);
+        runReport(query);
+      }
+      
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = (input.value || '').trim();
-        if (!q) { showState('error', 'Please enter a business name.'); return; }
-        runReport(q);
+        handleSearch(q);
       });
 
       rerunBtn?.addEventListener('click', () => {
         const q = (input.value || '').trim();
-        if (!q) { showState('error', 'Please enter a business name.'); return; }
-        runReport(q);
+        handleSearch(q);
       });
+
+      shareBtn?.addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          const originalText = shareBtn.textContent;
+          shareBtn.textContent = 'Copied!';
+          shareBtn.classList.add('bg-brand-green', 'text-white');
+          setTimeout(() => {
+            shareBtn.textContent = originalText;
+            shareBtn.classList.remove('bg-brand-green', 'text-white');
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy URL: ', err);
+          alert('Failed to copy link.');
+        });
+      });
+
+      // On page load, check for a company name in the URL hash
+      if (window.location.hash) {
+        const queryFromHash = decodeURIComponent(window.location.hash.substring(1));
+        if (queryFromHash) {
+          input.value = queryFromHash; // Pre-fill the input
+          handleSearch(queryFromHash);   // Automatically run the report
+        }
+      }
     });
   </script>
 </body>
