@@ -328,7 +328,6 @@
     const zakk = "AIzaSyBu21fiOBev1luJgbt_uEFiiy6u3Hxg18c";    // or set window.zakk at runtime
     const PROXY_BASE = "";                 // optional proxy base (leave empty for direct)
     const MODEL_CANDIDATES = [
-      'gemini-2.5-flash-preview-09-2025',
       'gemini-2.5-flash'
     ];
     const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -540,12 +539,12 @@
     function makePayload(systemPrompt, userQuery) {
       return {
         contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+        tools: [{ "google_search": {} }],
         system_instruction: { parts: [{ text: systemPrompt }] }, // v1beta snake_case
         generation_config: {
           max_output_tokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
-          top_p: 0.95,
-          response_mime_type: "application/json"
+          top_p: 0.95
         }
       };
     }
@@ -595,7 +594,7 @@ IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot
     /* ===================== Prompt ===================== */
     function buildSystemPrompt() {
       return `
-You are a meticulous US-focused business analyst. Return a SINGLE JSON object ONLY (no commentary, no code fences). 
+You are a meticulous US-focused business analyst.
 Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unknown.
 
 Required JSON shape (keys must match exactly). Include an SOS address so a map can be shown:
@@ -626,7 +625,7 @@ Required JSON shape (keys must match exactly). Include an SOS address so a map c
 Reviews: include 3–6 concise snippets (12–40 words) from US-centric sources with URLs (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).
 Map rule: prefer the SOS principal/registered address; if unknown, use contact.address; then profile.headquarters.
 
-Return valid JSON only.
+You MUST return ONLY the JSON object, enclosed in \`\`\`json ... \`\`\` tags.
       `.trim();
     }
 
@@ -638,10 +637,10 @@ Return valid JSON only.
 
     async function supplementReviews(companyName, baseJson) {
       const sys = `
-You are a US-focused research assistant. Return ONLY JSON with a "reviews" array.
+You are a US-focused research assistant. Return ONLY a JSON object with a "reviews" array, enclosed in \`\`\`json ... \`\`\` tags.
 Each review item must be: { "snippet": string (12–40 words), "source": string, "url": string }.
 Collect 3–6 impartial snippets summarizing public sentiment from credible US sources (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, or reputable media).
-Avoid duplicates; include direct URLs when possible. If nothing exists, return [].
+Avoid duplicates; include direct URLs when possible. If nothing exists, return {"reviews": []}.
 `.trim();
 
       const userQ = `Provide 5 review snippets for "${companyName}" as specified. US bias; business context only.`;

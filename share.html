@@ -358,7 +358,7 @@
   <script>
   // API Configuration - REPLACE WITH YOUR OWN API KEY
   const ZAKK = 'AIzaSyALJS0EyKycDIIG9TVQWclOaH96BcJk4lQ'; // ← Replace this with your actual Gemini API key
-  const MODEL_CANDIDATES = ['gemini-1.5-flash-latest', 'gemini-1.5-pro-latest'];
+  const MODEL_CANDIDATES = ['gemini-2.5-flash', 'gemini-1.5-flash-latest'];
   const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
   const MAX_OUTPUT_TOKENS = 8192;
 
@@ -397,12 +397,12 @@
   function makePayload(systemPrompt, userQuery) {
     return {
       contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+      tools: [{ "google_search": {} }],
       system_instruction: { parts: [{ text: systemPrompt }] },
       generation_config: {
         max_output_tokens: MAX_OUTPUT_TOKENS,
         temperature: 0.2,
-        top_p: 0.95,
-        response_mime_type: "application/json"
+        top_p: 0.95
       }
     };
   }
@@ -694,7 +694,7 @@
   // ======= 5. PROMPT BUILDING =======
   function buildSystemPrompt() {
     return \`
-You are a meticulous US-focused business analyst. Return a SINGLE JSON object ONLY (no commentary, no code fences). 
+You are a meticulous US-focused business analyst. 
 Prioritize US Secretary‑of‑State and corporate registry data for contact address. Use "N/A" when unknown.
 
 JSON schema:
@@ -719,7 +719,8 @@ JSON schema:
 
 - riskScore.score: 300 (high risk) to 850 (low risk).
 - Use contact.address from SOS filings if available
-Return valid JSON only.
+
+You MUST return ONLY the JSON object, enclosed in \\\`\\\`\\\`json ... \\\`\\\`\\\` tags.
     \`.trim();
   }
 
