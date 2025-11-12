@@ -1332,7 +1332,7 @@
       // --- Direct Google API calls using `zakk` ---
       async function callReportAPI(systemPrompt, userQuery, logId = 'report') {
         if (!zakk) throw new Error("Missing key: set `zakk` in the script near the bottom of the HTML.");
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${zakk}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${zakk}`;
 
         const payload = {
           contents: [{ parts: [{ text: userQuery }] }],
@@ -1373,7 +1373,7 @@
 
       async function callPreApprovalAPI(systemPrompt, userQuery, generationConfig, logId = 'pre-approval') {
         if (!zakk) throw new Error("Missing key: set `zakk` in the script near the bottom of the HTML.");
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${zakk}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${zakk}`;
 
         const payload = {
           contents: [{ parts: [{ text: userQuery }] }],
@@ -1408,7 +1408,7 @@
           generateReportBtn.disabled = true;
 
           const systemPrompt =
-            "You are an AI business analyst. A user is requesting a full report on a company. Perform a Google search to find: 1. A brief summary. 2. Corporate filing info (entity name, status, entity type, jurisdiction, formation date, registered agent). 3. Public records (UCC, liens, judgments, court filings, debt). 4. 2-3 recent customer review snippets. THEN, generate: 5. A fictional AI risk score (300-850) with justification, 2-3 positive factors, and 1-2 negative factors. 6. Two fictional, simple, minimalist SVG line charts as text strings (viewBox='0 0 100 50', use polyline, one green (#00C09A) for 'revenueTrend', one blue (#3B82F6) for 'cashFlow'). Respond *only* with a valid JSON object matching this exact structure: {\"summary\": {\"companyName\": \"string\", \"summary\": \"string\"}, \"sos\": {\"entityName\": \"string\", \"status\": \"string\", \"entityType\": \"string\", \"jurisdiction\": \"string\", \"formationDate\": \"string\", \"registeredAgent\": \"string\"}, \"publicRecords\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\"}]}, \"riskScore\": {\"score\": 0, \"justification\": \"string\", \"positiveFactors\": [\"string\"], \"negativeFactors\": [\"string\"]}, \"reviews\": [{\"snippet\": \"string\", \"source\": \"string\"}], \"charts\": {\"revenueTrend\": \"string\", \"cashFlow\": \"string\"}}. If info isn't found, use 'N/A' or an empty array.";
+            "You are an AI business analyst. A user is requesting a full report on a company. Perform a Google search to find: 1. A brief summary. 2. Corporate filing info (entity name, status, entity type, jurisdiction, formation date, registered agent). 3. Public records (UCC, liens, judgments, court filings, debt). 4. 2-3 recent customer review snippets. THEN, generate: 5. A fictional AI risk score (300-850) with justification, 2-3 positive factors, and 1-2 negative factors. 6. Two fictional, simple, minimalist SVG line charts as text strings (viewBox='0 0 100 50', use polyline, one green (#00C09A) for 'revenueTrend', one blue (#3B82F6) for 'cashFlow'). You MUST return ONLY a valid JSON object matching this exact structure, enclosed in ```json ... ``` tags: {\"summary\": {\"companyName\": \"string\", \"summary\": \"string\"}, \"sos\": {\"entityName\": \"string\", \"status\": \"string\", \"entityType\": \"string\", \"jurisdiction\": \"string\", \"formationDate\": \"string\", \"registeredAgent\": \"string\"}, \"publicRecords\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\"}]}, \"riskScore\": {\"score\": 0, \"justification\": \"string\", \"positiveFactors\": [\"string\"], \"negativeFactors\": [\"string\"]}, \"reviews\": [{\"snippet\": \"string\", \"source\": \"string\"}], \"charts\": {\"revenueTrend\": \"string\", \"cashFlow\": \"string\"}}. If info isn't found, use 'N/A' or an empty array.";
           const userQuery = `Generate a full AI business report for: "${businessName}"`;
 
           try {
