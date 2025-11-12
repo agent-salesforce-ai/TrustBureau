@@ -354,27 +354,29 @@
 
   <script>
     /* ===================== Config ===================== */
-    // Default to empty string; API key will be injected by the environment or set via Settings modal.
-    const zakk = "";    // or set window.zakk at runtime
-    const PROXY_BASE = "";                // optional proxy base (leave empty for direct)
-    
-    // Use the v1beta model that supports grounding and JSON schema
+    const zakk = "AIzaSyBnqELMSwalpd6M2rlx4W6NapzwUuPUU1s";    // or set window.zakk at runtime
+    const PROXY_BASE = "";                 // optional proxy base (leave empty for direct)
+    // CORRECTED: Remove 'models/' prefix for v1 API
     const MODEL_CANDIDATES = [
-      'gemini-2.5-flash-preview-09-2025'
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-flash',
+      'gemini-1.5-pro-latest', 
+      'gemini-1.5-pro',
+      'gemini-1.0-pro'
     ];
-    const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+    const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1/models';
     const MAX_OUTPUT_TOKENS = 8192;
 
     /* ===================== Utilities ===================== */
     function getApiKey() {
       const fromStorage = localStorage.getItem('apiKey');
-      if (fromStorage && fromStorage.trim()) return fromStorage.trim();
+      if (fromStorage) return fromStorage.trim();
       const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
       const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-      return fromWindow || fromConst || ""; // Default to empty string
+      return fromWindow || fromConst;
     }
     function makeUrl(model, key) {
-      if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models/${model}:generateContent`;
+      if (PROXY_BASE) return `${PROXY_BASE}/v1/models/${model}:generateContent`;
       return `${DIRECT_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`;
     }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
@@ -479,26 +481,22 @@
 
     /* ===================== Robust JSON parsing ===================== */
     function parseCandidateJSON(candidate) {
-      const part = candidate?.content?.parts?.[0];
-      if (part && part.text) {
-        try {
-          return JSON.parse(part.text);
-        } catch (e) {
-          const raw = part.text.trim().replace(/```json/g, '```').replace(/```/g, '');
+      const parts = candidate?.content?.parts || [];
+      for (const p of parts) { // text parts first
+        if (typeof p?.text === 'string' && p.text.trim()) {
+          const raw = p.text.trim().replace(/```json/g, '```').replace(/```/g, '');
           try { return JSON.parse(raw); } catch {}
           const lastCurly = raw.lastIndexOf('}'), lastSquare = raw.lastIndexOf(']');
           const cut = Math.max(lastCurly, lastSquare);
           if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
-          console.error("Failed to parse JSON text: ", part.text);
-          throw new Error(`Model returned unparseable JSON (error: ${e.message})`);
         }
       }
-      for (const p of (candidate?.content?.parts || [])) {
+      for (const p of parts) { // inline_data fallback
         if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
           try { return JSON.parse(atob(p.inline_data.data)); } catch {}
         }
       }
-      const preview = candidate?.content?.parts?.find(p => p.text)?.text?.slice(0, 300)?.replace(/\s+/g,' ') || 'No text';
+      const preview = parts.find(p => p.text)?.text?.slice(0, 300)?.replace(/\s+/g,' ') || 'No text';
       throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
     }
 
@@ -518,44 +516,19 @@
           return await res.json();
         } catch (e) {
           lastError = e;
-          if (e.code && String(e.code).startsWith('4')) break;
           if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
         }
       }
       throw lastError || new Error('API request failed.');
     }
 
-    /* ===================== API (v1beta, JSON Schema, Grounding) ===================== */
-    const responseSchema = {
-      type: "OBJECT",
-      properties: {
-        "summary": { type: "OBJECT", properties: { "companyName": { type: "STRING" }, "summary": { type: "STRING" } } },
-        "sos": { type: "OBJECT", properties: { "entityName": { type: "STRING" }, "status": { type: "STRING" }, "entityType": { type: "STRING" }, "jurisdiction": { type: "STRING" }, "formationDate": { type: "STRING" }, "registeredAgent": { type: "STRING" }, "principalAddress": { type: "STRING" } } },
-        "publicRecords": { type: "OBJECT", properties: { "findings": { type: "ARRAY", items: { type: "OBJECT", properties: { "type": { type: "STRING" }, "details": { type: "STRING" } } } } } },
-        "riskScore": { type: "OBJECT", properties: { "score": { type: "NUMBER" }, "justification": { type: "STRING" }, "positiveFactors": { type: "ARRAY", items: { type: "STRING" } }, "negativeFactors": { type: "ARRAY", items: { type: "STRING" } } } },
-        "reviews": { type: "ARRAY", items: { type: "OBJECT", properties: { "snippet": { type: "STRING" }, "source": { type: "STRING" }, "url": { type: "STRING" } } } },
-        "chartPoints": { type: "OBJECT", properties: { "revenue": { type: "ARRAY", items: { type: "NUMBER" } }, "cashFlow": { type: "ARRAY", items: { type: "NUMBER" } } } },
-        "profile": { type: "OBJECT", properties: { "founded": { type: "STRING" }, "headquarters": { type: "STRING" }, "employees": { type: "STRING" }, "website": { type: "STRING" }, "industry": { type: "STRING" }, "subindustry": { type: "STRING" }, "ticker": { type: "STRING" } } },
-        "news": { type: "ARRAY", items: { type: "OBJECT", properties: { "title": { type: "STRING" }, "date": { type: "STRING" }, "source": { type: "STRING" }, "url": { type: "STRING" } } } },
-        "leadership": { type: "ARRAY", items: { type: "OBJECT", properties: { "name": { type: "STRING" }, "title": { type: "STRING" }, "linkedin": { type: "STRING" } } } },
-        "products": { type: "ARRAY", items: { type: "STRING" } },
-        "competitors": { type: "ARRAY", items: { type: "STRING" } },
-        "webPresence": { type: "OBJECT", properties: { "twitter": { type: "STRING" }, "linkedin": { type: "STRING" }, "youtube": { type: "STRING" }, "traffic": { type: "STRING" } } },
-        "contact": { type: "OBJECT", properties: { "phone": { type: "STRING" }, "email": { type: "STRING" }, "address": { type: "STRING" }, "lat": { type: "NUMBER" }, "lng": { type: "NUMBER" }, "mapsLink": { type: "STRING" } } },
-        "highlights": { type: "ARRAY", items: { type: "STRING" } },
-        "kpis": { type: "ARRAY", items: { type: "OBJECT", properties: { "metric": { type: "STRING" }, "q1": { type: "STRING" }, "q2": { type: "STRING" }, "q3": { type: "STRING" }, "q4": { type: "STRING" }, "yoy": { type: "STRING" } } } },
-        "citations": { type: "ARRAY", items: { type: "OBJECT", properties: { "title": { type: "STRING" }, "url": { type: "STRING" } } } }
-      }
-    };
-
+    /* ===================== API (v1, JSON response) ===================== */
     function makePayload(systemPrompt, userQuery) {
+      const fullPrompt = `${systemPrompt}\n\n${userQuery}\n\nReturn JSON only.`;
+
       return {
-        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        tools: [{ "google_search": {} }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
         generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: responseSchema,
           maxOutputTokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
           topP: 0.95
@@ -565,51 +538,38 @@
 
     async function callReportAPI(systemPrompt, userQuery) {
       const key = getApiKey();
-      if (!PROXY_BASE && !key) {
-        throw new Error('Missing API key. Please add it in Settings.');
-      }
+      if (!key && !PROXY_BASE) throw new Error('Missing API key. Please add it in Settings.');
 
       let lastErr;
       for (const model of MODEL_CANDIDATES) {
         const url = makeUrl(model, key);
-        const payload = makePayload(systemPrompt, userQuery);
-        try {
-          const data = await fetchWithBackoff(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
+        let payload = makePayload(systemPrompt, userQuery);
 
-          const cand = data?.candidates?.[0];
-          if (!cand) {
-            if (data?.promptFeedback?.blockReason) {
-              throw new Error(`Request blocked: ${data.promptFeedback.blockReason}`);
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const data = await fetchWithBackoff(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const cand = data?.candidates?.[0];
+            if (!cand) throw new Error('No candidates in response.');
+            const json = parseCandidateJSON(cand);
+
+            const sources = []; // v1 API does not return grounding metadata in the same way.
+
+            return { json, sources };
+          } catch (e) {
+            lastErr = e;
+            const parseIssue = /no parseable JSON|Unexpected end of JSON|Unexpected token|Invalid or unexpected/i.test(e.message || '');
+            if (attempt === 1 && parseIssue) {
+              const stricter = `${systemPrompt}\n\nIMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
+              payload = makePayload(stricter, userQuery);
+              continue;
             }
-            throw new Error('No candidates in API response.');
+            break; // next model
           }
-          if (cand.finishReason && cand.finishReason !== 'STOP') {
-            throw new Error(`Generation stopped: ${cand.finishReason}`);
-          }
-
-          const json = parseCandidateJSON(cand);
-
-          // Extract grounding sources
-          let sources = [];
-          const groundingMetadata = cand.groundingMetadata;
-          if (groundingMetadata && groundingMetadata.groundingAttributions) {
-            sources = groundingMetadata.groundingAttributions
-              .map(attribution => ({
-                uri: attribution.web?.uri,
-                title: attribution.web?.title,
-              }))
-              .filter(source => source.uri && source.title);
-          }
-
-          return { json, sources };
-        } catch (e) {
-          lastErr = e;
-          console.error(`Attempt with model ${model} failed:`, e);
-          break;
         }
       }
       throw lastErr || new Error('All model attempts failed.');
@@ -618,82 +578,63 @@
     /* ===================== Prompt ===================== */
     function buildSystemPrompt() {
       return `
-You are a meticulous US-focused business analyst.
+You are a meticulous US-focused business analyst. Return a SINGLE JSON object ONLY (no commentary, no code fences). 
 Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unknown.
+
+Required JSON shape (keys must match exactly). Include an SOS address so a map can be shown:
+
+{
+  "summary": { "companyName": string, "summary": string },
+  "sos": { 
+    "entityName": string, "status": string, "entityType": string, "jurisdiction": string, 
+    "formationDate": string, "registeredAgent": string,
+    "principalAddress": string
+  },
+  "publicRecords": { "findings": [{ "type": string, "details": string }] },
+  "riskScore": { "score": number, "justification": string, "positiveFactors": [string], "negativeFactors": [string] },
+  "reviews": [{ "snippet": string, "source": string, "url": string }],
+  "chartPoints": { "revenue": [number], "cashFlow": [number] },
+  "profile": { "founded": string, "headquarters": string, "employees": string, "website": string, "industry": string, "subindustry": string, "ticker": string },
+  "news": [{ "title": string, "date": string, "source": string, "url": string }],
+  "leadership": [{ "name": string, "title": string, "linkedin": string }],
+  "products": [string],
+  "competitors": [string],
+  "webPresence": { "twitter": string, "linkedin": string, "youtube": string, "traffic": string },
+  "contact": { "phone": string, "email": string, "address": string, "lat": number, "lng": number, "mapsLink": string },
+  "highlights": [string],
+  "kpis": [{ "metric": string, "q1": string, "q2": string, "q3": string, "q4": string, "yoy": string }],
+  "citations": [{ "title": string, "url": string }]
+}
 
 Reviews: include 3–6 concise snippets (12–40 words) from US-centric sources with URLs (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).
 Map rule: prefer the SOS principal/registered address; if unknown, use contact.address; then profile.headquarters.
 
-Fill all fields in the provided JSON schema to the best of your ability using live search data.
+Return valid JSON only.
       `.trim();
     }
 
     /* ===================== Reviews fallback ===================== */
-    const reviewsSchema = {
-      type: "OBJECT",
-      properties: {
-        "reviews": {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              "snippet": { type: "STRING" },
-              "source": { type: "STRING" },
-              "url": { type: "STRING" }
-            }
-          }
-        }
-      }
-    };
-
     function reviewsNeeded(json) {
       const n = Array.isArray(json?.reviews) ? json.reviews.length : 0;
-      return n < 2;
+      return n < 2; // ask for more if none or too few
     }
 
     async function supplementReviews(companyName, baseJson) {
       const sys = `
-You are a US-focused research assistant. Return a JSON object with a "reviews" array.
+You are a US-focused research assistant. Return ONLY JSON with a "reviews" array.
 Each review item must be: { "snippet": string (12–40 words), "source": string, "url": string }.
 Collect 3–6 impartial snippets summarizing public sentiment from credible US sources (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, or reputable media).
-Avoid duplicates; include direct URLs when possible. If nothing exists, return {"reviews": []}.
+Avoid duplicates; include direct URLs when possible. If nothing exists, return [].
 `.trim();
 
       const userQ = `Provide 5 review snippets for "${companyName}" as specified. US bias; business context only.`;
       try {
-        const key = getApiKey();
-        const url = makeUrl(MODEL_CANDIDATES[0], key);
-        const payload = {
-          contents: [{ role: 'user', parts: [{ text: userQ }] }],
-          tools: [{ "google_search": {} }],
-          systemInstruction: { parts: [{ text: sys }] },
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: reviewsSchema,
-            maxOutputTokens: 2048,
-            temperature: 0.2
-          }
-        };
-        
-        const data = await fetchWithBackoff(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const cand = data?.candidates?.[0];
-        if (!cand) throw new Error('No candidate in reviews fallback.');
-        const json = parseCandidateJSON(cand);
-
-        const arr = json?.reviews;
+        const { json } = await callReportAPI(sys, userQ);
+        const arr = json?.reviews || json?.data?.reviews;
         if (Array.isArray(arr) && arr.length) {
-          const existingSnippets = new Set((baseJson.reviews || []).map(r => r.snippet));
-          const newReviews = arr.filter(r => r.snippet && !existingSnippets.has(r.snippet));
-          baseJson.reviews = (baseJson.reviews || []).concat(newReviews).slice(0, 6);
+          baseJson.reviews = arr.slice(0, 6);
         }
-      } catch (_e) {
-        console.error("Reviews fallback failed:", _e);
-      }
+      } catch (_e) { /* swallow; baseJson remains */ }
       return baseJson;
     }
 
@@ -702,8 +643,8 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
     function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
     function collectSources(json, modelSources) {
       const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
       (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
       if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
       const w = json?.webPresence || {};
       if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
@@ -711,7 +652,6 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
       if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
       (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
       (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-      
       const seen = new Set();
       return out.filter(({ url }) => !seen.has(url) && seen.add(url));
     }
@@ -733,10 +673,10 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
         const li = document.createElement('li');
         li.className = 'text-sm';
         li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
         ul.appendChild(li);
       });
-      ul.classList.remove('hidden');
+      ul.classList.remove('hidden'); // auto-expanded
       let open = true;
       const toggle = document.getElementById('toggle-sources');
       toggle.textContent = 'Hide list';
@@ -815,7 +755,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
         sos.registeredAddress,
         sos.mailingAddress,
         sos.address
-      ].filter(s => s && String(s).trim() && s.toLowerCase() !== 'n/a');
+      ].filter(Boolean);
       return candidates[0] || '';
     }
 
@@ -850,7 +790,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
         const li = document.createElement('li');
         li.className = 'flex items-start';
         li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
-                          `<span class="text-sm text-brand-dark">${f}</span>`;
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
         posList.appendChild(li);
       });
       negList.innerHTML = '';
@@ -858,7 +798,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
         const li = document.createElement('li');
         li.className = 'flex items-start';
         li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
-                          `<span class="text-sm text-brand-dark">${f}</span>`;
+                         `<span class="text-sm text-brand-dark">${f}</span>`;
         negList.appendChild(li);
       });
 
@@ -884,7 +824,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
       // Operational highlights
       const highlights = (data?.highlights || []).slice(0,8);
       highlightsList.innerHTML = highlights.length ? '' : '<li class="text-sm text-gray-600">No highlights available.</li>';
-      highlights.forEach(t => { const li = document.createElement('li'); li.innerHTML = t; highlightsList.appendChild(li); });
+      highlights.forEach(t => { const li = document.createElement('li'); li.textContent = t; highlightsList.appendChild(li); });
 
       // Recent news
       newsRoll.innerHTML = '';
@@ -931,7 +871,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
         li.textContent = `${r.type || 'Record'}: ${r.details || ''}`;
         recList.appendChild(li);
       });
-      if (!recList.children.length) recList.innerHTML = '<li class="list-none text-sm text-gray-600">No public records found.</li>';
+      if (!recList.children.length) recList.innerHTML = '<li class="text-sm text-gray-600">No public records found.</li>';
 
       // Leadership
       leaderList.innerHTML = '';
@@ -958,7 +898,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
       socialList.innerHTML = '';
       const w = data?.webPresence || {};
       [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
-        if (!v || String(v).toLowerCase() === 'n/a') return;
+        if (!v) return;
         const li = document.createElement('li');
         let valueHtml = v;
         if (typeof v === 'string' && /^https?:\/\//.test(v)) {
@@ -1043,10 +983,11 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
         const userQuery = `Generate a comprehensive US-focused AI business report for: "${query}"`;
 
         try {
+          // Primary call
           let { json, sources } = await callReportAPI(systemPrompt, userQuery);
 
+          // Reviews fallback if needed
           if (reviewsNeeded(json)) {
-            console.log('Supplementing reviews...');
             json = await supplementReviews(json?.summary?.companyName || query, json);
           }
 
@@ -1056,13 +997,10 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
           showState('content');
         } catch (e) {
           console.error(e);
-          const keyRelated = /API key|401|403/i.test(String(e));
-          const corsHint = (!PROXY_BASE && /Failed to fetch|NetworkError|CORS/i.test(String(e)))
-            ? 'A network error occurred. If you are running this locally, check the browser console for CORS errors.'
+          const corsHint = (!PROXY_BASE && /Failed to fetch|NetworkError|CORS|TypeError: fetch/i.test(String(e))) 
+            ? 'Network/CORS error: serve this page via http(s) and/or use a tiny proxy (set PROXY_BASE in code).' 
             : '';
-          const keyHint = keyRelated ? 'API key is invalid or missing. Please add a valid key in Settings (gear icon).' : '';
-          
-          showState('error', keyHint || corsHint || e.message || 'Failed to generate report.');
+          showState('error', e.message || corsHint || 'Failed to generate report.');
         } finally {
           btn.disabled = false; btn.classList.remove('cta-disabled');
         }
@@ -1073,6 +1011,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
           showState('error', 'Please enter a business name.');
           return;
         }
+        // Set the URL hash, which becomes the shareable link
         window.location.hash = encodeURIComponent(query);
         runReport(query);
       }
@@ -1089,33 +1028,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
       });
 
       shareBtn?.addEventListener('click', () => {
-        // Use document.execCommand as a fallback for iframe clipboard restrictions
-        const copyToClipboard = (text) => {
-          if (navigator.clipboard) {
-            return navigator.clipboard.writeText(text);
-          } else {
-            // Fallback for environments where navigator.clipboard is not available
-            return new Promise((resolve, reject) => {
-              const textArea = document.createElement("textarea");
-              textArea.value = text;
-              textArea.style.position = "fixed"; // Avoid scrolling to bottom
-              textArea.style.top = "0";
-              textArea.style.left = "0";
-              textArea.style.opacity = "0";
-              document.body.appendChild(textArea);
-              textArea.focus();
-              textArea.select();
-              try {
-                document.execCommand('copy') ? resolve() : reject(new Error('Copy failed'));
-              } catch (err) {
-                reject(err);
-              }
-              document.body.removeChild(textArea);
-            });
-          }
-        };
-      
-        copyToClipboard(window.location.href).then(() => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
           const originalText = shareBtn.textContent;
           shareBtn.textContent = 'Copied!';
           shareBtn.classList.add('bg-brand-green', 'text-white');
@@ -1125,9 +1038,7 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return {
           }, 2000);
         }).catch(err => {
           console.error('Failed to copy URL: ', err);
-          const originalText = shareBtn.textContent;
-          shareBtn.textContent = 'Failed!';
-          setTimeout(() => { shareBtn.textContent = originalText; }, 2000);
+          alert('Failed to copy link.');
         });
       });
 
