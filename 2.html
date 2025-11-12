@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TrustBureau.ai - The AI Verification Standard</title>
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    /* Tailwind config (brand tokens & fonts) */
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            'brand-green': '#00C09A',
+            'brand-dark':  '#1A1A1A',
+            'brand-gray':  '#666666',
+            'brand-light': '#F8F9FA',
+            'brand-border':'#E5E7EB',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Alpine.js (deferred for mobile stability) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #FFFFFF;
+    }
+
+    /* Fallbacks in case CDN/config is blocked */
+    .text-brand-dark  { color: #1A1A1A !important; }
+    .text-brand-gray  { color: #666666 !important; }
+    .text-brand-green { color: #00C09A !important; }
+    .bg-brand-dark    { background-color: #1A1A1A !important; }
+    .bg-brand-light   { background-color: #F8F9FA !important; }
+    .bg-brand-green   { background-color: #00C09A !important; }
+    .border-brand-border { border-color: #E5E7EB !important; }
+
+    /* Sticky header blur (Safari support) */
+    .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+
+    /* Prevent sticky header from hiding anchor targets */
+    section[id] { scroll-margin-top: 84px; }
+    @media (min-width: 768px) { section[id] { scroll-margin-top: 96px; } }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    [x-cloak] { display: none !important; }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #00C09A 0%, #007A63 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .yellow-gradient-text {
+      background: linear-gradient(90deg, #FACC15 0%, #EAB308 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* CTA & widget cohesion */
+    .cta-button { transition: all 0.3s ease; }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15); }
+
+    .widget-card {
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .widget-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(0, 192, 154, 0.12);
+      border-color: rgba(0,192,154,0.35);
+    }
+
+    .widget-btn {
+      /* identical visual to Request Demo */
+      background-color: #00C09A;
+      color: #fff;
+      font-weight: 700;
+      padding: .875rem 2rem; /* py-3.5 px-8 */
+      border-radius: .5rem;  /* rounded-lg */
+      font-size: 1.125rem;   /* text-lg */
+      transition: all .3s ease;
+    }
+    .widget-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,192,154,.15);
+      background-color: #00a883; /* subtle hover */
+    }
+
+    .hero-visual {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* Score gauge */
+    .score-circle {
+      width: 120px; height: 120px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 2.5rem;
+      border: 8px solid;
+    }
+    .score-red    { border-color: #FECACA; color: #DC2626; background-color: #FEF2F2; }
+    .score-yellow { border-color: #FDE68A; color: #D97706; background-color: #FFFBEB; }
+    .score-green  { border-color: #A7F3D0; color: #059669; background-color: #ECFDF5; }
+  </style>
+</head>
+
+<body class="font-sans text-brand-dark" x-data="{ open: false, page: 'home' }">
+  <!-- Header / Navigation -->
+  <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center relative">
+      <!-- Logo -->
+      <a href="#" @click.prevent="page = 'home'; open = false" class="flex items-center space-x-2.5">
+        <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center space-x-7">
+        <a href="#platform" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Platform</a>
+        <a href="#process"  @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Process</a>
+        <a href="#pricing"  @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Pricing</a>
+        <a href="#platform" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Developers</a>
+      </div>
+
+      <!-- Members -->
+      <a href="#" @click.prevent="page = 'login'" class="hidden md:inline-block bg-white border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">Members</a>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden" @click="open = !open" :aria-expanded="open.toString()" aria-controls="mobile-menu" aria-label="Toggle menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu"
+           x-show="open"
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0 scale-95"
+           x-transition:enter-end="opacity-100 scale-100"
+           x-transition:leave="transition ease-in duration-100"
+           x-transition:leave-start="opacity-100 scale-100"
+           x-transition:leave-end="opacity-0 scale-95"
+           class="absolute inset-x-0 top-full mt-2 w-full p-4 md:hidden z-50"
+           @click.outside="open = false"
+           x-cloak>
+        <div class="bg-white rounded-lg shadow-xl border border-brand-border p-5 space-y-4">
+          <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Platform</a>
+          <a href="#process"  class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Process</a>
+          <a href="#pricing"  class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Pricing</a>
+          <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Developers</a>
+          <a href="#" @click.prevent="page = 'login'; open = false" class="block w-full text-center bg-white border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">Members</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- [START] HOME PAGE CONTENT -->
+    <div x-show="page === 'home'">
+      <section class="bg-white py-24 md:py-36">
+        <div class="container mx-auto px-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Hero Text -->
+            <div class="text-center lg:text-left">
+              <h1 class="text-5xl md:text-7xl font-heading font-extrabold text-brand-dark leading-tight mb-6">
+                The <span class="yellow-gradient-text">Gold Standard</span> of
+                <span class="text-brand-dark">AI</span> <span class="text-brand-green">Underwriting</span>
+              </h1>
+              <p class="text-lg md:text-xl text-brand-gray max-w-xl mx-auto lg:mx-0 mb-10">
+                The AI underwriting tool for advanced decision-making in seconds. Our platform validates, analyzes, and reports on business health to ensure your decisions are fast, fair, and compliant.
+              </p>
+              <div class="flex justify-center lg:justify-start items-center space-x-4">
+                <a href="#" @click.prevent="page = 'demo'" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-lg text-lg cta-button">Request Demo</a>
+                <a href="#platform" @click="page = 'home'" class="bg-white border border-brand-border text-brand-dark font-medium py-3.5 px-8 rounded-lg text-lg hover:border-brand-gray transition-colors">Learn More</a>
+              </div>
+            </div>
+
+            <!-- Hero Visual -->
+            <div class="hero-visual">
+              <div class="bg-brand-light border-b border-brand-border px-4 py-3">
+                <div class="flex items-center space-x-2">
+                  <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                  <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                  <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                </div>
+              </div>
+              <div class="p-6 space-y-5">
+                <div class="flex justify-between items-center">
+                  <span class="font-heading font-bold text-lg">Model: FinCredit v2.1</span>
+                  <span class="bg-yellow-100 text-yellow-700 text-sm font-medium px-3 py-1 rounded-full">Scanning...</span>
+                </div>
+                <div class="space-y-4">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <span class="text-brand-dark font-medium">Fairness & Bias Audit</span>
+                    <span class="ml-auto text-green-700 font-medium">Passed</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <span class="text-brand-dark font-medium">Security & Robustness</span>
+                    <span class="ml-auto text-green-700 font-medium">Passed</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-red-100 text-red-700 rounded-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <span class="text-brand-dark font-medium">EU AI Act Compliance</span>
+                    <span class="ml-auto text-red-700 font-medium">Failed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /Hero Visual -->
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA (no button) -->
+      <section id="demo-top" class="bg-brand-dark">
+        <div class="container mx-auto px-6 py-16 text-center">
+          <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mb-6">Make Decisions in Seconds.</h2>
+          <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.</p>
+        </div>
+      </section>
+
+      <!-- Your Verification Report Section -->
+      <section id="report-mockup" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+          <!-- Live AI Demos header -->
+          <div class="text-center max-w-3xl mx-auto mb-16">
+            <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">Live AI Demos</span>
+            <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">See Our AI in Action</h2>
+            <p class="text-lg text-brand-gray">Use our AI tools below to generate live, comprehensive business reports or get fictional pre-approval terms based on real underwriting logic.</p>
+          </div>
+
+          <!-- Combined Widget -->
+          <div class="max-w-4xl mx-auto mb-16">
+            <div class="widget-card p-6 flex flex-col">
+              <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">Live AI Business Report</h3>
+              <div class="space-y-4 max-w-xl mx-auto w-full">
+                <div>
+                  <label for="business-name" class="block text-sm font-medium text-brand-dark">Enter any Business Name</label>
+                  <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green" placeholder="e.g., Apple Inc., Local Coffee Shop">
+                </div>
+                <button id="generate-report-btn" class="widget-btn cta-button w-full inline-flex justify-center items-center disabled:opacity-50 disabled:cursor-wait">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.193-1.444l3.041 3.04a1 1 0 001.415-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
+                  <span>Generate Full Report</span>
+                </button>
+              </div>
+
+              <!-- Results -->
+              <div id="report-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
+                <div id="report-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box">
+                  <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span class="text-sm text-brand-gray">Searching live web and generating AI analysis...</span>
+                </div>
+
+                <div id="report-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
+                  <p class="text-sm text-red-600" id="report-error-message"></p>
+                </div>
+
+                <div id="report-content" class="w-full" style="display: none;">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Left: Score -->
+                    <div class="md:col-span-1">
+                      <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
+                      <div class="flex flex-col items-center p-4 border border-brand-border rounded-lg bg-brand-light">
+                        <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">...</span></div>
+                        <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic"></p>
+                        <div class="w-full text-left">
+                          <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                          <ul id="report-score-positives" class="space-y-1.5 mb-3"></ul>
+                          <ul id="report-score-negatives" class="space-y-1.5"></ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right: Details -->
+                    <div class="md:col-span-2 space-y-6">
+                      <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Business Summary</h4>
+                        <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                          <h5 id="report-title" class="font-heading font-bold text-lg mb-2 text-brand-dark"></h5>
+                          <p id="report-summary" class="text-sm text-brand-gray"></p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
+                        <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                          <ul class="space-y-2 text-sm text-brand-gray">
+                            <li class="flex justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark text-right"></span></li>
+                            <li class="flex justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark text-right"></span></li>
+                            <li class="flex justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark text-right"></span></li>
+                            <li class="flex justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark text-right"></span></li>
+                            <li class="flex justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark text-right"></span></li>
+                            <li class="flex justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark text-right"></span></li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Records</h4>
+                        <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                          <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray"></ul>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Customer Reviews</h4>
+                        <div id="report-reviews-list" class="space-y-4"></div>
+                      </div>
+
+                      <div>
+                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Charts (Fictional)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                            <h5 class="text-sm font-medium text-brand-dark mb-2">Revenue Trend</h5>
+                            <div id="report-chart-revenue" class="h-24"></div>
+                          </div>
+                          <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                            <h5 class="text-sm font-medium text-brand-dark mb-2">Cash Flow</h5>
+                            <div id="report-chart-cashflow" class="h-24"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sources -->
+                  <div id="report-sources-container" class="mt-6 border-t border-brand-border pt-4" style="display: none;">
+                    <h5 class="text-xs font-semibold text-brand-gray uppercase mb-2">Sources Used:</h5>
+                    <ul id="report-sources" class="space-y-1 list-disc list-inside"></ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pre-Approval Widget -->
+          <div class="max-w-4xl mx-auto mb-16">
+            <div class="widget-card p-6 flex flex-col">
+              <h3 class="text-xl font-heading font-bold text-brand-dark mb-4 text-center">Live AI Pre-Approval Generator (Fictional)</h3>
+              <div class="space-y-5 max-w-xl mx-auto w-full" x-data="{ monthlyRevenue: 10000, ficoScore: 680 }">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
+                  <div>
+                    <label for="pre-approval-name" class="block text-sm font-medium text-brand-dark">Business Name</label>
+                    <input type="text" id="pre-approval-name" value="Apex Innovations" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green">
+                  </div>
+                  <div>
+                    <label for="pre-approval-time" class="block text-sm font-medium text-brand-dark">Time in Business (months)</label>
+                    <input type="number" id="pre-approval-time" value="12" min="0" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green">
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label for="pre-approval-industry" class="block text-sm font-medium text-brand-dark">Industry</label>
+                    <select id="pre-approval-industry" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm focus:outline-none focus:ring-brand-green focus:border-brand-green">
+                      <option>Retail</option>
+                      <option>Restaurant / Food Service</option>
+                      <option>SaaS / Tech</option>
+                      <option>Construction</option>
+                      <option>Healthcare</option>
+                      <option>Services (e.g., Salon, Legal)</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <div class="flex justify-between items-center">
+                      <label for="pre-approval-monthly-revenue" class="block text-sm font-medium text-brand-dark">Monthly Gross Revenue</label>
+                      <span class="font-bold text-brand-green bg-green-50 px-3 py-1 rounded-md text-sm" x-text="`$${parseInt(monthlyRevenue).toLocaleString()}`"></span>
+                    </div>
+                    <input type="range" id="pre-approval-monthly-revenue" x-model="monthlyRevenue" min="0" max="100000" step="1000" class="mt-2 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-green">
+                  </div>
+                  <div class="sm:col-span-2">
+                    <div class="flex justify-between items-center">
+                      <label for="pre-approval-fico" class="block text-sm font-medium text-brand-dark">Owner FICO Score</label>
+                      <span class="font-bold text-brand-green bg-green-50 px-3 py-1 rounded-md text-sm" x-text="ficoScore"></span>
+                    </div>
+                    <input type="range" id="pre-approval-fico" x-model="ficoScore" min="450" max="850" step="1" class="mt-2 block w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-green">
+                  </div>
+                </div>
+
+                <!-- Button styled like Request Demo -->
+                <button id="generate-pre-approval-btn" class="widget-btn cta-button w-full inline-flex justify-center items-center disabled:opacity-50 disabled:cursor-wait mt-6 sm:mt-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M11.49 3.17c.12-.22.36-.3.59-.18.23.12.3.36.18.59l-3.5 6.5A.996.996 0 008 10.5H5a1 1 0 00-1 1v3a1 1 0 001 1h3.5a.996.996 0 00.92-.62l3.5-6.5c.12-.22.04-.47-.18-.59a.49.49 0 00-.59.18l-2.67 4.94H8l2.49-4.62z" clip-rule="evenodd"/>
+                    <path d="M15.5 10.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01zM14 12.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75v-.01z"/>
+                  </svg>
+                  <span>Generate Pre-Approval Terms</span>
+                </button>
+              </div>
+
+              <!-- Pre-Approval Results -->
+              <div id="pre-approval-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
+                <div id="pre-approval-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box">
+                  <svg class="animate-spin h-8 w-8 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span class="text-sm text-brand-gray">Generating fictional pre-approval...</span>
+                </div>
+
+                <div id="pre-approval-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
+                  <p class="text-sm text-red-600" id="pre-approval-error-message"></p>
+                </div>
+
+                <div id="pre-approval-content" class="w-full" style="display: none;">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Term Loan -->
+                    <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
+                      <span id="loan-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
+                      <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Term Loan</h4>
+                      <p id="loan-amount" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
+                      <table id="loan-terms-table" class="w-full text-sm text-left">
+                        <tbody>
+                          <tr class="border-b border-brand-border/50"><td class="py-1.5 text-brand-gray">Term</td><td id="loan-term" class="py-1.5 text-right font-medium text-brand-dark"></td></tr>
+                          <tr class="border-b border-brand-border/50"><td class="py-1.5 text-brand-gray">Est. Rate</td><td id="loan-rate" class="py-1.5 text-right font-medium text-brand-dark"></td></tr>
+                          <tr class="border-b border-brand-border/50"><td class="py-1.5 text-brand-gray">Payback</td><td id="loan-payback" class="py-1.5 text-right font-medium text-brand-dark"></td></tr>
+                          <tr><td class="pt-1.5 text-brand-gray">Est. Payment</td><td id="loan-payment" class="pt-1.5 text-right font-medium text-brand-dark"></td></tr>
+                        </tbody>
+                      </table>
+                      <p id="loan-note" class="text-xs text-brand-gray italic mt-4"></p>
+                    </div>
+
+                    <!-- Line of Credit -->
+                    <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
+                      <span id="loc-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
+                      <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Line of Credit</h4>
+                      <p id="loc-limit" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
+                      <table id="loc-terms-table" class="w-full text-sm text-left">
+                        <tbody><tr><td class="pt-1.5 text-brand-gray">Rate</td><td id="loc-rate" class="pt-1.5 text-right font-medium text-brand-dark"></td></tr></tbody>
+                      </table>
+                      <p id="loc-note" class="text-xs text-brand-gray italic mt-4"></p>
+                    </div>
+
+                    <!-- Merchant Cash Advance -->
+                    <div class="p-5 border border-brand-border rounded-lg bg-white shadow-sm text-center">
+                      <span id="mca-status" class="float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1"></span>
+                      <h4 class="font-heading font-semibold text-brand-dark text-lg mt-3">Merchant Cash Advance</h4>
+                      <p id="mca-amount" class="text-3xl font-heading font-bold text-brand-green mt-3 mb-3"></p>
+                      <table id="mca-terms-table" class="w-full text-sm text-left">
+                        <tbody>
+                          <tr class="border-b border-brand-border/50"><td class="py-1.5 text-brand-gray">Factor Rate</td><td id="mca-factor" class="py-1.5 text-right font-medium text-brand-dark"></td></tr>
+                          <tr class="border-b border-brand-border/50"><td class="py-1.5 text-brand-gray">Payback</td><td id="mca-payback" class="py-1.5 text-right font-medium text-brand-dark"></td></tr>
+                          <tr><td class="pt-1.5 text-brand-gray">Est. Daily Remittance</td><td id="mca-remittance" class="pt-1.5 text-right font-medium text-brand-dark"></td></tr>
+                        </tbody>
+                      </table>
+                      <p id="mca-note" class="text-xs text-brand-gray italic mt-4"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Static Report Mockup header -->
+          <div class="text-center max-w-3xl mx-auto mb-16">
+            <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">Static Report Mockup</span>
+            <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">Your Verification Report</h2>
+            <p class="text-lg text-brand-gray">Below is a static mockup of a final, comprehensive report. All interactive demos are in the section above.</p>
+          </div>
+
+          <!-- Report Mockup -->
+          <div class="max-w-7xl mx-auto bg-white border border-brand-border rounded-lg shadow-xl overflow-hidden">
+            <div class="p-6 border-b border-brand-border">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3 class="font-heading text-2xl font-bold text-brand-green">Business Verification Report</h3>
+                  <p class="text-sm text-gray-500">Business — Report ID: TRUST-88A42F / Generated: Nov 08, 2025 • 23:03 UTC</p>
+                </div>
+                <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">The AI Verification Standard</span>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left -->
+                <div class="lg:col-span-1 space-y-6">
+                  <div>
+                    <h4 class="font-semibold text-brand-dark mb-3">Overall Status</h4>
+                    <div class="p-4 border border-brand-border rounded-lg">
+                      <div class="flex items-center space-x-4">
+                        <div class="relative w-24 h-24">
+                          <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50"></circle>
+                            <circle class="text-brand-green" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="39.6" stroke-linecap="round" stroke="currentColor" fill="transparent" r="42" cx="50" cy="50" transform="rotate(-90 50 50)"></circle>
+                          </svg>
+                          <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-3xl font-bold text-brand-dark">875</span>
+                          </div>
+                        </div>
+                        <div>
+                          <span class="text-2xl font-bold text-brand-green">Verified</span>
+                          <p class="text-sm text-gray-500">Strong financial health</p>
+                        </div>
+                      </div>
+                      <div class="mt-4 space-y-2 text-sm">
+                        <div class="flex justify-between">
+                          <span class="text-gray-500">Health: <span class="font-medium text-green-600">87.5 / 100</span></span>
+                          <span class="text-gray-500">Risk: <span class="font-medium text-green-600">Low</span></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                          <div class="bg-brand-green h-2 rounded-full" style="width: 87.5%"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mt-4 p-4 border border-brand-border rounded-lg text-sm space-y-2">
+                      <div class="flex justify-between"><span class="text-gray-500">NMLS</span><span class="font-medium text-brand-dark">#1234567</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Status</span><span class="font-medium text-green-600">Active</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Entity</span><span class="font-medium text-brand-dark">QuantumLeap AI LLC</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right -->
+                <div class="lg:col-span-2">
+                  <h4 class="font-semibold text-brand-dark mb-3">Key Metrics</h4>
+                  <div class="border border-brand-border rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-gray-50">
+                        <tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th><th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th></tr>
+                      </thead>
+                      <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                        <tr><td class="px-4 py-3 text-gray-500">Current Ratio</td><td class="px-4 py-3 text-right font-medium text-green-600">1.88</td></tr>
+                        <tr><td class="px-4 py-3 text-gray-500">Quick Ratio</td><td class="px-4 py-3 text-right font-medium text-green-600">1.21</td></tr>
+                        <tr><td class="px-4 py-3 text-gray-500">Debt Service Coverage</td><td class="px-4 py-3 text-right font-medium text-green-600">1.45</td></tr>
+                        <tr><td class="px-4 py-3 text-gray-500">Cash-Flow to Debt Ratio</td><td class="px-4 py-3 text-right font-medium text-green-600">0.95</td></tr>
+                        <tr><td class="px-4 py-3 text-gray-500">Revenue Trend</td><td class="px-4 py-3 text-right font-medium text-red-600">-12.1%</td></tr>
+                        <tr><td class="px-4 py-3 text-gray-500">Cash-Flow Volatility</td><td class="px-4 py-3 text-right font-medium text-brand-dark">28.0%</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Financial Snapshot (scrollable) -->
+              <div class="mt-6">
+                <h4 class="font-semibold text-brand-dark mb-3">Financial Snapshot</h4>
+                <!-- ✅ Scrollable on small screens -->
+                <div class="border border-brand-border rounded-lg mb-6 overflow-x-auto md:overflow-x-visible">
+                  <table class="min-w-[900px] w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Deposits</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"># Deposits</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Withdrawals</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg AOB</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg NSFs</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ending Bal</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">T'humpdri Score</th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                      <tr>
+                        <td class="px-4 py-3 text-gray-500">Chase, Bank of America</td>
+                        <td class="px-4 py-3 text-gray-500">$180,277</td>
+                        <td class="px-4 py-3 text-gray-500">41</td>
+                        <td class="px-4 py-3 text-gray-500">$95,845</td>
+                        <td class="px-4 py-3 text-gray-500">$450,705</td>
+                        <td class="px-4 py-3 font-medium text-green-600">0.1</td>
+                        <td class="px-4 py-3 text-gray-500">$215,848</td>
+                        <td class="px-4 py-3 text-gray-500">0</td>
+                        <td class="px-4 py-3 font-medium text-green-600">820</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <h5 class="font-medium text-brand-dark mb-2">Revenue Trend</h5>
+                    <div class="p-4 border border-brand-border rounded-lg h-48">
+                      <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                        <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,40 10,35 20,30 30,25 40,20 50,22 60,15 70,10 80,12 90,5 100,10" />
+                        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-brand-dark mb-2">Ending Balance</h5>
+                    <div class="p-4 border border-brand-border rounded-lg h-48">
+                      <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                        <polyline fill="none" stroke="#00C09A" stroke-width="2" points="0,30 10,28 20,35 30,30 40,25 50,20 60,25 70,15 80,18 90,10 100,15" />
+                        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-brand-dark mb-2">NSF / OVD Events</h5>
+                    <div class="p-4 border border-brand-border rounded-lg h-48 flex items-end space-x-2">
+                      <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none" class="flex items-end">
+                        <rect x="5" y="45" width="10" height="3" fill="#00C09A" />
+                        <rect x="20" y="48" width="10" height="0" fill="#00C09A" />
+                        <rect x="35" y="48" width="10" height="0" fill="#00C09A" />
+                        <rect x="50" y="40" width="10" height="8" fill="#FBBF24" />
+                        <rect x="65" y="35" width="10" height="13" fill="#EF4444" />
+                        <rect x="80" y="48" width="10" height="0" fill="#00C09A" />
+                        <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Monthly Banking Activity (already scrollable) -->
+              <div class="mt-6">
+                <h4 class="font-semibold text-brand-dark mb-3">Monthly Banking Activity</h4>
+                <div class="border border-brand-border rounded-lg overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Credits</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Num Credits</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">True Revenue</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transfers In</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Balance</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NSF/OVD</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                      <tr><td class="px-4 py-3 text-gray-500">Oct 2025</td><td class="px-4 py-3 text-gray-500">190,277</td><td class="px-4 py-3 text-gray-500">41</td><td class="px-4 py-3 text-gray-500">185,200</td><td class="px-4 py-3 text-gray-500">0</td><td class="px-4 py-3 text-gray-500">445,800</td><td class="px-4 py-3 font-medium text-green-600">0</td><td class="px-4 py-3 text-gray-500">215,848</td></tr>
+                      <tr><td class="px-4 py-3 text-gray-500">Sep 2025</td><td class="px-4 py-3 text-gray-500">215,802</td><td class="px-4 py-3 text-gray-500">47</td><td class="px-4 py-3 text-gray-500">200,500</td><td class="px-4 py-3 text-gray-500">0</td><td class="px-4 py-3 text-gray-500">478,900</td><td class="px-4 py-3 font-medium text-green-600">0</td><td class="px-4 py-3 text-gray-500">268,952</td></tr>
+                      <tr><td class="px-4 py-3 text-gray-500">Aug 2025</td><td class="px-4 py-3 text-gray-500">199,212</td><td class="px-4 py-3 text-gray-500">38</td><td class="px-4 py-3 text-gray-500">193,000</td><td class="px-4 py-3 text-gray-500">0</td><td class="px-4 py-3 text-gray-500">412,100</td><td class="px-4 py-3 font-medium text-yellow-600">1</td><td class="px-4 py-3 text-gray-500">190,230</td></tr>
+                      <tr><td class="px-4 py-3 text-gray-500">Jul 2025</td><td class="px-4 py-3 text-gray-500">230,100</td><td class="px-4 py-3 text-gray-500">42</td><td class="px-4 py-3 text-gray-500">222,800</td><td class="px-4 py-3 text-gray-500">0</td><td class="px-4 py-3 text-gray-500">490,000</td><td class="px-4 py-3 font-medium text-red-600">2</td><td class="px-4 py-3 text-gray-500">312,450</td></tr>
+                      <tr><td class="px-4 py-3 text-gray-500">Jun 2025</td><td class="px-4 py-3 text-gray-500">210,500</td><td class="px-4 py-3 text-gray-500">35</td><td class="px-4 py-3 text-gray-500">205,100</td><td class="px-4 py-3 text-gray-500">0</td><td class="px-4 py-3 text-gray-500">455,300</td><td class="px-4 py-3 font-medium text-green-600">0</td><td class="px-4 py-3 text-gray-500">278,900</td></tr>
+                      <tr><td class="px-4 py-3 text-gray-500">May 2025</td><td class="px-4 py-3 text-gray-500">205,123</td><td class="px-4 py-3 text-gray-500">40</td><td class="px-4 py-3 text-gray-500">198,000</td><td class="px-4 py-3 text-gray-500">0</td><td class="px-4 py-3 text-gray-500">468,200</td><td class="px-4 py-3 font-medium text-green-600">0</td><td class="px-4 py-3 text-gray-500">245,120</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Public Records -->
+              <div class="mt-6">
+                <h4 class="font-semibold text-brand-dark mb-3">Public Records</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="border border-brand-border rounded-lg">
+                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">UCC Filings</h5>
+                    <div class="p-4 text-sm">
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Bank of America, N.A.</span>
+                        <span class="font-medium text-brand-dark">UCC-1</span>
+                      </div>
+                      <p class="text-xs text-gray-400">Filed: 2024-01-15 | All Assets</p>
+                    </div>
+                  </div>
+                  <div class="border border-brand-border rounded-lg">
+                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Liens & Judgments</h5>
+                    <div class="p-4 text-sm">
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">State Tax Lien</span>
+                        <span class="font-medium text-yellow-600">$5,210.00</span>
+                      </div>
+                      <p class="text-xs text-gray-400">Filed: 2025-06-30 | Case #12345</p>
+                    </div>
+                  </div>
+                  <div class="border border-brand-border rounded-lg">
+                    <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Court Filings</h5>
+                    <div class="p-4 text-sm">
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Civil Lawsuit</span>
+                        <span class="font-medium text-yellow-600">Pending</span>
+                      </div>
+                      <p class="text-xs text-gray-400">Filed: 2025-09-10 | Case #C-56789</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SOS & Recommendations -->
+              <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="border border-brand-border rounded-lg">
+                  <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">SOS / Secretary of State Records</h5>
+                  <div class="p-4 overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                      <thead>
+                        <tr class="border-b border-brand-border">
+                          <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Name</th>
+                          <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity Type</th>
+                          <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Formation Date</th>
+                          <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Entity ID</th>
+                          <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                          <th class="py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered Agent</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="py-3 text-gray-500">QUANTUMLEAP AI LLC</td>
+                          <td class="py-3 text-gray-500">Domestic Limited Liability Company (LLC)</td>
+                          <td class="py-3 text-gray-500">2023-01-15</td>
+                          <td class="py-3 text-gray-500">5567890-0142</td>
+                          <td class="py-3 font-medium text-green-600">Active</td>
+                          <td class="py-3 text-gray-500">A Registered Agent Inc.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="border border-brand-border rounded-lg">
+                  <h5 class="font-medium text-brand-dark p-4 border-b border-brand-border">Recommendations</h5>
+                  <ul class="p-6 space-y-2 list-disc list-inside text-sm text-gray-500">
+                    <li class="font-medium text-green-600">Excellent financial health and low risk profile.</li>
+                    <li>Address negative revenue trend observed in Key Metrics.</li>
+                    <li>Investigate NSF events in Aug/Jul to prevent recurrence.</li>
+                    <li>Review public records (UCC, liens) despite strong financials.</li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trusted By -->
+      <section class="py-16 bg-brand-light">
+        <div class="container mx-auto px-6">
+          <h3 class="text-center text-sm font-semibold text-brand-gray tracking-wider uppercase mb-8">Certified by TrustBureau.ai</h3>
+          <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-70">
+            <span class="text-2xl font-bold text-brand-green">FutureTech</span>
+            <span class="text-2xl font-bold text-brand-green">QuantumLeap</span>
+            <span class="text-2xl font-bold text-brand-green">Axiom Inc.</span>
+            <span class="text-2xl font-bold text-brand-green">CodeGenius</span>
+            <span class="text-2xl font-bold text-brand-green">SynthData</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it Works -->
+      <section id="process" class="py-24 bg-white">
+        <div class="container mx-auto px-6 max-w-4xl">
+          <div class="text-center max-w-2xl mx-auto mb-16">
+            <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">A Simple, Verifiable Process</h2>
+            <p class="text-lg text-brand-gray">Our streamlined process makes AI governance simple, fast, and transparent.</p>
+          </div>
+          <div class="space-y-16">
+            <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
+              <div class="font-heading font-bold text-7xl text-brand-dark">01</div>
+              <div><h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Connect &amp; Scan</h3><p class="text-lg text-brand-gray">Securely connect your models, data, or platform via our API.</p></div>
+            </div>
+            <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
+              <div class="font-heading font-bold text-7xl yellow-gradient-text">02</div>
+              <div><h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Analyze &amp; Remediate</h3><p class="text-lg text-brand-gray">Receive a detailed risk dashboard with scorable, actionable insights.</p></div>
+            </div>
+            <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
+              <div class="font-heading font-bold text-7xl text-brand-green">03</div>
+              <div><h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Certify &amp; Monitor</h3><p class="text-lg text-brand-gray">Issue a "TrustBureau Certified" seal to display on your products.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Platform -->
+      <section id="platform" class="py-24 bg-brand-light">
+        <div class="container mx-auto px-6">
+          <div class="text-center max-w-3xl mx-auto mb-16">
+            <span class="font-heading font-bold text-brand-green bg-green-100 px-3 py-1 rounded-md">The Platform</span>
+            <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mt-6 mb-4">One Solution for AI Governance</h2>
+            <p class="text-lg text-brand-gray">Our platform provides a complete, end-to-end solution for AI governance, risk, and compliance (GRC).</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-green mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Model Auditing</h3>
+              <p class="text-brand-gray">Generate independent audit reports for performance, safety, and security.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
+              <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Bias &amp; Fairness</h3>
+              <p class="text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Security &amp; Robustness</h3>
+              <p class="text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-green mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Compliance Hub</h3>
+              <p class="text-brand-gray">Automate monitoring and reporting for EU AI Act, GDPR, HIPAA, and more.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Explainable AI (XAI)</h3>
+              <p class="text-brand-gray">Generate human-readable explanations for complex model decisions.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand-border">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Real-time Monitoring</h3>
+              <p class="text-brand-gray">Get alerts on model drift, data integrity issues, and new threats.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section id="pricing" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+          <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">Pricing for Underwriting Teams</h2>
+            <p class="text-lg text-brand-gray">Choose a plan that scales with your team's decision-making volume.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- Pro -->
+            <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
+              <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Pro</h3>
+              <p class="text-brand-gray mb-6 h-12">For small teams and regional banks.</p>
+              <div class="my-4"><span class="text-5xl font-heading font-extrabold text-brand-dark">$499</span><span class="text-brand-gray"> / mo</span></div>
+              <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 500 decisions / mo</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Standard compliance reports</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Email & chat support</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 5 users</li>
+              </ul>
+              <a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-light text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-brand-border transition-colors">Get Started</a>
+            </div>
+
+            <!-- Business -->
+            <div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col relative scale-105 border-2 border-brand-green">
+              <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full">Most Popular</div>
+              <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Business</h3>
+              <p class="text-brand-gray mb-6 h-12">For established teams and underwriting departments.</p>
+              <div class="my-4"><span class="text-5xl font-heading font-extrabold text-brand-dark">$1,999</span><span class="text-brand-gray"> / mo</span></div>
+              <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 5,000 decisions / mo</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced compliance reports</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority phone & email support</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 25 users</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Dedicated account manager</li>
+              </ul>
+              <a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-lg cta-button">Start Free Trial</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
+              <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Enterprise</h3>
+              <p class="text-brand-gray mb-6 h-12">For large-scale, automated, or on-premise deployments.</p>
+              <div class="my-4"><span class="text-5xl font-heading font-extrabold text-brand-dark">Custom</span></div>
+              <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited decisions</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Custom compliance integrations</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>24/7/365 dedicated support</li>
+                <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>On-premise deployment option</li>
+              </ul>
+              <a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-dark text-white font-bold py-3 px-6 rounded-lg hover:bg-brand-green transition-colors">Contact Sales</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section id="demo-bottom" class="bg-brand-dark">
+        <div class="container mx-auto px-6 py-24 text-center">
+          <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">Make Decisions in Seconds</h2>
+          <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.</p>
+          <a href="#" @click.prevent="page = 'demo'" class="bg-brand-green text-white font-bold py-3.5 px-10 rounded-lg text-lg cta-button">Request Your Demo</a>
+        </div>
+      </section>
+    </div>
+    <!-- [END] HOME PAGE CONTENT -->
+
+    <!-- [START] LOGIN PAGE -->
+    <div x-show="page === 'login'" x-cloak>
+      <div class="flex items-center justify-center min-h-screen bg-brand-light py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+          <div>
+            <a href="#" @click.prevent="page = 'home'" class="flex justify-center items-center space-x-2.5">
+              <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+                <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+            </a>
+            <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">Member Login</h2>
+          </div>
+          <form class="mt-8 space-y-6" action="#" method="POST">
+            <input type="hidden" name="remember" value="true">
+            <div class="rounded-md shadow-sm -space-y-px">
+              <div>
+                <label for="email-address" class="sr-only">Email address</label>
+                <input id="email-address" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-brand-border placeholder-brand-gray text-brand-dark rounded-t-md focus:outline-none focus:ring-brand-green focus:border-brand-green focus:z-10 sm:text-sm" placeholder="Email address">
+              </div>
+              <div>
+                <label for="password" class="sr-only">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-brand-border placeholder-brand-gray text-brand-dark rounded-b-md focus:outline-none focus:ring-brand-green focus:border-brand-green focus:z-10 sm:text-sm" placeholder="Password">
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="text-sm"><a href="#" class="font-medium text-brand-green hover:text-green-700">Forgot your password?</a></div>
+            </div>
+            <div>
+              <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                Sign in
+              </button>
+            </div>
+          </form>
+          <div class="text-center">
+            <a href="#" @click.prevent="page = 'home'" class="font-medium text-brand-green hover:text-green-700">&larr; Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [END] LOGIN PAGE -->
+
+    <!-- [START] DEMO REQUEST PAGE -->
+    <div x-show="page === 'demo'" x-cloak>
+      <div class="min-h-screen bg-brand-light py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-xl mx-auto">
+          <div>
+            <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">Request a Demo</h2>
+            <p class="mt-2 text-center text-lg text-brand-gray">See our AI underwriting platform in action. Fill out the form below to schedule a call.</p>
+          </div>
+          <form class="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-md border border-brand-border" action="#" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="first-name" class="block text-sm font-medium text-brand-dark">First Name</label>
+                <input type="text" name="first-name" id="first-name" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green">
+              </div>
+              <div>
+                <label for="last-name" class="block text-sm font-medium text-brand-dark">Last Name</label>
+                <input type="text" name="last-name" id="last-name" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green">
+              </div>
+            </div>
+            <div>
+              <label for="demo-email" class="block text-sm font-medium text-brand-dark">Work Email</label>
+              <input type="email" name="demo-email" id="demo-email" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green">
+            </div>
+            <div>
+              <label for="company" class="block text-sm font-medium text-brand-dark">Company</label>
+              <input type="text" name="company" id="company" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green">
+            </div>
+            <div>
+              <label for="message" class="block text-sm font-medium text-brand-dark">Message (Optional)</label>
+              <textarea id="message" name="message" rows="4" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green"></textarea>
+            </div>
+            <div>
+              <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                Submit Request
+              </button>
+            </div>
+          </form>
+          <div class="text-center mt-6">
+            <a href="#" @click.prevent="page = 'home'" class="font-medium text-brand-green hover:text-green-700">&larr; Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [END] DEMO REQUEST PAGE -->
+  </main>
+
+  <footer class="bg-white border-t border-brand-border">
+    <div class="container mx-auto px-6 py-16">
+      <div class="flex flex-col md:flex-row justify-between">
+        <div class="mb-8 md:mb-0 max-w-sm">
+          <a href="#" @click.prevent="page = 'home'" class="flex items-center space-x-2.5 mb-4">
+            <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
+              <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+          </a>
+          <p class="text-brand-gray">The AI Verification Standard for fair, fast, and compliant decision-making.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div>
+            <h4 class="font-semibold text-brand-dark mb-4">Platform</h4>
+            <ul class="space-y-3">
+              <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-green">Model Auditing</a></li>
+              <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-green">Bias & Fairness</a></li>
+              <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-green">Compliance Hub</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-dark mb-4">Company</h4>
+            <ul class="space-y-3">
+              <li><a href="#" class="text-brand-gray hover:text-brand-green">About Us</a></li>
+              <li><a href="#" class="text-brand-gray hover:text-brand-green">Careers</a></li>
+              <li><a href="#" class="text-brand-gray hover:text-brand-green">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-dark mb-4">Legal</h4>
+            <ul class="space-y-3">
+              <li><a href="#" class="text-brand-gray hover:text-brand-green">Privacy Policy</a></li>
+              <li><a href="#" class="text-brand-gray hover:text-brand-green">Terms of Service</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-brand-border pt-8 text-center text-brand-gray text-sm">
+        &copy; 2024 TrustBureau.ai, Inc. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  // Business Report Generator
+  document.getElementById('generate-report-btn')?.addEventListener('click', function() {
+    const businessName = document.getElementById('business-name').value.trim();
+    
+    if (!businessName) {
+      alert('Please enter a business name');
+      return;
+    }
+
+    // Show results container
+    document.getElementById('report-results-container').style.display = 'block';
+    
+    // Show loader, hide other elements
+    document.getElementById('report-loader').style.display = 'flex';
+    document.getElementById('report-error-container').style.display = 'none';
+    document.getElementById('report-content').style.display = 'none';
+    
+    // Disable button
+    this.disabled = true;
+    
+    // Simulate API call with setTimeout
+    setTimeout(() => {
+      // Hide loader, show content
+      document.getElementById('report-loader').style.display = 'none';
+      document.getElementById('report-content').style.display = 'block';
+      
+      // Generate mock data
+      const score = Math.floor(Math.random() * 400) + 600; // Random score 600-999
+      const scoreElement = document.getElementById('report-score-digit');
+      const circleElement = document.getElementById('report-score-circle');
+      
+      scoreElement.textContent = score;
+      
+      // Set score color class
+      circleElement.className = 'score-circle mb-4'; // Reset classes
+      if (score < 700) {
+        circleElement.classList.add('score-red');
+      } else if (score < 850) {
+        circleElement.classList.add('score-yellow');
+      } else {
+        circleElement.classList.add('score-green');
+      }
+      
+      // Populate mock data
+      document.getElementById('report-title').textContent = businessName;
+      document.getElementById('report-summary').textContent = `${businessName} is a business entity that we've analyzed using publicly available data and AI-driven insights.`;
+      
+      // Mock corporate filings
+      document.getElementById('report-sos-name').textContent = businessName.toUpperCase();
+      document.getElementById('report-sos-entity').textContent = 'Limited Liability Company';
+      document.getElementById('report-sos-status').textContent = 'Active';
+      document.getElementById('report-sos-jurisdiction').textContent = 'Delaware';
+      document.getElementById('report-sos-date').textContent = '2020-03-15';
+      document.getElementById('report-sos-agent').textContent = 'Registered Agent Inc.';
+      
+      // Re-enable button
+      document.getElementById('generate-report-btn').disabled = false;
+    }, 2000);
+  });
+
+  // Pre-Approval Generator
+  document.getElementById('generate-pre-approval-btn')?.addEventListener('click', function() {
+    // Show results container
+    document.getElementById('pre-approval-results-container').style.display = 'block';
+    
+    // Show loader, hide other elements
+    document.getElementById('pre-approval-loader').style.display = 'flex';
+    document.getElementById('pre-approval-error-container').style.display = 'none';
+    document.getElementById('pre-approval-content').style.display = 'none';
+    
+    // Disable button
+    this.disabled = true;
+    
+    // Get input values
+    const monthlyRevenue = parseInt(document.getElementById('pre-approval-monthly-revenue').value);
+    const ficoScore = parseInt(document.getElementById('pre-approval-fico').value);
+    
+    // Simulate API call
+    setTimeout(() => {
+      // Hide loader, show content
+      document.getElementById('pre-approval-loader').style.display = 'none';
+      document.getElementById('pre-approval-content').style.display = 'block';
+      
+      // Generate mock pre-approval terms based on inputs
+      const loanAmount = Math.min(monthlyRevenue * 1.5, 250000);
+      const locLimit = Math.min(monthlyRevenue * 1, 100000);
+      const mcaAmount = Math.min(monthlyRevenue * 1.2, 150000);
+      
+      // Populate loan terms
+      document.getElementById('loan-amount').textContent = `$${loanAmount.toLocaleString()}`;
+      document.getElementById('loan-status').textContent = ficoScore > 700 ? 'APPROVED' : 'CONDITIONAL';
+      document.getElementById('loan-status').className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 ' + (ficoScore > 700 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700');
+      document.getElementById('loan-term').textContent = '12 months';
+      document.getElementById('loan-rate').textContent = `${(8 + (850 - ficoScore) / 50).toFixed(1)}%`;
+      document.getElementById('loan-payback').textContent = 'Monthly';
+      document.getElementById('loan-payment').textContent = `$${Math.round(loanAmount * (1 + (8 + (850 - ficoScore) / 50)/100) / 12).toLocaleString()}`;
+      
+      // Populate line of credit
+      document.getElementById('loc-limit').textContent = `$${locLimit.toLocaleString()}`;
+      document.getElementById('loc-status').textContent = ficoScore > 680 ? 'APPROVED' : 'REVIEW';
+      document.getElementById('loc-status').className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 ' + (ficoScore > 680 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700');
+      document.getElementById('loc-rate').textContent = `Prime + ${(6 + (850 - ficoScore) / 60).toFixed(1)}%`;
+      
+      // Populate MCA
+      document.getElementById('mca-amount').textContent = `$${mcaAmount.toLocaleString()}`;
+      document.getElementById('mca-status').textContent = 'AVAILABLE';
+      document.getElementById('mca-status').className = 'float-right text-xs font-bold uppercase px-2 py-1 rounded -mt-2 -mr-1 bg-blue-100 text-blue-700';
+      const factor = 1.2 + (850 - ficoScore) / 1000;
+      document.getElementById('mca-factor').textContent = `${factor.toFixed(2)}x`;
+      document.getElementById('mca-payback').textContent = `$${Math.round(mcaAmount * factor).toLocaleString()}`;
+      document.getElementById('mca-remittance').textContent = `~10% of sales`;
+      
+      // Re-enable button
+      document.getElementById('generate-pre-approval-btn').disabled = false;
+    }, 1500);
+  });
+  </script>
+
+</body>
+</html>
