@@ -496,6 +496,28 @@
       throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
     }
 
+    /* ===================== Fetch helper ===================== */
+    async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
+      let lastError;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try { body = await res.json(); } catch {}
+            const msg = body?.error?.message || res.statusText || 'Request failed';
+            const err = new Error(`${msg} (HTTP ${res.status})`);
+            err.code = body?.error?.status;
+            throw err;
+          }
+          return await res.json();
+        } catch (e) {
+          lastError = e;
+          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+        }
+      }
+      throw lastError || new Error('API request failed.');
+    }
+
     /* ===================== API (v1, JSON response) ===================== */
     function makePayload(systemPrompt, userQuery) {
       return {
