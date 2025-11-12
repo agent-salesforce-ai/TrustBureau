@@ -111,3 +111,101 @@ When asked to:
 - Ensure mobile responsiveness
 - Keep page load times fast by avoiding unnecessary assets
 - Maintain accessibility standards (WCAG 2.1)
+
+## Security Guidelines
+
+### API Key Management
+- **Never commit API keys**: All API keys (Google Gemini, OpenCorporates) should be handled client-side or through environment variables
+- **Review JavaScript**: Before committing changes to JavaScript that handles API calls, ensure no hardcoded credentials are present
+- **External API calls**: Always validate and sanitize user inputs before sending to external APIs
+
+### Content Security
+- Maintain existing CORS policies
+- Avoid introducing inline JavaScript unless it matches existing patterns
+- Keep CDN resources to trusted sources only (Tailwind, Alpine.js, Google Fonts)
+
+### Input Validation
+- Validate all user inputs in forms and interactive elements
+- Sanitize data displayed from external APIs to prevent XSS attacks
+- Use Alpine.js's built-in protections for data binding
+
+## Testing and Validation
+
+### Browser Testing Workflow
+1. **Local Testing**: Open HTML files directly in a browser using `file://` protocol or a simple HTTP server
+2. **Manual Testing Checklist**:
+   - Test all interactive elements (buttons, forms, navigation)
+   - Verify responsive design on mobile (375px), tablet (768px), and desktop (1280px) viewports
+   - Check Alpine.js functionality (dropdowns, modals, dynamic content)
+   - Verify all external links and internal navigation
+   - Test with JavaScript disabled to ensure graceful degradation
+
+3. **HTML Validation**: Use [W3C Validator](https://validator.w3.org/nu/) for structural changes
+4. **Accessibility Testing**: Use browser DevTools accessibility features or [WAVE tool](https://wave.webaim.org/)
+
+### Simple Local Server for Testing
+```bash
+# Python 3
+python3 -m http.server 8000
+
+# Then visit http://localhost:8000 in your browser
+```
+
+## Troubleshooting
+
+### Common Issues
+- **Alpine.js not working**: Check that `defer` is used on the Alpine.js script tag and components are loaded after DOM
+- **Tailwind classes not applying**: Verify CDN is accessible and config is properly set in the `<script>` tag
+- **Responsive design broken**: Test with DevTools mobile view and check Tailwind responsive prefixes (sm:, md:, lg:)
+- **Links broken**: Ensure all internal links use relative paths and external links include `https://`
+
+### When Things Go Wrong
+1. Validate HTML structure first
+2. Check browser console for JavaScript errors
+3. Verify CDN resources are loading (Network tab in DevTools)
+4. Test in an incognito window to rule out cache issues
+
+## Examples
+
+### Good Changes ✅
+```html
+<!-- Adding a new feature with proper Tailwind classes and Alpine.js -->
+<div x-data="{ open: false }" class="relative">
+  <button @click="open = !open" 
+          class="px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-opacity-90 transition-colors">
+    Toggle Menu
+  </button>
+  <div x-show="open" 
+       x-transition
+       class="absolute mt-2 bg-white rounded-lg shadow-lg border border-brand-border">
+    <!-- Menu content -->
+  </div>
+</div>
+```
+
+### Changes to Avoid ❌
+```html
+<!-- DON'T: Introducing new dependencies or build tools -->
+<script src="node_modules/some-library/dist/lib.js"></script>
+
+<!-- DON'T: Inline styles when Tailwind utilities exist -->
+<div style="background-color: #00C09A; padding: 16px;">
+
+<!-- DON'T: Breaking existing CDN patterns -->
+<link rel="stylesheet" href="custom-local-styles.css">
+
+<!-- DON'T: Complex JavaScript that should use Alpine.js -->
+<script>
+  document.getElementById('btn').addEventListener('click', function() {
+    // Complex logic...
+  });
+</script>
+```
+
+## What Not to Change
+
+- **CNAME file**: Do not modify unless explicitly asked - it's required for custom domain
+- **CDN URLs**: Keep using CDN-hosted libraries (don't download and host locally)
+- **Brand colors**: Use the defined color tokens, don't introduce new colors without approval
+- **File structure**: Keep the flat structure - don't create subdirectories unless necessary
+- **Core Alpine.js patterns**: Maintain the existing Alpine.js coding patterns across files
