@@ -520,14 +520,19 @@
 
     /* ===================== API (v1, JSON response) ===================== */
     function makePayload(systemPrompt, userQuery) {
+      // Combine system prompt and user query into a single user message
+      const fullPrompt = `${systemPrompt}
+
+${userQuery}
+
+IMPORTANT: Return ONLY valid JSON (no markdown, no code fences).`;
+
       return {
-        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
         generationConfig: {
           maxOutputTokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
-          topP: 0.95,
-          responseMimeType: "application/json"
+          topP: 0.95
         }
       };
     }
@@ -553,8 +558,8 @@
             if (!cand) throw new Error('No candidates in response.');
             const json = parseCandidateJSON(cand);
 
-            const atts = cand?.groundingMetadata?.groundingAttributions || [];
-            const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+            // In v1, grounding metadata isn't returned in the same way, so we just return an empty array.
+            const sources = [];
 
             return { json, sources };
           } catch (e) {
