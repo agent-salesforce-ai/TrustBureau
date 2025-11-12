@@ -84,11 +84,72 @@
         </svg>
         <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
       </a>
-      <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
-        <span aria-hidden="true">←</span> Back to Main
-      </a>
+      <div class="flex items-center gap-3">
+        <button id="settings-btn" class="text-brand-dark hover:text-brand-green transition-colors p-2 rounded-lg hover:bg-brand-light" aria-label="Settings" title="Settings">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+        <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
+          <span aria-hidden="true">←</span> Back to Main
+        </a>
+      </div>
     </nav>
   </header>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div id="settings-overlay" class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-brand-green bg-opacity-10 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+              <h3 class="text-lg leading-6 font-heading font-bold text-brand-dark">Settings</h3>
+              <div class="mt-4">
+                <form id="settings-form" class="space-y-4">
+                  <div>
+                    <label for="api-key-input" class="block text-sm font-medium text-brand-dark mb-1">
+                      Google Gemini API Key
+                    </label>
+                    <input type="password" id="api-key-input" placeholder="AIza..." 
+                           class="w-full px-3 py-2 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm">
+                    <p class="mt-2 text-xs text-brand-gray">
+                      Your API key is stored locally in your browser and never sent to our servers.
+                      <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener" class="text-brand-green hover:underline">Get your API key here</a>
+                    </p>
+                  </div>
+                  <div id="settings-message" class="hidden text-sm p-3 rounded-md"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" id="save-settings-btn"
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-green text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green sm:ml-3 sm:w-auto sm:text-sm">
+            Save
+          </button>
+          <button type="button" id="cancel-settings-btn"
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+          <button type="button" id="clear-settings-btn"
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-red-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto sm:text-sm">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Hero / Search (Centered) -->
   <section class="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14">
@@ -324,8 +385,106 @@
   </footer>
 
   <script>
+    /* ===================== Settings Management ===================== */
+    const SettingsManager = {
+      STORAGE_KEY: 'trustbureau_api_key',
+      
+      getApiKey() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored && stored.trim()) {
+          return stored.trim();
+        }
+        return "AIzaSyBnqELMSwalpd6M2rlx4W6NapzwUuPUU1s";
+      },
+      
+      saveApiKey(apiKey) {
+        if (!apiKey || !apiKey.trim()) {
+          throw new Error('API key cannot be empty');
+        }
+        const trimmedKey = apiKey.trim();
+        if (!trimmedKey.startsWith('AIza')) {
+          throw new Error('Invalid API key format. Gemini API keys typically start with "AIza"');
+        }
+        localStorage.setItem(this.STORAGE_KEY, trimmedKey);
+      },
+      
+      clearApiKey() {
+        localStorage.removeItem(this.STORAGE_KEY);
+      },
+      
+      hasCustomKey() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        return !!(stored && stored.trim());
+      }
+    };
+
+    /* ===================== Settings UI ===================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('settings-modal');
+      const settingsBtn = document.getElementById('settings-btn');
+      const cancelBtn = document.getElementById('cancel-settings-btn');
+      const saveBtn = document.getElementById('save-settings-btn');
+      const clearBtn = document.getElementById('clear-settings-btn');
+      const overlay = document.getElementById('settings-overlay');
+      const apiKeyInput = document.getElementById('api-key-input');
+      const messageDiv = document.getElementById('settings-message');
+      
+      function openModal() {
+        modal.classList.remove('hidden');
+        if (SettingsManager.hasCustomKey()) {
+          apiKeyInput.value = SettingsManager.getApiKey();
+        }
+      }
+      
+      function closeModal() {
+        modal.classList.add('hidden');
+        messageDiv.classList.add('hidden');
+      }
+      
+      function showMessage(text, isError = false) {
+        messageDiv.textContent = text;
+        messageDiv.className = `text-sm p-3 rounded-md ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+        messageDiv.classList.remove('hidden');
+        setTimeout(() => messageDiv.classList.add('hidden'), 5000);
+      }
+      
+      settingsBtn.addEventListener('click', openModal);
+      cancelBtn.addEventListener('click', closeModal);
+      overlay.addEventListener('click', closeModal);
+      
+      saveBtn.addEventListener('click', () => {
+        try {
+          const apiKey = apiKeyInput.value.trim();
+          if (!apiKey) {
+            showMessage('Please enter an API key', true);
+            return;
+          }
+          SettingsManager.saveApiKey(apiKey);
+          showMessage('API key saved successfully! Reload the page for changes to take effect.');
+          setTimeout(closeModal, 2000);
+        } catch (error) {
+          showMessage(error.message, true);
+        }
+      });
+      
+      clearBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear your saved API key? The default key will be used instead.')) {
+          SettingsManager.clearApiKey();
+          apiKeyInput.value = '';
+          showMessage('API key cleared. Reload the page to use the default key.');
+        }
+      });
+      
+      apiKeyInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveBtn.click();
+        }
+      });
+    });
+
     /* ===================== Config ===================== */
-    const zakk = "AIzaSyBnqELMSwalpd6M2rlx4W6NapzwUuPUU1s";    // or set window.zakk at runtime
+    const zakk = SettingsManager.getApiKey();
     const PROXY_BASE = "";                 // optional proxy base (leave empty for direct)
     const MODEL_CANDIDATES = [
       'gemini-2.5-flash-preview-09-2025',
@@ -336,9 +495,7 @@
 
     /* ===================== Utilities ===================== */
     function getApiKey() {
-      const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-      return fromWindow || fromConst;
+      return SettingsManager.getApiKey();
     }
     function makeUrl(model, key) {
       if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models/${model}:generateContent`;
