@@ -4,6 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live AI Business Report — TrustBureau.ai</title>
+  <!-- PWA Support -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00C09A">
+  <meta name="description" content="Live AI-powered business verification and reports">
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -38,7 +42,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
 
   <style>
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:#fff; color: #0F172A; }
     .card { border:1px solid #E5E7EB; border-radius:.75rem; background:#fff; box-shadow: var(--shadow, 0 10px 20px rgba(0,0,0,.04)); }
     .cta { background:#00C09A; color:#fff; font-weight:700; border-radius:.5rem; transition: transform .15s ease, box-shadow .15s ease; }
     .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,192,154,.15); }
@@ -51,6 +55,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.1s ease-in-out infinite; border-radius:.5rem; }
+    #search-suggestions button:hover { background: #F8FAFC; }
   </style>
 </head>
 
@@ -66,9 +71,16 @@
         <span class="font-heading text-lg md:text-xl font-extrabold">TrustBureau.ai</span>
       </a>
 
-      <a href="/" class="text-sm text-brand-gray hover:text-brand-green flex items-center gap-1">
-        <span aria-hidden="true">←</span> Back to Main
-      </a>
+      <div class="flex items-center gap-3">
+        <button id="help-btn" class="text-sm text-brand-gray hover:text-brand-green" title="Keyboard shortcuts (?)">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </button>
+        <a href="/" class="text-sm text-brand-gray hover:text-brand-green flex items-center gap-1">
+          <span aria-hidden="true">←</span> Back to Main
+        </a>
+      </div>
     </div>
   </header>
 
@@ -78,27 +90,34 @@
     <p class="text-center text-brand-gray mt-3">Search by <span class="font-semibold">company name or website</span> • Real-time data</p>
 
     <div class="card p-3 md:p-4 mt-6">
-      <form id="search-form" class="flex flex-col sm:flex-row gap-3" autocomplete="off">
-        <input id="query" class="flex-1 px-4 py-3 rounded-lg border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-green"
-               placeholder="e.g., Apple Inc., aquamark.io, tesla.com, microsoft.com">
-        <button id="btn-generate" class="cta px-5 py-3 text-lg inline-flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
-          Generate
-        </button>
+      <form id="search-form" class="relative" autocomplete="off">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input id="query" class="flex-1 px-4 py-3 rounded-lg border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-green"
+                 placeholder="e.g., Apple Inc., aquamark.io, tesla.com, microsoft.com">
+          <button id="btn-generate" class="cta px-5 py-3 text-lg inline-flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
+            Generate
+          </button>
+        </div>
+        <!-- Autocomplete dropdown -->
+        <div id="search-suggestions" class="absolute z-20 w-full mt-1 bg-white border border-brand-border rounded-lg shadow-lg hidden"></div>
       </form>
-      <p class="text-xs text-brand-gray mt-2">Tip: Enter a company name OR website domain for best results</p>
+      <p class="text-xs text-brand-gray mt-2">Tip: Enter a company name OR website domain • Press <kbd class="px-1.5 py-0.5 text-xs bg-gray-100 rounded">⌘K</kbd> to focus search</p>
     </div>
 
-    <div class="flex justify-center mt-4">
+    <div class="flex justify-center gap-2 mt-4">
       <button id="btn-sample" class="text-xs px-3 py-1.5 border border-brand-border rounded hover:bg-brand-light">Load sample report</button>
+      <button id="btn-insights" class="text-xs px-3 py-1.5 border border-brand-border rounded hover:bg-brand-light hidden">View insights</button>
     </div>
   </section>
 
   <!-- Results -->
   <section id="results" class="max-w-6xl mx-auto px-4 pb-16 mt-8 hidden">
     <!-- Controls -->
-    <div class="flex items-center gap-2 mb-4">
-      <button id="btn-rerun" class="px-3 py-1.5 rounded bg-brand-light text-brand-dark border border-brand-border hover:bg-white">Re‑run</button>
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+      <button id="btn-rerun" class="px-3 py-1.5 rounded bg-brand-light border border-brand-border hover:bg-white">Re‑run</button>
+      
+      <button id="btn-compare" class="px-3 py-1.5 rounded bg-brand-green text-white hover:bg-green-600 hidden">Compare (0)</button>
 
       <div class="relative inline-block">
         <button id="btn-share" class="px-3 py-1.5 rounded border border-brand-border hover:bg-brand-light">Share ▾</button>
@@ -115,6 +134,8 @@
           <button class="w-full text-left px-3 py-2 hover:bg-brand-light text-sm" id="export-print">Print / Save PDF</button>
         </div>
       </div>
+
+      <div id="cache-indicator" class="ml-auto text-xs text-brand-green hidden">✓ Cached</div>
     </div>
 
     <!-- Loader -->
@@ -132,7 +153,7 @@
           <div class="w-full bg-gray-100 rounded-full h-2 mt-2 overflow-hidden">
             <span id="bar" class="block h-2 bg-brand-green" style="width:8%"></span>
           </div>
-          <p class="text-xs text-brand-gray mt-2">Usually 10–30s. If you see a CORS error, host via http(s) and temporarily disable extensions that block requests to generativelanguage.googleapis.com.</p>
+          <p class="text-xs text-brand-gray mt-2">Fetching real-time data and generating AI analysis...</p>
         </div>
       </div>
 
@@ -185,7 +206,7 @@
         <div class="md:col-span-2 space-y-4">
           <div class="card p-5">
             <h3 class="font-semibold mb-3">Business Summary</h3>
-            <p id="summary" class="text-sm text-brand-dark leading-relaxed"></p>
+            <p id="summary" class="text-sm leading-relaxed"></p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div class="p-4 border border-brand-border rounded bg-brand-light/40">
@@ -335,8 +356,12 @@
 
   <!-- =================== APP SCRIPT =================== -->
   <script>
-  // ======= SIMPLE API KEY (no bootstrap; set here) =======
-  const ZAKK = 'YOUR_GEMINI_API_KEY_HERE'; // <— put your key here
+  // API Configuration - REPLACE WITH YOUR OWN API KEY
+  const ZAKK = 'AIzaSyALJS0EyKycDIIG9TVQWclOaH96BcJk4lQ'; // ← Replace this with your actual Gemini API key
+  const MODEL_CANDIDATES = ['gemini-1.5-flash-latest', 'gemini-1.5-pro-latest'];
+  const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+  const MAX_OUTPUT_TOKENS = 8192;
+
   function getApiKey() {
     if (!ZAKK || /YOUR_GEMINI_API_KEY_HERE/.test(ZAKK)) {
       throw new Error('Missing API key. Set const ZAKK near the top of the file.');
@@ -346,9 +371,9 @@
 
   // ------- Small helpers
   const $ = (id) => document.getElementById(id);
-  const show = (el) => el.classList.remove('hidden');
-  const hide = (el) => el.classList.add('hidden');
-  const txt  = (el, v) => { el.textContent = v && String(v).trim() ? v : 'N/A'; };
+  const show = (el) => el?.classList.remove('hidden');
+  const hide = (el) => el?.classList.add('hidden');
+  const txt  = (el, v) => { if(el) el.textContent = v && String(v).trim() ? v : 'N/A'; };
 
   function linkify(url, label) {
     if (!url) return 'N/A';
@@ -358,34 +383,647 @@
       return `<a href="${u.toString()}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${label || d}</a>`;
     } catch { return url; }
   }
+  
   function mapEmbedSrc(addr) {
     if (!addr || !addr.trim()) return '';
     return 'https://www.google.com/maps?q=' + encodeURIComponent(addr) + '&output=embed';
   }
 
+  // ======= API HELPERS =======
+  function makeUrl(model, key) {
+    return `${DIRECT_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`;
+  }
+
+  function makePayload(systemPrompt, userQuery) {
+    return {
+      contents: [{ role: 'user', parts: [{ text: userQuery }] }],
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      generation_config: {
+        max_output_tokens: MAX_OUTPUT_TOKENS,
+        temperature: 0.2,
+        top_p: 0.95,
+        response_mime_type: "application/json"
+      }
+    };
+  }
+
+  async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          let body = null;
+          try { body = await res.json(); } catch {}
+          const msg = body?.error?.message || res.statusText || 'Request failed';
+          const err = new Error(`${msg} (HTTP ${res.status})`);
+          err.code = body?.error?.status;
+          throw err;
+        }
+        return await res.json();
+      } catch (e) {
+        lastError = e;
+        if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+      }
+    }
+    throw lastError || new Error('API request failed.');
+  }
+
+  // ======= 1. REAL-TIME DATA SOURCES =======
+  const DataSources = {
+    async fetchFromOpenCorporates(companyName) {
+      try {
+        const response = await fetch(`https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(companyName)}&jurisdiction_code=us&per_page=1`);
+        const data = await response.json();
+        return data?.results?.[0]?.company || null;
+      } catch (e) {
+        console.error('OpenCorporates fetch failed:', e);
+        return null;
+      }
+    },
+
+    async verifyDomain(domain) {
+      try {
+        const response = await fetch(`https://api.domainsdb.info/v1/domains/search?domain=${domain}&zone=com`);
+        const data = await response.json();
+        return data?.domains?.[0] || null;
+      } catch (e) {
+        console.error('Domain verification failed:', e);
+        return null;
+      }
+    },
+
+    async enhancePromptWithRealData(query) {
+      const realData = {};
+      if (query.includes('.')) {
+        realData.domain = await this.verifyDomain(query);
+      } else {
+        realData.company = await this.fetchFromOpenCorporates(query);
+      }
+      return realData;
+    }
+  };
+
+  // ======= 2. CACHING SYSTEM =======
+  const CacheManager = {
+    CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours
+    
+    getCacheKey(query) {
+      return `trustbureau_${query.toLowerCase().replace(/\s+/g, '_')}`;
+    },
+    
+    get(query) {
+      const key = this.getCacheKey(query);
+      const cached = localStorage.getItem(key);
+      if (!cached) return null;
+      
+      try {
+        const data = JSON.parse(cached);
+        const age = Date.now() - data.timestamp;
+        if (age > this.CACHE_DURATION) {
+          localStorage.removeItem(key);
+          return null;
+        }
+        return data.report;
+      } catch {
+        return null;
+      }
+    },
+    
+    set(query, report) {
+      const key = this.getCacheKey(query);
+      const data = {
+        timestamp: Date.now(),
+        query: query,
+        report: report
+      };
+      
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        this.cleanup();
+      }
+    },
+    
+    cleanup() {
+      const keys = Object.keys(localStorage)
+        .filter(k => k.startsWith('trustbureau_'));
+      
+      const items = keys.map(k => ({
+        key: k,
+        data: JSON.parse(localStorage.getItem(k))
+      })).sort((a, b) => a.data.timestamp - b.data.timestamp);
+      
+      items.slice(0, Math.floor(items.length / 2))
+        .forEach(item => localStorage.removeItem(item.key));
+    }
+  };
+
+  // ======= 3. SEARCH HISTORY =======
+  const SearchHistory = {
+    MAX_ITEMS: 20,
+    
+    get() {
+      const history = localStorage.getItem('trustbureau_history');
+      return history ? JSON.parse(history) : [];
+    },
+    
+    add(query, companyName) {
+      let history = this.get();
+      history = history.filter(h => h.query !== query);
+      
+      history.unshift({
+        query,
+        companyName,
+        timestamp: Date.now()
+      });
+      
+      history = history.slice(0, this.MAX_ITEMS);
+      localStorage.setItem('trustbureau_history', JSON.stringify(history));
+    },
+    
+    getSuggestions(input) {
+      const history = this.get();
+      const lower = input.toLowerCase();
+      
+      return history
+        .filter(h => 
+          h.query.toLowerCase().includes(lower) || 
+          h.companyName.toLowerCase().includes(lower)
+        )
+        .slice(0, 5);
+    }
+  };
+
+  function addAutocomplete() {
+    const input = document.getElementById('query');
+    const suggestions = document.getElementById('search-suggestions');
+    
+    if (!input || !suggestions) return;
+    
+    input.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (value.length < 2) {
+        suggestions.classList.add('hidden');
+        return;
+      }
+      
+      const matches = SearchHistory.getSuggestions(value);
+      if (matches.length === 0) {
+        suggestions.classList.add('hidden');
+        return;
+      }
+      
+      suggestions.innerHTML = matches.map(m => `
+        <button class="w-full text-left px-4 py-2 hover:bg-brand-light flex justify-between items-center">
+          <span>${m.companyName}</span>
+          <span class="text-xs text-brand-gray">${m.query}</span>
+        </button>
+      `).join('');
+      
+      suggestions.classList.remove('hidden');
+      
+      suggestions.querySelectorAll('button').forEach((btn, idx) => {
+        btn.onclick = () => {
+          input.value = matches[idx].query;
+          suggestions.classList.add('hidden');
+          document.getElementById('search-form').dispatchEvent(new Event('submit'));
+        };
+      });
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (input && !input.contains(e.target) && suggestions && !suggestions.contains(e.target)) {
+        suggestions.classList.add('hidden');
+      }
+    });
+  }
+
+  // ======= 4. ERROR HANDLING =======
+  const ErrorHandler = {
+    async withRetry(fn, maxRetries = 3, delay = 1000) {
+      let lastError;
+      
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          return await fn();
+        } catch (error) {
+          lastError = error;
+          console.error(`Attempt ${i + 1} failed:`, error);
+          
+          if (i < maxRetries - 1) {
+            await new Promise(resolve => 
+              setTimeout(resolve, delay * Math.pow(2, i))
+            );
+          }
+        }
+      }
+      
+      throw lastError;
+    },
+    
+    categorizeError(error) {
+      const message = error.message || '';
+      
+      if (message.includes('CORS') || message.includes('Failed to fetch')) {
+        return {
+          type: 'network',
+          userMessage: 'Network error. Please check your connection and CORS settings.',
+          technical: message
+        };
+      }
+      
+      if (message.includes('API key')) {
+        return {
+          type: 'auth',
+          userMessage: 'API key issue. Please check your Gemini API key.',
+          technical: message
+        };
+      }
+      
+      if (message.includes('quota') || message.includes('rate limit')) {
+        return {
+          type: 'quota',
+          userMessage: 'API quota exceeded. Please try again later.',
+          technical: message
+        };
+      }
+      
+      return {
+        type: 'unknown',
+        userMessage: 'An unexpected error occurred.',
+        technical: message
+      };
+    },
+    
+    displayError(error) {
+      const categorized = this.categorizeError(error);
+      const errorEl = document.getElementById('error');
+      
+      if (!errorEl) return;
+      
+      errorEl.innerHTML = `
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-red-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <div class="flex-1">
+            <div class="font-semibold">${categorized.userMessage}</div>
+            <details class="mt-2">
+              <summary class="text-sm cursor-pointer hover:text-red-800">Technical details</summary>
+              <pre class="text-xs mt-2 p-2 bg-red-100 rounded overflow-x-auto">${categorized.technical}</pre>
+            </details>
+            ${categorized.type === 'network' ? `
+              <div class="mt-3 text-sm">
+                <p class="font-medium">Troubleshooting tips:</p>
+                <ul class="list-disc list-inside mt-1 space-y-1">
+                  <li>Host this file via HTTP(S) server, not file://</li>
+                  <li>Disable ad blockers and privacy extensions temporarily</li>
+                  <li>Check browser console for CORS errors</li>
+                </ul>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      
+      errorEl.classList.remove('hidden');
+    }
+  };
+
+  // ======= 5. PROMPT BUILDING =======
+  function buildSystemPrompt() {
+    return \`
+You are a meticulous US-focused business analyst. Return a SINGLE JSON object ONLY (no commentary, no code fences). 
+Prioritize US Secretary‑of‑State and corporate registry data for contact address. Use "N/A" when unknown.
+
+JSON schema:
+{
+  "summary": { "companyName": string, "summary": string },
+  "sos": { "entityName": string, "status": string, "entityType": string, "jurisdiction": string, "formationDate": string, "registeredAgent": string, "registeredAddress": string },
+  "publicRecords": [{ "type": string, "details": string }],
+  "riskScore": { "score": number, "justification": string, "positiveFactors": [string], "negativeFactors": [string] },
+  "reviews": [{ "snippet": string, "source": string, "url": string }],
+  "chartPoints": { "revenue": [number], "cashFlow": [number] },
+  "kpis": [{ "metric": string, "q1": string, "q2": string, "q3": string, "q4": string, "yoy": string }],
+  "profile": { "founded": string, "headquarters": string, "employees": string, "website": string, "industry": string, "ticker": string, "phone": string, "email": string },
+  "news": [{ "title": string, "date": string, "source": string, "url": string }],
+  "leadership": [{ "name": string, "title": string, "linkedin": string }],
+  "products": [string],
+  "competitors": [string],
+  "webPresence": { "twitter": string, "linkedin": string, "youtube": string, "traffic": string },
+  "contact": { "phone": string, "email": string, "address": string },
+  "highlights": [string],
+  "citations": [{ "title": string, "url": string }]
+}
+
+- riskScore.score: 300 (high risk) to 850 (low risk).
+- Use contact.address from SOS filings if available
+Return valid JSON only.
+    \`.trim();
+  }
+
+  // ======= 6. COMPARISON MODE =======
+  const ComparisonMode = {
+    companies: [],
+    maxCompanies: 3,
+    
+    add(report) {
+      if (this.companies.length >= this.maxCompanies) {
+        this.companies.shift();
+      }
+      this.companies.push(report);
+      this.updateUI();
+    },
+    
+    updateUI() {
+      const btn = document.getElementById('btn-compare');
+      if (btn && this.companies.length > 1) {
+        btn.classList.remove('hidden');
+        btn.textContent = \`Compare (\${this.companies.length})\`;
+      }
+    },
+    
+    showComparison() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+      modal.innerHTML = \`
+        <div class="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto p-6">
+          <h2 class="text-2xl font-bold mb-4">Company Comparison</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-2 pr-4">Metric</th>
+                  \${this.companies.map(c => 
+                    \`<th class="text-left py-2 pr-4">\${c.summary?.companyName || 'N/A'}</th>\`
+                  ).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                \${this.getComparisonRows()}
+              </tbody>
+            </table>
+          </div>
+          <button class="mt-4 px-4 py-2 bg-brand-gray text-white rounded" onclick="this.parentElement.parentElement.remove()">Close</button>
+        </div>
+      \`;
+      document.body.appendChild(modal);
+      
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+    },
+    
+    getComparisonRows() {
+      const metrics = [
+        ['Risk Score', c => c.riskScore?.score || 'N/A'],
+        ['Industry', c => c.profile?.industry || 'N/A'],
+        ['Employees', c => c.profile?.employees || 'N/A'],
+        ['Founded', c => c.profile?.founded || 'N/A'],
+        ['Headquarters', c => c.profile?.headquarters || 'N/A'],
+        ['Status', c => c.sos?.status || 'N/A'],
+      ];
+      
+      return metrics.map(([label, getter]) => \`
+        <tr class="border-t">
+          <td class="py-2 pr-4 font-medium">\${label}</td>
+          \${this.companies.map(c => {
+            const value = getter(c);
+            const isScore = label === 'Risk Score';
+            const scoreClass = isScore ? 
+              (value < 550 ? 'text-red-600' : 
+               value < 700 ? 'text-yellow-600' : 
+               'text-green-600') : '';
+            return \`<td class="py-2 pr-4 \${scoreClass}">\${value}</td>\`;
+          }).join('')}
+        </tr>
+      \`).join('');
+    }
+  };
+
+  // ======= 7. ANALYTICS =======
+  const Analytics = {
+    track(event, properties = {}) {
+      const data = {
+        event,
+        timestamp: Date.now(),
+        properties: {
+          ...properties,
+          sessionId: this.getSessionId()
+        }
+      };
+      
+      this.storeLocal(data);
+    },
+    
+    getSessionId() {
+      let id = sessionStorage.getItem('trustbureau_session');
+      if (!id) {
+        id = Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('trustbureau_session', id);
+      }
+      return id;
+    },
+    
+    storeLocal(data) {
+      const key = \`analytics_\${Date.now()}_\${Math.random()}\`;
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch {
+        this.cleanupOldAnalytics();
+      }
+    },
+    
+    cleanupOldAnalytics() {
+      const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('analytics_'))
+        .forEach(k => {
+          try {
+            const data = JSON.parse(localStorage.getItem(k));
+            if (data.timestamp < oneWeekAgo) {
+              localStorage.removeItem(k);
+            }
+          } catch {
+            localStorage.removeItem(k);
+          }
+        });
+    },
+    
+    getInsights() {
+      const events = Object.keys(localStorage)
+        .filter(k => k.startsWith('analytics_'))
+        .map(k => {
+          try {
+            return JSON.parse(localStorage.getItem(k));
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      
+      return {
+        totalSearches: events.filter(e => e.event === 'search').length,
+        popularQueries: this.getPopularQueries(events),
+        avgGenerationTime: this.getAvgGenerationTime(events),
+        errorRate: this.getErrorRate(events)
+      };
+    },
+    
+    getPopularQueries(events) {
+      const queries = {};
+      events
+        .filter(e => e.event === 'search')
+        .forEach(e => {
+          const q = e.properties.query;
+          queries[q] = (queries[q] || 0) + 1;
+        });
+      
+      return Object.entries(queries)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([query, count]) => ({ query, count }));
+    },
+    
+    getAvgGenerationTime(events) {
+      const times = events
+        .filter(e => e.event === 'report_generated')
+        .map(e => e.properties.duration)
+        .filter(Boolean);
+      
+      if (times.length === 0) return 0;
+      return Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+    },
+    
+    getErrorRate(events) {
+      const total = events.filter(e => e.event === 'search').length;
+      const errors = events.filter(e => e.event === 'error').length;
+      
+      if (total === 0) return 0;
+      return Math.round((errors / total) * 100);
+    }
+  };
+
+  // ======= 8. KEYBOARD SHORTCUTS =======
+  const Shortcuts = {
+    init() {
+      document.addEventListener('keydown', (e) => {
+        // Cmd/Ctrl + K: Focus search
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          const query = document.getElementById('query');
+          if (query) query.focus();
+        }
+        
+        // Cmd/Ctrl + Enter: Submit search
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          const query = document.getElementById('query');
+          const form = document.getElementById('search-form');
+          if (query?.value && form) {
+            form.dispatchEvent(new Event('submit'));
+          }
+        }
+        
+        // Escape: Clear search
+        if (e.key === 'Escape') {
+          const query = document.getElementById('query');
+          if (document.activeElement === query) {
+            query.value = '';
+          }
+          // Also close any modals
+          document.querySelectorAll('.fixed.inset-0').forEach(m => m.remove());
+        }
+        
+        // Cmd/Ctrl + S: Save report
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+          e.preventDefault();
+          if (window.__lastReportJSON) {
+            const exportBtn = document.getElementById('export-json');
+            if (exportBtn) exportBtn.click();
+          }
+        }
+        
+        // ?: Show help
+        if (e.key === '?' && e.shiftKey) {
+          this.showHelp();
+        }
+      });
+    },
+    
+    showHelp() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+      modal.innerHTML = \`
+        <div class="bg-white rounded-lg p-6 max-w-md">
+          <h3 class="font-bold text-lg mb-4">Keyboard Shortcuts</h3>
+          <dl class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <dt class="text-brand-gray">Focus search</dt>
+              <dd class="font-mono bg-gray-100 rounded px-2 py-1">⌘/Ctrl + K</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-brand-gray">Submit search</dt>
+              <dd class="font-mono bg-gray-100 rounded px-2 py-1">⌘/Ctrl + Enter</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-brand-gray">Clear search</dt>
+              <dd class="font-mono bg-gray-100 rounded px-2 py-1">Esc</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-brand-gray">Save report</dt>
+              <dd class="font-mono bg-gray-100 rounded px-2 py-1">⌘/Ctrl + S</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-brand-gray">Show this help</dt>
+              <dd class="font-mono bg-gray-100 rounded px-2 py-1">?</dd>
+            </div>
+          </dl>
+          <button class="mt-4 px-4 py-2 bg-brand-green text-white rounded w-full" onclick="this.parentElement.parentElement.remove()">Close</button>
+        </div>
+      \`;
+      
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+      
+      document.body.appendChild(modal);
+    }
+  };
+
   // ------- Loader timer / bar
   let __timerInt = null, __barInt = null, __t0 = 0;
   function startLoader() {
-    $('error').textContent = '';
-    hide($('error'));
+    const error = $('error');
+    if (error) error.textContent = '';
+    hide(error);
     show($('results'));
-    show($('loader')); hide($('content'));
-    const bar = $('bar'); bar.style.width = '8%';
+    show($('loader')); 
+    hide($('content'));
+    hide($('cache-indicator'));
+    const bar = $('bar'); 
+    if (bar) bar.style.width = '8%';
     __t0 = Date.now();
     __timerInt = setInterval(() => {
       const s = Math.floor((Date.now() - __t0)/1000);
       const mm = String(Math.floor(s/60)).padStart(2,'0');
       const ss = String(s%60).padStart(2,'0');
-      $('timer').textContent = `${mm}:${ss}`;
+      const timer = $('timer');
+      if (timer) timer.textContent = \`\${mm}:\${ss}\`;
     }, 200);
     __barInt = setInterval(() => {
+      const bar = $('bar');
+      if (!bar) return;
       let w = parseFloat(bar.style.width);
       bar.style.width = Math.min(98, w + 1.5) + '%';
     }, 600);
   }
+  
   function stopLoader() {
-    clearInterval(__timerInt); clearInterval(__barInt);
-    $('bar').style.width = '100%';
+    clearInterval(__timerInt); 
+    clearInterval(__barInt);
+    const bar = $('bar');
+    if (bar) bar.style.width = '100%';
     hide($('loader'));
   }
 
@@ -408,11 +1046,12 @@
       }
     }
     const preview = parts.find(p => p?.text)?.text?.slice(0,240)?.replace(/\s+/g,' ') || 'No text content';
-    throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
+    throw new Error(\`Model returned no parseable JSON (preview: \${preview})\`);
   }
 
   // ------- Charts
   function lineChart(container, values, color) {
+    if (!container) return;
     if (!Array.isArray(values) || values.length < 2) {
       container.innerHTML = '<div class="text-sm text-brand-gray">Chart not available.</div>';
       return;
@@ -421,19 +1060,60 @@
     const min = Math.min(...nums), max = Math.max(...nums);
     const norm = (max - min) > 0 ? nums.map(n => (100*(n - min))/(max-min)) : nums.map(_ => 50);
     const step = 100/(norm.length - 1);
-    const pts  = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
+    const pts  = norm.map((v,i) => \`\${(i*step).toFixed(2)},\${(50 - (v/100)*44 - 3).toFixed(2)}\`).join(' ');
     container.innerHTML =
-      `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-        <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
+      \`<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+        <polyline fill="none" stroke="\${color}" stroke-width="2" points="\${pts}" />
         <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-      </svg>`;
+      </svg>\`;
   }
 
-  // ------- Render report
-  function renderReport(d) {
-    stopLoader(); show($('content'));
+  // ------- API Call
+  async function callReportAPI(systemPrompt, userQuery) {
+    const key = getApiKey();
+    
+    let lastErr;
+    for (const model of MODEL_CANDIDATES) {
+      const url = makeUrl(model, key);
+      let payload = makePayload(systemPrompt, userQuery);
+      
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const data = await fetchWithBackoff(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          
+          const cand = data?.candidates?.[0];
+          if (!cand) throw new Error('No candidates in response.');
+          
+          const json = parseCandidateJSON(cand);
+          const atts = cand?.groundingMetadata?.groundingAttributions || [];
+          const sources = atts.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri);
+          
+          return { json, sources };
+        } catch (e) {
+          lastErr = e;
+          const parseIssue = /no parseable JSON|Unexpected end of JSON|Unexpected token|Invalid or unexpected/i.test(e.message || '');
+          
+          if (attempt === 1 && parseIssue) {
+            const stricter = \`\${systemPrompt}\n\nIMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.\`;
+            payload = makePayload(stricter, userQuery);
+            continue;
+          }
+          break;
+        }
+      }
+    }
+    throw lastErr || new Error('All model attempts failed.');
+  }
 
-    // Add generation timestamp
+  // ------- Render report (with defensive checks)
+  function renderReport(d, fromCache = false) {
+    stopLoader(); 
+    show($('content'));
+
     const genTime = new Date().toLocaleString('en-US', { 
       dateStyle: 'medium', 
       timeStyle: 'short' 
@@ -441,360 +1121,346 @@
     
     txt($('title'), d?.summary?.companyName || '—');
     
-    // Update subtitle with timestamp
     const subtitleEl = document.querySelector('#content .text-xs.text-brand-gray');
     if (subtitleEl) {
-      subtitleEl.textContent = `Live business verification snapshot • Generated: ${genTime}`;
+      subtitleEl.innerHTML = \`Live business verification snapshot • Generated: \${genTime}\${fromCache ? ' <span class="text-brand-green">(cached)</span>' : ''}\`;
     }
     
-    $('summary').textContent = d?.summary?.summary || 'No summary provided.';
+    if (fromCache) {
+      show($('cache-indicator'));
+    }
+    
+    const summary = $('summary');
+    if (summary) summary.textContent = d?.summary?.summary || 'No summary provided.';
 
     const s = d?.riskScore || {};
     const score = Number(s.score || 0);
-    $('score-digit').textContent = score || '—';
-    $('score-just').textContent  = s.justification || '—';
+    txt($('score-digit'), score || '—');
+    txt($('score-just'), s.justification);
     const circle = $('score-circle');
-    circle.className = 'score-circle mb-3';
-    if (score < 550) circle.classList.add('score-red');
-    else if (score < 700) circle.classList.add('score-yellow');
-    else circle.classList.add('score-green');
+    if(circle){
+        circle.className = 'score-circle mb-3';
+        if (score < 550) circle.classList.add('score-red');
+        else if (score < 700) circle.classList.add('score-yellow');
+        else circle.classList.add('score-green');
+    }
 
     const pos = s.positiveFactors || s.positives || [];
     const neg = s.negativeFactors || s.negatives || [];
-    $('score-pos').innerHTML = pos.map(t => `<li class="flex items-start gap-2"><span>✔</span><span>${t}</span></li>`).join('') || '<li class="text-brand-gray">—</li>';
-    $('score-neg').innerHTML = neg.map(t => `<li class="flex items-start gap-2"><span>⚠</span><span>${t}</span></li>`).join('') || '<li class="text-brand-gray">—</li>';
+    const scorePos = $('score-pos');
+    if (scorePos) scorePos.innerHTML = pos.map(t => \`<li class="flex items-start gap-2"><span>✔</span><span>\${t}</span></li>\`).join('') || '<li class="text-brand-gray">—</li>';
+    const scoreNeg = $('score-neg');
+    if (scoreNeg) scoreNeg.innerHTML = neg.map(t => \`<li class="flex items-start gap-2"><span>⚠</span><span>\${t}</span></li>\`).join('') || '<li class="text-brand-gray">—</li>';
 
     const sos = d?.sos || {};
     txt($('sos-name'), sos.entityName);
     txt($('sos-type'), sos.entityType);
-    const st = $('sos-status'); st.textContent = sos.status || 'N/A';
-    st.style.background = (String(sos.status||'').toLowerCase() === 'active') ? '#DCFCE7' : '#F1F5F9';
+    const st = $('sos-status'); 
+    if(st) {
+        st.textContent = sos.status || 'N/A';
+        st.style.background = (String(sos.status||'').toLowerCase().includes('active')) ? '#DCFCE7' : '#F1F5F9';
+    }
     txt($('sos-juris'), sos.jurisdiction);
     txt($('sos-date'), sos.formationDate);
     txt($('sos-agent'), sos.registeredAgent);
     txt($('sos-addr'), sos.registeredAddress);
 
     const hi = d?.highlights || [];
-    $('highlights').innerHTML = hi.map(h => `<li>• ${h}</li>`).join('') || '<li class="text-brand-gray">—</li>';
+    const highlights = $('highlights');
+    if(highlights) highlights.innerHTML = hi.map(h => \`<li>• \${h}</li>\`).join('') || '<li class="text-brand-gray">—</li>';
 
     const n = Array.isArray(d?.news) ? d.news.slice(0,6) : [];
-    $('news').innerHTML = n.map(item => {
+    const news = $('news');
+    if (news) news.innerHTML = n.map(item => {
       const src = item.source || 'Source';
-      const date= item.date ? ` • ${item.date}` : '';
-      const url = item.url ? ` href="${item.url}" target="_blank" rel="noopener"` : '';
-      return `<li><a class="text-brand-dark hover:text-brand-green font-medium" ${url}>${item.title || 'Untitled'}</a><div class="text-xs text-brand-gray">${src}${date}</div></li>`;
+      const date= item.date ? \` • \${item.date}\` : '';
+      const url = item.url ? \` href="\${item.url}" target="_blank" rel="noopener"\` : '';
+      return \`<li><a class="font-medium hover:text-brand-green" \${url}>\${item.title || 'Untitled'}</a><div class="text-xs text-brand-gray">\${src}\${date}</div></li>\`;
     }).join('') || '<li class="text-brand-gray">No recent headlines.</li>';
 
-    // Contact & map
-    const addr = sos.registeredAddress || d?.profile?.headquarters || '';
+    const addr = sos.registeredAddress || d?.profile?.headquarters || d?.contact?.address || '';
     txt($('contact-addr'), addr || 'N/A');
-    txt($('contact-phone'), d?.profile?.phone || 'N/A');
-    txt($('contact-email'), d?.profile?.email || 'N/A');
+    txt($('contact-phone'), d?.profile?.phone || d?.contact?.phone || 'N/A');
+    txt($('contact-email'), d?.profile?.email || d?.contact?.email || 'N/A');
     const mapSrc = mapEmbedSrc(addr);
-    $('map-embed').src = mapSrc || 'about:blank';
-    const openMaps = addr ? `https://www.google.com/maps?q=${encodeURIComponent(addr)}` : '#';
-    $('maps-link').href = openMaps;
+    const mapEmbed = $('map-embed');
+    if(mapEmbed) mapEmbed.src = mapSrc || 'about:blank';
+    const openMaps = addr ? \`https://www.google.com/maps?q=\${encodeURIComponent(addr)}\` : '#';
+    const mapsLink = $('maps-link');
+    if(mapsLink) mapsLink.href = openMaps;
 
-    // Public records
-    const recs = d?.publicRecords || d?.public_records || d?.records || [];
-    $('records').innerHTML = recs.map(r => `<li><span class="font-medium">${r.type||'Record'}:</span> ${r.details||''}</li>`).join('') || '<li class="text-brand-gray">No public records found.</li>';
+    const recs = d?.publicRecords || [];
+    const records = $('records');
+    if(records) records.innerHTML = recs.map(r => \`<li><span class="font-medium">\${r.type||'Record'}:</span> \${r.details||''}</li>\`).join('') || '<li class="text-brand-gray">No public records found.</li>';
 
-    // Facts
     const p = d?.profile || {};
     txt($('facts-founded'), p.founded);
     txt($('facts-hq'), p.headquarters);
     txt($('facts-employees'), p.employees);
     txt($('facts-industry'), p.industry || p.subindustry);
-    $('facts-website').innerHTML = p.website ? linkify(p.website) : 'N/A';
+    const factsWebsite = $('facts-website');
+    if(factsWebsite) factsWebsite.innerHTML = p.website ? linkify(p.website) : 'N/A';
     txt($('facts-ticker'), p.ticker);
 
-    // Leadership
     const leaders = d?.leadership || [];
-    $('leadership').innerHTML = leaders.map(l => {
-      const ln = l.linkedin ? ` — <a class="text-brand-green hover:underline" href="${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>` : '';
-      return `<li><span class="font-medium">${l.name||'N/A'}</span> — <span>${l.title||''}</span>${ln}</li>`;
+    const leadership = $('leadership');
+    if (leadership) leadership.innerHTML = leaders.map(l => {
+      const ln = l.linkedin ? \` — <a class="text-brand-green hover:underline" href="\${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>\` : '';
+      return \`<li><span class="font-medium">\${l.name||'N/A'}</span> — <span>\${l.title||''}</span>\${ln}</li>\`;
     }).join('') || '<li class="text-brand-gray">—</li>';
-
-    // Products, Competitors, Social
-    $('products').innerHTML = (d?.products || []).map(i => `<li>• ${i}</li>`).join('') || '<li class="text-brand-gray">—</li>';
-    $('competitors').innerHTML = (d?.competitors || []).map(i => `<li>• ${i}</li>`).join('') || '<li class="text-brand-gray">—</li>';
+    
+    const products = $('products');
+    if(products) products.innerHTML = (d?.products || []).map(i => \`<li>• \${i}</li>\`).join('') || '<li class="text-brand-gray">—</li>';
+    const competitors = $('competitors');
+    if(competitors) competitors.innerHTML = (d?.competitors || []).map(i => \`<li>• \${i}</li>\`).join('') || '<li class="text-brand-gray">—</li>';
+    
     const w = d?.webPresence || {};
-    $('social').innerHTML = [
+    const social = $('social');
+    if(social) social.innerHTML = [
       ['Website Traffic', w.traffic],
       ['Twitter/X', w.twitter ? linkify(w.twitter,'twitter.com') : 'N/A'],
       ['LinkedIn', w.linkedin ? linkify(w.linkedin,'linkedin.com') : 'N/A'],
-      ['YouTube', w.youtube ? linkify(w.youtube,'youtube.com') : 'N/A'],
-      ['Facebook', w.facebook ? linkify(w.facebook,'facebook.com') : 'N/A'],
-    ].map(([k,v])=>`<li><span class="text-brand-gray">${k}:</span> <span class="font-medium">${typeof v==='string'?v:v}</span></li>`).join('');
+      ['YouTube', w.youtube ? linkify(w.youtube,'youtube.com') : 'N/A']
+    ].filter(([,v]) => v).map(([k,v]) => \`<li><span class="text-brand-gray">\${k}:</span> <span class="font-medium">\${v}</span></li>\`).join('') || '<li class="text-brand-gray">—</li>';
 
-    // Reviews
-    $('reviews').innerHTML = (d?.reviews || []).map(r => {
-      const src = r.source ? `<span class="text-xs text-brand-gray">— ${r.source}</span>` : '';
-      const link = r.url ? ` <a href="${r.url}" class="text-xs text-brand-green hover:underline" target="_blank" rel="noopener">Link</a>` : '';
-      return `<blockquote class="p-3 border border-brand-border rounded bg-white"><div class="text-sm">${r.snippet||''}</div><div class="mt-1">${src}${link}</div></blockquote>`;
-    }).join('') || '<div class="text-sm text-brand-gray">No recent customer reviews found.</div>';
+    const reviews = $('reviews');
+    if(reviews) reviews.innerHTML = (d?.reviews || []).map(r => {
+      const url = r.url && /^https?:\/\//.test(r.url) ? 
+        \` — <a href="\${r.url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">\${r.source || 'Source'}</a>\` : 
+        (r.source ? \` — \${r.source}\` : '');
+      return \`<div class="p-3 border border-brand-border rounded bg-white">
+        <p class="text-sm">"\${r.snippet || ''}"</p>
+        <div class="text-xs text-brand-gray mt-1">\${url}</div>
+      </div>\`;
+    }).join('') || '<p class="text-sm text-brand-gray">No reviews found.</p>';
 
-    // Charts
-    const cp = d?.chartPoints || {};
-    lineChart($('chart-revenue'), Array.isArray(cp.revenue)&&cp.revenue.length>1 ? cp.revenue : [30,35,33,40,38,45,50,55,60,62,65,70], '#00C09A');
-    lineChart($('chart-cash'),    Array.isArray(cp.cashFlow)&&cp.cashFlow.length>1 ? cp.cashFlow : [65,60,58,62,59,57,55,54,53,52,51,50], '#3B82F6');
+    const pts = d?.chartPoints || {};
+    lineChart($('chart-revenue'), pts.revenue || [], '#00C09A');
+    lineChart($('chart-cash'), pts.cashFlow || [], '#3B82F6');
 
-    // KPIs
-    const kpis = Array.isArray(d?.kpis) ? d.kpis : [];
-    $('kpis').innerHTML = kpis.map(k =>
-      `<tr class="border-t"><td class="py-2 pr-4">${k.metric||'—'}</td><td class="py-2 pr-4">${k.q1||'—'}</td><td class="py-2 pr-4">${k.q2||'—'}</td><td class="py-2 pr-4">${k.q3||'—'}</td><td class="py-2 pr-4">${k.q4||'—'}</td><td class="py-2 pr-4">${k.yoy||'—'}</td></tr>`
-    ).join('') || `<tr class="border-t"><td colspan="6" class="py-3 text-brand-gray">No KPIs supplied.</td></tr>`;
+    const kpis = d?.kpis || [];
+    const kpisEl = $('kpis');
+    if(kpisEl) kpisEl.innerHTML = kpis.map(k => \`
+      <tr class="border-b">
+        <td class="py-2 pr-4 font-medium">\${k.metric || ''}</td>
+        <td class="py-2 pr-4">\${k.q1 || '—'}</td>
+        <td class="py-2 pr-4">\${k.q2 || '—'}</td>
+        <td class="py-2 pr-4">\${k.q3 || '—'}</td>
+        <td class="py-2 pr-4">\${k.q4 || '—'}</td>
+        <td class="py-2 pr-4 font-medium">\${k.yoy || '—'}</td>
+      </tr>
+    \`).join('') || '<tr><td colspan="6" class="py-4 text-center text-brand-gray">No KPI data available</td></tr>';
 
-    // Sources (auto‑expanded)
-    const cites = Array.isArray(d?.citations) ? d.citations : [];
-    const chips = $('source-chips'), list = $('source-list');
-    chips.innerHTML = ''; list.innerHTML = '';
-    if (cites.length) {
-      cites.forEach(c => {
-        const url = c.url || c.uri;
-        if (!url) return;
-        const a = document.createElement('span');
-        a.className = 'px-2 py-1 border border-brand-border rounded-full bg-brand-light text-xs';
-        a.innerHTML = `🔗 <a href="${url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">${c.title || new URL(url).hostname}</a>`;
-        chips.appendChild(a);
-
+    const citations = d?.citations || [];
+    const sourceChips = $('source-chips');
+    const sourceList = $('source-list');
+    if(sourceChips) sourceChips.innerHTML = '';
+    if(sourceList) sourceList.innerHTML = '';
+    
+    if (citations.length > 0) {
+      citations.forEach(c => {
+        const chip = document.createElement('span');
+        chip.className = 'inline-block px-2 py-1 bg-gray-100 rounded text-xs';
+        chip.innerHTML = \`<a href="\${c.url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">\${c.title || 'Source'}</a>\`;
+        if(sourceChips) sourceChips.appendChild(chip);
+        
         const li = document.createElement('li');
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${c.title || url}</a>
-                        <span class="text-xs text-brand-gray ml-1">(${(new URL(url)).hostname})</span>`;
-        list.appendChild(li);
+        li.className = 'text-sm';
+        li.innerHTML = \`<a href="\${c.url}" class="text-brand-green hover:underline" target="_blank" rel="noopener">\${c.title || c.url}</a>\`;
+        if(sourceList) sourceList.appendChild(li);
       });
-    } else {
-      chips.innerHTML = '<span class="text-sm text-brand-gray">No links captured.</span>';
+    }
+
+    window.__lastReportJSON = d;
+    ComparisonMode.add(d);
+    Analytics.track('report_generated', {
+      query: $('query').value,
+      company: d?.summary?.companyName,
+      duration: Date.now() - __t0,
+      fromCache
+    });
+    
+    if (d?.summary?.companyName) {
+      SearchHistory.add($('query').value, d.summary.companyName);
     }
   }
 
-  // ------- Prompt & API (UPDATED FOR BETTER WEBSITE/NAME SEARCHING)
-  const MODEL_FALLBACKS = [
-    'gemini-2.5-flash',
-    'gemini-2.5-flash-preview-09-2025',
-    'gemini-2.0-flash'
-  ];
-
-  function buildPrompt(q) {
-    // Detect if input looks like a website
-    const isWebsite = q.includes('.') && (q.includes('.com') || q.includes('.io') || q.includes('.org') || q.includes('.net') || q.includes('.co'));
-    
-    const searchInstruction = isWebsite 
-      ? `Find the company that operates the website "${q}". First identify the company behind this domain, then provide all information about that company.`
-      : `Focus on the US company that best matches "${q}". This could be a legal name, DBA, or common name.`;
-
-    // Get current date for context
-    const now = new Date();
-    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
-
-    return `
-You are an AI business analyst. Current date: ${currentDate}. Return ONE JSON object ONLY (no code fences, no commentary).
-
-${searchInstruction}
-
-Search strategy:
-- If given a website (like aquamark.io), identify the company that owns/operates it
-- If given a company name, match against legal names, DBAs, and common trade names
-- For startups/tech companies, website domain is often the best identifier
-- Prefer US Secretary-of-State (SOS) identity fields for official filings when available
-- Prioritize recent information (2024-2025) over older data
-- For news and updates, focus on the most recent 6 months
-
-Fields to include:
-
-1) summary: { companyName, summary }
-2) sos: { entityName, entityType, status, jurisdiction, formationDate, registeredAgent, registeredAddress }
-3) riskScore: { score (300-850), justification, positiveFactors:[string], negativeFactors:[string] }
-4) profile: { founded, headquarters, employees, industry, website, ticker, phone, email }
-5) highlights: [string] // Recent developments and key facts as of ${currentDate}
-6) news: [{ title, date, source, url }] // Most recent news, prioritize 2024-2025
-7) publicRecords: [{ type, details }]
-8) leadership: [{ name, title, linkedin }] // Current leadership as of ${currentDate}
-9) products: [string]
-10) competitors: [string]
-11) webPresence: { twitter, linkedin, youtube, facebook, traffic }
-12) reviews: [{ snippet, source, url }] // Recent reviews from last 12 months
-13) chartPoints: { revenue:[number], cashFlow:[number] }   // 10–24 points each, latest available data
-14) kpis: [{ metric, q1, q2, q3, q4, yoy }] // Most recent fiscal year or quarters
-15) citations: [{ title, url }]
-
-Important: 
-- If searching by website, ensure the 'profile.website' field matches the searched domain
-- The 'summary.companyName' should be the actual company name, not the domain
-- For tech startups, the legal entity name in 'sos.entityName' might differ from the brand name
-- All data should be as current as possible (as of ${currentDate})
-- For financial data and KPIs, indicate the year/quarter being reported
-
-If unknown, use "N/A" or [].
-Respond ONLY with valid JSON.`;
-  }
-
+  // ------- Main generate function
   async function generateReport(query) {
-    const API_KEY = getApiKey(); // throws if missing
-    const base = 'https://generativelanguage.googleapis.com/v1beta/models';
+    if (!query || !query.trim()) {
+      ErrorHandler.displayError(new Error('Please enter a company name or website.'));
+      return;
+    }
 
     startLoader();
-    let lastErr = null;
+    Analytics.track('search', { query });
 
-    for (const model of MODEL_FALLBACKS) {
-      const payload = {
-        contents: [{ role: 'user', parts: [{ text: buildPrompt(query) }] }],
-        generationConfig: {
-          maxOutputTokens: 8192,
-          temperature: 0.2,
-          topP: 0.95,
-          responseMimeType: 'application/json'
-        }
-        // No tools when forcing JSON
-      };
-
-      try {
-        const url = `${base}/${model}:generateContent?key=${encodeURIComponent(API_KEY)}`;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) {
-          const body = await res.text().catch(()=> '');
-          throw new Error(`Gemini error ${res.status} ${res.statusText}${body ? ': '+body : ''}`);
-        }
-        const data = await res.json();
-        const cand = data?.candidates?.[0];
-        if (!cand) throw new Error('No candidates in response');
-
-        const json = parseCandidateJSON(cand);
-        renderReport(json);
-        window.__lastReportJSON = json; // share/export
+    try {
+      const cached = CacheManager.get(query);
+      if (cached) {
+        renderReport(cached, true);
         return;
+      }
+
+      const realData = await DataSources.enhancePromptWithRealData(query);
+      
+      let systemPrompt = buildSystemPrompt();
+      if (realData.company) {
+        systemPrompt += \`\n\nAdditional context from OpenCorporates:\n\${JSON.stringify(realData.company, null, 2)}\`;
+      }
+      
+      const userQuery = \`Generate a comprehensive US-focused AI business report for: "\${query}"\`;
+      
+      const { json, sources } = await ErrorHandler.withRetry(async () => {
+        return await callReportAPI(systemPrompt, userQuery);
+      });
+      
+      CacheManager.set(query, json);
+      renderReport(json, false);
+      
+    } catch (error) {
+      console.error('Report generation failed:', error);
+      Analytics.track('error', { query, error: error.message });
+      ErrorHandler.displayError(error);
+      stopLoader();
+    }
+  }
+
+  // ------- Event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    Shortcuts.init();
+    addAutocomplete();
+    
+    $('search-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const queryInput = $('query');
+      if (queryInput) generateReport(queryInput.value);
+    });
+    
+    $('btn-rerun')?.addEventListener('click', () => {
+      const queryInput = $('query');
+      if (queryInput) generateReport(queryInput.value);
+    });
+    
+    $('btn-sample')?.addEventListener('click', () => {
+      const queryInput = $('query');
+      if(queryInput) queryInput.value = 'Microsoft Corporation';
+      generateReport('Microsoft Corporation');
+    });
+    
+    $('btn-compare')?.addEventListener('click', () => {
+      ComparisonMode.showComparison();
+    });
+    
+    const shareBtn = $('btn-share');
+    const shareMenu = $('share-menu');
+    shareBtn?.addEventListener('click', () => shareMenu?.classList.toggle('hidden'));
+    
+    const exportBtn = $('btn-export');
+    const exportMenu = $('export-menu');
+    exportBtn?.addEventListener('click', () => exportMenu?.classList.toggle('hidden'));
+    
+    $('export-json')?.addEventListener('click', () => {
+      if (!window.__lastReportJSON) return;
+      const blob = new Blob([JSON.stringify(window.__lastReportJSON, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = \`report-\${Date.now()}.json\`;
+      a.click();
+      URL.revokeObjectURL(url);
+      hide(exportMenu);
+    });
+    
+    $('export-print')?.addEventListener('click', () => {
+      window.print();
+      hide(exportMenu);
+    });
+    
+    $('share-copy-link')?.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      hide(shareMenu);
+      alert('Link copied to clipboard!');
+    });
+    
+    $('share-copy-snapshot')?.addEventListener('click', () => {
+      if (!window.__lastReportJSON) return;
+      const snapshot = btoa(JSON.stringify(window.__lastReportJSON));
+      const url = \`\${window.location.origin}\${window.location.pathname}#snapshot=\${snapshot}\`;
+      navigator.clipboard.writeText(url);
+      hide(shareMenu);
+      alert('Snapshot link copied to clipboard!');
+    });
+    
+    $('help-btn')?.addEventListener('click', () => {
+      Shortcuts.showHelp();
+    });
+    
+    $('btn-insights')?.addEventListener('click', () => {
+      const insights = Analytics.getInsights();
+      console.log('Analytics Insights:', insights);
+      
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+      modal.innerHTML = \`
+        <div class="bg-white rounded-lg p-6 max-w-md w-full">
+          <h3 class="font-bold text-lg mb-4">Analytics Insights</h3>
+          <dl class="space-y-3 text-sm">
+            <div>
+              <dt class="text-brand-gray">Total Searches</dt>
+              <dd class="font-semibold text-lg">\${insights.totalSearches}</dd>
+            </div>
+            <div>
+              <dt class="text-brand-gray">Average Generation Time</dt>
+              <dd class="font-semibold">\${insights.avgGenerationTime}ms</dd>
+            </div>
+            <div>
+              <dt class="text-brand-gray">Error Rate</dt>
+              <dd class="font-semibold">\${insights.errorRate}%</dd>
+            </div>
+            <div>
+              <dt class="text-brand-gray mb-2">Popular Queries</dt>
+              <dd>
+                \${insights.popularQueries.slice(0, 5).map(q => 
+                  \`<div class="flex justify-between py-1">
+                    <span>\${q.query}</span>
+                    <span class="text-brand-gray">\${q.count}x</span>
+                  </div>\`
+                ).join('') || '<div class="text-brand-gray">No queries yet</div>'}
+              </dd>
+            </div>
+          </dl>
+          <button class="mt-4 px-4 py-2 bg-brand-green text-white rounded w-full" onclick="this.parentElement.parentElement.remove()">Close</button>
+        </div>
+      \`;
+      document.body.appendChild(modal);
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (shareBtn && !shareBtn.contains(e.target) && shareMenu && !shareMenu.contains(e.target)) {
+        hide(shareMenu);
+      }
+      if (exportBtn && !exportBtn.contains(e.target) && exportMenu && !exportMenu.contains(e.target)) {
+        hide(exportMenu);
+      }
+    });
+    
+    if (window.location.hash.includes('snapshot=')) {
+      try {
+        const snapshot = window.location.hash.split('snapshot=')[1];
+        const json = JSON.parse(atob(snapshot));
+        show($('results'));
+        renderReport(json, true);
       } catch (e) {
-        lastErr = e;
+        console.error('Failed to load snapshot:', e);
       }
     }
-
-    stopLoader();
-    $('error').innerHTML = `
-      <div class="font-medium mb-1">Failed to generate report.</div>
-      <div class="text-sm">${(lastErr && lastErr.message) || 'Unknown error'}</div>
-      <div class="text-xs mt-2 text-brand-gray">If you see "Network/CORS", host this file via http(s) and temporarily disable extensions that block third‑party requests to generativelanguage.googleapis.com.</div>
-    `;
-    show($('error'));
-  }
-
-  // ------- Share / Export
-  function copy(text) {
-    return navigator.clipboard?.writeText(text).catch(()=> {
-      const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy'); ta.remove();
-    });
-  }
-  function copyLinkRegenerate() {
-    const q = ($('query').value || '').trim();
-    const url = new URL(location.href);
-    url.searchParams.set('q', q);
-    url.searchParams.delete('snapshot');
-    copy(url.toString()).then(()=> alert('Link copied. It regenerates the report on open.'));
-  }
-  function copySnapshotLink() {
-    const json = window.__lastReportJSON;
-    if (!json) return alert('No report to snapshot yet.');
-    const enc = btoa(unescape(encodeURIComponent(JSON.stringify(json))));
-    const url = new URL(location.href);
-    url.searchParams.set('snapshot', enc);
-    copy(url.toString()).then(()=> alert('Snapshot link copied (JSON embedded in URL).'));
-  }
-  function downloadJSON() {
-    const json = window.__lastReportJSON;
-    if (!json) return alert('No report to export.');
-    const blob = new Blob([JSON.stringify(json, null, 2)], { type:'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'live-business-report.json'; a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  // ------- Sample data (offline test)
-  const SAMPLE = {
-    "summary":{"companyName":"AOL Inc.","summary":"AOL (America Online) was a pioneering internet services company with dial-up access, email, and messaging, later evolving into a digital media brand."},
-    "sos":{"entityName":"AOL LLC","entityType":"Limited Liability Company","status":"Active","jurisdiction":"Delaware","formationDate":"2005-08-01","registeredAgent":"Corporation Service Company","registeredAddress":"770 Broadway, New York, NY 10003"},
-    "riskScore":{"score":580,"justification":"Mature legacy brand; diversified parent support; portal usage has declined.","positiveFactors":["Established brand recognition","Part of a larger organization"],"negativeFactors":["Declining relevance in core portal","High reliance on advertising revenue"]},
-    "profile":{"founded":"1985","headquarters":"New York, NY","employees":"N/A (integrated within Yahoo)","industry":"Internet Services / Media","website":"https://aol.com"},
-    "highlights":["Iconic dial-up and AIM history","Continues as media/email brand under Yahoo!"],
-    "news":[{"title":"Verizon to Rebrand Oath as Verizon Media Group","date":"2018-12-10","source":"Reuters","url":"https://www.reuters.com/article/us-verizon-oath-rebrand-idUSKBN1O92QU"}],
-    "publicRecords":[{"type":"FTC Settlement","details":"2005: AOL paid $1.25 million for unsolicited pop-up advertisements case."}],
-    "leadership":[{"name":"Jim Lanzone","title":"CEO, Yahoo Inc. (parent)","linkedin":"https://www.linkedin.com/in/jimlanzone/"}],
-    "products":["AOL Mail","AOL.com portal (news, finance, entertainment)"],
-    "competitors":["Google (Gmail, News)","Microsoft (Outlook, MSN)","Yahoo (news portal)","CNN"],
-    "webPresence":{"twitter":"https://twitter.com/aol","linkedin":"https://www.linkedin.com/company/aol/","youtube":"https://youtube.com/user/aol","traffic":"Significant, but declining portal traffic"},
-    "reviews":[{"snippet":"\"AOL Mail is simple, but can feel dated compared to Gmail or Outlook.\"","source":"User reviews","url":"https://www.trustpilot.com/review/mail.aol.com"}],
-    "chartPoints":{"revenue":[45,46,47,49,50,51,52,53,54,56,57,58],"cashFlow":[52,51,50,51,50,49,48,47,47,46,45,45]},
-    "kpis":[{"metric":"Portal Visits (MM)","q1":"120","q2":"118","q3":"115","q4":"113","yoy":"-6%"}],
-    "citations":[
-      {"title":"Delaware SOS — Entity Search","url":"https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx"},
-      {"title":"Wikipedia — AOL","url":"https://en.wikipedia.org/wiki/AOL"}
-    ]
-  };
-
-  // ------- UI wire‑up
-  function toggleMenu(btnId, menuId) {
-    const btn = $(btnId), menu = $(menuId);
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('hidden');
-    });
-    document.addEventListener('click', () => menu.classList.add('hidden'));
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = $('search-form');
-    const qEl  = $('query');
-
-    toggleMenu('btn-share','share-menu');
-    toggleMenu('btn-export','export-menu');
-
-    $('share-copy-link').onclick = copyLinkRegenerate;
-    $('share-copy-snapshot').onclick = copySnapshotLink;
-    $('export-json').onclick = downloadJSON;
-    $('export-print').onclick = () => window.print();
-
-    $('btn-rerun').onclick = () => {
-      const q = (qEl.value || '').trim();
-      if (!q) return alert('Enter a business name.');
-      $('results').classList.remove('hidden');
-      generateReport(q);
-    };
-
-    $('btn-sample').onclick = () => {
-      $('results').classList.remove('hidden');
-      startLoader();
-      setTimeout(() => { renderReport(SAMPLE); window.__lastReportJSON = SAMPLE; }, 500);
-    };
-
-    form.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      const q = (qEl.value || '').trim();
-      if (!q) return alert('Enter a business name.');
-      $('results').classList.remove('hidden');
-      generateReport(q);
-    });
-
-    // Auto-run if ?q= or ?snapshot= present (optional; works without API key script)
-    const url = new URL(location.href);
-    const q   = url.searchParams.get('q');
-    const snap= url.searchParams.get('snapshot');
-    if (snap) {
-      try {
-        const json = JSON.parse(decodeURIComponent(escape(atob(snap))));
-        $('results').classList.remove('hidden');
-        startLoader();
-        setTimeout(() => { renderReport(json); window.__lastReportJSON = json; }, 300);
-      } catch {
-        // ignore; fall back to q
-      }
-    } else if (q) {
-      qEl.value = q;
-      $('results').classList.remove('hidden');
-      generateReport(q);
+    
+    if (Analytics.getInsights().totalSearches > 0) {
+      show($('btn-insights'));
     }
   });
   </script>
