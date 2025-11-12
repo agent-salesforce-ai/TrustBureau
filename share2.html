@@ -356,10 +356,10 @@
     const zakk = "AIzaSyBnqELMSwalpd6M2rlx4W6NapzwUuPUU1s";    // or set window.zakk at runtime
     const PROXY_BASE = "";                 // optional proxy base (leave empty for direct)
     const MODEL_CANDIDATES = [
-      'gemini-2.5-flash-preview-09-2025',
-      'gemini-2.5-flash'
+      'gemini-1.5-flash',
+      'gemini-1.5-pro'
     ];
-    const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+    const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1/models';
     const MAX_OUTPUT_TOKENS = 8192;
 
     /* ===================== Utilities ===================== */
@@ -371,7 +371,7 @@
       return fromWindow || fromConst;
     }
     function makeUrl(model, key) {
-      if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models/${model}:generateContent`;
+      if (PROXY_BASE) return `${PROXY_BASE}/v1/models/${model}:generateContent`;
       return `${DIRECT_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`;
     }
     function setText(el, v){ el.textContent = (v && String(v).trim()) ? v : 'N/A'; }
@@ -495,82 +495,11 @@
       throw new Error(`Model returned no parseable JSON (preview: ${preview})`);
     }
 
-    /* ===================== Sources helpers ===================== */
-    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
-    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
-    function collectSources(json, modelSources) {
-      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w = json?.webPresence || {};
-      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-      const seen = new Set();
-      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-    }
-    function populateSources(links) {
-      const chips = document.getElementById('report-sources-chips');
-      const ul = document.getElementById('report-sources');
-      const box = document.getElementById('report-sources-container');
-      chips.innerHTML = ''; ul.innerHTML = '';
-      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-      box.style.display = 'block';
-      links.forEach(({ url, title, kind }) => {
-        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-        const span = document.createElement('span');
-        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({ url, title }) => {
-        const li = document.createElement('li');
-        li.className = 'text-sm';
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      ul.classList.remove('hidden'); // auto-expanded
-      let open = true;
-      const toggle = document.getElementById('toggle-sources');
-      toggle.textContent = 'Hide list';
-      toggle.onclick = () => {
-        open = !open;
-        ul.classList.toggle('hidden', !open);
-        toggle.textContent = open ? 'Hide list' : 'Show list';
-      };
-    }
-
-    /* ===================== Fetch helper ===================== */
-    async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
-      let lastError;
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body=null; try { body = await res.json(); } catch {}
-            const msg = body?.error?.message || res.statusText || 'Request failed';
-            const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.code = body?.error?.status;
-            throw err;
-          }
-          return await res.json();
-        } catch (e) {
-          lastError = e;
-          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
-        }
-      }
-      throw lastError || new Error('API request failed.');
-    }
-
-    /* ===================== API (v1beta, JSON response) ===================== */
+    /* ===================== API (v1, JSON response) ===================== */
     function makePayload(systemPrompt, userQuery) {
       return {
         contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        system_instruction: { parts: [{ text: systemPrompt }] }, // v1beta snake_case
+        system_instruction: { parts: [{ text: systemPrompt }] },
         generation_config: {
           max_output_tokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
@@ -683,6 +612,55 @@ Avoid duplicates; include direct URLs when possible. If nothing exists, return [
         }
       } catch (_e) { /* swallow; baseJson remains */ }
       return baseJson;
+    }
+
+    /* ===================== Sources helpers ===================== */
+    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
+    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
+    function collectSources(json, modelSources) {
+      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
+      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
+      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
+      if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
+      const w = json?.webPresence || {};
+      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
+      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
+      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
+      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
+      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
+      const seen = new Set();
+      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
+    }
+    function populateSources(links) {
+      const chips = document.getElementById('report-sources-chips');
+      const ul = document.getElementById('report-sources');
+      const box = document.getElementById('report-sources-container');
+      chips.innerHTML = ''; ul.innerHTML = '';
+      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      links.forEach(({ url, title, kind }) => {
+        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
+        const span = document.createElement('span');
+        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
+        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
+        chips.appendChild(span);
+      });
+      links.forEach(({ url, title }) => {
+        const li = document.createElement('li');
+        li.className = 'text-sm';
+        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
+                         <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
+        ul.appendChild(li);
+      });
+      ul.classList.remove('hidden'); // auto-expanded
+      let open = true;
+      const toggle = document.getElementById('toggle-sources');
+      toggle.textContent = 'Hide list';
+      toggle.onclick = () => {
+        open = !open;
+        ul.classList.toggle('hidden', !open);
+        toggle.textContent = open ? 'Hide list' : 'Show list';
+      };
     }
 
     /* ===================== DOM refs ===================== */
