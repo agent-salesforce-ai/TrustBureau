@@ -672,16 +672,14 @@
 
     /* ===================== Prompt ===================== */
     function buildSystemPrompt() {
-      return `
-You are a meticulous US-focused business analyst.
-Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unknown.
-
-Reviews: include 3–6 concise snippets (12–40 words) from US-centric sources with URLs (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).
-Map rule: prefer the SOS principal/registered address; if unknown, use contact.address; then profile.headquarters.
-
-Fill all fields in the provided JSON schema to the best of your ability using live search data.
-You MUST return ONLY the JSON object, enclosed in ` + '```json ... ```' + ` tags.
-      `.trim();
+      return (
+        'You are a meticulous US-focused business analyst.\n' +
+        'Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unknown.\n\n' +
+        'Reviews: include 3–6 concise snippets (12–40 words) from US-centric sources with URLs (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).\n' +
+        'Map rule: prefer the SOS principal/registered address; if unknown, use contact.address; then profile.headquarters.\n\n' +
+        'Fill all fields in the provided JSON schema to the best of your ability using live search data.\n' +
+        'You MUST return ONLY the JSON object, enclosed in ```json ... ``` tags.'
+      );
     }
 
     /* ===================== Reviews booster (still real data via search/tooling) ===================== */
@@ -708,12 +706,12 @@ You MUST return ONLY the JSON object, enclosed in ` + '```json ... ```' + ` tags
     }
 
     async function supplementReviews(companyName, baseJson) {
-      const sys = `
-You are a US-focused research assistant. Return ONLY a JSON object with a "reviews" array, enclosed in ` + '```json ... ```' + ` tags.
-Each review item must be: { "snippet": string (12–40 words), "source": string, "url": string }.
-Collect 3–6 impartial snippets summarizing public sentiment from credible US sources (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).
-Avoid duplicates; include direct URLs when possible. If nothing exists, return {"reviews": []}.
-`.trim();
+      const sys = (
+        'You are a US-focused research assistant. Return ONLY a JSON object with a "reviews" array, enclosed in ```json ... ``` tags.\n' +
+        'Each review item must be: { "snippet": string (12–40 words), "source": string, "url": string }.\n' +
+        'Collect 3–6 impartial snippets summarizing public sentiment from credible US sources (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).\n' +
+        'Avoid duplicates; include direct URLs when possible. If nothing exists, return {"reviews": []}.'
+      );
 
       const userQ = `Provide 5 review snippets for "${companyName}" as specified. US bias; business context only.`;
       try {
