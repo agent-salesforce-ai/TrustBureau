@@ -520,19 +520,14 @@
 
     /* ===================== API (v1, JSON response) ===================== */
     function makePayload(systemPrompt, userQuery) {
-      // Combine system prompt and user query into a single user message
-      const fullPrompt = `${systemPrompt}
-
-${userQuery}
-
-IMPORTANT: Return ONLY valid JSON (no markdown, no code fences).`;
+      const fullPrompt = `${systemPrompt}\n\n${userQuery}\n\nReturn JSON only.`;
 
       return {
         contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
         generationConfig: {
           maxOutputTokens: MAX_OUTPUT_TOKENS,
           temperature: 0.2,
-          topP: 0.95
+          topP: 0.95,
         }
       };
     }
@@ -558,17 +553,14 @@ IMPORTANT: Return ONLY valid JSON (no markdown, no code fences).`;
             if (!cand) throw new Error('No candidates in response.');
             const json = parseCandidateJSON(cand);
 
-            // In v1, grounding metadata isn't returned in the same way, so we just return an empty array.
-            const sources = [];
+            const sources = []; // v1 API does not return grounding metadata in the same way.
 
             return { json, sources };
           } catch (e) {
             lastErr = e;
             const parseIssue = /no parseable JSON|Unexpected end of JSON|Unexpected token|Invalid or unexpected/i.test(e.message || '');
             if (attempt === 1 && parseIssue) {
-              const stricter = `${systemPrompt}
-
-IMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
+              const stricter = `${systemPrompt}\n\nIMPORTANT: Return ONE JSON object ONLY (no prose, no code fences). If you cannot find data, use "N/A" or [] for that field.`;
               payload = makePayload(stricter, userQuery);
               continue;
             }
