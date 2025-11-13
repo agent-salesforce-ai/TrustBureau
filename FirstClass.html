@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Class Business Group - Small Business Financing</title>
+    
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Define Custom Brand Colors & Font --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Slate/Teal Color Palette
+                        'brand-primary': '#2D3748',       // Dark Slate Blue
+                        'brand-secondary': '#00A79D',     // Vibrant Teal Accent
+                        'brand-light-bg': '#F7FAFC',      // Very Light Gray
+                        'brand-dark-text': '#1A202C',      // Near Black (Darkest Slate)
+                        'brand-gray-text': '#4A5568',      // Medium Gray
+                        'brand-dark-bg': '#1A202C',        // Darkest Slate for footer
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Load Inter font --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Updated glow effects to prioritize the secondary (teal) color for CTAs */
+        .btn-glow-primary {
+            box-shadow: 0 4px 15px 0 rgba(45, 55, 72, 0.3); /* Dark Slate glow */
+        }
+        .btn-glow-primary:hover {
+            box-shadow: 0 6px 20px 0 rgba(45, 55, 72, 0.4);
+        }
+        .btn-glow-secondary {
+             box-shadow: 0 4px 15px 0 rgba(0, 167, 157, 0.35); /* Teal glow */
+        }
+        .btn-glow-secondary:hover {
+             box-shadow: 0 6px 20px 0 rgba(0, 167, 157, 0.45);
+        }
+
+        /* NEW: Gradient text for hero headline */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(to right, #2D3748, #00A79D);
+        }
+
+        /* Style for FAQ accordion */
+        .faq-question {
+            cursor: pointer;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-white text-brand-dark-text">
+
+    <!-- Header & Navigation --><header class="bg-white sticky top-0 z-50 shadow-md">
+        <!-- Main navigation container --><nav class="container mx-auto px-6 py-4 flex justify-between items-center relative">
+            <!-- Logo --><a href="#home" class="flex items-center flex-shrink-0">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-10 h-10 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.875L6 12zM6 12l15-6.075" />
+                    </svg>
+                    <!-- UPDATED: Applied text-gradient class to the logo text -->
+                    <span class="font-bold text-xl text-gradient">First Class Business Group</span>
+                </div>
+            </a>
+            
+            <!-- Desktop Menu --><div class="hidden md:flex space-x-8 items-center">
+                <a href="#home" class="text-brand-gray-text hover:text-brand-secondary font-medium transition duration-300">Home</a>
+                <a href="#services" class="text-brand-gray-text hover:text-brand-secondary font-medium transition duration-300">Services</a>
+                <a href="#how-it-works" class="text-brand-gray-text hover:text-brand-secondary font-medium transition duration-300">How It Works</a>
+                <a href="#why-us" class="text-brand-gray-text hover:text-brand-secondary font-medium transition duration-300">Why Us</a>
+                <a href="#faq" class="text-brand-gray-text hover:text-brand-secondary font-medium transition duration-300">FAQs</a>
+                <!-- UPDATED: Changed main CTA to secondary (teal) color --><a href="#apply" class="bg-brand-secondary text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105 btn-glow-secondary">
+                    Apply Now
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button --><div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-brand-dark-text focus:outline-none">
+                    <svg id="menu-icon" class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                    <svg id="close-icon" class="w-8 h-8 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Menu --><div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white shadow-xl z-40">
+                <div class="flex flex-col space-y-4 p-6">
+                    <a href="#home" class="mobile-link text-brand-gray-text hover:text-brand-secondary font-medium text-lg">Home</a>
+                    <a href="#services" class="mobile-link text-brand-gray-text hover:text-brand-secondary font-medium text-lg">Services</a>
+                    <a href="#how-it-works" class="mobile-link text-brand-gray-text hover:text-brand-secondary font-medium text-lg">How It Works</a>
+                    <a href="#why-us" class="mobile-link text-brand-gray-text hover:text-brand-secondary font-medium text-lg">Why Us</a>
+                    <a href="#faq" class="mobile-link text-brand-gray-text hover:text-brand-secondary font-medium text-lg">FAQs</a>
+                    <!-- UPDATED: Changed main CTA to secondary (teal) color --><a href="#apply" class="mobile-link bg-brand-secondary text-white font-bold py-3 px-6 rounded-lg text-center transition duration-300 transform hover:scale-105 btn-glow-secondary">
+                        Apply Now
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section --><!-- UPDATED: Added subtle gradient background for depth --><section id="home" class="bg-gradient-to-br from-white to-brand-light-bg pt-24 pb-32">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <!-- Left Column (Text) --><div class="md:w-1/2 text-center md:text-left">
+                        <!-- UPDATED: Toned down size, added gradient text for visual interest --><h1 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight text-brand-dark-text">
+                            Capital Solutions That <span class="text-gradient">Elevate Your Business</span>
+                        </h1>
+                        <p class="text-xl md:text-2xl text-brand-gray-text mb-12 max-w-2xl md:max-w-none mx-auto leading-relaxed">
+                            Access the funding you need to thrive and expand. First Class Business Group delivers fast, flexible, and tailored financial solutions.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                            <a href="#apply" class="bg-brand-secondary text-white font-bold py-4 px-12 rounded-lg shadow-xl text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105 btn-glow-secondary inline-block">
+                                Get Started Now
+                            </a>
+                        </div>
+                         <!-- NEW: Social proof line -->
+                         <p class="mt-6 text-brand-gray-text text-center md:text-left text-sm">
+                            Join 10,000+ businesses who trust us for their funding needs.
+                        </p>
+                    </div>
+                    <!-- Right Column (Key Benefits) --><!-- NEW: Replaced placeholder image with useful key benefits --><div class="md:w-1/2 bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
+                        <div class="flex flex-col space-y-8"> <!-- Increased space-y for more air --><!-- Benefit 1 --><div class="flex items-start space-x-5"> <!-- Increased space-x --><div class="flex-shrink-0 w-14 h-14 bg-brand-secondary/5 rounded-full flex items-center justify-center"> <!-- Larger icon circle, subtler bg --><svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-brand-dark-text">Funding as Fast as 24 Hours</h3>
+                                    <p class="text-brand-gray-text mt-1">Get approved quickly and have funds deposited directly into your account.</p>
+                                </div>
+                            </div>
+
+                            <!-- Benefit 2 --><div class="flex items-start space-x-5"> <!-- Increased space-x --><div class="flex-shrink-0 w-14 h-14 bg-brand-secondary/5 rounded-full flex items-center justify-center"> <!-- Larger icon circle, subtler bg --><svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-brand-dark-text">Simple & Secure Application</h3>
+                                    <p class="text-brand-gray-text mt-1">Our 5-minute online application won't affect your credit score.</p>
+                                </div>
+                            </div>
+
+                            <!-- Benefit 3 --><div class="flex items-start space-x-5"> <!-- Increased space-x --><div class="flex-shrink-0 w-14 h-14 bg-brand-secondary/5 rounded-full flex items-center justify-center"> <!-- Larger icon circle, subtler bg --><svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-brand-dark-text">Trusted by 10,000+ Businesses</h3>
+                                    <p class="text-brand-gray-text mt-1">We've delivered over $500M in funding to businesses just like yours.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Bar --><section class="bg-brand-light-bg py-16">
+            <div class="container mx-auto px-6">
+                <h3 class="text-center text-base font-semibold text-brand-gray-text uppercase tracking-wider opacity-90">
+                    Powering Growth Across Industries
+                </h3>
+                <!-- UPDATED: Replaced text with SVG icons for more visual depth -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-10 opacity-80">
+                    <div class="flex flex-col items-center gap-3">
+                        <svg class="w-10 h-10 text-brand-gray-text" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.25pc.75-.75h3a.75.75 0 01.75.75V21m0 0h1.5m0 0h1.5m-1.5 0h.008v.008H12v-.008zM12 3.75l-4.5 4.5v8.25a.75.75 0 00.75.75h3.75a.75.75 0 00.75-.75V8.25l-4.5-4.5z" /></svg>
+                        <span class="text-lg font-medium text-brand-gray-text">Retail & E-commerce</span>
+                    </div>
+                     <div class="flex flex-col items-center gap-3">
+                        <svg class="w-10 h-10 text-brand-gray-text" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.25 12l2.846.813a4.5 4.5 0 013.09 3.09L24 18.75l-.813 2.846a4.5 4.5 0 01-3.09 3.09L18.25 24l-2.846-.813a4.5 4.5 0 01-3.09-3.09L11.25 18.75l.813-2.846a4.5 4.5 0 013.09-3.09L18.25 12zM12 2.25l-2.846.813a4.5 4.5 0 00-3.09 3.09L5.25 9l.813 2.846a4.5 4.5 0 003.09 3.09L12 15.75l2.846-.813a4.5 4.5 0 003.09-3.09L18.75 9l-.813-2.846a4.5 4.5 0 00-3.09-3.09L12 2.25z" /></svg>
+                        <span class="text-lg font-medium text-brand-gray-text">Restaurants & Hospitality</span>
+                    </div>
+                     <div class="flex flex-col items-center gap-3">
+                        <svg class="w-10 h-10 text-brand-gray-text" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 00-.12-1.03l-2.268-9.64a3.375 3.375 0 00-3.285-2.602H7.923a3.375 3.375 0 00-3.285 2.602l-2.268 9.64a4.5 4.5 0 00-.12 1.03v.228m19.5 0a3 3 0 01-3 3H5.25a3 3 0 01-3-3m19.5 0a3 3 0 00-3-3H5.25a3 3 0 00-3 3m16.5 0h.008v.008h-.008v-.008z" /></svg>
+                        <span class="text-lg font-medium text-brand-gray-text">Construction & Trades</span>
+                    </div>
+                     <div class="flex flex-col items-center gap-3">
+                         <svg class="w-10 h-10 text-brand-gray-text" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.83-5.83M11.42 15.17l.017-.017L15.17 11.42l5.83 5.83c.577.577.577 1.519 0 2.096l-3.32 3.32c-.577.577-1.519.577-2.096 0l-5.83-5.83z" /><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L5.59 21A2.652 2.652 0 012.25 17.25l5.83-5.83M11.42 15.17l-.017-.017L15.17 11.42 21 5.59a2.652 2.652 0 00-3.75-3.75L11.42 15.17z" /></svg>
+                        <span class="text-lg font-medium text-brand-gray-text">Medical & Dental</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section --><section id="services" class="py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-brand-dark-text mb-4">Our Premier Funding Options</h2>
+                    <p class="text-lg text-brand-gray-text max-w-2xl mx-auto leading-relaxed">
+                        We offer a comprehensive suite of financial products. Find the perfect fit for your business needs.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Service Card 1 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-dark-text mb-4">Business Loans</h3>
+                        <p class="text-brand-gray-text leading-relaxed">
+                            Traditional term loans with fixed payments and predictable monthly installments.
+                        </p>
+                        <!-- NEW: Added depth with "Best for" -->
+                        <p class="text-sm font-semibold text-brand-primary mt-4">Best for: Large investments, expansion, or major purchases.</p>
+                    </div>
+
+                    <!-- Service Card 2 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                         <div class="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6H2.25m0 0v1.5c0 .621.504 1.125 1.125 1.125H17.25m0-4.5h1.5m.75 0v.75c0 .621-.504 1.125-1.125 1.125h-1.5m-1.5 0l.31.73c.3.72.3 1.54 0 2.26l-1.38 3.22a1.125 1.125 0 01-1.02 1.125h-5.99a1.125 1.125 0 01-1.02-1.125L3.75 9.25c-.3-.72-.3-1.54 0-2.26l.31-.73m0 0l1.38-3.22a1.125 1.125 0 011.02-1.125h5.99c.47 0 .897.283 1.02.724L17.25 4.5z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-dark-text mb-4">Merchant Cash Advance</h3>
+                        <p class="text-brand-gray-text leading-relaxed">
+                            Get an advance on your future sales. A flexible option with payments that align with your daily sales volume.
+                        </p>
+                        <p class="text-sm font-semibold text-brand-primary mt-4">Best for: Quick capital for businesses with high card sales.</p>
+                    </div>
+
+                    <!-- Service Card 3 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                         <div class="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h6m3-3.75l3 3m0 0l-3 3m3-3H6.75m10.5-9v9.75" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-dark-text mb-4">Line of Credit</h3>
+                        <p class="text-brand-gray-text leading-relaxed">
+                            Access to funds on demand. Draw what you need, when you need it, and only pay interest on the amount you use.
+                        </p>
+                        <p class="text-sm font-semibold text-brand-primary mt-4">Best for: Managing cash flow, unexpected costs, or project-based needs.</p>
+                    </div>
+
+                    <!-- Service Card 4 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                         <div class="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mb-6">
+                           <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h10.5m-10.5-4.5V6.375c0-.621.504-1.125 1.125-1.125h14.25c.621 0 1.125.504 1.125 1.125v10.5m-16.5-4.5c0-.621.504-1.125 1.125-1.125h6.098c.621 0 1.125.504 1.125 1.125v4.5m0-10.5h-5.25V6.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v3.375z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-dark-text mb-4">Equipment Financing</h3>
+                        <p class="text-brand-gray-text leading-relaxed">
+                            Acquire the new or used equipment you need to operate and grow, without tying up your working capital.
+                        </p>
+                        <p class="text-sm font-semibold text-brand-primary mt-4">Best for: Purchasing vehicles, machinery, or new technology.</p>
+                    </div>
+
+                    <!-- Service Card 5 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                         <div class="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-dark-text mb-4">Invoice Factoring</h3>
+                        <p class="text-brand-gray-text leading-relaxed">
+                            Turn your unpaid invoices into immediate cash. Solve cash flow gaps while waiting for customer payments.
+                        </p>
+                         <p class="text-sm font-semibold text-brand-primary mt-4">Best for: B2B businesses that need to cover payroll or supplies.</p>
+                    </div>
+
+                    <!-- Service Card 6 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                         <div class="w-16 h-16 bg-brand-secondary/10 rounded-full flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 12h6m-6 5.25h6M5.25 6.75h.008v.008H5.25V6.75zm0 5.25h.008v.008H5.25v-.008zm0 5.25h.008v.008H5.25v-.008zm13.5-5.25h.008v.008h-.008v-.008zm0 5.25h.008v.008h-.008v-.008zm0-10.5h.008v.008h-.008V6.75z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-brand-dark-text mb-4">SBA Loans</h3>
+                        <p class="text-brand-gray-text leading-relaxed">
+                            Government-backed loans with competitive rates and long-term options for qualified businesses.
+                        </p>
+                        <p class="text-sm font-semibold text-brand-primary mt-4">Best for: Established businesses seeking the lowest rates.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section --><section id="how-it-works" class="py-24 bg-brand-light-bg">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-brand-dark-text mb-4">Your Path to Funding in 3 Steps</h2>
+                    <p class="text-lg text-brand-gray-text max-w-2xl mx-auto leading-relaxed">
+                        Our streamlined process makes securing capital straightforward and efficient.
+                    </p>
+                </div>
+                
+                <!-- Steps container --><div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center relative">
+                    
+                    <!-- Dashed line for desktop --><!-- UPDATED: Line color changed to match new accent theme --><div class="hidden md:block absolute top-12 left-0 w-full h-1 z-0">
+                          <svg width="100%" height="2" class="text-brand-secondary/40">
+                            <line x1="0" y1="1" x2="100%" y2="1" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8"/>
+                          </svg>
+                    </div>
+
+                    <!-- Step 1 --><div class="relative z-10">
+                        <!-- UPDATED: Number circle changed to secondary (teal) color --><div class="bg-brand-secondary text-white rounded-full w-24 h-24 flex items-center justify-center text-4xl font-extrabold mx-auto mb-6 shadow-xl border-4 border-brand-light-bg">
+                            1
+                        </div>
+                        <div class="bg-white p-8 rounded-lg shadow-xl h-full">
+                            <h3 class="text-2xl font-bold text-brand-dark-text mb-3">Simple Online Application</h3>
+                            <p class="text-brand-gray-text leading-relaxed">
+                                Complete our quick, secure application in minutes from any device. It's free and won't impact your credit score.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Step 2 --><div class="relative z-10">
+                         <!-- UPDATED: Number circle changed to secondary (teal) color --><div class="bg-brand-secondary text-white rounded-full w-24 h-24 flex items-center justify-center text-4xl font-extrabold mx-auto mb-6 shadow-xl border-4 border-brand-light-bg">
+                            2
+                        </div>
+                        <div class="bg-white p-8 rounded-lg shadow-xl h-full">
+                            <h3 class="text-2xl font-bold text-brand-dark-text mb-3">Rapid Review & Approval</h3>
+                            <p class="text-brand-gray-text leading-relaxed">
+                                Our experts and technology swiftly review your details, often providing a decision within hours, not weeks.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Step 3 --><div class="relative z-10">
+                         <!-- UPDATED: Number circle changed to secondary (teal) color --><div class="bg-brand-secondary text-white rounded-full w-24 h-24 flex items-center justify-center text-4xl font-extrabold mx-auto mb-6 shadow-xl border-4 border-brand-light-bg">
+                            3
+                        </div>
+                        <div class="bg-white p-8 rounded-lg shadow-xl h-full">
+                            <h3 class="text-2xl font-bold text-brand-dark-text mb-3">Funds Delivered</h3>
+                            <p class="text-brand-gray-text leading-relaxed">
+                                Upon approval, accept your offer and capital is transferred to your bank account, often by the next business day.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Us Section --><!-- UPDATED: Added subtle gradient background for depth --><section id="why-us" class="py-24 bg-gradient-to-b from-brand-primary to-brand-dark-bg text-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Why Choose First Class Business Group?</h2>
+                    <p class="text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed">
+                        We're more than just a lender. We're a partner dedicated to empowering your business with smart financial solutions.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Feature 1 --><!-- UPDATED: Modern card design with icon in a bg circle, matching Services section --><div class="text-center p-8 bg-white/10 rounded-xl transition-all duration-300 hover:bg-white/20 transform hover:scale-105">
+                        <div class="w-16 h-16 bg-brand-secondary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Unmatched Speed</h3>
+                        <p class="text-gray-200 leading-relaxed">We've stripped away the red tape of traditional banks. Access the funds you need swiftly, often within 24 hours.</p>
+                    </div>
+                    <!-- Feature 2 --><div class="text-center p-8 bg-white/10 rounded-xl transition-all duration-300 hover:bg-white/20 transform hover:scale-105">
+                        <div class="w-16 h-16 bg-brand-secondary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Tailored Solutions</h3>
+                        <p class="text-gray-200 leading-relaxed">Your business is unique. Our diverse products ensure we find the perfect funding fit for your specific goals, not a one-size-fits-all loan.</p>
+                    </div>
+                    <!-- Feature 3 --><div class="text-center p-8 bg-white/10 rounded-xl transition-all duration-300 hover:bg-white/20 transform hover:scale-105">
+                        <div class="w-16 h-16 bg-brand-secondary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m-1.125 0H5.625A2.25 2.25 0 003.375 6v12a2.25 2.25 0 002.25 2.25h12.75A2.25 2.25 0 0020.625 18V9A2.25 2.25 0 0018.375 6.75h-1.5m-6.75 0V3.75c0-.621.504-1.125 1.125-1.125h1.5c.621 0 1.125.504 1.125 1.125v3" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Effortless Process</h3>
+                        <p class="text-gray-200 leading-relaxed">Our streamlined online application eliminates unnecessary complexity and delays. Apply in minutes, get back to business.</p>
+                    </div>
+                    <!-- Feature 4 --><div class="text-center p-8 bg-white/10 rounded-xl transition-all duration-300 hover:bg-white/20 transform hover:scale-105">
+                        <div class="w-16 h-16 bg-brand-secondary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <svg class="w-8 h-8 text-brand-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A9.065 9.065 0 0112 3c2.953 0 5.694 1.252 7.582 3.252m-3.562 4.5c-.213-.11-.44-.195-.678-.267A10.968 10.968 0 0012 7.5c-2.596 0-4.956 1.05-6.682 2.75a9.026 9.026 0 00-.805 10.33m.798-10.03cA9.026 9.026 0 0012 21a9.026 9.026 0 007.5-3.572M12 6V3.75m0 3V6m0 3V6m0 3v4.5m0 3v4.5m-3.75-6.75h-.008v.008H8.25v-.008zm0 3h.008v.008H8.25v-.008zm0 3h.008v.008H8.25v-.008zm3.75 0h.008v.008h-.008v-.008zm0-3h.008v.008h-.008v-.008zm0-3h.008v.008h-.008V9m3.75 0h.008v.008h-.008V9zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Expert Guidance</h3>
+                        <p class="text-gray-200 leading-relaxed">Our dedicated funding specialists are here to provide personalized support and help you navigate your options.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Testimonials Section --><section id="testimonials" class="py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-brand-dark-text mb-4">What Our Clients Say</h2>
+                    <p class="text-lg text-brand-gray-text max-w-2xl mx-auto leading-relaxed">
+                        See how we've helped businesses just like yours succeed.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Testimonial 1 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg">
+                        <div class="text-brand-secondary mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10c.221 0 .442-.01.659-.029C8.678 12.417 10 15.445 10 19v1H3v-7.5c0-4.694 3.806-8.5 8.5-8.5h.5c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5h-.5c-2.481 0-4.5 2.019-4.5 4.5zM17.5 10c.221 0 .442-.01.659-.029C19.678 12.417 21 15.445 21 19v1h-7v-7.5c0-4.694 3.806-8.5 8.5-8.5h.5c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5h-.5c-2.481 0-4.5 2.019-4.5 4.5z" /></svg>
+                        </div>
+                        <p class="text-brand-gray-text text-lg italic leading-relaxed mb-6">"First Class Business Group got us the $50,000 we needed for a new truck in under 48 hours. The bank told us it would be weeks. Game changer!"</p>
+                        <div class="font-bold text-brand-dark-text">- Sarah L, Owner</div>
+                        <div class="text-sm text-brand-secondary">Prime Landscaping</div>
+                    </div>
+
+                    <!-- Testimonial 2 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg">
+                        <div class="text-brand-secondary mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10c.221 0 .442-.01.659-.029C8.678 12.417 10 15.445 10 19v1H3v-7.5c0-4.694 3.806-8.5 8.5-8.5h.5c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5h-.5c-2.481 0-4.5 2.019-4.5 4.5zM17.5 10c.221 0 .442-.01.659-.029C19.678 12.417 21 15.445 21 19v1h-7v-7.5c0-4.694 3.806-8.5 8.5-8.5h.5c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5h-.5c-2.481 0-4.5 2.019-4.5 4.5z" /></svg>
+                        </div>
+                        <p class="text-brand-gray-text text-lg italic leading-relaxed mb-6">"The line of credit was perfect for managing our cash flow during the slow season. The application was simple and the team was incredibly helpful."</p>
+                        <div class="font-bold text-brand-dark-text">- Michael B, GM</div>
+                        <div class="text-sm text-brand-secondary">Oak & Fig Restaurant</div>
+                    </div>
+
+                    <!-- Testimonial 3 --><div class="bg-brand-light-bg p-8 rounded-xl shadow-lg">
+                        <div class="text-brand-secondary mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10c.221 0 .442-.01.659-.029C8.678 12.417 10 15.445 10 19v1H3v-7.5c0-4.694 3.806-8.5 8.5-8.5h.5c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5h-.5c-2.481 0-4.5 2.019-4.5 4.5zM17.5 10c.221 0 .442-.01.659-.029C19.678 12.417 21 15.445 21 19v1h-7v-7.5c0-4.694 3.806-8.5 8.5-8.5h.5c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5h-.5c-2.481 0-4.5 2.019-4.5 4.5z" /></svg>
+                        </div>
+                        <p class="text-brand-gray-text text-lg italic leading-relaxed mb-6">"I used a merchant cash advance to stock up for the holidays and it was the best decision I made all year. Repayment was easy since it just came out of my daily sales."</p>
+                        <div class="font-bold text-brand-dark-text">- David K, Shop Owner</div>
+                        <div class="text-sm text-brand-secondary">The Corner Bodega</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: FAQ Section --><section id="faq" class="py-24 bg-brand-light-bg">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-brand-dark-text mb-4">Frequently Asked Questions</h2>
+                    <p class="text-lg text-brand-gray-text max-w-2xl mx-auto leading-relaxed">
+                        Have questions? We have answers.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- FAQ 1 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md faq-item">
+                        <div class="faq-question flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-brand-dark-text">What are the minimum requirements to qualify?</h3>
+                            <svg class="w-6 h-6 text-brand-secondary transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                        <div class="faq-answer text-brand-gray-text pt-4 leading-relaxed">
+                            <p>Minimum requirements vary by product, but generally, we look for businesses with at least 6 months in operation, $10,000+ in monthly revenue, and a FICO score of 500+. Don't worry, applying is free and will not affect your credit score.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 2 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md faq-item">
+                        <div class="faq-question flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-brand-dark-text">Will checking my options affect my credit score?</h3>
+                            <svg class="w-6 h-6 text-brand-secondary transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                        <div class="faq-answer text-brand-gray-text pt-4 leading-relaxed">
+                            <p>No. Our simple application uses a "soft pull" which does not impact your credit score. You can see your funding options with zero risk.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 3 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md faq-item">
+                        <div class="faq-question flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-brand-dark-text">How quickly can I receive my funds?</h3>
+                            <svg class="w-6 h-6 text-brand-secondary transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                        <div class="faq-answer text-brand-gray-text pt-4 leading-relaxed">
+                            <p>This is our specialty! For many of our products, like the Merchant Cash Advance, you can receive your funds in as little as 24 hours after approval. Term loans and SBA loans may take slightly longer.</p>
+                        </div>
+                    </div>
+                     <!-- FAQ 4 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md faq-item">
+                        <div class="faq-question flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-brand-dark-text">What is the difference between a loan and a cash advance?</h3>
+                            <svg class="w-6 h-6 text-brand-secondary transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                        <div class="faq-answer text-brand-gray-text pt-4 leading-relaxed">
+                            <p>A business loan has a fixed repayment amount over a set term. A merchant cash advance (MCA) is a purchase of your future sales. You receive a lump sum upfront and repay it with a small, fixed percentage of your daily sales. This means you pay back more when sales are strong and less when they're slow, which many business owners find flexible.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section --><section id="apply" class="py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-brand-dark-text mb-4">Ready to Elevate Your Business?</h2>
+                <p class="text-lg text-brand-gray-text mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Unlock your business potential. Discover your funding options with a free, no-obligation application today.
+                </p>
+                <!-- UPDATED: Main CTA is teal, and added a secondary "ghost" button --><div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#" class="bg-brand-secondary text-white font-bold py-4 px-12 rounded-lg shadow-xl text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105 btn-glow-secondary">
+                        Apply Now
+                    </a>
+                    <a href="#services" class="bg-transparent border-2 border-brand-primary text-brand-primary font-bold py-4 px-12 rounded-lg text-lg hover:bg-brand-primary hover:text-white transition duration-300 transform hover:scale-105">
+                        See Our Solutions
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer --><footer class="bg-brand-dark-bg text-gray-300 py-16">
+        <div class="container mx-auto px-6">
+            <!-- NEW: Expanded footer with nav links -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+                <!-- Column 1: Logo & Info -->
+                <div>
+                    <div class="flex items-center space-x-2 justify-center md:justify-start mb-4">
+                        <svg class="w-10 h-10 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.875L6 12zM6 12l15-6.075" />
+                        </svg>
+                        <span class="font-bold text-xl text-white">First Class <span class="text-brand-secondary">Business Group</span></span>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-4">
+                        Fast, flexible funding solutions to help your business thrive.
+                    </p>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div>
+                    <h5 class="font-bold text-white text-lg mb-4 uppercase tracking-wider">Navigation</h5>
+                    <nav class="flex flex-col space-y-2">
+                        <a href="#home" class="hover:text-white transition duration-300">Home</a>
+                        <a href="#services" class="hover:text-white transition duration-300">Services</a>
+                        <a href="#how-it-works" class="hover:text-white transition duration-300">How It Works</a>
+                        <a href="#why-us" class="hover:text-white transition duration-300">Why Us</a>
+                         <a href="#faq" class="hover:text-white transition duration-300">FAQs</a>
+                    </nav>
+                </div>
+
+                <!-- Column 3: Legal -->
+                 <div>
+                    <h5 class="font-bold text-white text-lg mb-4 uppercase tracking-wider">Legal</h5>
+                    <nav class="flex flex-col space-y-2">
+                        <a href="#" class="hover:text-white transition duration-300">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition duration-300">Terms of Service</a>
+                    </nav>
+                </div>
+
+                <!-- Column 4: Contact -->
+                <div>
+                    <h5 class="font-bold text-white text-lg mb-4 uppercase tracking-wider">Contact Us</h5>
+                     <nav class="flex flex-col space-y-2">
+                        <a href="tel:1-800-555-1234" class="hover:text-white transition duration-300">1 (800) 555-1234</a>
+                        <a href="mailto:info@fcbg.com" class="hover:text-white transition duration-300">info@fcbg.com</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-700 mt-12 pt-8 text-center">
+                <p class="text-sm text-gray-400">
+                    First Class Business Group is a financial technology company, not a bank. Loans are provided by our lending partners.
+                </p> 
+                <p class="text-sm text-gray-400 mt-4">&copy; <span id="footer-year"></span> First Class Business Group. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        // --- Mobile Menu Toggle ---
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const closeIcon = document.getElementById('close-icon');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('hidden');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+
+        // Toggle menu when hamburger button is clicked
+        menuBtn.addEventListener('click', toggleMenu);
+
+        // Close menu when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (!mobileMenu.classList.contains('hidden')) {
+                    toggleMenu();
+                }
+            });
+        });
+
+        // --- Smooth Scroll for ALL Anchor Links ---
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                
+                // Special case for logo to go to top
+                if (targetId === '#home') {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                    return;
+                }
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // Get header height
+                    const header = document.querySelector('header');
+                    const headerHeight = header ? header.offsetHeight : 0;
+                    
+                    // Calculate target position
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20; // 20px offset
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // --- FAQ Accordion ---
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            const answer = item.querySelector('.faq-answer');
+            const icon = item.querySelector('svg');
+
+            question.addEventListener('click', () => {
+                // Close all other open answers
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.querySelector('.faq-answer').style.maxHeight = '0px';
+                        otherItem.querySelector('svg').style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                // Toggle the clicked answer
+                if (answer.style.maxHeight === '0px' || !answer.style.maxHeight) {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    answer.style.maxHeight = '0px';
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+
+    </script>
+
+</body>
+</html>
