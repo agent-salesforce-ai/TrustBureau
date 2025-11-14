@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TrustBureau.ai - The AI Verification Standard</title>
+
+    <!-- Tailwind Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- (MODIFIED) Custom Tailwind Configuration (AMOLED DARK MODE) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-green': '#00C09A', // Verification Green (Accent)
+                        'brand-dark': '#f1f5f9',    // Primary Text (Slate-100)
+                        'brand-gray': '#94a3b8',    // Secondary Text (Slate-400)
+                        'brand-light': '#0f172a',   // (MODIFIED) Card Background (Slate-900)
+                        'brand-border': '#1e293b',  // (MODIFIED) Border Color (Slate-800)
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- (MODIFIED) Styles updated for AMOLED theme -->
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Sticky header blur (Safari support) */
+        .backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+
+        /* Prevent sticky header from hiding anchor targets */
+        section[id] { scroll-margin-top: 84px; }
+        @media (min-width: 768px) { section[id] { scroll-margin-top: 96px; } }
+
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+        [x-cloak] { display: none !important; }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #00C09A 0%, #007A63 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .yellow-gradient-text {
+            background: linear-gradient(90deg, #FACC15 0%, #EAB308 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* CTA & widget cohesion */
+        .cta-button { transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 192, 154, 0.15); }
+        .cta-button:active { transform: translateY(0); }
+
+        /* (AMOLED) Updated widget card styles */
+        .widget-card {
+            border: 1px solid #1e293b; /* brand-border (slate-800) */
+            border-radius: 12px;
+            background: #0f172a; /* brand-light (slate-900) */
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+        .widget-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(0, 192, 154, 0.12);
+            border-color: rgba(0,192,154,0.35);
+        }
+        .widget-btn {
+            /* identical visual to Request Demo */
+            background-color: #00C09A;
+            color: #fff;
+            font-weight: 700;
+            padding: .875rem 2rem; /* py-3.5 px-8 */
+            border-radius: .5rem;  /* rounded-lg */
+            font-size: 1.125rem;   /* text-lg */
+            transition: all .3s ease;
+        }
+        .widget-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,192,154,.15);
+            background-color: #00a883; /* subtle hover */
+        }
+
+        /* (AMOLED) Updated hero visual styles */
+        .hero-visual {
+            background: #0f172a; /* brand-light (slate-900) */
+            border: 1px solid #1e293b; /* brand-border (slate-800) */
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .hero-visual-header {
+            background-color: #1e293b; /* slate-800 */
+            border-bottom: 1px solid #334155; /* slate-700 */
+        }
+
+        /* Styles for the score gauge (DARK) - No change needed */
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', 'sans-serif';
+            font-weight: 800;
+            font-size: 2.5rem;
+            border: 8px solid;
+        }
+        .score-red {
+            border-color: #991b1b; /* red-800 */
+            color: #f87171; /* red-400 */
+            background-color: #7f1d1d20; /* red-900/20 */
+        }
+        .score-yellow {
+            border-color: #92400e; /* yellow-800 */
+            color: #facc15; /* yellow-400 */
+            background-color: #78350f20; /* yellow-900/20 */
+        }
+        .score-green {
+            border-color: #065f46; /* green-800 */
+            color: #4ade80; /* green-400 */
+            background-color: #064e3b20; /* green-900/20 */
+        }
+        
+        /* Helper for list items in report (AMOLED) */
+        .report-list-item {
+            padding-bottom: 0.75rem; /* Increased padding */
+            border-bottom: 1px solid #1e293b; /* brand-border (slate-800) */
+            margin-bottom: 0.75rem; /* Increased margin */
+        }
+        .report-list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        /* Styles for Banking Charts (AMOLED) */
+        .chart-visual {
+            border-left: 1px solid #1e293b; /* brand-border */
+            border-bottom: 1px solid #1e293b;
+            height: 150px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 10px 12px 6px 12px;
+            gap: 8px;
+        }
+        .chart-empty {
+            font-size: 0.875rem; /* text-sm */
+            color: #94a3b8; /* brand-gray */
+            padding: 16px 4px 8px 4px;
+            text-align: center;
+            width: 100%;
+        }
+        .bar-wrapper {
+            flex: 1;
+            max-width: 90px;
+            height: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            position: relative;
+        }
+        .bar {
+            width: 90%;
+            max-width: 40px;
+            background-color: #00C09A; /* brand-green */
+            position: relative;
+            min-height: 2px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease-out;
+        }
+        .bar-green { background: linear-gradient(180deg, #00C09A, #008a6c); }
+        .bar-blue { background: linear-gradient(180deg, #3B82F6, #1D4ED8); }
+        .bar-yellow { background: linear-gradient(180deg, #F59E0B, #B45309); }
+        .bar-red { background: linear-gradient(180deg, #EF4444, #B91C1C); }
+        .bar-label {
+            font-size: 0.75rem; /* text-xs */
+            color: #94a3b8; /* brand-gray */
+            padding-top: 4px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem; /* text-xs */
+            color: #f1f5f9; /* brand-dark */
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Styles for Data Table (AMOLED) */
+        .data-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.875rem; /* text-sm */
+            overflow-x: auto;
+            display: block;
+        }
+        .data-table th, .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #1e293b; /* brand-border */
+            text-align: left;
+            white-space: nowrap;
+        }
+        .data-table th {
+            background-color: #0f172a; /* brand-light (slate-900) */
+            font-weight: 600;
+            color: #94a3b8; /* brand-gray */
+            font-size: 0.75rem; /* text-xs */
+            text-transform: uppercase;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table .monthly-avg td {
+            font-weight: 600;
+            background-color: #1e293b; /* slate-800 */
+            color: #f1f5f9; /* brand-dark */
+            border-top: 2px solid #334155; /* slate-700 */
+        }
+        .text-red-table { color: #f87171; } /* red-400 */
+        .text-green-table { color: #4ade80; } /* green-400 */
+
+        /* Styles for Risk Checklist (DARK) - No change needed */
+        .risk-checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.875rem; /* text-sm */
+            margin-bottom: 0.75rem; /* mb-3 */
+            line-height: 1.4;
+        }
+        .risk-checklist-item:last-child { margin-bottom: 0; }
+        .risk-label {
+            flex: 0 0 160px; /* Basis 160px */
+            color: #f1f5f9; /* brand-dark */
+            font-weight: 500;
+        }
+        .chip {
+            flex: 1;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600;
+            text-align: left;
+            line-height: 1.45;
+            border: 1px solid transparent;
+        }
+        .chip-red { color: #fca5a5; background-color: #7f1d1d20; border-color: #991b1b; }
+        .chip-green { color: #86efac; background-color: #064e3b20; border-color: #065f46; }
+        .chip-yellow { color: #fde047; background-color: #78350f20; border-color: #92400e; }
+        /* (AMOLED) Darkened grey chip */
+        .chip-grey { color: #cbd5e1; background-color: #1e293b; border-color: #334155; }
+    </style>
+</head>
+
+<!-- (AMOLED) Body: Page background set to bg-black, default text to brand-dark, Alpine data added -->
+<body class="font-sans text-brand-dark bg-black" 
+      x-data="{ 
+          open: false, 
+          page: 'home', 
+          settingsModalOpen: false,
+          openSettingsModal() { 
+              this.settingsModalOpen = true;
+              document.dispatchEvent(new CustomEvent('open-settings'));
+          },
+          closeSettingsModal() { 
+              this.settingsModalOpen = false;
+          }
+      }">
+    
+    <!-- (AMOLED) Header / Navigation -->
+    <header class="bg-black/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center relative">
+            <!-- Logo -->
+            <a href="#" @click.prevent="page = 'home'; open = false; document.getElementById('main-widget-container')?.scrollIntoView();" class="flex items-center space-x-2.5">
+                <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- (MODIFIED) Changed fill from #00C09A to #FACC15 (yellow) -->
+                <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#FACC15"/>
+                <!-- (MODIFIED) Changed stroke from white to black -->
+                <path d="M17.5 25L22.5 30L32.5 20" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+            </a>
+            <!-- Desktop Nav (text-brand-dark is light in dark mode) -->
+            <div class="hidden md:flex items-center space-x-7">
+                <a href="#platform" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Platform</a>
+                <a href="#process"  @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Process</a>
+                <a href="#pricing"  @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Pricing</a>
+                <a href="#platform" @click="page = 'home'" class="text-brand-dark hover:text-brand-green font-medium transition-colors">Developers</a>
+            </div>
+            <!-- (AMOLED) Settings Button -->
+            <button @click="openSettingsModal()" class="hidden md:inline-block bg-slate-800 border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">
+                Settings
+            </button>
+            
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden" @click="open = !open" :aria-expanded="open.toString()" aria-controls="mobile-menu" aria-label="Toggle menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+            
+            <!-- (AMOLED) Mobile Menu -->
+            <div id="mobile-menu"
+                x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="absolute inset-x-0 top-full mt-2 w-full p-4 md:hidden z-50"
+                @click.outside="open = false"
+                x-cloak>
+                <div class="bg-slate-900 rounded-lg shadow-xl border border-brand-border p-5 space-y-4">
+                    <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Platform</a>
+                    <a href="#process"  class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Process</a>
+                    <a href="#pricing"  class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Pricing</a>
+                    <a href="#platform" class="block text-brand-dark hover:text-brand-green font-medium transition-colors" @click="page = 'home'; open = false">Developers</a>
+                    <button @click="openSettingsModal(); open = false" class="block w-full text-center bg-slate-800 border border-brand-border text-brand-dark font-medium py-2.5 px-5 rounded-lg hover:border-brand-gray transition-colors">
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- [START] HOME PAGE CONTENT -->
+        <div x-show="page === 'home'">
+            <!-- (AMOLED) Hero Section -->
+            <section class="bg-black py-24 md:py-36">
+                <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <!-- Hero Text (text-brand-dark/gray are light/mid in dark mode) -->
+                    <div class="text-center lg:text-left">
+                    <h1 class="text-5xl md:text-7xl font-heading font-extrabold text-brand-dark leading-tight mb-6">
+                        The <span class="yellow-gradient-text">Gold Standard</span> of
+                        <span class="text-brand-dark">AI</span> <span class="text-brand-green">Underwriting</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-brand-gray max-w-xl mx-auto lg:mx-0 mb-10">
+                        The AI underwriting tool for advanced decision-making in seconds. Our platform validates, analyzes, and reports on business health to ensure your decisions are fast, fair, and compliant.
+                    </p>
+                    <div class="flex justify-center lg:justify-start items-center space-x-4">
+                        <a href="#" @click.prevent="page = 'demo'" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-lg text-lg cta-button">Request Demo</a>
+                        <a href="#platform" @click="page = 'home'" class="bg-slate-800 border border-brand-border text-brand-dark font-medium py-3.5 px-8 rounded-lg text-lg hover:border-brand-gray transition-colors">Read Docs</a>
+                    </div>
+                    </div>
+                    <!-- (AMOLED) Hero Visual -->
+                    <div class="hero-visual">
+                    <div class="hero-visual-header px-4 py-3">
+                        <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-slate-500 rounded-full"></div>
+                        <div class="w-3 h-3 bg-slate-500 rounded-full"></div>
+                        <div class="w-3 h-3 bg-slate-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div class="flex justify-between items-center">
+                        <span class="font-heading font-bold text-lg text-brand-dark">Model: FinCredit v2.1</span>
+                        <span class="bg-yellow-900/30 text-yellow-300 text-sm font-medium px-3 py-1 rounded-full">Scanning...</span>
+                        </div>
+                        <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-green-900/30 text-green-300 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            </div>
+                            <span class="text-brand-dark font-medium">Fairness & Bias Audit</span>
+                            <span class="ml-auto text-green-400 font-medium">Passed</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-green-900/30 text-green-300 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            </div>
+                            <span class="text-brand-dark font-medium">Security & Robustness</span>
+                            <span class="ml-auto text-green-400 font-medium">Passed</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-red-900/30 text-red-300 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            </div>
+                            <span class="text-brand-dark font-medium">EU AI Act Compliance</span>
+                            <span class="ml-auto text-red-400 font-medium">Failed</span>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    <!-- /Hero Visual -->
+                </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) CTA Section -->
+            <section id="demo-top" class="bg-slate-900">
+                <div class="container mx-auto px-6 py-16 text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mb-6">Make Decisions in Seconds.</h2>
+                <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.</p>
+                </div>
+            </section>
+
+            <!-- (AMOLED) Your Verification Report Section -->
+            <section id="report-mockup" class="py-24 bg-black">
+                <div class="container mx-auto px-6">
+                    <!-- Live AI Demos header -->
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <span class="font-heading font-bold text-brand-green bg-green-900/30 px-3 py-1 rounded-md">Live AI Demo</span>
+                        <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mt-6 mb-4">See Our AI in Action</h2>
+                        <p class="text-lg text-brand-gray">Use our AI tool below to generate a live, comprehensive business report.</p>
+                    </div>
+
+                    <!-- 
+                    ================================================================
+                    [START] INJECTED COMPREHENSIVE WIDGET
+                    This is the widget from trustbureau_dark.html
+                    ================================================================
+                    -->
+                    <div id="main-widget-container" class="max-w-xl mx-auto w-full transition-all duration-300 ease-in-out">
+                        <!-- (AMOLED): Main widget bg set to slate-900, border to brand-border -->
+                        <div class="bg-slate-900 border border-brand-border rounded-lg shadow-lg p-6 flex flex-col relative">
+                            
+                            <h3 class="text-2xl font-heading font-bold text-brand-dark mb-4 text-center">
+                                Live AI Comprehensive Business Report
+                            </h3>
+                            <div class="space-y-4 max-w-xl mx-auto w-full">
+                                <div>
+                                    <!-- (MODIFIED): Added text-center -->
+                                    <label for="business-name" class="block text-sm font-medium text-brand-dark text-center">Enter any Business Name</label>
+                                    <!-- (AMOLED): Input styles updated -->
+                                    <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 bg-slate-800 border border-brand-border rounded-md shadow-sm placeholder-brand-gray text-brand-dark focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="e.g., Tesla, Inc. or Apex Innovations">
+                                </div>
+                                <!-- [MODIFIED] Button classes updated to match site-wide CTA style -->
+                                <button id="generate-report-btn" class="w-full flex justify-center py-3.5 px-8 text-lg font-bold rounded-lg text-white bg-brand-green cta-button disabled:opacity-50 disabled:cursor-wait">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
+                                    </svg>
+                                    <!-- (MODIFIED) Removed the word "Master" -->
+                                    <span>Generate Report</span>
+                                </button>
+                            </div>
+                            
+                            <!-- (AMOLED): Results Container border updated -->
+                            <div id="report-results-container" class="mt-6 border-t border-brand-border pt-6" style="display: none;">
+                                <!-- Loader -->
+                                <div id="report-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box py-16">
+                                    <svg class="animate-spin h-12 w-12 text-brand-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-lg text-brand-gray font-medium">Building Comprehensive Report...</span>
+                                    <span class="text-sm text-brand-gray">This may take a moment as the AI performs multiple searches.</span>
+                                </div>
+
+                                <!-- (DARK): Error container styles updated -->
+                                <div id="report-error-container" style="display: none;" class="p-4 border border-red-700 rounded-lg bg-red-900/20 results-box flex flex-col items-center justify-center">
+                                    <p class="text-sm font-bold text-red-300">An Error Occurred</p>
+                                    <p class="text-sm text-red-400" id="report-error-message"></p>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div id="report-content" class="w-full" style="display: none;">
+                                    
+                                    <!-- (AMOLED): Report Header styles updated -->
+                                    <div class="mb-6 pb-4 border-b border-brand-border">
+                                        <h2 id="report-company-name-header" class="text-3xl font-heading font-bold text-brand-dark text-center"></h2>
+                                        <p id="report-summary-header" class="text-center text-brand-gray text-lg mt-2 max-w-3xl mx-auto"></p>
+                                    </div>
+
+                                    <!-- Main 2-Column Grid (Re-organized) -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+                                        <!-- [SIDEBAR COLUMN: Vitals & Checks] -->
+                                        <div class="lg:col-span-2 space-y-6">
+                                            
+                                            <!-- AI Risk Score -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="flex flex-col items-center p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <div id="report-score-circle" class="score-circle mb-4">
+                                                        <span id="report-score-digit">...</span>
+                                                    </div>
+                                                    <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic"></p>
+                                                    
+                                                    <div class="w-full text-left">
+                                                        <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                                                        <ul id="report-score-positives" class="space-y-1.5 mb-3"></ul>
+                                                        <ul id="report-score-negatives" class="space-y-1.5"></ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Public Sentiment -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Sentiment</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <h5 id="report-sentiment-rating" class="font-heading font-bold text-2xl text-brand-dark mb-2"></h5>
+                                                    <p id="report-sentiment-justification" class="text-sm text-brand-gray italic"></p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Public Records -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Records</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
+                                                        <!-- Items will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Legal & Regulatory -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Legal & Regulatory</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-legal-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
+                                                        <!-- Items will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- AI Risk Checklist -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Checklist</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-risk-checklist" class="space-y-3">
+                                                        <!-- Checklist items will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        
+                                        <!-- [MAIN COLUMN: Story & Analysis] -->
+                                        <div class="lg:col-span-3 space-y-6">
+
+                                            <!-- AI Recommendation (MOVED HERE) -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Underwriting Recommendation</h4>
+                                                <div id="report-recommendation-box" class="p-4 border-l-4 rounded-r-lg">
+                                                    <h5 id="report-recommendation-decision" class="font-heading font-bold text-2xl"></h5>
+                                                    <p id="report-recommendation-justification" class="text-sm mt-1"></p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Key Info (MOVED FROM LEFT) -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Key Information</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul class="space-y-2 text-sm text-brand-gray">
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Website:</strong> <span id="report-key-website" class="font-medium text-brand-dark sm:text-right break-all"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Industry:</strong> <span id="report-key-industry" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>CEO:</strong> <span id="report-key-ceo" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Founded:</strong> <span id="report-key-founded" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Employees:</strong> <span id="report-key-employees" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Phone:</strong> <span id="report-key-phone" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Address:</strong> <span id="report-key-address" class="font-medium text-brand-dark sm:text-right text-left break-words"></span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Business Location Map -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Business Location</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <iframe 
+                                                        id="report-map-iframe"
+                                                        width="100%" 
+                                                        height="300" 
+                                                        frameborder="0" 
+                                                        scrolling="no" 
+                                                        marginheight="0" 
+                                                        marginwidth="0" 
+                                                        src=""
+                                                        class="rounded-lg border border-brand-border"
+                                                        aria-label="Business Location Map"
+                                                        style="display: none; filter: invert(90%);"> <!-- (DARK): Added filter to invert map colors -->
+                                                    </iframe>
+                                                    <p id="report-map-fallback" class="text-sm text-brand-gray italic mt-2" style="display: none;">Map could not be loaded. Address may be missing or invalid.</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Corporate Filings (MOVED FROM LEFT) -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul class="space-y-2 text-sm text-brand-gray">
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Banking Snapshot & Trends -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Banking Snapshot & Trends</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                        <!-- True Revenue -->
+                                                        <div>
+                                                            <h5 class="text-sm font-semibold text-brand-dark mb-2">True Revenue (Last 3 Months)</h5>
+                                                            <div id="banking-chart-revenue" class="chart-visual">
+                                                                <!-- Chart will be injected by JS -->
+                                                            </div>
+                                                        </div>
+                                                        <!-- Average Daily Balance -->
+                                                        <div>
+                                                            <h5 class="text-sm font-semibold text-brand-dark mb-2">Average Daily Balance</h5>
+                                                            <div id="banking-chart-avg-balance" class="chart-visual">
+                                                                <!-- Chart will be injected by JS -->
+                                                            </div>
+                                                        </div>
+                                                        <!-- Ending Balance -->
+                                                        <div>
+                                                            <h5 class="text-sm font-semibold text-brand-dark mb-2">Ending Balance</h5>
+                                                            <div id="banking-chart-end-balance" class="chart-visual">
+                                                                <!-- Chart will be injected by JS -->
+                                                            </div>
+                                                        </div>
+                                                        <!-- Debt Service -->
+                                                        <div>
+                                                            <h5 class="text-sm font-semibold text-brand-dark mb-2">Debt Service (Monthly Payments)</h5>
+                                                            <div id="banking-chart-debt" class="chart-visual">
+                                                                <!-- Chart will be injected by JS -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Monthly Financial Breakdown -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Monthly Financial Breakdown</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <div class="overflow-x-auto">
+                                                        <table class="data-table w-full">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Month</th>
+                                                                    <th>Total Credits</th>
+                                                                    <th>Total Debits</th>
+                                                                    <th>Avg Balance</th>
+                                                                    <th>Min Balance</th>
+                                                                    <th>Days Neg</th>
+                                                                    <th># NSFs</th>
+                                                                    <th>Net Cashflow</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="report-monthly-breakdown-body">
+                                                                <!-- Rows will be injected by JS -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Extrapolated Debt Obligations -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Extrapolated Debt Obligations</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-debt-obligations-list" class="space-y-3">
+                                                        <!-- Debt items will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Financial Summary -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Summary</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <!-- Public Company View -->
+                                                    <div id="report-fin-public" style="display: none;">
+                                                        <ul class="space-y-2 text-sm text-brand-gray">
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Public Company</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Ticker:</strong> <span id="report-fin-ticker" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Market Cap:</strong> <span id="report-fin-marketcap" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Latest Revenue:</strong> <span id="report-fin-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Net Income:</strong> <span id="report-fin-netincome" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        </ul>
+                                                    </div>
+                                                    <!-- Private Company View -->
+                                                    <div id="report-fin-private" style="display: none;">
+                                                        <ul class="space-y-2 text-sm text-brand-gray">
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Private Company</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Annual Revenue:</strong> <span id="report-fin-est-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Profit Margin:</strong> <span id="report-fin-est-margin" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Cash on Hand:</strong> <span id="report-fin-est-cash" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        </ul>
+                                                    </div>
+                                                    
+                                                    <!-- Credit Snapshot (New) -->
+                                                    <div id="report-fin-credit" class="mt-4 pt-4 border-t border-brand-border">
+                                                        <h5 class="text-sm font-semibold uppercase text-brand-gray mb-3">Credit Snapshot</h5>
+                                                        <ul class="space-y-2 text-sm text-brand-gray">
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Decision:</strong> <span id="report-fin-credit-decision" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>FICO Score:</strong> <span id="report-fin-credit-score" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Total Debt (Credit):</strong> <span id="report-fin-credit-total-debt" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Revolving Debt:</strong> <span id="report-fin-credit-revolving-debt" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Avg Monthly Revenue (Bank):</strong> <span id="report-fin-credit-avg-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <p id="report-fin-note" class="text-xs italic text-brand-gray mt-3 pt-3 border-t border-brand-border"></p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- SWOT Analysis -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">SWOT Analysis</h4>
+                                                <div class="space-y-4">
+                                                    <!-- (DARK): SWOT card styles updated -->
+                                                    <div class="p-4 border border-green-800 rounded-lg bg-green-900/20">
+                                                        <h5 class="font-semibold text-green-400 mb-2">Strengths</h5>
+                                                        <ul id="report-swot-strengths" class="space-y-1 list-disc list-inside text-sm text-slate-300"></ul>
+                                                    </div>
+                                                    <div class="p-4 border border-red-800 rounded-lg bg-red-900/20">
+                                                        <h5 class="font-semibold text-red-400 mb-2">Weaknesses</h5>
+                                                        <ul id="report-swot-weaknesses" class="space-y-1 list-disc list-inside text-sm text-slate-300"></ul>
+                                                    </div>
+                                                    <div class="p-4 border border-blue-800 rounded-lg bg-blue-900/20">
+                                                        <h5 class="font-semibold text-blue-400 mb-2">Opportunities</h5>
+                                                        <ul id="report-swot-opportunities" class="space-y-1 list-disc list-inside text-sm text-slate-300"></ul>
+                                                    </div>
+                                                    <div class="p-4 border border-yellow-800 rounded-lg bg-yellow-900/20">
+                                                        <h5 class="font-semibold text-yellow-400 mb-2">Threats</h5>
+                                                        <ul id="report-swot-threats" class="space-y-1 list-disc list-inside text-sm text-slate-300"></ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Recent News -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Recent News</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-news-list" class="space-y-3">
+                                                        <!-- News items will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Customer Reviews -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Customer Reviews</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-reviews-list" class="space-y-4">
+                                                        <!-- Reviews will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Competitive Landscape -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Competitive Landscape</h4>
+                                                <!-- (AMOLED): Card styles updated -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
+                                                    <ul id="report-competitors-list" class="space-y-3">
+                                                        <!-- Competitors will be injected by JS -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- (AMOLED): Sources styles updated -->
+                                    <div id="report-sources-container" class="mt-8 border-t border-brand-border pt-6" style="display: none;">
+                                        <h5 class="text-sm font-semibold text-brand-gray uppercase mb-3">Data Sources</h5>
+                                        <ul id="report-sources" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 list-disc list-inside"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 
+                    ================================================================
+                    [END] INJECTED COMPREHENSIVE WIDGET
+                    ================================================================
+                    -->
+
+                </div>
+            </section>
+
+            <!-- (AMOLED) Trusted By -->
+            <section class="py-16 bg-brand-light">
+                <div class="container mx-auto px-6">
+                <h3 class="text-center text-sm font-semibold text-brand-gray tracking-wider uppercase mb-8">Trusted By Industry Leaders</h3>
+                <div class="flex flex-wrap justify-center items-center gap-x-10 md:gap-x-16 gap-y-8">
+                    <!-- Replaced text with placeholder logos -->
+                    <img src="https://placehold.co/180x40/1e293b/FFFFFF?text=Google+AI+Studio" alt="Google AI Studio Logo" class="h-8 md:h-9 w-auto opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+                    <img src="https://placehold.co/160x40/1e293b/FFFFFF?text=Anthropic" alt="Anthropic Logo" class="h-8 md:h-9 w-auto opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+                    <img src="https://placehold.co/140x40/1e293b/FFFFFF?text=OpenAI" alt="OpenAI Logo" class="h-8 md:h-9 w-auto opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+                    <img src="https://placehold.co/160x40/1e293b/FFFFFF?text=Perplexity" alt="Perplexity Logo" class="h-8 md:h-9 w-auto opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+                    <img src="https://placehold.co/200x40/1e293b/FFFFFF?text=Google+Workspace" alt="Google Workspace Logo" class="h-8 md:h-9 w-auto opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+                </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) How it Works -->
+            <section id="process" class="py-24 bg-black">
+                <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">A Simple, Verifiable Process</h2>
+                    <p class="text-lg text-brand-gray">Our streamlined process makes AI governance simple, fast, and transparent.</p>
+                </div>
+                <div class="space-y-16">
+                    <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
+                    <div class="font-heading font-bold text-7xl text-brand-dark">01</div>
+                    <div><h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Connect &amp; Scan</h3><p class="text-lg text-brand-gray">Securely connect your models, data, or platform via our API. Our scanner auto-detects vulnerabilities, biases, and compliance gaps.</p></div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
+                    <div class="font-heading font-bold text-7xl yellow-gradient-text">02</div>
+                    <div><h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Analyze &amp; Remediate</h3><p class="text-lg text-brand-gray">Receive a detailed risk dashboard with scorable, actionable insights. Use our tools and recommendations to fix issues before they become a problem.</p></div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-8">
+                    <div class="font-heading font-bold text-7xl text-brand-green">03</div>
+                    <div><h3 class="font-heading text-2xl font-bold text-brand-dark mb-3">Certify &amp; Monitor</h3><p class="text-lg text-brand-gray">Issue a "TrustBureau Certified" seal to display on your products. Our platform continuously monitors your models in production to prevent trust drift.</p></div>
+                    </div>
+                </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) Platform -->
+            <section id="platform" class="py-24 bg-brand-light">
+                <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="font-heading font-bold text-brand-green bg-green-900/30 px-3 py-1 rounded-md">The Platform</span>
+                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold yellow-gradient-text mt-6 mb-4">One Solution for AI Governance</h2>
+                    <p class="text-lg text-brand-gray">Our platform provides a complete, end-to-end solution for AI governance, risk, and compliance (GRC).</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- (AMOLED) Feature Cards -->
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-sm border border-brand-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-green mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Model Auditing</h3>
+                    <p class="text-brand-gray">Generate independent audit reports for performance, safety, and security.</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-sm border border-brand-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 0010 0l-3-9m0 0l3-1m-3 1v11m0-11l3 9m-3-9l-3 9M12 6l3 1m0 0l-3 9a5.002 5.002 0 0010 0l-3-9m0 0l3-1m-3 1v11m0-11l3 9m-3-9l-3 9" /></svg>
+                    <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Bias &amp; Fairness</h3>
+                    <p class="text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-sm border border-brand-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Security &amp; Robustness</h3>
+                    <p class="text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-sm border border-brand-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-green mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4-4m-4 0l4 4" /></svg>
+                    <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Compliance Hub</h3>
+                    <p class="text-brand-gray">Automate monitoring and reporting for EU AI Act, GDPR, HIPAA, and more.</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-sm border border-brand-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16v4m-2-2h4m5 16v4m-2-2h4M17 3v4m-2-2h4M3 11h18M3 7v8M21 7v8" /></svg>
+                    <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Explainable AI (XAI)</h3>
+                    <p class="text-brand-gray">Generate human-readable explanations for complex model decisions.</p>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-sm border border-brand-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" /></svg>
+                    <h3 class="font-heading text-xl font-bold text-brand-dark mb-2">Real-time Monitoring</h3>
+                    <p class="text-brand-gray">Get alerts on model drift, data integrity issues, and new threats.</p>
+                    </div>
+                </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) Pricing -->
+            <section id="pricing" class="py-24 bg-black">
+                <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-brand-dark mb-4">Pricing for Underwriting Teams</h2>
+                    <p class="text-lg text-brand-gray">Choose a plan that scales with your team's decision-making volume.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- (AMOLED) Pro Card -->
+                    <div class="bg-brand-light rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
+                    <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Pro</h3>
+                    <p class="text-brand-gray mb-6 h-12">For small teams and regional banks.</p>
+                    <div class="my-4"><span class="text-5xl font-heading font-extrabold text-brand-dark">$499</span><span class="text-brand-gray"> / mo</span></div>
+                    <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>5 User Seats</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 250 Reports / mo</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Standard AI Analysis</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Email Support</li>
+                    </ul>
+                    <a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-slate-800 text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-slate-700 transition-colors">Get Started</a>
+                    </div>
+                    <!-- (AMOLED) Business Card -->
+                    <div class="bg-brand-light rounded-xl shadow-2xl p-8 flex flex-col relative scale-105 border-2 border-brand-green">
+                    <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full">Most Popular</div>
+                    <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Business</h3>
+                    <p class="text-brand-gray mb-6 h-12">For established teams and underwriting departments.</p>
+                    <div class="my-4"><span class="text-5xl font-heading font-extrabold text-brand-dark">$1,999</span><span class="text-brand-gray"> / mo</span></div>
+                    <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>20 User Seats</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Up to 1,500 Reports / mo</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Analysis &amp; XAI</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Compliance Modules (EU, GDPR)</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority Support</li>
+                    </ul>
+                    <a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-lg cta-button">Start Free Trial</a>
+                    </div>
+                    <!-- (AMOLED) Enterprise Card -->
+                    <div class="bg-brand-light rounded-xl shadow-lg p-8 flex flex-col border border-brand-border">
+                    <h3 class="font-heading text-lg font-bold text-brand-green uppercase">Enterprise</h3>
+                    <p class="text-brand-gray mb-6 h-12">For large-scale, automated, or on-premise deployments.</p>
+                    <div class="my-4"><span class="text-5xl font-heading font-extrabold text-brand-dark">Custom</span></div>
+                    <ul class="space-y-3 text-brand-gray mb-8 flex-grow">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited Users & Reports</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Full API & Integration Access</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>On-Premise & VPC Deployment</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Dedicated Account Manager & SLAs</li>
+                    </ul>
+                    <a href="#" @click.prevent="page = 'demo'" class="mt-auto w-full text-center bg-slate-300 text-slate-900 font-bold py-3 px-6 rounded-lg hover:bg-white transition-colors">Contact Sales</a>
+                    </div>
+                </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) Final CTA -->
+            <section id="demo-bottom" class="bg-slate-900">
+                <div class="container mx-auto px-6 py-24 text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">Make Decisions in Seconds</h2>
+                <p class="text-lg md:text-xl text-brand-gray max-w-2xl mx-auto mb-10">See our AI underwriting platform in action. Schedule a personalized demo to see how you can make faster, fairer decisions.</p>
+                <a href="#" @click.prevent="page = 'demo'" class="bg-brand-green text-white font-bold py-3.5 px-10 rounded-lg text-lg cta-button">Request Your Demo</a>
+                </div>
+            </section>
+        </div>
+        <!-- [END] HOME PAGE CONTENT -->
+
+        <!-- (AMOLED) [START] LOGIN PAGE -->
+        <div x-show="page === 'login'" x-cloak>
+            <div class="flex items-center justify-center min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-md w-full space-y-8">
+                <div>
+                    <a href="#" @click.prevent="page = 'home'" class="flex justify-center items-center space-x-2.5">
+                    <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- (MODIFIED) Changed fill from #00C09A to #FACC15 (yellow) -->
+                        <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#FACC15"/>
+                        <!-- (MODIFIED) Changed stroke from white to black -->
+                        <path d="M17.5 25L22.5 30L32.5 20" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+                    </a>
+                    <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">Member Login</h2>
+                </div>
+                <form class="mt-8 space-y-6" action="#" method="POST">
+                    <input type="hidden" name="remember" value="true">
+                    <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="email-address" class="sr-only">Email address</label>
+                        <input id="email-address" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-brand-border placeholder-brand-gray text-brand-dark rounded-t-md focus:outline-none focus:ring-brand-green focus:border-brand-green focus:z-10 sm:text-sm bg-slate-800" placeholder="Email address">
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">Password</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-brand-border placeholder-brand-gray text-brand-dark rounded-b-md focus:outline-none focus:ring-brand-green focus:border-brand-green focus:z-10 sm:text-sm bg-slate-800" placeholder="Password">
+                    </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                    <div class="text-sm"><a href="#" class="font-medium text-brand-green hover:text-green-700">Forgot your password?</a></div>
+                    </div>
+                    <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button">Sign in</button>
+                    </div>
+                </form>
+                <div class="text-center">
+                    <a href="#" @click.prevent="page = 'home'" class="font-medium text-brand-green hover:text-green-700">&larr; Back to Home</a>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!-- [END] LOGIN PAGE -->
+
+        <!-- (AMOLED) [START] DEMO REQUEST PAGE -->
+        <div x-show="page === 'demo'" x-cloak>
+            <div class="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-xl mx-auto">
+                <div>
+                    <h2 class="mt-6 text-center text-3xl font-heading font-extrabold text-brand-dark">Request a Demo</h2>
+                    <p class="mt-2 text-center text-lg text-brand-gray">See our AI underwriting platform in action. Fill out the form below to schedule a call.</p>
+                </div>
+                <form class="mt-8 space-y-6 bg-brand-light p-8 rounded-lg shadow-md border border-brand-border" action="#" method="POST">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="first-name" class="block text-sm font-medium text-brand-dark">First Name</label>
+                        <input type="text" name="first-name" id="first-name" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-slate-800 text-brand-dark">
+                    </div>
+                    <div>
+                        <label for="last-name" class="block text-sm font-medium text-brand-dark">Last Name</label>
+                        <input type="text" name="last-name" id="last-name" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-slate-800 text-brand-dark">
+                    </div>
+                    </div>
+                    <div>
+                    <label for="demo-email" class="block text-sm font-medium text-brand-dark">Work Email</label>
+                    <input type="email" name="demo-email" id="demo-email" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-slate-800 text-brand-dark" placeholder="you@company.com">
+                    </div>
+                    <div>
+                    <label for="company" class="block text-sm font-medium text-brand-dark">Company</label>
+                    <input type="text" name="company" id="company" required class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-slate-800 text-brand-dark">
+                    </div>
+                    <div>
+                    <label for="message" class="block text-sm font-medium text-brand-dark">Message (Optional)</label>
+                    <textarea id="message" name="message" rows="4" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm bg-slate-800 text-brand-dark" placeholder="Tell us a bit about your needs..."></textarea>
+                    </div>
+                    <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button">Submit Request</button>
+                    </div>
+                </form>
+                <div class="text-center mt-6">
+                    <a href="#" @click.prevent="page = 'home'" class="font-medium text-brand-green hover:text-green-700">&larr; Back to Home</a>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!-- [END] DEMO REQUEST PAGE -->
+    </main>
+
+    <!-- (AMOLED) Footer -->
+    <footer class="bg-black border-t border-brand-border">
+        <div class="container mx-auto px-6 py-16">
+        <div class="flex flex-col md:flex-row justify-between">
+            <div class="mb-8 md:mb-0 max-w-sm">
+            <a href="#" @click.prevent="page = 'home'" class="flex items-center space-x-2.5 mb-4">
+                <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- (MODIFIED) Changed fill from #00C09A to #FACC15 (yellow) -->
+                <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#FACC15"/>
+                <!-- (MODIFIED) Changed stroke from white to black -->
+                <path d="M17.5 25L22.5 30L32.5 20" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="font-heading text-2xl font-bold text-brand-dark">TrustBureau.ai</span>
+            </a>
+            <p class="text-sm text-brand-gray">&copy; 2025 TrustBureau.ai, Inc. All rights reserved.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+                <h4 class="font-heading font-semibold text-brand-dark mb-3">Product</h4>
+                <ul class="space-y-2">
+                <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Platform</a></li>
+                <li><a href="#process"  @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Process</a></li>
+                <li><a href="#pricing"  @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Pricing</a></li>
+                <li><a href="#" @click.prevent="page = 'demo'" class="text-brand-gray hover:text-brand-dark">Book a Demo</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-heading font-semibold text-brand-dark mb-3">Resources</h4>
+                <ul class="space-y-2">
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Blog</a></li>
+                <li><a href="#platform" @click="page = 'home'" class="text-brand-gray hover:text-brand-dark">Documentation</a></li>
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Whitepapers</a></li>
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">EU AI Act</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-heading font-semibold text-brand-dark mb-3">Company</h4>
+                <ul class="space-y-2">
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">About Us</a></li>
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Careers</a></li>
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-heading font-semibold text-brand-dark mb-3">Legal</h4>
+                <ul class="space-y-2">
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Privacy Policy</a></li>
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">Terms of Service</a></li>
+                <li><a href="#" @click.prevent="page = 'home'" class="text-brand-gray hover:text-brand-dark">DPA</a></li>
+                </ul>
+            </div>
+            </div>
+        </div>
+        </div>
+    </footer>
+
+    <!-- (AMOLED) Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" 
+         x-show="settingsModalOpen" 
+         @keydown.escape.window="closeSettingsModal()"
+         x-cloak>
+        <!-- Overlay -->
+        <div id="settings-overlay" class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+             @click="closeSettingsModal()" 
+             x-show="settingsModalOpen"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"></div>
+        
+        <!-- (AMOLED): Modal styles updated -->
+        <div class="relative w-full max-w-md p-6 bg-slate-900 rounded-lg shadow-xl transform transition-all border border-brand-border"
+             x-show="settingsModalOpen"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+                <h3 class="text-xl font-heading font-bold text-brand-dark">Settings</h3>
+                <button id="close-settings-btn" @click="closeSettingsModal()" class="p-1 text-brand-gray hover:text-brand-dark rounded-full hover:bg-slate-800">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mt-4 space-y-4">
+                <div>
+                    <label for="api-key-input" class="block text-sm font-medium text-brand-dark">Gemini API Key</label>
+                    <input type="password" id="api-key-input" class="mt-1 block w-full px-3 py-2 bg-slate-800 border-slate-700 rounded-md shadow-sm placeholder-slate-400 text-slate-100 focus:outline-none focus:ring-brand-green focus:border-brand-green sm:text-sm" placeholder="Enter your API key">
+                    <p class="mt-1 text-xs text-brand-gray">Your key is saved locally in your browser. It is not sent anywhere except to Google's API.</p>
+                </div>
+                <button id="save-api-key-btn" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cta-button">
+                    Save Key
+                </button>
+                <p id="api-key-status" class="text-sm text-center font-medium"></p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 
+    ================================================================
+    [START] SCRIPT FROM 'trustbureau_dark.html'
+    This script contains the logic for the comprehensive widget
+    ================================================================
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- UI Elements ---
+            const mainWidgetContainer = document.getElementById('main-widget-container'); 
+            
+            // --- [NEW] Settings Modal Elements ---
+            const settingsModal = document.getElementById('settings-modal');
+            const apiKeyInput = document.getElementById('api-key-input');
+            const saveApiKeyBtn = document.getElementById('save-api-key-btn');
+            const apiKeyStatus = document.getElementById('api-key-status');
+            // Note: close-settings-btn is handled by Alpine
+
+            const generateReportBtn = document.getElementById('generate-report-btn');
+            const businessNameInput = document.getElementById('business-name');
+            
+            // Containers
+            const resultsContainer = document.getElementById('report-results-container');
+            const loader = document.getElementById('report-loader');
+            const errorContainer = document.getElementById('report-error-container');
+            const errorMessage = document.getElementById('report-error-message');
+            const contentContainer = document.getElementById('report-content');
+            
+            // Headers
+            const companyNameHeader = document.getElementById('report-company-name-header');
+            const summaryHeader = document.getElementById('report-summary-header');
+            
+            // Col 1: Risk & Vitals
+            const recommendationBox = document.getElementById('report-recommendation-box');
+            const recommendationDecision = document.getElementById('report-recommendation-decision');
+            const recommendationJustification = document.getElementById('report-recommendation-justification');
+            
+            const scoreCircle = document.getElementById('report-score-circle');
+            const scoreDigit = document.getElementById('report-score-digit');
+            const scoreJustification = document.getElementById('report-score-justification');
+            const positiveList = document.getElementById('report-score-positives');
+            const negativeList = document.getElementById('report-score-negatives');
+            
+            // Col 2: Story & Analysis
+            const keyWebsite = document.getElementById('report-key-website');
+            const keyIndustry = document.getElementById('report-key-industry');
+            const keyCeo = document.getElementById('report-key-ceo');
+            const keyFounded = document.getElementById('report-key-founded');
+            const keyEmployees = document.getElementById('report-key-employees');
+            const keyPhone = document.getElementById('report-key-phone');
+            const keyAddress = document.getElementById('report-key-address');
+            
+            const mapIframe = document.getElementById('report-map-iframe'); 
+            const mapFallback = document.getElementById('report-map-fallback'); 
+            
+            const sosStatus = document.getElementById('report-sos-status');
+            const sosEntity = document.getElementById('report-sos-entity');
+            const sosJurisdiction = document.getElementById('report-sos-jurisdiction');
+            const sosDate = document.getElementById('report-sos-date');
+            const sosAgent = document.getElementById('report-sos-agent');
+            const sosName = document.getElementById('report-sos-name');
+            
+            const finPublicDiv = document.getElementById('report-fin-public');
+            const finTicker = document.getElementById('report-fin-ticker');
+            const finMarketCap = document.getElementById('report-fin-marketcap');
+            const finRevenue = document.getElementById('report-fin-revenue');
+            const finNetIncome = document.getElementById('report-fin-netincome');
+            
+            const finPrivateDiv = document.getElementById('report-fin-private');
+            const finEstRevenue = document.getElementById('report-fin-est-revenue');
+            const finEstMargin = document.getElementById('report-fin-est-margin');
+            const finEstCash = document.getElementById('report-fin-est-cash');
+            const finNote = document.getElementById('report-fin-note');
+
+            const swotStrengths = document.getElementById('report-swot-strengths');
+            const swotWeaknesses = document.getElementById('report-swot-weaknesses');
+            const swotOpportunities = document.getElementById('report-swot-opportunities');
+            const swotThreats = document.getElementById('report-swot-threats');
+
+            const sentimentRating = document.getElementById('report-sentiment-rating');
+            const sentimentJustification = document.getElementById('report-sentiment-justification');
+            const newsList = document.getElementById('report-news-list');
+            const reviewsList = document.getElementById('report-reviews-list');
+            const competitorsList = document.getElementById('report-competitors-list');
+            const recordsList = document.getElementById('report-records-list');
+            const legalList = document.getElementById('report-legal-list');
+            
+            const riskChecklist = document.getElementById('report-risk-checklist');
+            
+            const bankingChartRevenue = document.getElementById('banking-chart-revenue');
+            const bankingChartAvgBalance = document.getElementById('banking-chart-avg-balance');
+            const bankingChartEndBalance = document.getElementById('banking-chart-end-balance');
+            const bankingChartDebt = document.getElementById('banking-chart-debt');
+            
+            const monthlyBreakdownBody = document.getElementById('report-monthly-breakdown-body');
+            const debtObligationsList = document.getElementById('report-debt-obligations-list'); 
+            
+            const finCreditDecision = document.getElementById('report-fin-credit-decision');
+            const finCreditScore = document.getElementById('report-fin-credit-score');
+            const finCreditTotalDebt = document.getElementById('report-fin-credit-total-debt');
+            const finCreditRevolvingDebt = document.getElementById('report-fin-credit-revolving-debt');
+            const finCreditAvgRevenue = document.getElementById('report-fin-credit-avg-revenue');
+
+            // Footer
+            const sourcesContainer = document.getElementById('report-sources-container');
+            const sourcesList = document.getElementById('report-sources');
+
+
+            // --- Helper Function: Show/Hide Report State ---
+            function showReportState(state, message = '') {
+                loader.style.display = 'none';
+                errorContainer.style.display = 'none';
+                contentContainer.style.display = 'none';
+                sourcesContainer.style.display = 'none';
+                resultsContainer.style.display = 'block';
+
+                // Widget container expansion logic
+                mainWidgetContainer.classList.remove('max-w-xl', 'max-w-7xl');
+                if (state === 'content') {
+                    mainWidgetContainer.classList.add('max-w-7xl');
+                } else {
+                    mainWidgetContainer.classList.add('max-w-xl');
+                }
+
+                if (state === 'loading') {
+                    loader.style.display = 'flex';
+                } else if (state === 'error') {
+                    errorContainer.style.display = 'flex';
+                    errorMessage.innerText = message;
+                } else if (state === 'content') {
+                    contentContainer.style.display = 'block';
+                }
+            }
+            
+            // --- Helper Function: Populate List (UL) ---
+            function populateGenericList(element, items, formatter, placeholder = 'No information found.') {
+                if (!element) return; // Guard clause in case element doesn't exist
+                element.innerHTML = '';
+                if (items && items.length > 0) {
+                    items.forEach(item => {
+                        element.innerHTML += formatter(item);
+                    });
+                } else {
+                    element.innerHTML = `<li class="text-sm text-brand-gray italic">${placeholder}</li>`;
+                }
+            }
+            
+            // --- List Formatter Functions ---
+            const formatFinding = (finding) => {
+                const type = finding.type || 'Finding';
+                const details = finding.details || 'No details';
+                let color = 'text-brand-gray'; // (DARK): default
+                if (type.toLowerCase().includes('no records') || type.toLowerCase().includes('clear')) {
+                    color = 'text-green-400'; // (DARK): green
+                } else if (type.toLowerCase().includes('lien') || type.toLowerCase().includes('judgment') || type.toLowerCase().includes('lawsuit')) {
+                    color = 'text-red-400'; // (DARK): red
+                }
+                return `<li class="${color}"><strong>${type}:</strong> <span class="text-brand-gray">${details}</span></li>`;
+            };
+
+            const formatSwotItem = (item) => `<li class="text-sm text-slate-300">${item}</li>`; // (DARK): updated text color
+
+            const formatNewsItem = (item) => {
+                return `<li class="report-list-item">
+                    <strong class="text-sm font-medium text-brand-dark">${item.title || 'No Title'}</strong>
+                    <p class="text-sm text-brand-gray mt-1 mb-2">${item.summary || 'No summary.'}</p>
+                    <span class="text-xs text-brand-gray font-medium">${item.source || 'Unknown Source'}</span>
+                </li>`;
+            };
+
+            const formatReviewItem = (item) => {
+                // (AMOLED): updated border and bg
+                return `<blockquote class="p-4 border-l-4 border-brand-border bg-slate-900/50 report-list-item">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-brand-dark">${item.source || 'Unknown Source'}</span>
+                        <span class="text-sm font-bold text-brand-green">${item.rating || ''}</span>
+                    </div>
+                    <p class="text-sm italic text-brand-gray">"${item.snippet || 'No snippet provided.'}"</p>
+                </blockquote>`;
+            };
+
+            const formatCompetitorItem = (item) => {
+                return `<li class="report-list-item">
+                    <strong class="text-sm font-medium text-brand-dark">${item.name || 'Unknown Competitor'}</strong>
+                    <p class="text-sm text-brand-gray mt-1">${item.summary || 'No summary.'}</p>
+                </li>`;
+            };
+
+            const formatDebtItem = (item) => {
+                return `<li class="report-list-item">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                        <strong class="text-sm font-medium text-brand-dark">${item.type || 'Unknown Debt'}</strong>
+                        <span class="text-sm font-bold text-red-400 sm:text-right">${item.monthlyPayment || 'N/A'} / mo</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                        <span>Lender: <strong>${item.lender || 'Unknown Lender'}</strong></span>
+                        <span class="sm:text-right">Est. Balance: <strong>${item.estimatedBalance || 'N/A'}</strong></span>
+                    </div>
+                </li>`;
+            };
+
+            // --- Helper Function: Populate Banking Charts ---
+            function populateBankingCharts(element, data, barColorClass) {
+                if (!element) return;
+                element.innerHTML = '';
+                if (!data || data.length === 0) {
+                    element.innerHTML = `<div class="chart-empty">No recent data available.</div>`;
+                    return;
+                }
+
+                const maxAmount = Math.max(...data.map(d => d.amount || 0));
+                const scaleMax = maxAmount === 0 ? 1 : maxAmount * 1.1; 
+
+                data.forEach(item => {
+                    const barHeight = (item.amount / scaleMax) * 100;
+                    element.innerHTML += `
+                        <div class="bar-wrapper" title="${item.label}: ${item.value}">
+                            <div class="bar-value">${item.value || 'N/A'}</div>
+                            <div class="bar ${barColorClass || 'bar-green'}" style="height: ${barHeight}%;"></div>
+                            <div class="bar-label">${item.label || 'N/A'}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // --- Helper Function: Populate Monthly Breakdown Table ---
+            function populateMonthlyTable(bodyElement, months, averages) {
+                if (!bodyElement) return;
+                bodyElement.innerHTML = '';
+                if (!months || months.length === 0) {
+                    bodyElement.innerHTML = `<tr><td colspan="8" class="text-center italic text-brand-gray">No monthly statement breakdown available.</td></tr>`;
+                    return;
+                }
+
+                months.forEach(month => {
+                    const netColor = (month.netCashflow || '').startsWith('-') ? 'text-red-table' : 'text-green-table';
+                    bodyElement.innerHTML += `
+                        <tr>
+                            <td class="font-medium text-brand-dark">${month.month || 'N/A'}</td>
+                            <td class="text-green-table">${month.credits || '$0.00'}</td>
+                            <td class="text-red-table">${month.debits || '$0.00'}</td>
+                            <td>${month.avgBalance || '$0.00'}</td>
+                            <td>${month.minBalance || '$0.00'}</td>
+                            <td class="${(month.daysNeg || 0) > 0 ? 'text-red-table font-bold' : ''}">${month.daysNeg || 0}</td>
+                            <td class="${(month.nsfs || 0) > 0 ? 'text-red-table font-bold' : ''}">${month.nsfs || 0}</td>
+                            <td class="font-medium ${netColor}">${month.netCashflow || '$0.00'}</td>
+                        </tr>
+                    `;
+                });
+
+                if (averages) {
+                    const avgNetColor = (averages.netCashflow || '').startsWith('-') ? 'text-red-table' : 'text-green-table';
+                    bodyElement.innerHTML += `
+                        <tr class="monthly-avg">
+                            <td>Average</td>
+                            <td>${averages.credits || '$0.00'}</td>
+                            <td>${averages.debits || '$0.00'}</td>
+                            <td>${averages.avgBalance || '$0.00'}</td>
+                            <td>${averages.minBalance || '$0.00'}</td>
+                            <td>${averages.daysNeg || 0}</td>
+                            <td>${averages.nsfs || 0}</td>
+                            <td class="${avgNetColor}">${averages.netCashflow || '$0.00'}</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // --- Helper Function: Populate AI Risk Checklist ---
+            function populateRiskChecklist(element, items) {
+                if (!element) return;
+                element.innerHTML = '';
+                if (!items || items.length === 0) {
+                    element.innerHTML = `<li class="text-sm text-brand-gray italic">No checklist items available.</li>`;
+                    return;
+                }
+
+                items.forEach(item => {
+                    let colorClass = 'chip-grey';
+                    if (item.color === 'green') colorClass = 'chip-green';
+                    else if (item.color === 'red') colorClass = 'chip-red';
+                    else if (item.color === 'yellow') colorClass = 'chip-yellow';
+                    
+                    element.innerHTML += `
+                        <li class="risk-checklist-item">
+                            <span class="risk-label">${item.label || 'Unknown Check'}</span>
+                            <span class="chip ${colorClass}">${item.status || 'Not assessed.'}</span>
+                        </li>
+                    `;
+                });
+            }
+
+
+            // --- Helper Function: Populate Sources ---
+            function populateSources(sources) {
+                if (!sourcesList || !sourcesContainer) return;
+                sourcesList.innerHTML = ''; // Clear old sources
+                if (sources && sources.length > 0) {
+                    sources.forEach(source => {
+                        const li = document.createElement('li');
+                        li.className = 'text-xs truncate';
+                        li.innerHTML = `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-green hover:text-green-700">${source.title || source.uri}</a>`;
+                        sourcesList.appendChild(li);
+                    });
+                    sourcesContainer.style.display = 'block';
+                } else {
+                    sourcesContainer.style.display = 'none';
+                }
+            }
+            
+            // --- Helper Function: Populate Report Content (The "Master" Function) ---
+            function populateReport(data) {
+                // Use guard clauses for all elements
+                if (companyNameHeader) companyNameHeader.innerText = data.keyInfo?.companyName || 'Business Report';
+                if (summaryHeader) summaryHeader.innerText = data.keyInfo?.summary || 'A comprehensive AI-generated report.';
+
+                if (recommendationDecision) recommendationDecision.innerText = data.aiRecommendation?.decision || 'Manual Review';
+                if (recommendationJustification) recommendationJustification.innerText = data.aiRecommendation?.justification || 'AI justification not provided.';
+                if (recommendationBox) {
+                    const decision = data.aiRecommendation?.decision || 'Manual Review';
+                    recommendationBox.className = "p-4 border-l-4 rounded-r-lg"; // Reset
+                    if (recommendationDecision) recommendationDecision.className = "font-heading font-bold text-2xl"; // Reset
+                    
+                    if (decision.toLowerCase() === 'approve') {
+                        recommendationBox.classList.add('bg-green-900/20', 'border-green-700', 'text-green-300');
+                        if (recommendationDecision) recommendationDecision.classList.add('text-green-400');
+                    } else if (decision.toLowerCase() === 'decline') {
+                        recommendationBox.classList.add('bg-red-900/20', 'border-red-700', 'text-red-300');
+                        if (recommendationDecision) recommendationDecision.classList.add('text-red-400');
+                    } else {
+                        recommendationBox.classList.add('bg-yellow-900/20', 'border-yellow-700', 'text-yellow-300');
+                        if (recommendationDecision) recommendationDecision.classList.add('text-yellow-400');
+                    }
+                }
+
+                const score = data.aiRiskScore?.score || 0;
+                if (scoreDigit) scoreDigit.innerText = score;
+                if (scoreJustification) scoreJustification.innerText = data.aiRiskScore?.justification || 'No justification provided.';
+                
+                if (scoreCircle) {
+                    scoreCircle.className = "score-circle mb-4"; // reset classes
+                    if (score < 550) scoreCircle.classList.add('score-red');
+                    else if (score < 700) scoreCircle.classList.add('score-yellow');
+                    else scoreCircle.classList.add('score-green');
+                }
+
+                const checkIcon = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+                const xIcon = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+                
+                populateGenericList(positiveList, data.aiRiskScore?.positiveFactors, (item) => `<li class="flex items-start">${checkIcon}<span class="text-sm text-brand-dark">${item}</span></li>`, 'No positive factors noted.');
+                populateGenericList(negativeList, data.aiRiskScore?.negativeFactors, (item) => `<li class="flex items-start">${xIcon}<span class="text-sm text-brand-dark">${item}</span></li>`, 'No negative factors noted.');
+                
+                if (keyWebsite) keyWebsite.innerHTML = data.keyInfo?.website ? `<a href="${data.keyInfo.website.startsWith('http') ? '' : '//'}${data.keyInfo.website}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${data.keyInfo.website}</a>` : 'N/A';
+                if (keyIndustry) keyIndustry.innerText = data.keyInfo?.industry || 'N/A';
+                if (keyCeo) keyCeo.innerText = data.keyInfo?.ceoName || 'N/A';
+                if (keyFounded) keyFounded.innerText = data.keyInfo?.yearFounded || 'N/A';
+                if (keyEmployees) keyEmployees.innerText = data.keyInfo?.employeeCount || 'N/A';
+                if (keyPhone) keyPhone.innerText = data.keyInfo?.phone || 'N/A';
+                if (keyAddress) keyAddress.innerText = data.keyInfo?.fullAddress || 'N/A';
+
+                const address = data.keyInfo?.fullAddress;
+                if (address && address !== 'N/A') {
+                    const encodedAddress = encodeURIComponent(address);
+                    if (mapIframe) {
+                        mapIframe.src = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+                        mapIframe.style.display = 'block';
+                    }
+                    if (mapFallback) mapFallback.style.display = 'none';
+                } else {
+                    if (mapIframe) mapIframe.style.display = 'none';
+                    if (mapFallback) mapFallback.style.display = 'block';
+                }
+
+                if (sosName) sosName.innerText = data.sos?.entityName || 'N/A';
+                if (sosStatus) sosStatus.innerText = data.sos?.status || 'N/A';
+                if (sosEntity) sosEntity.innerText = data.sos?.entityType || 'N/A';
+                if (sosJurisdiction) sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
+                if (sosDate) sosDate.innerText = data.sos?.formationDate || 'N/A';
+                if (sosAgent) sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
+                if (sosStatus) {
+                    sosStatus.className = "font-medium text-brand-dark sm:text-right break-words"; // reset
+                    if (data.sos?.status?.toLowerCase().includes('active')) {
+                        sosStatus.classList.add('text-green-400');
+                    } else if (data.sos?.status && !data.sos?.status.toLowerCase().includes('n/a')) {
+                        sosStatus.classList.add('text-red-400');
+                    }
+                }
+
+                const fin = data.financialSummary;
+                if (fin?.isPublic) {
+                    if (finPublicDiv) finPublicDiv.style.display = 'block';
+                    if (finPrivateDiv) finPrivateDiv.style.display = 'none';
+                    if (finTicker) finTicker.innerText = fin.tickerSymbol || 'N/A';
+                    if (finMarketCap) finMarketCap.innerText = fin.marketCap || 'N/A';
+                    if (finRevenue) finRevenue.innerText = fin.latestRevenue || 'N/A';
+                    if (finNetIncome) finNetIncome.innerText = fin.netIncome || 'N/A';
+                } else {
+                    if (finPublicDiv) finPublicDiv.style.display = 'none';
+                    if (finPrivateDiv) finPrivateDiv.style.display = 'block';
+                    if (finEstRevenue) finEstRevenue.innerText = fin.estAnnualRevenue || 'N/A';
+                    if (finEstMargin) finEstMargin.innerText = fin.estProfitMargin || 'N/A';
+                    if (finEstCash) finEstCash.innerText = fin.cashOnHand || 'N/A';
+                }
+                
+                if (finCreditDecision) finCreditDecision.innerText = fin?.creditDecision || 'N/A';
+                if (finCreditScore) finCreditScore.innerText = fin?.ficoScore || 'N/A';
+                if (finCreditTotalDebt) finCreditTotalDebt.innerText = fin?.totalDebt || 'N/A';
+                if (finCreditRevolvingDebt) finCreditRevolvingDebt.innerText = fin?.revolvingDebt || 'N/A';
+                if (finCreditAvgRevenue) finCreditAvgRevenue.innerText = fin?.avgMonthlyRevenue || 'N/A';
+                
+                if (finNote) finNote.innerText = fin?.note || (fin?.isPublic ? 'Data sourced from public filings.' : 'Fictional data generated by AI for demonstration.');
+
+                populateGenericList(swotStrengths, data.swotAnalysis?.strengths, formatSwotItem, 'No strengths identified.');
+                populateGenericList(swotWeaknesses, data.swotAnalysis?.weaknesses, formatSwotItem, 'No weaknesses identified.');
+                populateGenericList(swotOpportunities, data.swotAnalysis?.opportunities, formatSwotItem, 'No opportunities identified.');
+                populateGenericList(swotThreats, data.swotAnalysis?.threats, formatSwotItem, 'No threats identified.');
+
+                if (sentimentRating) sentimentRating.innerText = data.publicSentiment?.rating || 'Neutral';
+                if (sentimentJustification) sentimentJustification.innerText = data.publicSentiment?.justification || 'No sentiment analysis available.';
+
+                populateGenericList(newsList, data.recentNews, formatNewsItem, 'No recent news found.');
+                populateGenericList(reviewsList, data.customerReviews, formatReviewItem, 'No customer reviews found.');
+                populateGenericList(competitorsList, data.competitors, formatCompetitorItem, 'No competitors identified.');
+                populateGenericList(recordsList, data.publicRecords?.findings, formatFinding, 'No public records found.');
+                populateGenericList(legalList, data.legalAndRegulatory?.findings, formatFinding, 'No legal or regulatory flags found.');
+
+                populateBankingCharts(bankingChartRevenue, data.bankingSnapshot?.revenue, 'bar-green');
+                populateBankingCharts(bankingChartAvgBalance, data.bankingSnapshot?.avgDailyBalance, 'bar-blue');
+                populateBankingCharts(bankingChartEndBalance, data.bankingSnapshot?.endingBalance, 'bar-yellow');
+                populateBankingCharts(bankingChartDebt, data.bankingSnapshot?.debtService, 'bar-red');
+
+                populateMonthlyTable(monthlyBreakdownBody, data.monthlyBreakdown?.months, data.monthlyBreakdown?.averages);
+                
+                populateGenericList(debtObligationsList, data.debtObligations, formatDebtItem, 'No extrapolated debt obligations found.');
+                
+                populateRiskChecklist(riskChecklist, data.aiRiskChecklist);
+            }
+
+            // --- Main Event Listener for Combined Widget ---
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', async () => {
+
+                    // [MODIFIED] Removed the faulty API key check.
+                    // An empty string "" (the demo key) is valid, but the old
+                    // `if (!apiKey)` check was incorrectly treating it as an error.
+                    // The `getApiKey()` call is now only inside `callReportAPI`.
+
+                    // [REMOVED BLOCK]
+                    // const apiKey = getApiKey();
+                    // if (!apiKey) { 
+                    //     showReportState('error', 'API Key not set. Please set it in the settings menu.');
+                    //     return;
+                    // }
+
+                    const businessName = businessNameInput.value.trim();
+                    if (!businessName) {
+                        showReportState('error', 'Please enter a business name.');
+                        return;
+                    }
+                    
+                    showReportState('loading');
+                    generateReportBtn.disabled = true; // Disable on load
+
+                    // This is the "Masterpiece" prompt
+                    const systemPrompt = `You are a world-class Tier-4 Senior Underwriting Analyst and business intelligence expert. A user is requesting an 'insanely comprehensive' master report on a company. You MUST use Google Search extensively to find as much real-world data as possible.
+1.  First, determine if the company is public (has a stock ticker) or private.
+2.  Second, conduct multiple searches to find ALL of the following: \`keyInfo\` (companyName, website, fullAddress, phone, yearFounded, industry, ceoName, employeeCount, and a 1-2 sentence summary), \`sos\` (corporate filing info: entityName, status, entityType, jurisdiction, formationDate, registeredAgent), \`publicRecords\` (liens, judgments, UCC filings), \`legalAndRegulatory\` (lawsuits, regulatory flags), \`recentNews\` (top 3-5 headlines with summaries and source), \`customerReviews\` (3-5 snippets with ratings/source), and \`competitors\` (top 2-3 with a brief summary).
+3.  Third, based on all found data, GENERATE: \`publicSentiment\` (e.g., 'Positive (8/10)' with justification), a full \`swotAnalysis\` (3-4 bullets each for strengths, weaknesses, opportunities, threats), an \`aiRiskScore\` (fictional score 300-850 with justification & 2-3 positive/negative factors), and a final \`aiRecommendation\` ('Approve', 'Decline', or 'Manual Review' with detailed justification).
+4.  Fourth, for \`financialSummary\`: If the company is PUBLIC, find its real \`tickerSymbol\`, \`marketCap\`, \`latestRevenue\`, and \`netIncome\`. If the company is PRIVATE, generate *fictional but realistic* \`estAnnualRevenue\`, \`estProfitMargin\`, and \`cashOnHand\`. ALSO, find (or generate fictional) \`creditDecision\`, \`ficoScore\`, \`totalDebt\`, \`revolvingDebt\`, \`avgMonthlyRevenue\`. Add a \`note\` stating if data is real or fictional.
+5.  Fifth, generate a *fictional but realistic* \`bankingSnapshot\` for 4 charts (revenue, avgDailyBalance, endingBalance, debtService), each with 3 months of data (\`[{"label": "string", "value": "string", "amount": 0}]\`).
+6.  Sixth, generate a *fictional but realistic* \`monthlyBreakdown\` with 3 months of \`months\` data and one \`averages\` object, matching the table structure.
+7.  Seventh, generate an \`aiRiskChecklist\` with 6 items, each with a \`label\`, \`status\` (e.g., 'No declining trend found.'), and \`color\` ('green', 'red', 'yellow', or 'grey').
+8.  Eighth, generate a *fictional but realistic* list of \`debtObligations\` (e.g., MCA, term loan) extrapolated from financial data, with at least 2-3 entries. Each item MUST have \`type\`, \`lender\`, \`estimatedBalance\`, and \`monthlyPayment\`.
+9.  Respond ONLY with a single, valid JSON object matching this *exact* structure. Fill all fields with 'N/A' or an empty array [] if no information can be found.
+
+\`{\"keyInfo\": {\"companyName\": \"string\", \"summary\": \"string\", \"website\": \"string\", \"fullAddress\": \"string\", \"phone\": \"string\", \"yearFounded\": \"string\", \"industry\": \"string\", \"ceoName\": \"string\", \"employeeCount\": \"string\"}, \"financialSummary\": {\"isPublic\": false, \"tickerSymbol\": \"string (if public)\", \"marketCap\": \"string (if public)\", \"latestRevenue\": \"string (if public)\", \"netIncome\": \"string (if public)\", \"estAnnualRevenue\": \"string (if private)\", \"estProfitMargin\": \"string (if private)\", \"cashOnHand\": \"string (Fictional - if private)\", \"note\": \"string\", \"creditDecision\": \"string (Fictional)\", \"ficoScore\": \"string (Fictional)\", \"totalDebt\": \"string (Fictional)\", \"revolvingDebt\": \"string (Fictional)\", \"avgMonthlyRevenue\": \"string (Fictional)\"}, \"bankingSnapshot\": {\"revenue\": [{\"label\": \"string\", \"value\": \"string\", \"amount\": 0}], \"avgDailyBalance\": [{\"label\": \"string\", \"value\": \"string\", \"amount\": 0}], \"endingBalance\": [{\"label\": \"string\", \"value\": \"string\", \"amount\": 0}], \"debtService\": [{\"label\": "string", "value": "string", "amount": 0}]}, \"monthlyBreakdown\": {\"months\": [{\"month\": \"string\", \"credits\": \"string\", \"debits\": \"string\", \"avgBalance\": \"string\", \"minBalance\": \"string\", \"daysNeg\": 0, \"nsfs\": 0, \"netCashflow\": \"string\"}], \"averages\": {\"credits\": \"string\", \"debits\": \"string\", \"avgBalance\": \"string\", \"minBalance\": \"string\", \"daysNeg\": 0, \"nsfs\": 0, \"netCashflow\": \"string\"}}, \"debtObligations\": [{\"type\": \"string\", \"lender\": \"string\", \"estimatedBalance\": \"string\", \"monthlyPayment\": \"string\"}], \"sos\": {\"entityName\": \"string\", \"status\": \"string\", \"entityType\": \"string\", \"jurisdiction\": \"string\", \"formationDate\": \"string\", \"registeredAgent\": \"string\"}, \"publicRecords\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\"}]}, \"legalAndRegulatory\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\", \"date\": \"string\"}]}, \"recentNews\": [{\"title\": \"string\", \"source\": \"string\", \"summary\": \"string\"}], \"customerReviews\": [{\"snippet\": \"string\", \"source\": \"string\", \"rating\": \"string\"}], \"competitors\": [{\"name\": \"string\", \"summary\": \"string\"}], \"publicSentiment\": {\"rating\": \"string\", \"justification\": \"string\"}, \"swotAnalysis\": {\"strengths\": [\"string\"], \"weaknesses\": [\"string\"], \"opportunities\": ["string"], \"threats\": ["string"]}, \"aiRiskScore\": {\"score\": 0, \"justification\": \"string\", \"positiveFactors\": [\"string\"], \"negativeFactors\": [\"string\"]}, \"aiRiskChecklist\": [{\"label\": \"string\", \"status\": \"string\", \"color\": \"string\"}], \"aiRecommendation\": {\"decision\": \"string\", \"justification\": \"string\"}}\``;
+                    
+                    const userQuery = `Generate a master comprehensive AI business report for: "${businessName}"`;
+
+                    try {
+                        const { json, sources } = await callReportAPI(systemPrompt, userQuery, 'full-report');
+                        populateReport(json);
+                        populateSources(sources);
+                        showReportState('content');
+                    } catch (error) {
+                        console.error("Full Report Error:", error);
+                        showReportState('error', `Failed to generate report: ${error.message}. The AI may be unable to parse data for this company, or the response was invalid.`);
+                    } finally {
+                        checkApiKey(); // Re-check API key status
+                    }
+                });
+            }
+
+            
+            /**
+             * -----------------------------------------------------------------
+             * API Helper Functions
+             * -----------------------------------------------------------------
+             */
+
+            async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+                let lastError;
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (!response.ok) {
+                            let errorBody;
+                            try { errorBody = await response.json(); } catch (e) { errorBody = null; }
+                            const errorMessage = errorBody?.error?.message || response.statusText;
+                            lastError = new Error(`API Error: ${errorMessage} (Status: ${response.status})`);
+                            if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
+                                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                                continue;
+                            } else {
+                                throw lastError;
+                            }
+                        }
+                        return await response.json();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < retries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                        }
+                    }
+                }
+                throw lastError || new Error("API request failed after all retries.");
+            }
+
+            async function callReportAPI(systemPrompt, userQuery, logId = 'api') {
+                const apiKey = getApiKey(); // [NEW] Get key
+                
+                // [MODIFIED] REMOVED faulty API key check. An empty string "" is VALID and uses the demo key.
+                // if (!apiKey) {
+                //     throw new Error("API Key not set. Please set it in the settings menu.");
+                // }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`; 
+
+                const textPayload = {
+                     contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                const result = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(textPayload) // Using text payload
+                });
+
+                const candidate = result.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                    throw new Error("No content received from API. The model may be adjusting.");
+                }
+                
+                let json = null;
+                try {
+                    // Clean the text response which might be wrapped in markdown
+                    const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    json = JSON.parse(jsonString); 
+                } catch (e) {
+                    console.error(`[${logId}] Failed to parse JSON response:`, e);
+                    console.error("Raw text was:", text);
+                    throw new Error("Received an invalid JSON response from the API.");
+                }
+
+                // Extract grounding sources
+                let sources = [];
+                const groundingMetadata = candidate.groundingMetadata;
+                if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                    sources = groundingMetadata.groundingAttributions
+                        .map(attribution => ({
+                            uri: attribution.web?.uri,
+                            title: attribution.web?.title,
+                        }))
+                        .filter(source => source.uri && source.title);
+                }
+
+                 return { json, sources };
+            }
+
+            /**
+             * -----------------------------------------------------------------
+             * [NEW] Settings Modal & API Key Logic
+             * -----------------------------------------------------------------
+             */
+
+            function getApiKey() {
+                return localStorage.getItem('geminiApiKey') || "";
+            }
+
+            function checkApiKey() {
+                // const apiKey = getApiKey(); // No longer needed here
+                const btnSpan = generateReportBtn.querySelector('span');
+                
+                // [MODIFIED] The button should ALWAYS be enabled.
+                // An empty API key "" is valid and uses the demo key.
+                generateReportBtn.disabled = false;
+                if (btnSpan) btnSpan.innerText = 'Generate Report';
+            }
+
+            // This is called by the Alpine 'openSettingsModal'
+            function loadApiKey() {
+                // [MODIFIED] Update placeholder to reflect current key status
+                const apiKey = getApiKey();
+                if(apiKeyInput) {
+                    apiKeyInput.value = ""; // Always clear value for security
+                    if (apiKey) {
+                        apiKeyInput.placeholder = "Using user-provided key (saved)";
+                    } else {
+                        apiKeyInput.placeholder = "Using default demo key (leave blank to keep)";
+                    }
+                }
+                if(apiKeyStatus) apiKeyStatus.innerText = '';
+            }
+
+            function saveApiKey() {
+                const newKey = apiKeyInput.value.trim();
+                if (newKey) {
+                    localStorage.setItem('geminiApiKey', newKey);
+                    apiKeyStatus.innerText = 'API Key saved!';
+                    apiKeyStatus.className = "text-sm text-center font-medium text-green-400"; // (DARK)
+                } else {
+                    // [MODIFIED] Allow user to clear the key to return to demo key
+                    localStorage.removeItem('geminiApiKey');
+                    apiKeyStatus.innerText = 'User key removed. Using default demo key.';
+                    apiKeyStatus.className = "text-sm text-center font-medium text-brand-gray"; // (DARK)
+                }
+                checkApiKey(); // Re-validate button
+                
+                // Find the close function from Alpine and call it
+                // This is a bit of a hack, but necessary to bridge the two scopes
+                const alpineRoot = document.body;
+                if (alpineRoot && alpineRoot.__x) {
+                    alpineRoot.__x.dataStack[0].closeSettingsModal();
+                }
+            }
+
+            // --- [NEW] Settings Event Listeners ---
+            if (saveApiKeyBtn) {
+                saveApiKeyBtn.addEventListener('click', saveApiKey);
+            }
+            
+            // Listen for the custom event from Alpine
+            document.addEventListener('open-settings', () => {
+                loadApiKey();
+            });
+
+            // --- Initial Check on Load ---
+            checkApiKey();
+
+        });
+    </script>
+    <!-- [END] SCRIPT -->
+
+</body>
+</html>
