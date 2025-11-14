@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Client Report</title>
+    <!-- 
+      NEW: Added Inter font from Google Fonts for a cleaner look.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            /* NEW: Cleaner font stack */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa; /* Softer background */
+            color: #343a40; /* Darker, softer gray */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6; /* Softer border */
+            border-radius: 8px;
+            padding: 40px; /* More padding */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Softer shadow */
+        }
+        /* NEW: Header for the brand */
+        .header {
+            text-align: right;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0052cc; /* Professional blue */
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #212529; /* Near-black */
+            border-bottom: 2px solid #e9ecef; /* Lighter border */
+            padding-bottom: 15px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #0052cc; /* Professional blue */
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-top: 40px; /* More spacing */
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057; /* Dark gray */
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        /* NEW: Modern table styling (no vertical lines) */
+        th, td {
+            border: 0; /* Remove all cell borders */
+            border-bottom: 1px solid #dee2e6; /* Add row borders */
+            padding: 14px; /* More padding */
+            text-align: left;
+            word-break: break-word;
+        }
+        th {
+            background-color: #f8f9fa; /* Lighter header */
+            font-weight: 600;
+            color: #495057;
+            border-bottom-width: 2px; /* Thicker header border */
+        }
+        tbody tr:last-child td {
+            border-bottom: 0; /* No border on last row */
+        }
+        tbody tr:nth-child(even) {
+            background-color: transparent; /* Remove zebra striping for a cleaner look */
+        }
+        .summary-list {
+            list-style-type: none;
+            padding-left: 0;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden; /* To contain border-radius */
+        }
+        .summary-list li {
+            font-size: 16px;
+            padding: 15px 20px; /* More padding */
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-list li:last-child {
+            border-bottom: none;
+        }
+        .summary-list b {
+            color: #212529;
+            min-width: auto; /* Remove fixed width */
+            padding-right: 20px;
+            font-weight: 500;
+        }
+        .summary-list span {
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .ai-summary {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); /* Subtle shadow */
+        }
+        .ai-summary ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        .ai-recommendation {
+            background-color: #f8f9fa; /* Lighter background */
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 25px;
+            font-size: 16px;
+        }
+        
+        /* NEW: Improved Decision Block Styles */
+        .decision-block {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+        }
+        .decision-DECLINED {
+            background-color: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+        .decision-APPROVED {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+        .decision-MANUAL-REVIEW {
+            background-color: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+        .decision-block h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .decision-block p {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .decision-details {
+            font-size: 16px;
+            list-style: none;
+            padding-left: 0;
+        }
+        .decision-details li {
+            padding: 6px 0;
+        }
+
+        /* NEW: Subtler Placeholder Style */
+        .placeholder {
+            background-color: #fff9db;
+            border: 1px dashed #e6db55;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #6d6d00;
+            font-style: normal;
+        }
+        .placeholder-block {
+            background-color: #fff9db;
+            border: 1px dashed #e6db55;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #6d6d00;
+            font-style: normal;
+            display: block;
+            line-height: 1.5;
+        }
+
+        /* NEW: Cleaner Chart Styles */
+        .charts-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            background: #fdfdfd;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+        .chart {
+            width: 48%;
+            min-width: 300px;
+            margin-bottom: 20px;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #495057;
+        }
+        .chart-visual {
+            border-left: 2px solid #e9ecef;
+            border-bottom: 2px solid #e9ecef;
+            height: 150px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 0 10px;
+        }
+        .bar {
+            width: 20%;
+            background-color: #0052cc;
+            position: relative;
+            min-height: 1px;
+            border-radius: 3px 3px 0 0; /* Rounded top */
+        }
+        .bar-positive {
+            background-color: #20c997; /* Teal/Green */
+        }
+        .bar-negative {
+            background-color: #e63946; /* Red */
+            height: 100%;
+        }
+        .bar-label {
+            font-size: 12px;
+            text-align: center;
+            padding-top: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        .cashflow-chart {
+            display: flex;
+            justify-content: space-around;
+            height: 150px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .bar-wrapper {
+            width: 20%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+        }
+        .bar-wrapper-neg {
+             justify-content: flex-start;
+             border-top: 2px dashed #ced4da; /* Zero line */
+        }
+        .bar-value {
+            font-size: 12px;
+            text-align: center;
+            font-weight: bold;
+            position: absolute;
+            width: 100%;
+            top: -20px; /* Position value above positive bar */
+            color: #343a40;
+        }
+        .bar-value-neg {
+            top: auto;
+            bottom: -20px; /* Position value below negative bar */
+        }
+
+        /* NEW: Cleaner Risk Checklist */
+        .risk-checklist {
+            list-style: none;
+            padding: 10px 0 0 0;
+        }
+        .risk-checklist li {
+            font-size: 16px;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+        }
+        .risk-checklist li:last-child {
+            border-bottom: 0;
+        }
+        .risk-checklist li:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .risk-checklist span {
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .check-YES { color: #d90000; background-color: #fff1f1; border: 1px solid #ffcccc; } /* Red for YES (risk) */
+        .check-NO { color: #166534; background-color: #f0fdf4; border: 1px solid #bbf7d0; } /* Green for NO (no risk) */
+        .check-N-A { color: #575757; background-color: #f1f1f1; border: 1px solid #ddd; } /* Neutral */
+
+        /* NEW: Cleaner Verification Steps */
+        .verification-steps {
+            list-style-type: decimal;
+            padding-left: 25px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px 20px 20px 40px;
+            border-radius: 8px;
+        }
+        .verification-steps li {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #adb5bd; /* Lighter gray */
+            margin-top: 40px;
+            border-top: 1px solid #e9ecef;
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- NEW: Added Header -->
+        <div class="header">
+            TrustBureau.ai
+        </div>
+
+        <h1>Comprehensive Client Report</h1>
+        <p>This report has been automatically generated based on the Moneythumb JSON, Credit PDF, and Clear Report PDF submitted.</p>
+
+        <!-- 
+          SECTION: FINAL DECISION
+        -->
+        <h3>Final Decision & Underwriting Summary (AI-Generated)</h3>
+        <div class="ai-recommendation">
+            <!-- 
+              The class "decision-APPROVED", "decision-DECLINED", or "decision-MANUAL-REVIEW" 
+              should be populated by your Zap.
+            -->
+            <div class="decision-block decision-{{AI_DECISION_CLASS}}">
+                <h4>Decision</h4>
+                <p><span class="placeholder">{{AI_DECISION}}</span></p>
+            </div>
+
+            <ul class="decision-details">
+                <li><strong>Risk Score:</strong> <span class="placeholder">{{AI_RISK_SCORE}}</span></li>
+                <li><strong>Recommended Amount:</strong> <span class="placeholder">{{AI_REC_AMOUNT}}</span></li>
+            </ul>
+
+            <p><strong>Summary Justification:</strong></p>
+            <p class="placeholder-block">{{AI_SUMMARY_JUSTIFICATION}}</p>
+        </div>
+
+        <!-- 
+          NEW SECTION: VISUAL DASHBOARD
+        -->
+        <h2>Visual Dashboard (Email-Safe)</h2>
+        <div class="charts-container">
+            <div class="chart">
+                <div class="chart-title">Monthly Net Cash Flow</div>
+                <!-- 
+                  Your Zap's AI step will need to calculate relative heights (0-100%) for each bar.
+                  A positive/negative split is shown.
+                -->
+                <div class="cashflow-chart">
+                    <div class="bar-wrapper">
+                        <span class="bar-value"><span class="placeholder">{{NET_CASH_VAL_1}}</span></span>
+                        <div class="bar bar-positive" style="height: {{NET_CASH_BAR_1}}%;"></div>
+                        <div class="bar-label"><span class="placeholder">{{MONTH_1}}</span></div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <span class="bar-value"><span class="placeholder">{{NET_CASH_VAL_2}}</span></span>
+                        <div class="bar bar-positive" style="height: {{NET_CASH_BAR_2}}%;"></div>
+                        <div class="bar-label"><span class="placeholder">{{MONTH_2}}</span></div>
+                    </div>
+                    <div class="bar-wrapper bar-wrapper-neg">
+                        <div class="bar bar-negative" style="height: {{NET_CASH_BAR_3}}%;"></div>
+                        <span class="bar-value bar-value-neg"><span class="placeholder">{{NET_CASH_VAL_3}}</span></span>
+                        <div class="bar-label"><span class="placeholder">{{MONTH_3}}</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart">
+                <div class="chart-title">Monthly Average Balance</div>
+                <div class="chart-visual">
+                    <div class="bar-wrapper">
+                        <span class="bar-value"><span class="placeholder">{{AVG_BAL_VAL_1}}</span></span>
+                        <div class="bar" style="height: {{AVG_BAL_BAR_1}}%;"></div>
+                        <div class="bar-label"><span class="placeholder">{{MONTH_1}}</span></div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <span class="bar-value"><span class="placeholder">{{AVG_BAL_VAL_2}}</span></span>
+                        <div class="bar" style="height: {{AVG_BAL_BAR_2}}%;"></div>
+                        <div class="bar-label"><span class="placeholder">{{MONTH_2}}</span></div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <span class="bar-value"><span class="placeholder">{{AVG_BAL_VAL_3}}</span></span>
+                        <div class="bar" style="height: {{AVG_BAL_BAR_3}}%;"></div>
+                        <div class="bar-label"><span class="placeholder">{{MONTH_3}}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 
+          SECTION: AI SUMMARIES
+        -->
+        <h2>AI-Powered Analysis</h2>
+        <p style="font-style: italic; color: #555;">This section contains AI-generated summaries from the attached PDF documents (Credit Report & Clear Report) and an underwriting analysis of the bank data.</p>
+        
+        <h3>Credit Report Summary (from PDF)</h3>
+        <div class="ai-summary">
+            <p>Summary of the attached credit report:</p>
+            <ul>
+                <li><strong>FICO Score:</strong> <span class="placeholder">{{AI_FICO_SCORE}}</span></li>
+                <li><strong>Total Existing Debt:</strong> <span class="placeholder">{{AI_TOTAL_DEBT}}</span></li>
+                <li><strong>Revolving Debt:</strong> <span class="placeholder">{{AI_REVOLVING_DEBT}}</span></li>
+                <li><strong>Delinquencies:</strong> <span class="placeholder">{{AI_DELINQUENCIES}}</span></li>
+            </ul>
+        </div>
+
+        <h3>Public Records Summary (from Clear Report PDF)</h3>
+        <div class="ai-summary">
+            <p>Key findings from the attached clear report:</p>
+            <ul>
+                <li><strong>Liens:</strong> <span class="placeholder">{{AI_LIENS}}</span></li>
+                <li><strong>Judgements:</strong> <span class="placeholder">{{AI_JUDGEMENTS}}</span></li>
+                <li><strong>UCC Filings:</strong> <span class="placeholder">{{AI_UCC_FILINGS}}</span></li>
+            </ul>
+        </div>
+
+        <h3>Corporate Search Summary (from Clear Report / SoS PDF)</h3>
+        <div class="ai-summary">
+            <p>Key findings from the Secretary of State / Corporate search:</p>
+            <ul>
+                <li><strong>Entity Status:</strong> <span class="placeholder">{{AI_ENTITY_STATUS}}</span></li>
+                <li><strong>Formation Date:</strong> <span class="placeholder">{{AI_FORMATION_DATE}}</span></li>
+                <li><strong>Registered Agent:</strong> <span class="placeholder">{{AI_REGISTERED_AGENT}}</span></li>
+            </ul>
+        </div>
+
+        <!-- 
+          SECTION: AI UNDERWRITING OF BANK DATA
+        -->
+        <h3>Underwriter's Bank Statement Analysis (AI-Generated from Moneythumb data)</h3>
+        <div class="ai-summary">
+            <ul>
+                <li>
+                    <strong>Cash Flow & Revenue:</strong> 
+                    <span class="placeholder-block">{{AI_CASH_FLOW_ANALYSIS}}</span>
+                </li>
+                <li>
+                    <strong>Risk & Red Flags:</strong>
+                    <span class="placeholder-block">{{AI_RISK_ANALYSIS}}</span>
+                </li>
+                <!-- NEW: Expanded AI Analysis -->
+                <li>
+                    <strong>Largest Transaction Analysis:</strong>
+                    <span class="placeholder-block">{{AI_LARGEST_TX_ANALYSIS}}</span>
+                </li>
+                 <li>
+                    <strong>Lender Stacking Analysis:</strong>
+                    <span class="placeholder-block">{{AI_LENDER_STACKING_ANALYSIS}}</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 
+          NEW SECTION: AI-Generated Risk Checklist
+          NEW: Updated class names for check-YES, check-NO
+        -->
+        <h3>AI-Generated Risk Checklist</h3>
+        <ul class="risk-checklist">
+            <li>Declining Revenue Trend? <span class="check-{{AI_CHK_REVENUE_CLASS}}">{{AI_CHK_REVENUE_TEXT}}</span></li>
+            <li>High Number of NSFs? <span class="check-{{AI_CHK_NSF_CLASS}}">{{AI_CHK_NSF_TEXT}}</span></li>
+            <li>Multiple Negative Days? <span class="check-{{AI_CHK_NEG_DAYS_CLASS}}">{{AI_CHK_NEG_DAYS_TEXT}}</span></li>
+            <li>MCA Stacking Identified? <span class="check-{{AI_CHK_STACKING_CLASS}}">{{AI_CHK_STACKING_TEXT}}</span></li>
+            <li>Liens or Judgements Found? <span class="check-{{AI_CHK_LIENS_CLASS}}">{{AI_CHK_LIENS_TEXT}}</span></li>
+            <li>SoS Status Not Active? <span class="check-{{AI_CHK_SOS_CLASS}}">{{AI_CHK_SOS_TEXT}}</span></li>
+        </ul>
+
+        <!-- 
+          NEW SECTION: AI-Generated Verification Steps
+        -->
+        <h3>Final Verification Steps (AI-Generated)</h3>
+        <ol class="verification-steps">
+            <li><span class="placeholder">{{AI_STEP_1}}</span></li>
+            <li><span class="placeholder">{{AI_STEP_2}}</span></li>
+            <li><span class="placeholder">{{AI_STEP_3}}</span></li>
+        </ol>
+
+
+        <!-- 
+          SECTION: KEY METRICS
+        -->
+        <h2>Key Metrics - <span class="placeholder">{{CLIENT_NAME}}</span> (from Moneythumb)</h2>
+        <ul class="summary-list">
+            <li><b>Revenue:</b> <span><span class="placeholder">{{METRIC_REVENUE}}</span></span></li>
+            <li><b>True Revenue:</b> <span><span class="placeholder">{{METRIC_TRUE_REVENUE}}</span></span></li>
+            <li><b>Expenses:</b> <span><span class="placeholder">{{METRIC_EXPENSES}}</span></span></li>
+            <li><b>Profit:</b> <span><span class="placeholder">{{METRIC_PROFIT}}</span></span></li>
+            <li><b>Balance/Days Negative:</b> <span><span class="placeholder">{{METRIC_BALANCE_DAYS_NEG}}</span></span></li>
+            <li><b>Non-True Revenue:</b> <span><span class="placeholder">{{METRIC_NON_TRUE_REVENUE}}</span></span></li>
+            <li><b>Average Monthly Net Revenue:</b> <span><span class="placeholder">{{METRIC_AVG_MONTHLY_NET}}</span></span></li>
+            <li><b>Minimum Monthly True Revenue:</b> <span><span class="placeholder">{{METRIC_MIN_MONTHLY_TRUE}}</span></span></li>
+            <li><b>Total Debt Withdrawals:</b> <span><span class="placeholder">{{METRIC_TOTAL_DEBT_WITHDRAWALS}}</span></span></li>
+            <li><b>DTI Percent:</b> <span><span class="placeholder">{{METRIC_DTI_PERCENT}}</span></span></li>
+        </ul>
+
+        <!-- 
+          SECTION: MONTHLY BREAKDOWN
+        -->
+        <h2>Monthly Financial Breakdown (from Moneythumb)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Total Credits</th>
+                    <th>Total Debits</th>
+                    <th>Avg Balance</th>
+                    <th>Min Balance</th>
+                    <th>Days Neg</th>
+                    <th># NSFs</th>
+                    <th>Net Cashflow</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create <tr>...</tr> blocks for each month -->
+                <tr>
+                    <td><span class="placeholder">{{MONTH_YEAR}}</span></td>
+                    <td><span class="placeholder">{{TOTAL_CREDITS}}</span></td>
+                    <td><span class="placeholder">{{TOTAL_DEBITS}}</span></td>
+                    <td><span class="placeholder">{{AVG_BALANCE}}</span></td>
+                    <td><span class="placeholder">{{MIN_BALANCE}}</span></td>
+                    <td><span class="placeholder">{{DAYS_NEG}}</span></td>
+                    <td><span class="placeholder">{{NUM_NSFS}}</span></td>
+                    <td><span class="placeholder">{{NET_CASHFLOW}}</span></td>
+                </tr>
+                <!-- Example of a second row -->
+                 <tr>
+                    <td><span class="placeholder">{{MONTH_YEAR}}</span></td>
+                    <td><span class="placeholder">{{TOTAL_CREDITS}}</span></td>
+                    <td><span class="placeholder">{{TOTAL_DEBITS}}</span></td>
+                    <td><span class="placeholder">{{AVG_BALANCE}}</span></td>
+                    <td><span class="placeholder">{{MIN_BALANCE}}</span></td>
+                    <td><span class="placeholder">{{DAYS_NEG}}</span></td>
+                    <td><span class="placeholder">{{NUM_NSFS}}</span></td>
+                    <td><span class="placeholder">{{NET_CASHFLOW}}</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 
+          SECTION: DETAILED LOGS
+        -->
+        <h2>Detailed Transaction Logs (from Moneythumb)</h2>
+
+        <h3>Daily Balance Log</h3>
+        <!-- Populated by 'scorecard.dailybalance.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Balance (<span class="placeholder">{{ACCOUNT_ID}}</span>)</th>
+                    <th>True Balance (<span class="placeholder">{{ACCOUNT_ID}}</span>)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create these rows -->
+                <tr>
+                    <td><span class="placeholder">{{DAILY_DATE}}</span></td>
+                    <td><span class="placeholder">{{DAILY_BALANCE}}</span></td>
+                    <td><span class="placeholder">{{DAILY_TRUE_BALANCE}}</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">...and so on for all days...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Large Transactions</h3>
+        <!-- Populated by 'scorecard.largetrans.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create these rows -->
+                <tr>
+                    <td><span class="placeholder">{{TX_DATE}}</span></td>
+                    <td><span class="placeholder">{{TX_DESC}}</span></td>
+                    <td><span class="placeholder">{{TX_AMOUNT}}</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">...and so on for all large transactions...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>All Credit Transactions</h3>
+        <!-- Populated by 'scorecard.credittrans.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create these rows -->
+                <tr>
+                    <td><span class="placeholder">{{TX_DATE}}</span></td>
+                    <td><span class="placeholder">{{TX_DESC}}</span></td>
+                    <td><span class="placeholder">{{TX_AMOUNT}}</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">...and so on for all credit transactions...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 
+          SECTION: RISK ANALYSIS
+        -->
+        <h2>Risk Analysis (Raw Data from Moneythumb)</h2>
+        
+        <h3>MCA Transactions</h3>
+        <!-- Populated by 'scorecard.mcatrans.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Lender</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create these rows -->
+                <tr>
+                    <td><span class="placeholder">{{MCA_LENDER}}</span></td>
+                    <td><span class="placeholder">{{TX_DATE}}</span></td>
+                    <td><span class="placeholder">{{TX_DESC}}</span></td>
+                    <td><span class="placeholder">{{TX_AMOUNT}}</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">...and so on for all MCA transactions...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Overdrafts</h3>
+        <!-- Populated by 'scorecard.overtrans.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Memo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create these rows -->
+                <tr>
+                    <td><span class="placeholder">{{TX_DATE}}</span></td>
+                    <td><span class="placeholder">{{TX_DESC}}</span></td>
+                    <td><span class="placeholder">{{TX_AMOUNT}}</span></td>
+                    <td><span class="placeholder">{{TX_MEMO}}</span></td>
+                </tr>
+                <!-- Add a placeholder row if no data -->
+                <!--
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">No overdrafts found.</td>
+                </tr>
+                -->
+            </tbody>
+        </table>
+
+        <h3>Returned Items</h3>
+        <!-- Populated by 'scorecard.returnedtrans.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop and create these rows -->
+                <tr>
+                    <td><span class="placeholder">{{TX_DATE}}</span></td>
+                    <td><span class="placeholder">{{TX_DESC}}</span></td>
+                    <td><span class="placeholder">{{TX_AMOUNT}}</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">...and so on for all returned items...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>NSF Transactions</h3>
+        <!-- Populated by 'scorecard.nsftrans.data' -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your Zap will loop, or show this message if no data -->
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 12px; font-style: italic; color: #6c757d;">No NSF transactions found.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p>--- End of Report ---</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
