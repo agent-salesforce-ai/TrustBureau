@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <title>Critical Financing – Offer Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Critical Financing offer builder – estimate your approvals and payments."
+  />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Poppins font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --cf-navy: #0b184b;   /* deep blue */
+      --cf-red: #dc2626;    /* bold red (accent only) */
+      --cf-light: #f9fafb;  /* soft white */
+    }
+
+    body {
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: var(--cf-light);
+      color: #0b184b;
+    }
+
+    .cf-shell {
+      border-radius: 1.5rem;
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.06),
+        0 16px 40px rgba(15, 23, 42, 0.16);
+    }
+
+    /* Primary CTA: solid navy */
+    .cf-primary-btn {
+      border-radius: 999px;
+      background-color: var(--cf-navy);
+      color: #ffffff;
+      padding: 0.55rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow:
+        0 4px 10px rgba(15, 23, 42, 0.35);
+      transition:
+        transform 0.12s ease-out,
+        box-shadow 0.12s ease-out,
+        background-color 0.12s ease-out;
+    }
+
+    .cf-primary-btn:hover {
+      background-color: #020617;
+      transform: translateY(-1px);
+      box-shadow:
+        0 8px 18px rgba(15, 23, 42, 0.45);
+    }
+
+    .cf-secondary-btn {
+      border-radius: 999px;
+      padding: 0.55rem 1.6rem;
+      font-size: 0.8rem;
+      border: 1px solid #cbd5f5;
+      background: #ffffff;
+      color: #0b184b;
+      font-weight: 500;
+      transition:
+        background-color 0.12s ease-out,
+        border-color 0.12s ease-out,
+        transform 0.12s ease-out,
+        color 0.12s ease-out;
+    }
+
+    .cf-secondary-btn:hover {
+      background: #e5edff;
+      border-color: #93c5fd;
+      color: #0b184b;
+      transform: translateY(-1px);
+    }
+
+    .cf-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cf-navy);
+    }
+
+    .cf-input {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      border: 1px solid #d1d5db;
+      color: #0b184b;
+      font-size: 0.9rem;
+      padding: 0.6rem 0.75rem;
+      outline: none;
+      width: 100%;
+      transition:
+        border-color 0.12s ease-out,
+        box-shadow 0.12s ease-out,
+        background-color 0.12s ease-out;
+    }
+
+    .cf-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .cf-input:focus {
+      border-color: var(--cf-navy);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.6),
+        0 0 0 3px rgba(191, 219, 254, 0.8);
+      background: #ffffff;
+    }
+
+    /* Remove number input arrows */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    /* Sliders: solid navy tone */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 0.38rem;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+      accent-color: var(--cf-navy);
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 0.38rem;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 0.9rem;
+      width: 0.9rem;
+      border-radius: 999px;
+      background-color: var(--cf-navy);
+      border: 1px solid #020617;
+      box-shadow: 0 0 0 2px #e5e7eb;
+      margin-top: -0.26rem;
+    }
+
+    input[type=range]::-moz-range-track {
+      height: 0.38rem;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      height: 0.9rem;
+      width: 0.9rem;
+      border-radius: 999px;
+      background-color: var(--cf-navy);
+      border: 1px solid #020617;
+    }
+
+    .cf-toggle-btn {
+      border-radius: 9999px;
+      border: 1px solid #cbd5f5;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: #ffffff;
+      color: #0b184b;
+      transition:
+        background-color 0.12s ease-out,
+        color 0.12s ease-out,
+        border-color 0.12s ease-out,
+        box-shadow 0.12s ease-out;
+    }
+
+    .cf-toggle-btn.cf-toggle-active {
+      background-color: var(--cf-navy);
+      color: #ffffff;
+      border-color: rgba(15, 23, 42, 0.95);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.9),
+        0 0 10px rgba(15, 23, 42, 0.55);
+    }
+
+    .cf-offer-shell {
+      border-radius: 1.25rem;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: #ffffff;
+      box-shadow:
+        0 0 0 1px rgba(148, 163, 184, 0.45),
+        0 16px 40px rgba(15, 23, 42, 0.16);
+    }
+
+    .cf-offer-hero-amount {
+      color: var(--cf-navy);
+    }
+
+    .cf-offer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--cf-navy);
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      padding: 0.18rem 0.6rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .cf-offer-pill .dot {
+      height: 0.45rem;
+      width: 0.45rem;
+      border-radius: 999px;
+      background-color: #22c55e; /* live green */
+      box-shadow:
+        0 0 0 2px rgba(34, 197, 94, 0.3),
+        0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .cf-saved-offer-card {
+      border-radius: 0.9rem;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 0.8rem 0.9rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-3 py-6">
+  <div class="w-full max-w-xl">
+    <section class="cf-shell p-4 sm:p-6 space-y-4">
+      <header class="space-y-3 text-center flex flex-col items-center">
+        <img
+          src="https://static.wixstatic.com/media/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png"
+          alt="Critical Financing"
+          class="h-8 w-auto mb-1"
+        />
+        <p class="cf-tag text-[0.65rem] tracking-[0.24em] text-slate-500">
+          Offer builder
+        </p>
+        <span class="cf-offer-pill text-[0.7rem] mt-1">
+          <span class="dot"></span>
+          Live preview
+        </span>
+      </header>
+
+      <!-- CALCULATOR -->
+      <section id="cf-offer-calculator" class="cf-offer-shell p-4 space-y-4">
+        <div class="space-y-3">
+          <div>
+            <label
+              for="cf-biz-name"
+              class="block mb-1 text-xs text-slate-600 font-medium"
+            >
+              Business Name (optional)
+            </label>
+            <input
+              id="cf-biz-name"
+              type="text"
+              class="cf-input text-sm"
+              placeholder="e.g., Acme Holdings LLC"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs text-slate-600">
+              <span class="font-medium">Amount You Get</span>
+              <span id="cf-amount-label" class="font-semibold text-slate-900">
+                $50,000
+              </span>
+            </div>
+            <input
+              id="cf-amount-slider"
+              type="range"
+              min="5000"
+              max="1000000"
+              step="1000"
+              value="50000"
+              class="w-full h-1.5 rounded-lg cursor-pointer bg-slate-200"
+            />
+            <input
+              id="cf-amount-input"
+              type="text"
+              inputmode="numeric"
+              class="cf-input text-sm mt-1"
+              placeholder="Enter amount"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs text-slate-600">
+              <span class="font-medium">Factor Rate</span>
+              <span id="cf-factor-label" class="font-semibold text-slate-900">
+                1.25x
+              </span>
+            </div>
+            <input
+              id="cf-factor-slider"
+              type="range"
+              min="1.10"
+              max="1.50"
+              step="0.01"
+              value="1.25"
+              class="w-full h-1.5 rounded-lg cursor-pointer bg-slate-200"
+            />
+            <input
+              id="cf-factor-input"
+              type="number"
+              step="0.01"
+              class="cf-input text-sm mt-1"
+              placeholder="1.25"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs text-slate-600">
+              <span class="font-medium">Term (Months)</span>
+              <span id="cf-term-label" class="font-semibold text-slate-900">
+                12 months
+              </span>
+            </div>
+            <input
+              id="cf-term-slider"
+              type="range"
+              min="3"
+              max="36"
+              step="1"
+              value="12"
+              class="w-full h-1.5 rounded-lg cursor-pointer bg-slate-200"
+            />
+            <input
+              id="cf-term-input"
+              type="number"
+              step="1"
+              class="cf-input text-sm mt-1"
+              placeholder="12"
+            />
+          </div>
+
+          <div class="flex items-center justify-center gap-2 pt-1">
+            <button
+              id="cf-toggle-daily"
+              type="button"
+              class="cf-toggle-btn text-xs"
+            >
+              Daily
+            </button>
+            <button
+              id="cf-toggle-weekly"
+              type="button"
+              class="cf-toggle-btn text-xs"
+            >
+              Weekly
+            </button>
+            <button
+              id="cf-toggle-monthly"
+              type="button"
+              class="cf-toggle-btn text-xs"
+            >
+              Monthly
+            </button>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-4 space-y-4">
+          <div class="text-center space-y-1">
+            <span class="text-xs font-semibold text-slate-500 block">
+              You get
+            </span>
+            <p
+              id="cf-summary-amount"
+              class="text-3xl sm:text-4xl font-semibold cf-offer-hero-amount"
+            >
+              $50,000
+            </p>
+            <p class="text-xs text-slate-600">
+              Total payback:
+              <span
+                id="cf-summary-payback"
+                class="font-semibold text-slate-900"
+              ></span>
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="text-center space-y-0.5">
+              <p class="text-[0.7rem] text-slate-500 font-medium">
+                Factor Rate
+              </p>
+              <p
+                id="cf-summary-factor"
+                class="text-sm font-semibold text-slate-900"
+              >
+                1.25x
+              </p>
+            </div>
+            <div class="text-center space-y-0.5">
+              <p class="text-[0.7rem] text-slate-500 font-medium">
+                Term
+              </p>
+              <p
+                id="cf-summary-term"
+                class="text-sm font-semibold text-slate-900"
+              >
+                12 months
+              </p>
+            </div>
+            <div class="text-center space-y-0.5">
+              <p class="text-[0.7rem] text-slate-500 font-medium">
+                Total Cost of Funds
+              </p>
+              <p
+                id="cf-summary-cost"
+                class="text-sm font-semibold text-slate-900"
+              ></p>
+            </div>
+            <div class="text-center space-y-0.5">
+              <p
+                id="cf-summary-payment-label"
+                class="text-[0.7rem] text-slate-500 font-medium"
+              >
+                Est. Daily Payment
+              </p>
+              <p
+                id="cf-summary-payment-value"
+                class="text-sm font-semibold text-slate-900"
+              ></p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-slate-200 pt-3 mt-2 flex flex-wrap gap-2 justify-center"
+        >
+          <button
+            id="cf-add-offer"
+            type="button"
+            class="cf-primary-btn text-xs flex items-center gap-1 justify-center w-full sm:w-auto"
+          >
+            <span>+ Add Offer</span>
+          </button>
+          <button
+            id="cf-share-link"
+            type="button"
+            class="cf-secondary-btn text-xs flex items-center gap-1 justify-center w-full sm:w-auto"
+          >
+            Copy Shareable Link
+          </button>
+        </div>
+
+        <div
+          id="cf-saved-offers-section"
+          class="border-t border-slate-200 pt-4 mt-4 hidden"
+        >
+          <p class="text-xs font-semibold text-slate-700 mb-2">
+            Additional offers
+          </p>
+          <div
+            id="cf-saved-offers-container"
+            class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"
+          ></div>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <script>
+    // ---- Calculator Logic ----
+    const cfEls = {
+      bizName: document.getElementById("cf-biz-name"),
+
+      amountSlider: document.getElementById("cf-amount-slider"),
+      amountInput: document.getElementById("cf-amount-input"),
+      amountLabel: document.getElementById("cf-amount-label"),
+
+      factorSlider: document.getElementById("cf-factor-slider"),
+      factorInput: document.getElementById("cf-factor-input"),
+      factorLabel: document.getElementById("cf-factor-label"),
+
+      termSlider: document.getElementById("cf-term-slider"),
+      termInput: document.getElementById("cf-term-input"),
+      termLabel: document.getElementById("cf-term-label"),
+
+      toggleDaily: document.getElementById("cf-toggle-daily"),
+      toggleWeekly: document.getElementById("cf-toggle-weekly"),
+      toggleMonthly: document.getElementById("cf-toggle-monthly"),
+
+      summaryAmount: document.getElementById("cf-summary-amount"),
+      summaryPayback: document.getElementById("cf-summary-payback"),
+      summaryFactor: document.getElementById("cf-summary-factor"),
+      summaryTerm: document.getElementById("cf-summary-term"),
+      summaryCost: document.getElementById("cf-summary-cost"),
+      summaryPaymentLabel: document.getElementById("cf-summary-payment-label"),
+      summaryPaymentValue: document.getElementById("cf-summary-payment-value"),
+
+      addOffer: document.getElementById("cf-add-offer"),
+      shareLink: document.getElementById("cf-share-link"),
+
+      savedSection: document.getElementById("cf-saved-offers-section"),
+      savedContainer: document.getElementById("cf-saved-offers-container"),
+    };
+
+    let cfPaymentFrequency = "daily";
+    const cfMaxAdditionalOffers = 2;
+    let cfSavedOffers = [];
+
+    function cfFormatCurrency(num) {
+      const n = Number(num);
+      if (isNaN(n)) return "$0";
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(n);
+    }
+
+    function cfParseCurrency(str) {
+      if (!str) return 0;
+      return parseFloat(String(str).replace(/[$,]/g, "")) || 0;
+    }
+
+    function cfComputeOffer(amount, factor, termMonths, frequency) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+
+      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
+      const weeklyPayment =
+        termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
+      const dailyPayment =
+        termMonths > 0 ? totalPayback / (termMonths * 22) : 0;
+
+      let payment = dailyPayment;
+      let paymentLabel = "Est. Daily Payment";
+
+      if (frequency === "weekly") {
+        payment = weeklyPayment;
+        paymentLabel = "Est. Weekly Payment";
+      } else if (frequency === "monthly") {
+        payment = monthlyPayment;
+        paymentLabel = "Est. Monthly Payment";
+      }
+
+      return {
+        amount,
+        factor,
+        termMonths,
+        totalPayback,
+        totalCost,
+        payment,
+        paymentLabel,
+        frequency,
+      };
+    }
+
+    function cfGetCurrentValues() {
+      const amount = cfParseCurrency(cfEls.amountInput.value);
+      const factor = parseFloat(cfEls.factorInput.value) || 1.25;
+      const term = parseInt(cfEls.termInput.value, 10) || 12;
+      return { amount, factor, term };
+    }
+
+    function cfUpdateToggleUI() {
+      const map = [
+        { btn: cfEls.toggleDaily, mode: "daily" },
+        { btn: cfEls.toggleWeekly, mode: "weekly" },
+        { btn: cfEls.toggleMonthly, mode: "monthly" },
+      ];
+
+      map.forEach(({ btn, mode }) => {
+        if (!btn) return;
+        btn.classList.remove("cf-toggle-active");
+        if (cfPaymentFrequency === mode) {
+          btn.classList.add("cf-toggle-active");
+        }
+      });
+    }
+
+    function cfRenderSavedOffers() {
+      if (!cfEls.savedSection || !cfEls.savedContainer) return;
+
+      if (!cfSavedOffers.length) {
+        cfEls.savedSection.classList.add("hidden");
+        cfEls.savedContainer.innerHTML = "";
+        return;
+      }
+
+      cfEls.savedSection.classList.remove("hidden");
+
+      const html = cfSavedOffers
+        .map((offer, idx) => {
+          const labelIndex = idx + 2;
+          return `
+            <div class="cf-saved-offer-card space-y-1.5">
+              <div class="flex items-center justify-between text-[0.7rem] text-slate-500">
+                <span class="font-semibold">Offer ${labelIndex}</span>
+              </div>
+              <div class="text-center mt-1">
+                <p class="text-[0.7rem] text-slate-500">You get</p>
+                <p class="text-sm font-semibold text-slate-900">
+                  ${cfFormatCurrency(offer.amount)}
+                </p>
+              </div>
+              <div class="grid grid-cols-2 gap-2 mt-2 text-[0.7rem] text-slate-600">
+                <div class="text-center">
+                  <p class="font-medium text-slate-500">Factor</p>
+                  <p class="font-semibold text-slate-900">${offer.factor.toFixed(
+                    2
+                  )}x</p>
+                </div>
+                <div class="text-center">
+                  <p class="font-medium text-slate-500">Term</p>
+                  <p class="font-semibold text-slate-900">${offer.termMonths} mo</p>
+                </div>
+                <div class="text-center">
+                  <p class="font-medium text-slate-500">Payback</p>
+                  <p class="font-semibold text-slate-900">${cfFormatCurrency(
+                    offer.totalPayback
+                  )}</p>
+                </div>
+                <div class="text-center">
+                  <p class="font-medium text-slate-500">${offer.paymentLabel}</p>
+                  <p class="font-semibold text-slate-900">${cfFormatCurrency(
+                    offer.payment
+                  )}</p>
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      cfEls.savedContainer.innerHTML = html;
+    }
+
+    function cfUpdateSummary() {
+      const { amount, factor, term } = cfGetCurrentValues();
+      const offer = cfComputeOffer(amount, factor, term, cfPaymentFrequency);
+
+      if (cfEls.amountLabel)
+        cfEls.amountLabel.textContent = cfFormatCurrency(amount);
+      if (cfEls.factorLabel)
+        cfEls.factorLabel.textContent = `${factor.toFixed(2)}x`;
+      if (cfEls.termLabel)
+        cfEls.termLabel.textContent = `${term} months`;
+
+      if (cfEls.summaryAmount)
+        cfEls.summaryAmount.textContent = cfFormatCurrency(amount);
+      if (cfEls.summaryPayback)
+        cfEls.summaryPayback.textContent = cfFormatCurrency(offer.totalPayback);
+      if (cfEls.summaryFactor)
+        cfEls.summaryFactor.textContent = `${factor.toFixed(2)}x`;
+      if (cfEls.summaryTerm)
+        cfEls.summaryTerm.textContent = `${term} months`;
+      if (cfEls.summaryCost)
+        cfEls.summaryCost.textContent = cfFormatCurrency(offer.totalCost);
+      if (cfEls.summaryPaymentLabel)
+        cfEls.summaryPaymentLabel.textContent = offer.paymentLabel;
+      if (cfEls.summaryPaymentValue)
+        cfEls.summaryPaymentValue.textContent = cfFormatCurrency(offer.payment);
+    }
+
+    function cfSyncSliderAndInput(slider, input, labelCallback, min, max, isCurrency) {
+      if (!slider || !input) return;
+
+      // init input from slider
+      const initialVal = parseFloat(slider.value || min);
+      input.value = isCurrency
+        ? cfFormatCurrency(initialVal)
+        : initialVal.toString();
+      if (labelCallback) labelCallback(initialVal);
+
+      slider.addEventListener("input", () => {
+        let val = parseFloat(slider.value || min);
+        if (val < min) val = min;
+        if (val > max) val = max;
+        input.value = isCurrency ? cfFormatCurrency(val) : val.toString();
+        if (labelCallback) labelCallback(val);
+        cfUpdateSummary();
+      });
+
+      input.addEventListener("input", () => {
+        const raw = input.value;
+        let val = isCurrency ? cfParseCurrency(raw) : parseFloat(raw);
+        if (isNaN(val)) return;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        if (labelCallback) labelCallback(val);
+        cfUpdateSummary();
+      });
+
+      input.addEventListener("blur", () => {
+        let val = isCurrency ? cfParseCurrency(input.value) : parseFloat(input.value);
+        if (isNaN(val) || val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        input.value = isCurrency ? cfFormatCurrency(val) : val.toString();
+        if (labelCallback) labelCallback(val);
+        cfUpdateSummary();
+      });
+    }
+
+    function cfApplyUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      const amountParam = params.get("amount");
+      const factorParam = params.get("factor");
+      const termParam = params.get("term");
+      const freqParam = params.get("freq");
+      const bizNameParam = params.get("bizName");
+
+      if (amountParam && cfEls.amountSlider && cfEls.amountInput) {
+        const amount = parseFloat(amountParam) || 50000;
+        cfEls.amountSlider.value = String(amount);
+        cfEls.amountInput.value = cfFormatCurrency(amount);
+      }
+
+      if (factorParam && cfEls.factorSlider && cfEls.factorInput) {
+        const factor = parseFloat(factorParam) || 1.25;
+        cfEls.factorSlider.value = String(factor);
+        cfEls.factorInput.value = factor.toFixed(2);
+      }
+
+      if (termParam && cfEls.termSlider && cfEls.termInput) {
+        const term = parseInt(termParam, 10) || 12;
+        cfEls.termSlider.value = String(term);
+        cfEls.termInput.value = String(term);
+      }
+
+      if (freqParam && ["daily", "weekly", "monthly"].includes(freqParam)) {
+        cfPaymentFrequency = freqParam;
+      }
+
+      if (bizNameParam && cfEls.bizName) {
+        cfEls.bizName.value = bizNameParam;
+      }
+    }
+
+    function cfInitCalculator() {
+      // Sync sliders & inputs
+      cfSyncSliderAndInput(
+        cfEls.amountSlider,
+        cfEls.amountInput,
+        (val) => {
+          if (cfEls.amountLabel) cfEls.amountLabel.textContent = cfFormatCurrency(val);
+        },
+        5000,
+        1000000,
+        true
+      );
+
+      cfSyncSliderAndInput(
+        cfEls.factorSlider,
+        cfEls.factorInput,
+        (val) => {
+          if (cfEls.factorLabel)
+            cfEls.factorLabel.textContent = `${parseFloat(val).toFixed(2)}x`;
+        },
+        1.1,
+        1.5,
+        false
+      );
+
+      cfSyncSliderAndInput(
+        cfEls.termSlider,
+        cfEls.termInput,
+        (val) => {
+          if (cfEls.termLabel)
+            cfEls.termLabel.textContent = `${parseInt(val, 10)} months`;
+        },
+        3,
+        36,
+        false
+      );
+
+      // Toggles
+      if (cfEls.toggleDaily) {
+        cfEls.toggleDaily.addEventListener("click", () => {
+          cfPaymentFrequency = "daily";
+          cfUpdateToggleUI();
+          cfUpdateSummary();
+        });
+      }
+      if (cfEls.toggleWeekly) {
+        cfEls.toggleWeekly.addEventListener("click", () => {
+          cfPaymentFrequency = "weekly";
+          cfUpdateToggleUI();
+          cfUpdateSummary();
+        });
+      }
+      if (cfEls.toggleMonthly) {
+        cfEls.toggleMonthly.addEventListener("click", () => {
+          cfPaymentFrequency = "monthly";
+          cfUpdateToggleUI();
+          cfUpdateSummary();
+        });
+      }
+
+      // Add offer
+      if (cfEls.addOffer) {
+        cfEls.addOffer.addEventListener("click", () => {
+          if (cfSavedOffers.length >= cfMaxAdditionalOffers) return;
+          const { amount, factor, term } = cfGetCurrentValues();
+          const offer = cfComputeOffer(
+            amount,
+            factor,
+            term,
+            cfPaymentFrequency
+          );
+          cfSavedOffers.push(offer);
+          cfRenderSavedOffers();
+        });
+      }
+
+      // Share link (prefills calculator with current values)
+      if (cfEls.shareLink) {
+        cfEls.shareLink.addEventListener("click", () => {
+          const { amount, factor, term } = cfGetCurrentValues();
+          const freq = cfPaymentFrequency;
+          const bizName = cfEls.bizName ? cfEls.bizName.value.trim() : "";
+
+          const url = new URL(window.location.href);
+          url.searchParams.set("amount", String(amount));
+          url.searchParams.set("factor", String(factor.toFixed(2)));
+          url.searchParams.set("term", String(term));
+          url.searchParams.set("freq", freq);
+          if (bizName) {
+            url.searchParams.set("bizName", bizName);
+          } else {
+            url.searchParams.delete("bizName");
+          }
+
+          const textArea = document.createElement("textarea");
+          textArea.value = url.toString();
+          textArea.style.position = "fixed";
+          textArea.style.top = "0";
+          textArea.style.left = "0";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+
+          try {
+            document.execCommand("copy");
+            const original = cfEls.shareLink.textContent;
+            cfEls.shareLink.textContent = "Link Copied";
+            setTimeout(() => {
+              cfEls.shareLink.textContent = original;
+            }, 1800);
+          } catch (err) {
+            console.error("Copy failed", err);
+          } finally {
+            document.body.removeChild(textArea);
+          }
+        });
+      }
+
+      // Apply URL params and finalize
+      cfApplyUrlParams();
+      cfUpdateToggleUI();
+      cfUpdateSummary();
+      cfRenderSavedOffers();
+    }
+
+    cfInitCalculator();
+  </script>
+</body>
+</html>
