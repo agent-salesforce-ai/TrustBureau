@@ -132,8 +132,16 @@
       color: var(--accent-text-inverted);
     }
 
-    .header-icon {
+    .header-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 0.9rem;
+      border-radius: 9999px;
+      background-color: rgba(210, 155, 42, 0.08);
       color: var(--accent-color);
+      border: 1px solid rgba(210, 155, 42, 0.35);
+      gap: 0.35rem;
     }
 
     .button-primary {
@@ -153,24 +161,6 @@
       cursor: not-allowed;
     }
 
-    .border-accent {
-      border-color: var(--accent-color);
-    }
-    .header-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 0.9rem;
-      border-radius: 9999px;
-      background-color: rgba(210, 155, 42, 0.08);
-      color: var(--accent-color);
-      border: 1px solid rgba(210, 155, 42, 0.35);
-      gap: 0.35rem;
-    }
-    .theme-toggle {
-      background-color: rgba(210, 155, 42, 0.06);
-      border-color: rgba(210, 155, 42, 0.4);
-    }
     .brand-logo {
       filter: drop-shadow(0 0 18px rgba(210, 155, 42, 0.45));
     }
@@ -291,31 +281,23 @@
     <!-- === END: OFFER CALCULATOR === -->
 
 
-    <!-- OFFER PRESENTATION CARD -->
+    <!-- OFFER 1 CARD -->
     <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
-      <!-- Card Header -->
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
-        <h4 class="text-sm font-semibold header-chip">Your Approved Terms</h4>
+        <h4 class="text-sm font-semibold header-chip">Offer 1 – Your Approved Terms</h4>
       </div>
-
-      <!-- Hero Amount -->
       <div class="text-center py-6">
         <span id="businessNameDisplay" class="text-sm font-semibold text-primary block mb-1 hidden"></span>
         <span class="text-sm font-semibold text-muted block">You Get</span>
-        <span id="summaryAmountOut" class="text-5xl font-semibold block my-2 text-hero">
-          $50,000
-        </span>
+        <span id="summaryAmountOut" class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
         <span class="text-base font-medium text-secondary block">
           Total Payback:
           <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
         </span>
       </div>
-
-      <!-- Offer Details -->
       <div class="flex justify-center items-center border-b border-primary pb-2">
         <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
       </div>
-
       <div class="pt-6">
         <div class="grid grid-cols-2 gap-4">
           <div class="text-center">
@@ -336,8 +318,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Rep Contact Block (shows to client) -->
       <div id="repContactBlock" class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
         <div class="font-semibold text-muted mb-1">Your Sutton Funding Specialist</div>
         <div id="repNameDisplay" class="font-medium"></div>
@@ -345,9 +325,8 @@
         <div id="repPhoneDisplay"></div>
       </div>
     </div>
-    <!-- === END: OFFER PRESENTATION CARD === -->
 
-    <!-- ADDITIONAL OFFERS -->
+    <!-- ADDITIONAL OFFERS (2 & 3) -->
     <div id="savedOffersSection" class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
       <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
         <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
@@ -366,7 +345,7 @@
         </button>
         <button id="shareLinkButton" class="button-primary flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367-2.684z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z" />
           </svg>
           Share Approval Link
         </button>
@@ -374,10 +353,8 @@
     </div>
 
   </div>
-  <!-- === END: Main Card === -->
 
   <script>
-    // === DOM Elements ===
     const elements = {
       calcAmountSlider: document.getElementById('calcAmountSlider'),
       calcFactorSlider: document.getElementById('calcFactorSlider'),
@@ -392,7 +369,6 @@
       toggleMonthly: document.getElementById('toggleMonthly'),
 
       themeSelector: document.getElementById('themeSelector'),
-
       shareLinkButton: document.getElementById('shareLinkButton'),
 
       summaryAmountOut: document.getElementById('summaryAmountOut'),
@@ -405,7 +381,6 @@
 
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
-      businessNameContainer: document.getElementById('businessNameContainer'),
 
       repSettingsToggle: document.getElementById('repSettingsToggle'),
       repSettingsPanel: document.getElementById('repSettingsPanel'),
@@ -430,7 +405,6 @@
       savedOffersContainer: document.getElementById('savedOffersContainer'),
     };
 
-    // === State ===
     let paymentFrequency = 'daily';
     let currentTheme = 'theme-slate';
     let currentAccent = 'accent-sutton';
@@ -523,15 +497,7 @@
               <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
               <span class="text-[11px] text-muted" data-role="label">${offer.paymentLabel}</span>
             </div>
-            <div class="mt-2 mb-1">
-              <input type="range"
-                     class="w-full h-1.5 slider-track slider-thumb saved-offer-slider"
-                     min="5000"
-                     max="${offer.amount}"
-                     value="${offer.amount}"
-                     data-offer-index="${index}" />
-            </div>
-            <div class="text-center">
+            <div class="text-center mt-2">
               <span class="text-[11px] font-semibold text-muted block">You Get</span>
               <span class="text-2xl font-semibold text-hero block" data-role="amount">${formatCurrency(offer.amount)}</span>
             </div>
@@ -553,13 +519,22 @@
                 <span class="text-sm font-semibold text-primary block" data-role="payment">${formatCurrency(offer.payment)}</span>
               </div>
             </div>
+            <!-- Slider BELOW the offer (what-if, local only) -->
+            <div class="mt-3">
+              <input type="range"
+                     class="w-full h-1.5 slider-track slider-thumb saved-offer-slider"
+                     min="5000"
+                     max="${offer.amount}"
+                     value="${offer.amount}"
+                     data-offer-index="${index}" />
+            </div>
           </div>
         `;
       }).join('');
 
       elements.savedOffersContainer.innerHTML = cardsHtml;
 
-      // Make each offer's slider functional for its own card (what-if, does not update others)
+      // Each offer's slider updates its card locally only (does NOT update savedOffers, so rep side is unaffected)
       const sliders = elements.savedOffersContainer.querySelectorAll('.saved-offer-slider');
       sliders.forEach((slider) => {
         slider.addEventListener('input', () => {
@@ -568,7 +543,15 @@
           if (Number.isNaN(idx) || idx < 0 || idx >= savedOffers.length) return;
 
           const base = savedOffers[idx];
-          const newAmount = parseFloat(slider.value);
+          let newAmount = parseFloat(slider.value);
+          if (isNaN(newAmount)) return;
+
+          // Cap locally by this offer's original amount
+          const cap = base.amount;
+          if (newAmount > cap) newAmount = cap;
+          if (newAmount < 5000) newAmount = 5000;
+          slider.value = newAmount;
+
           const updated = computeOffer(newAmount, base.factor, base.termMonths, base.frequency);
 
           const card = slider.closest('[data-offer-index]');
@@ -599,7 +582,7 @@
     function handleAddOffer() {
       if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
       const offer = getCurrentOffer();
-      savedOffers.push({ ...offer });
+      savedOffers.push({ ...offer }); // snapshot
       renderSavedOffers();
       updateAddOfferButtonState();
     }
@@ -726,7 +709,7 @@
 
       paymentFrequency = freq || 'daily';
 
-      // Rehydrate additional offers from URL (if any)
+      // Decode additional offers from URL (rep side approvals)
       savedOffers = [];
       if (offersParam) {
         try {
@@ -748,13 +731,10 @@
       }
 
       if (viewMode === 'approval') {
-        // Lock calculator controls except main amount slider
+        // Hide factor/term controls and toggles; main slider stays visible but capped
         elements.factorContainer.style.display = 'none';
         elements.termContainer.style.display = 'none';
         elements.toggleContainer.style.display = 'none';
-
-        // Main amount slider stays visible but is capped by amountSliderMax
-        // Keep calcAmountSlider enabled so client can move it within the cap
 
         // Hide editable Business Name field
         if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
@@ -764,7 +744,6 @@
         elements.themeControls.style.display = 'none';
         if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
-
         elements.buttonContainer.style.display = 'none';
 
         elements.headerContainer.classList.remove('justify-between');
