@@ -809,8 +809,26 @@
 
       const view = params.get('view');
       if (view === 'approval') {
-        // Mark this as a shared scenario, but keep controls editable so the client can adjust
+        // Shared scenario: lock structure-level settings, let client tweak amount/discount/day/dates.
         isApprovalView = true;
+
+        const lockedEls = [
+          elements.businessNameInput,
+          elements.factorSlider,
+          elements.factorInput,
+          elements.termSlider,
+          elements.termInput,
+          elements.payDaily,
+          elements.payWeekly,
+          elements.payMonthly,
+        ];
+        lockedEls.forEach((el) => {
+          if (el) {
+            el.disabled = true;
+            el.classList.add('cursor-default', 'opacity-70');
+          }
+        });
+
         if (elements.shareScenarioButton) {
           elements.shareScenarioButton.disabled = true;
           elements.shareScenarioButton.classList.add('opacity-60', 'cursor-default');
