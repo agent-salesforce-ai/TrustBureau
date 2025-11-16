@@ -725,12 +725,57 @@
       const termParam = params.get("term");
       const freqParam = params.get("freq");
       const bizNameParam = params.get("bizName");
+      const offersParam = params.get("offers");
 
       if (amountParam && cfEls.amountSlider && cfEls.amountInput) {
         const amount = parseFloat(amountParam) || 50000;
         cfEls.amountSlider.value = String(amount);
         cfEls.amountInput.value = cfFormatCurrency(amount);
       }
+
+      if (factorParam && cfEls.factorSlider && cfEls.factorInput) {
+        const factor = parseFloat(factorParam) || 1.25;
+        cfEls.factorSlider.value = String(factor);
+        cfEls.factorInput.value = factor.toFixed(2);
+      }
+
+      if (termParam && cfEls.termSlider && cfEls.termInput) {
+        const term = parseInt(termParam, 10) || 12;
+        cfEls.termSlider.value = String(term);
+        cfEls.termInput.value = String(term);
+      }
+
+      if (freqParam && ["daily", "weekly", "monthly"].includes(freqParam)) {
+        cfPaymentFrequency = freqParam;
+      }
+
+      if (bizNameParam && cfEls.bizName) {
+        cfEls.bizName.value = bizNameParam;
+      }
+
+      // Restore any additional offers from the URL, if present
+      if (offersParam) {
+        try {
+          const rawOffers = JSON.parse(offersParam);
+          if (Array.isArray(rawOffers)) {
+            cfSavedOffers = rawOffers
+              .map((raw) => {
+                const a = Number(raw.a ?? raw.amount ?? 0);
+                const f = Number(raw.f ?? raw.factor ?? 1.25);
+                const tRaw = raw.t ?? raw.term ?? 12;
+                const t = parseInt(tRaw, 10);
+                const termMonths = Number.isNaN(t) ? 12 : t;
+                const q = raw.q ?? raw.frequency ?? freqParam ?? "daily";
+                return cfComputeOffer(a, f, termMonths, q);
+              })
+              .slice(0, cfMaxAdditionalOffers);
+          }
+        } catch (err) {
+          console.error("Error parsing offers from URL", err);
+          cfSavedOffers = [];
+        }
+      }
+    }
 
       if (factorParam && cfEls.factorSlider && cfEls.factorInput) {
         const factor = parseFloat(factorParam) || 1.25;
@@ -837,14 +882,32 @@
           const bizName = cfEls.bizName ? cfEls.bizName.value.trim() : "";
 
           const url = new URL(window.location.href);
+          // Start from a clean query string each time
+          url.search = "";
+          url.hash = "";
+
           url.searchParams.set("amount", String(amount));
           url.searchParams.set("factor", String(factor.toFixed(2)));
           url.searchParams.set("term", String(term));
           url.searchParams.set("freq", freq);
           if (bizName) {
             url.searchParams.set("bizName", bizName);
-          } else {
-            url.searchParams.delete("bizName");
+          }
+
+          // Persist any additional offers into the link
+          if (cfSavedOffers.length) {
+            const offersForUrl = cfSavedOffers.map((offer) => ({
+              a: offer.amount,
+              f: offer.factor,
+              t: offer.termMonths,
+              q: offer.frequency || freq,
+            }));
+            try {
+              const encoded = JSON.stringify(offersForUrl);
+              url.searchParams.set("offers", encoded);
+            } catch (err) {
+              console.error("Error stringifying offers for URL", err);
+            }
           }
 
           const textArea = document.createElement("textarea");
