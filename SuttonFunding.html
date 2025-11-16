@@ -412,7 +412,6 @@
 
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
-
       businessNameContainer: document.getElementById('businessNameContainer'),
 
       repSettingsToggle: document.getElementById('repSettingsToggle'),
@@ -448,6 +447,14 @@
     let savedOffers = [];
     let activeOfferIndex = -1;
     let isApprovalView = false;
+
+    // Helper to keep JS cap and slider.max in sync
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
 
     const formatCurrency = (num) => {
       const numericValue = Number(num);
@@ -510,7 +517,7 @@
       if (!offer) return;
 
       if (isApprovalView) {
-        amountSliderMax = offer.amount;
+        setAmountSliderMax(offer.amount); // cap + update DOM max
       }
 
       // Update sliders and inputs from a saved offer
@@ -719,9 +726,9 @@
 
       // In approval links, cap the primary amount at its approved value
       if (isApprovalView) {
-        amountSliderMax = amount;
+        setAmountSliderMax(amount);
       } else {
-        amountSliderMax = 1000000;
+        setAmountSliderMax(1000000);
       }
 
       elements.calcAmountInput.value = formatCurrency(amount);
@@ -767,6 +774,7 @@
       }
 
       if (viewMode === 'approval') {
+        // Client sees a static approval, not controls
         elements.factorContainer.style.display = 'none';
         elements.termContainer.style.display = 'none';
         elements.toggleContainer.style.display = 'none';
