@@ -48,13 +48,13 @@
 
     /* Light corporate theme tuned for Critical Financing */
     html.theme-corporate {
-      --bg-body: #f3f4f6;
-      --bg-card: #ffffff;
-      --bg-card-inner: #f9fafb;
-      --bg-slider-track: #e5e7eb;
+      --bg-body: #ffffff;
+      --bg-card: #f9fafb;
+      --bg-card-inner: #ffffff;
+      --bg-slider-track: #d1d5db;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
-      --border-primary: #e5e7eb;
+      --border-primary: #d1d5db;
       --text-primary: #0b1120;
       --text-secondary: #111827;
       --text-muted: #6b7280;
@@ -65,11 +65,11 @@
 
     /* Critical Financing accent: navy + red */
     html.accent-critical {
-      --accent-color: #0b184b;         /* Navy (sliders, focus) */
-      --accent-color-light: #b91c1c;   /* Red (buttons) */
-      --accent-color-dark: #7f1d1d;    /* Darker red hover */
+      --accent-color: #102347;         /* Navy (sliders, focus, headings) */
+      --accent-color-light: #c32026;   /* Brand red (buttons) */
+      --accent-color-dark: #991b1f;    /* Darker red hover */
       --accent-text-inverted: #ffffff;
-      --accent-shadow: 0 0 18px rgba(11, 24, 75, 0.7);
+      --accent-shadow: none;
       --button-text-color: #ffffff;
     }
 
@@ -116,7 +116,6 @@
 
     .text-hero {
       color: var(--accent-color);
-      text-shadow: var(--accent-shadow);
     }
 
     .toggle-inactive {
@@ -143,15 +142,13 @@
     .button-primary:hover {
       background-color: var(--accent-color-dark);
       box-shadow:
-        0 0 0 1px rgba(185, 28, 28, 0.75),
-        0 0 18px rgba(11, 24, 75, 0.6);
+        0 6px 14px rgba(15, 23, 42, 0.25);
       transform: translateY(-1px);
     }
     .button-primary:active {
       transform: translateY(0);
       box-shadow:
-        0 0 0 1px rgba(185, 28, 28, 0.75),
-        0 0 10px rgba(11, 24, 75, 0.5);
+        0 3px 8px rgba(15, 23, 42, 0.25);
     }
     .button-primary:disabled {
       background-color: var(--bg-slider-track);
@@ -161,7 +158,7 @@
     }
 
     .brand-logo {
-      filter: drop-shadow(0 0 16px rgba(11, 24, 75, 0.45));
+      filter: none;
     }
     .brand-georgia {
       font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -174,10 +171,8 @@
       border-color: var(--accent-color);
       border-width: 2px;
       box-shadow:
-        0 0 0 3px rgba(11, 24, 75, 0.9),    /* inner navy ring */
-        0 0 25px rgba(185, 28, 28, 0.7),    /* red mid-glow */
-        0 0 55px rgba(15, 23, 42, 0.75),    /* deep navy outer */
-        0 0 90px rgba(59, 130, 246, 0.55);  /* blue halo */
+        0 10px 15px -3px rgba(15, 23, 42, 0.18),
+        0 4px 6px -4px rgba(15, 23, 42, 0.16);
     }
   </style>
 </head>
@@ -889,7 +884,9 @@
     function initializeCalculator() {
       initializeFromURL();
       applyTheme();
+      if (elements.themeSelector) {
       elements.themeSelector.value = currentTheme;
+      }
 
       syncInputs(
         elements.calcAmountSlider,
@@ -945,10 +942,12 @@
       if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
       if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
+      if (elements.themeSelector) {
       elements.themeSelector.addEventListener('change', (e) => {
         currentTheme = e.target.value;
         applyTheme();
       });
+      }
 
       if (elements.addOfferButton) {
         elements.addOfferButton.addEventListener('click', handleAddOffer);
@@ -1024,7 +1023,9 @@
       updateAddOfferButtonState();
     }
 
-    initializeCalculator();
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeCalculator();
+    });
   </script>
 </body>
 </html>
