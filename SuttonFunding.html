@@ -1,28 +1,26 @@
 <!DOCTYPE html>
-<!-- Sutton Funding-branded Offer Calculator with independent sliders per offer on client side -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sutton Funding | Offer Calculator</title>
-  <!-- Load Tailwind CSS -->
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Load Inter font -->
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body { font-family: 'Inter', sans-serif; }
+
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
     input[type=number] { -moz-appearance: textfield; }
+
     .input-icon { top: 50%; transform: translateY(-50%); }
 
-    /* Theme system */
     html.theme-slate {
       --bg-body: #020617;
       --bg-card: #020617;
@@ -61,26 +59,63 @@
     }
 
     body { transition: background-color 0.2s; }
+
     .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
     .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
     .border-primary { border-color: var(--border-primary); }
-    .text-accent { color: var(--accent-color); }
+
     .slider-track { background-color: var(--bg-slider-track); }
     .slider-thumb { accent-color: var(--accent-color); }
-    .input-field { background-color: var(--bg-input); border-color: var(--border-primary); color: var(--text-primary); }
-    .input-field:focus-within,
-    .input-field:focus { border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-color-light); }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px var(--accent-color-light);
+    }
+
     .text-hero { color: var(--accent-color); text-shadow: var(--accent-shadow); }
-    .toggle-inactive { background-color: var(--bg-toggle-inactive); color: var(--text-secondary); }
-    .toggle-active { background-color: var(--accent-color-dark); color: var(--accent-text-inverted); }
-    .button-primary { background-color: var(--accent-color); color: var(--button-text-color); font-weight: 600; border-radius: 0.5rem; padding: 0.5rem 1.5rem; transition: background-color 0.2s; }
-    .button-primary:hover { background-color: var(--accent-color-dark); }
-    .button-primary:disabled { background-color: var(--bg-slider-track); color: var(--text-muted); cursor: not-allowed; }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-secondary);
+    }
+    .toggle-active {
+      background-color: var(--accent-color-dark);
+      color: var(--accent-text-inverted);
+    }
+
+    .button-primary {
+      background-color: var(--accent-color);
+      color: var(--button-text-color);
+      font-weight: 600;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      transition: background-color 0.2s;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-dark);
+    }
+    .button-primary:disabled {
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
     .brand-logo { filter: drop-shadow(0 0 18px rgba(210, 155, 42, 0.45)); }
-    .brand-georgia { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.08em; font-weight: 700; }
+    .brand-georgia {
+      font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
@@ -94,10 +129,13 @@
         <span class="brand-georgia text-primary text-xl mt-2 tracking-wide">Sutton Funding</span>
       </div>
       <div id="themeControls" class="flex items-center justify-center">
-        <button id="repSettingsToggle" type="button" class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-accent flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        <button id="repSettingsToggle" type="button"
+                class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-accent flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
           </svg>
           Settings
         </button>
@@ -105,7 +143,8 @@
     </div>
 
     <!-- REP SETTINGS PANEL -->
-    <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+    <div id="repSettingsPanel"
+         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary">Rep Settings</span>
         <span class="text-[11px] text-muted">Shown on client approval view</span>
@@ -113,22 +152,29 @@
       <div class="grid grid-cols-1 gap-2 text-xs">
         <div>
           <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
-          <select id="themeSelector" class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+          <select id="themeSelector"
+                  class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
             <option value="theme-corporate">Sutton – Light</option>
             <option value="theme-slate">Sutton – Dark</option>
           </select>
         </div>
         <div>
           <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
-          <input id="repNameInput" type="text" class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field" placeholder="Jane Doe" />
+          <input id="repNameInput" type="text"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Jane Doe" />
         </div>
         <div>
           <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
-          <input id="repEmailInput" type="email" class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field" placeholder="jane@example.com" />
+          <input id="repEmailInput" type="email"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="jane@example.com" />
         </div>
         <div>
           <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
-          <input id="repPhoneInput" type="tel" class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field" placeholder="(555) 123-4567" />
+          <input id="repPhoneInput" type="tel"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="(555) 123-4567" />
         </div>
       </div>
     </div>
@@ -136,59 +182,88 @@
     <!-- OFFER CALCULATOR -->
     <div id="calculatorInputs" class="space-y-4 pt-2">
       <div id="businessNameContainer" class="px-1 mt-2">
-        <label for="businessNameInput" class="block text-xs font-semibold text-muted">Business Name</label>
-        <input id="businessNameInput" type="text" class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field" placeholder="e.g., Acme Holdings LLC" />
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+          Business Name
+        </label>
+        <input id="businessNameInput" type="text"
+               class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+               placeholder="e.g., Acme Holdings LLC" />
       </div>
 
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
         <div id="amountContainer" class="space-y-1">
-          <label for="calcAmount" class="block text-xs font-semibold text-muted">Amount You Get ($)</label>
-          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
+          <label for="calcAmount" class="block text-xs font-semibold text-muted">
+            Amount You Get ($)
+          </label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000"
+                 value="50000"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
             <span class="absolute left-3 input-icon text-muted text-sm">$</span>
-            <input id="calcAmountInput" inputmode="numeric" class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcAmountInput" inputmode="numeric"
+                   class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="factorContainer" class="space-y-1">
           <label for="calcFactor" class="block text-xs font-semibold text-muted">Factor Rate</label>
-          <input id="calcFactorSlider" type="range" min="1.1" max="1.5" step="0.01" value="1.25" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <input id="calcFactorSlider" type="range" min="1.1" max="1.5" step="0.01" value="1.25"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12"/>
             </svg>
-            <input id="calcFactorInput" type="number" step="0.01" class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcFactorInput" type="number" step="0.01"
+                   class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="termContainer" class="space-y-1">
-          <label for="calcTerm" class="block text-xs font-semibold text-muted">Term (Months)</label>
-          <input id="calcTermSlider" type="range" min="3" max="24" step="1" value="6" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <label for="calcTerm" class="block text-xs font-semibold text-muted">
+            Term (Months)
+          </label>
+          <input id="calcTermSlider" type="range" min="3" max="24" step="1" value="6"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
             </svg>
-            <input id="calcTermInput" type="number" step="1" class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcTermInput" type="number" step="1"
+                   class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
       </div>
 
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
-        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors duration-200">Daily</button>
-        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors duration-200">Weekly</button>
-        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors duration-200">Monthly</button>
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Daily
+        </button>
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Weekly
+        </button>
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Monthly
+        </button>
       </div>
     </div>
 
     <!-- OFFER 1 CARD -->
     <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
-        <h4 class="text-sm font-semibold header-chip">Offer 1 – Your Approved Terms</h4>
+        <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
       </div>
       <div class="text-center py-6">
-        <span id="businessNameDisplay" class="text-sm font-semibold text-primary block mb-1 hidden"></span>
+        <span id="businessNameDisplay"
+              class="text-sm font-semibold text-primary block mb-1 hidden"></span>
         <span class="text-sm font-semibold text-muted block">You Get</span>
-        <span id="summaryAmountOut" class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
+        <span id="summaryAmountOut"
+              class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
         <span class="text-base font-medium text-secondary block">
           Total Payback:
           <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
@@ -201,23 +276,29 @@
         <div class="grid grid-cols-2 gap-4">
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Factor Rate</span>
-            <span id="summaryFactorOut" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryFactorOut"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Term</span>
-            <span id="summaryTermOut" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryTermOut"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Total Cost of Funds</span>
-            <span id="summaryCostOut" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryCostOut"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
-            <span id="summaryPaymentLabel" class="text-xs font-semibold text-muted block">Est. Daily Payment</span>
-            <span id="summaryPaymentValue" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryPaymentLabel"
+                  class="text-xs font-semibold text-muted block">Est. Daily Payment</span>
+            <span id="summaryPaymentValue"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
         </div>
       </div>
-      <div id="repContactBlock" class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
+      <div id="repContactBlock"
+           class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
         <div class="font-semibold text-muted mb-1">Your Sutton Funding Specialist</div>
         <div id="repNameDisplay" class="font-medium"></div>
         <div id="repEmailDisplay"></div>
@@ -225,26 +306,32 @@
       </div>
     </div>
 
-    <!-- ADDITIONAL OFFERS (Offer 2 & 3) -->
-    <div id="savedOffersSection" class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+    <!-- STATIC ADDITIONAL OFFERS -->
+    <div id="savedOffersSection"
+         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
       <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
         <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
       </div>
-      <div id="savedOffersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <div id="savedOffersContainer"
+           class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
     <!-- BUTTONS -->
     <div id="buttonContainer" class="pt-4 border-t border-primary">
       <div class="relative flex justify-center gap-3 flex-wrap">
         <button id="addOfferButton" class="button-primary flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v16m8-8H4" />
           </svg>
           Add Offer
         </button>
         <button id="shareLinkButton" class="button-primary flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
           </svg>
           Share Approval Link
         </button>
@@ -380,90 +467,38 @@
       const cardsHtml = savedOffers.map((offer, index) => {
         const labelIndex = index + 2;
         return `
-          <div class="card-bg rounded-lg border border-primary p-3 space-y-3" data-offer-index="${index}">
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
-              <span class="text-[11px] text-muted" data-role="label">${offer.paymentLabel}</span>
+              <span class="text-[11px] text-muted">${offer.paymentLabel}</span>
             </div>
             <div class="text-center mt-2">
               <span class="text-[11px] font-semibold text-muted block">You Get</span>
-              <span class="text-2xl font-semibold text-hero block" data-role="amount">${formatCurrency(offer.amount)}</span>
+              <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
             </div>
             <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
               <div>
                 <span class="text-[11px] font-semibold text-muted block">Factor</span>
-                <span class="text-sm font-semibold text-primary block" data-role="factor">${offer.factor.toFixed(2)}x</span>
+                <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
               </div>
               <div>
                 <span class="text-[11px] font-semibold text-muted block">Term</span>
-                <span class="text-sm font-semibold text-primary block" data-role="term">${offer.termMonths} mo</span>
+                <span class="text-sm font-semibold text-primary block">${offer.termMonths} mo</span>
               </div>
               <div>
                 <span class="text-[11px] font-semibold text-muted block">Payback</span>
-                <span class="text-sm font-semibold text-primary block" data-role="payback">${formatCurrency(offer.totalPayback)}</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span>
               </div>
               <div>
-                <span class="text-[11px] font-semibold text-muted block" data-role="payment-label">${offer.paymentLabel}</span>
-                <span class="text-sm font-semibold text-primary block" data-role="payment">${formatCurrency(offer.payment)}</span>
+                <span class="text-[11px] font-semibold text-muted block">${offer.paymentLabel}</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
               </div>
-            </div>
-            <div class="mt-3">
-              <input type="range"
-                     class="w-full h-1.5 slider-track slider-thumb saved-offer-slider"
-                     min="5000"
-                     max="${offer.amount}"
-                     value="${offer.amount}"
-                     data-offer-index="${index}"
-                     data-factor="${offer.factor}"
-                     data-term="${offer.termMonths}"
-                     data-frequency="${offer.frequency || 'daily'}" />
             </div>
           </div>
         `;
       }).join('');
 
       elements.savedOffersContainer.innerHTML = cardsHtml;
-
-      const sliders = elements.savedOffersContainer.querySelectorAll('.saved-offer-slider');
-      sliders.forEach((slider) => {
-        slider.addEventListener('input', () => {
-          const idxAttr = slider.getAttribute('data-offer-index');
-          const idx = idxAttr != null ? parseInt(idxAttr, 10) : -1;
-          if (Number.isNaN(idx) || idx < 0 || idx >= savedOffers.length) return;
-
-          let newAmount = parseFloat(slider.value);
-          if (isNaN(newAmount)) return;
-
-          const cap = parseFloat(slider.max) || savedOffers[idx].amount || 0;
-          if (newAmount > cap) newAmount = cap;
-          if (newAmount < 5000) newAmount = 5000;
-          slider.value = newAmount;
-
-          const baseFactor = parseFloat(slider.dataset.factor) || savedOffers[idx].factor || 1.1;
-          const termMonths = parseInt(slider.dataset.term, 10) || savedOffers[idx].termMonths || 3;
-          const freq = slider.dataset.frequency || savedOffers[idx].frequency || 'daily';
-
-          const updated = computeOffer(newAmount, baseFactor, termMonths, freq);
-          savedOffers[idx] = updated;
-
-          const card = slider.closest('[data-offer-index]');
-          if (!card) return;
-
-          const amtEl = card.querySelector('[data-role="amount"]');
-          const factorEl = card.querySelector('[data-role="factor"]');
-          const termEl = card.querySelector('[data-role="term"]');
-          const paybackEl = card.querySelector('[data-role="payback"]');
-          const payLabelEl = card.querySelector('[data-role="payment-label"]');
-          const paymentEl = card.querySelector('[data-role="payment"]');
-
-          if (amtEl) amtEl.textContent = formatCurrency(updated.amount);
-          if (factorEl) factorEl.textContent = `${updated.factor.toFixed(2)}x`;
-          if (termEl) termEl.textContent = `${updated.termMonths} mo`;
-          if (paybackEl) paybackEl.textContent = formatCurrency(updated.totalPayback);
-          if (payLabelEl) payLabelEl.textContent = updated.paymentLabel;
-          if (paymentEl) paymentEl.textContent = formatCurrency(updated.payment);
-        });
-      });
     }
 
     function updateAddOfferButtonState() {
@@ -542,6 +577,20 @@
       if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
       if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
       if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
+    }
+
+    function updatePaymentToggleUI() {
+      const toggles = [elements.toggleDaily, elements.toggleWeekly, elements.toggleMonthly];
+      const frequencies = ['daily', 'weekly', 'monthly'];
+      toggles.forEach((toggle, index) => {
+        if (!toggle) return;
+        toggle.classList.remove('toggle-active', 'toggle-inactive');
+        if (paymentFrequency === frequencies[index]) {
+          toggle.classList.add('toggle-active');
+        } else {
+          toggle.classList.add('toggle-inactive');
+        }
+      });
     }
 
     function initializeFromURL() {
