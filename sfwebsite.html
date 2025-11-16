@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-corporate accent-sutton">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sutton Funding — Small Business Financing</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    html.theme-slate {
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    html.theme-slate body { background-color: var(--bg-body); }
+
+    html.theme-corporate {
+      --bg-body: #f7f5f0;
+      --bg-card: #ffffff;
+      --bg-card-inner: #fbfaf7;
+      --bg-slider-track: #d1d5db;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #e2e8f0;
+      --text-primary: #111827;
+      --text-secondary: #374151;
+      --text-muted: #6b7280;
+    }
+    html.theme-corporate body { background-color: var(--bg-body); }
+
+    html.accent-sutton {
+      --accent-color: #d29b2a;      /* mid gold */
+      --accent-color-light: #f2c365;/* lighter */
+      --accent-color-dark: #9b6e15; /* deeper */
+      --accent-text-inverted: #111827;
+      --accent-shadow: 0 0 18px rgba(210, 155, 42, 0.55);
+      --button-text-color: #111827;
+    }
+
+    body { transition: background-color 0.2s; }
+
+    .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
+    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-muted); }
+    .border-primary { border-color: var(--border-primary); }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px var(--accent-color-light);
+    }
+
+    .text-hero {
+      color: var(--accent-color);
+    }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-secondary);
+    }
+    .toggle-active {
+      background-color: var(--accent-color);
+      color: #0f172a;
+    }
+
+    .button-primary {
+      background-color: var(--accent-color);
+      color: #0f172a;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.6rem 1.75rem;
+      border: 1px solid rgba(210, 155, 42, 0.95);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-dark);
+      box-shadow:
+        0 0 0 1px rgba(210, 155, 42, 0.85),
+        0 0 18px rgba(210, 155, 42, 0.7);
+      transform: translateY(-1px) scale(1.02);
+    }
+    .button-primary:disabled {
+      background-color: #d1d5db;
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .brand-logo { filter: drop-shadow(0 0 18px rgba(210, 155, 42, 0.45)); }
+    .brand-georgia {
+      font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .shell {
+      border-color: var(--accent-color);
+      border-width: 2px;
+      box-shadow:
+        0 0 0 3px rgba(210, 155, 42, 0.85),
+        0 0 30px rgba(210, 155, 42, 0.65),
+        0 0 80px rgba(210, 155, 42, 0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[var(--bg-body)] text-primary flex flex-col">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-primary/60 bg-[var(--bg-card)]/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <img src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Funding Bridge Logo" class="brand-logo h-10 w-auto" />
+        <div class="flex flex-col leading-tight">
+          <span class="brand-georgia text-sm tracking-[0.25em] uppercase">Sutton Funding</span>
+          <span class="text-xs text-muted">Business Financing &amp; Working Capital</span>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-xs font-medium text-secondary">
+        <a href="#hero" class="hover:text-primary">Home</a>
+        <a href="#programs" class="hover:text-primary">Financing Programs</a>
+        <a href="#how-it-works" class="hover:text-primary">How It Works</a>
+        <a href="#calculator-section" class="hover:text-primary">Offer Calculator</a>
+        <a href="#faq" class="hover:text-primary">FAQ</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <button id="themeToggleButton" type="button"
+                class="hidden sm:inline-flex px-3 py-1.5 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-[var(--accent-color)]">
+          Dark Mode
+        </button>
+        <a href="#calculator-section" class="hidden sm:inline-flex button-primary text-xs">Get My Offer</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1">
+    <!-- HERO + CALCULATOR -->
+    <section id="hero" class="py-10 md:py-14 px-4">
+      <div class="max-w-6xl mx-auto grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start">
+        <!-- Copy -->
+        <div class="space-y-6">
+          <p class="text-xs font-semibold tracking-[0.24em] uppercase text-muted">Bridge the gap between opportunity and capital</p>
+          <h1 class="text-3xl md:text-4xl font-semibold leading-tight text-primary">
+            Flexible Small Business Funding,
+            <span class="text-hero">Built Around Your Cash Flow.</span>
+          </h1>
+          <p class="text-sm md:text-base text-secondary max-w-xl">
+            Sutton Funding helps business owners access working capital in days, not weeks.
+            Answer a few quick questions about your business to see a Sutton-style mock approval that mirrors how we actually structure deals.
+          </p>
+          <ul class="text-sm text-secondary space-y-2">
+            <li class="flex items-start gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--accent-color)]"></span> Approvals from <span class="font-semibold ml-1">$5,000 to $1,000,000</span></li>
+            <li class="flex items-start gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--accent-color)]"></span> Terms from <span class="font-semibold ml-1">3 to 36 months</span> with daily, weekly, or monthly options</li>
+            <li class="flex items-start gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--accent-color)]"></span> Dedicated Sutton Funding specialist on every deal</li>
+          </ul>
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <a href="#calculator-section" class="button-primary text-xs">Check My Mock Approval</a>
+            <span class="text-[11px] text-muted">No hard credit pull to explore example terms.</span>
+          </div>
+        </div>
+
+        <!-- Simple Qualification + Mock Approval Card -->
+        <div id="calculator-section" class="lg:justify-self-end">
+          <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+
+            <!-- HEADER (no settings) -->
+            <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
+              <div class="flex flex-col items-center justify-center flex-shrink-0">
+                <img src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Funding Bridge Logo" class="brand-logo h-16 w-auto" />
+                <span class="brand-georgia text-primary text-xl mt-2 tracking-wide">Sutton Funding</span>
+              </div>
+            </div>
+
+            <!-- SIMPLE QUALIFICATION FORM -->
+            <div id="calculatorInputs" class="space-y-4 pt-2">
+              <div id="businessNameContainer" class="px-1 mt-2">
+                <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+                  Legal Business Name (optional)
+                </label>
+                <input id="businessNameInput" type="text"
+                       class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+                       placeholder="e.g., Acme Holdings LLC" />
+              </div>
+
+              <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
+                <div class="grid grid-cols-1 gap-3 text-sm">
+                  <div>
+                    <label for="qMonthlyDeposits" class="block text-xs font-semibold text-muted">
+                      Average Monthly Deposits (last 3 months)
+                    </label>
+                    <div class="relative group mt-1">
+                      <span class="absolute left-3 input-icon text-muted text-sm">$</span>
+                      <input id="qMonthlyDeposits" type="number" inputmode="decimal"
+                             class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field"
+                             placeholder="e.g., 75,000" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label for="qTIB" class="block text-xs font-semibold text-muted">
+                        Time in Business
+                      </label>
+                      <select id="qTIB"
+                              class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+                        <option value="">Select...</option>
+                        <option value="0-6">0–6 months</option>
+                        <option value="6-12">6–12 months</option>
+                        <option value="12-24">12–24 months</option>
+                        <option value="24+">2+ years</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="qFicoBand" class="block text-xs font-semibold text-muted">
+                        Personal Credit Range (FICO)
+                      </label>
+                      <select id="qFicoBand"
+                              class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+                        <option value="">Select...</option>
+                        <option value="under580">Below 580</option>
+                        <option value="580-629">580–629</option>
+                        <option value="630-679">630–679</option>
+                        <option value="680+">680+</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="toggleContainer" class="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
+                <span class="text-[11px] text-muted">Preferred Payment Schedule:</span>
+                <div class="flex items-center justify-center space-x-2">
+                  <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+                    Daily
+                  </button>
+                  <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+                    Weekly
+                  </button>
+                  <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+                    Monthly
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- MOCK APPROVAL CARD -->
+            <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
+              <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
+                <h4 class="text-sm font-semibold text-secondary text-center">Your Sutton-Style Mock Approval</h4>
+              </div>
+              <div class="text-center py-5">
+                <span id="businessNameDisplay"
+                      class="text-sm font-semibold text-primary block mb-1 hidden"></span>
+                <span id="mockStatusLabel"
+                      class="text-[11px] font-semibold text-muted block mb-2">
+                  Enter your average monthly deposits, time in business, and credit range, then click "Check My Mock Approval".
+                </span>
+                <span class="text-xs font-semibold text-muted block">Estimated approval up to</span>
+                <span id="summaryAmountOut"
+                      class="text-5xl font-semibold block my-2 text-hero">$0</span>
+                <span id="mockTierLabel"
+                      class="text-xs text-secondary block mt-1"></span>
+                <span class="text-base font-medium text-secondary block mt-3">
+                  Total Payback:
+                  <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
+                </span>
+              </div>
+              <div class="flex justify-center items-center border-b border-primary pb-2">
+                <h5 class="text-sm font-semibold text-secondary text-center">Illustrative Offer Details</h5>
+              </div>
+              <div class="pt-5">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-center">
+                    <span class="text-xs font-semibold text-muted block">Estimated Factor Rate</span>
+                    <span id="summaryFactorOut"
+                          class="text-xl font-semibold text-primary block">—</span>
+                  </div>
+                  <div class="text-center">
+                    <span class="text-xs font-semibold text-muted block">Estimated Term</span>
+                    <span id="summaryTermOut"
+                          class="text-xl font-semibold text-primary block">—</span>
+                  </div>
+                  <div class="text-center">
+                    <span class="text-xs font-semibold text-muted block">Approx. Cost of Funds</span>
+                    <span id="summaryCostOut"
+                          class="text-xl font-semibold text-primary block">—</span>
+                  </div>
+                  <div class="text-center">
+                    <span id="summaryPaymentLabel"
+                          class="text-xs font-semibold text-muted block">Est. Payment</span>
+                    <span id="summaryPaymentValue"
+                          class="text-xl font-semibold text-primary block">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div id="buttonContainer" class="pt-4 border-t border-primary">
+              <div class="relative flex justify-center gap-3 flex-wrap">
+                <button id="runMockApprovalButton" class="button-primary flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                       fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5 13l4 4L19 7" />
+                  </svg>
+                  Check My Mock Approval
+                </button>
+                <a id="getFundingButton" href="https://www.suttonfunding.com/apply/" target="_blank" rel="noopener noreferrer"
+                   class="button-primary flex items-center gap-2 hidden">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                  Get Funding
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRAMS -->
+    <section id="programs" class="py-10 md:py-12 px-4 border-t border-primary/40 bg-[var(--bg-card)]/70">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+          <div>
+            <p class="text-[11px] font-semibold tracking-[0.24em] uppercase text-[var(--accent-color)]">Funding Programs</p>
+            <h2 class="text-xl md:text-2xl font-semibold text-primary">Capital that matches how your business actually operates.</h2>
+          </div>
+          <p class="text-xs md:text-sm text-secondary max-w-md">We underwrite based on cash flow, not just credit score. Sutton Funding offers multiple structures so you can pick the balance of speed, term, and flexibility that fits your use of funds.</p>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-3 text-sm">
+          <div class="card-bg border border-primary rounded-xl p-4 flex flex-col gap-2 border-t-2 border-t-[var(--accent-color)]/80">
+            <h3 class="text-sm font-semibold text-primary flex items-center gap-2">
+              <span class="h-6 w-6 rounded-full bg-[var(--accent-color)]/10 flex items-center justify-center text-[11px] font-bold">A</span>
+              Prime Working Capital
+            </h3>
+            <p class="text-secondary text-xs">For strong, established businesses looking for the most aggressive rates and longest terms.</p>
+            <ul class="text-xs text-secondary space-y-1 mt-1">
+              <li>&bull; Approvals typically from $50K–$250K</li>
+              <li>&bull; Terms from 3–36 months</li>
+              <li>&bull; No collateral required</li>
+            </ul>
+          </div>
+
+          <div class="card-bg border border-primary rounded-xl p-4 flex flex-col gap-2 border-t-2 border-t-[var(--accent-color)]/80">
+            <h3 class="text-sm font-semibold text-primary flex items-center gap-2">
+              <span class="h-6 w-6 rounded-full bg-[var(--accent-color)]/10 flex items-center justify-center text-[11px] font-bold">B</span>
+              Core Business Funding
+            </h3>
+            <p class="text-secondary text-xs">For growing companies with solid cash flow that need fast access to working capital.</p>
+            <ul class="text-xs text-secondary space-y-1 mt-1">
+              <li>&bull; Approvals typically from $25K–$100K</li>
+              <li>&bull; Terms from 6–12 months</li>
+              <li>&bull; Personal guarantee optional</li>
+            </ul>
+          </div>
+
+          <div class="card-bg border border-primary rounded-xl p-4 flex flex-col gap-2 border-t-2 border-t-[var(--accent-color)]/80">
+            <h3 class="text-sm font-semibold text-primary flex items-center gap-2">
+              <span class="h-6 w-6 rounded-full bg-[var(--accent-color)]/10 flex items-center justify-center text-[11px] font-bold">C/D</span>
+              Turnaround & Bridge Capital
+            </h3>
+            <p class="text-secondary text-xs">For businesses in rebuilding mode that still have strong daily deposits and a plan to bounce back.</p>
+            <ul class="text-xs text-secondary space-y-1 mt-1">
+              <li>&bull; Approvals typically from $5K–$50K</li>
+              <li>&bull; Terms from 3–9 months</li>
+              <li>&bull; PG required; collateral on higher-risk deals</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="py-10 md:py-12 px-4">
+      <div class="max-w-6xl mx-auto grid gap-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-start">
+        <div>
+          <p class="text-[11px] font-semibold tracking-[0.24em] uppercase text-[var(--accent-color)]">How It Works</p>
+          <h2 class="text-xl md:text-2xl font-semibold text-primary mb-3">From offer to funding in as little as 24–48 hours.</h2>
+          <ol class="space-y-3 text-sm text-secondary">
+            <li class="flex gap-3">
+              <div class="mt-0.5 h-6 w-6 rounded-full bg-[var(--accent-color)]/15 flex items-center justify-center text-[11px] font-semibold text-primary">1</div>
+              <div>
+                <div class="font-semibold text-primary text-sm">Explore your terms with the calculator.</div>
+                <p class="text-xs">Enter just a few core details and see Sutton-style mock approvals before you commit.</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <div class="mt-0.5 h-6 w-6 rounded-full bg-[var(--accent-color)]/15 flex items-center justify-center text-[11px] font-semibold text-primary">2</div>
+              <div>
+                <div class="font-semibold text-primary text-sm">Connect with a Sutton Funding specialist.</div>
+                <p class="text-xs">We confirm business details, review existing obligations, and position your file with the right capital provider.</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <div class="mt-0.5 h-6 w-6 rounded-full bg-[var(--accent-color)]/15 flex items-center justify-center text-[11px] font-semibold text-primary">3</div>
+              <div>
+                <div class="font-semibold text-primary text-sm">Finalize docs and receive funding.</div>
+                <p class="text-xs">Most clients receive funds directly into their business account within 24–48 hours of approval.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="card-bg border border-primary rounded-xl p-4 text-xs space-y-3 border-t-2 border-t-[var(--accent-color)]/80">
+          <h3 class="text-sm font-semibold text-primary mb-1">What we look at</h3>
+          <ul class="space-y-1 text-secondary">
+            <li>&bull; Time in business (typically 6+ months)</li>
+            <li>&bull; Average monthly deposits and seasonality</li>
+            <li>&bull; Existing advances, loans, and stacks</li>
+            <li>&bull; Recent overdrafts / NSFs and cash cushions</li>
+            <li>&bull; Industry risk profile and use of funds</li>
+          </ul>
+          <p class="text-[11px] text-muted pt-1">We use this information to structure an offer that your business can actually sustain — not just the biggest number on paper.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-10 md:py-12 px-4 border-t border-primary/40 bg-[var(--bg-card)]/80">
+      <div class="max-w-6xl mx-auto grid gap-8 md:grid-cols-2">
+        <div>
+          <p class="text-[11px] font-semibold tracking-[0.24em] uppercase text-[var(--accent-color)]">Questions</p>
+          <h2 class="text-xl md:text-2xl font-semibold text-primary mb-3">Frequently asked by business owners.</h2>
+          <p class="text-sm text-secondary max-w-md">Every business is different. Use this as a starting point, then connect with your Sutton Funding specialist to go deeper on your specific scenario.</p>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div class="card-bg border border-primary rounded-lg p-3 border-l-2 border-l-[var(--accent-color)]/80">
+            <div class="font-semibold text-primary text-sm mb-1">Will checking terms impact my credit?</div>
+            <p class="text-xs text-secondary">No. Using the Sutton Funding offer calculator and speaking with a specialist does not create a hard credit inquiry. If a particular lending partner later requires a hard pull, we will disclose that before anything is run.</p>
+          </div>
+          <div class="card-bg border border-primary rounded-lg p-3 border-l-2 border-l-[var(--accent-color)]/80">
+            <div class="font-semibold text-primary text-sm mb-1">How fast can I get funded?</div>
+            <p class="text-xs text-secondary">For complete files with recent bank statements and basic documents ready, many approvals fund within 24–48 business hours from final sign-off.</p>
+          </div>
+          <div class="card-bg border border-primary rounded-lg p-3 border-l-2 border-l-[var(--accent-color)]/80">
+            <div class="font-semibold text-primary text-sm mb-1">Do you work with startups?</div>
+            <p class="text-xs text-secondary">Typically we focus on businesses with at least 6 months of operating history and consistent revenue. If you are pre-revenue, we can still talk through future options.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-primary/50 bg-[var(--bg-card)]">
+    <div class="max-w-6xl mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-muted">
+      <div class="flex items-center gap-2">
+        <span class="brand-georgia text-[11px] tracking-[0.24em] uppercase">Sutton Funding</span>
+        <span class="hidden md:inline">&middot;</span>
+        <span>Alternative business financing — all offers subject to underwriting and approval.</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span>© <span id="yearSpan"></span> Sutton Funding. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const elements = {
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      monthlyDepositsInput: document.getElementById('qMonthlyDeposits'),
+      tibSelect: document.getElementById('qTIB'),
+      ficoBandSelect: document.getElementById('qFicoBand'),
+      toggleDaily: document.getElementById('toggleDaily'),
+      toggleWeekly: document.getElementById('toggleWeekly'),
+      toggleMonthly: document.getElementById('toggleMonthly'),
+      runMockApprovalButton: document.getElementById('runMockApprovalButton'),
+      summaryAmountOut: document.getElementById('summaryAmountOut'),
+      summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+      summaryFactorOut: document.getElementById('summaryFactorOut'),
+      summaryTermOut: document.getElementById('summaryTermOut'),
+      summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+      summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      mockTierLabel: document.getElementById('mockTierLabel'),
+      mockStatusLabel: document.getElementById('mockStatusLabel'),
+      getFundingButton: document.getElementById('getFundingButton'),
+      themeToggleButton: document.getElementById('themeToggleButton')
+    };
+
+    let paymentFrequency = 'weekly';
+    let currentTheme = 'theme-corporate';
+
+    function formatCurrency(num) {
+      const numericValue = Number(num);
+      if (isNaN(numericValue) || !isFinite(numericValue)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(numericValue);
+    }
+
+    function parseFormattedNumber(val) {
+      if (val === null || val === undefined) return 0;
+      const str = String(val).trim();
+      if (!str) return 0;
+      const cleaned = str.replace(/[$,]/g, '');
+      const num = parseFloat(cleaned);
+      if (isNaN(num) || !isFinite(num)) return 0;
+      return num;
+    }
+
+    function parseNumberFromInput(el) {
+      if (!el) return 0;
+      return parseFormattedNumber(el.value);
+    }
+
+    function updateBusinessNameDisplay() {
+      if (!elements.businessNameDisplay || !elements.businessNameInput) return;
+      const name = elements.businessNameInput.value.trim();
+      if (name) {
+        elements.businessNameDisplay.textContent = name;
+        elements.businessNameDisplay.classList.remove('hidden');
+      } else {
+        elements.businessNameDisplay.textContent = '';
+        elements.businessNameDisplay.classList.add('hidden');
+      }
+    }
+
+    function updatePaymentToggleUI() {
+      const pairs = [
+        { button: elements.toggleDaily, freq: 'daily' },
+        { button: elements.toggleWeekly, freq: 'weekly' },
+        { button: elements.toggleMonthly, freq: 'monthly' }
+      ];
+      pairs.forEach(pair => {
+        if (!pair.button) return;
+        pair.button.classList.remove('toggle-active', 'toggle-inactive');
+        if (paymentFrequency === pair.freq) {
+          pair.button.classList.add('toggle-active');
+        } else {
+          pair.button.classList.add('toggle-inactive');
+        }
+      });
+    }
+
+    function applyTheme() {
+      const root = document.documentElement;
+      root.classList.remove('theme-corporate', 'theme-slate');
+      root.classList.add(currentTheme);
+      if (!root.classList.contains('accent-sutton')) {
+        root.classList.add('accent-sutton');
+      }
+      if (elements.themeToggleButton) {
+        elements.themeToggleButton.textContent =
+          currentTheme === 'theme-corporate' ? 'Dark Mode' : 'Light Mode';
+      }
+      try {
+        localStorage.setItem('suttonTheme', currentTheme);
+      } catch (e) {
+        console.warn('Theme save failed', e);
+      }
+    }
+
+    function computeMockApproval(qual) {
+      const monthlyDeposits = Math.max(0, qual.monthlyDeposits || 0);
+      if (!monthlyDeposits) {
+        return {
+          approvedAmount: 0,
+          factor: 0,
+          termMonths: 0,
+          payment: 0,
+          paymentLabel: 'Est. Payment',
+          totalPayback: 0,
+          totalCost: 0,
+          tier: '',
+          programLabel: '',
+          status: 'Enter your average monthly deposits to see a Sutton-style mock approval.'
+        };
+      }
+
+      // Base approval from deposits
+      let multiplier;
+      if (monthlyDeposits < 15000) multiplier = 0.6;
+      else if (monthlyDeposits < 40000) multiplier = 0.9;
+      else if (monthlyDeposits < 100000) multiplier = 1.1;
+      else if (monthlyDeposits < 250000) multiplier = 1.3;
+      else multiplier = 1.5;
+
+      let approval = monthlyDeposits * multiplier;
+      let factorBase = 1.25;
+      let termMonths = 12;
+      let tier = 'Core Business Funding';
+      let programLabel = 'Core Funding';
+
+      // Time in business adjustments
+      switch (qual.tibBand) {
+        case '0-6':
+          approval *= 0.6;
+          factorBase += 0.15;
+          termMonths = 6;
+          tier = 'Bridge Capital';
+          programLabel = 'Turnaround & Bridge';
+          break;
+        case '6-12':
+          approval *= 0.85;
+          factorBase += 0.08;
+          termMonths = 9;
+          tier = 'Core & Bridge';
+          break;
+        case '12-24':
+          factorBase += 0.03;
+          termMonths = 12;
+          tier = 'Core Funding';
+          break;
+        case '24+':
+          approval *= 1.1;
+          factorBase -= 0.02;
+          termMonths = 15;
+          tier = 'Prime Working Capital';
+          programLabel = 'Prime Working Capital';
+          break;
+        default:
+          break;
+      }
+
+      // Personal credit adjustments
+      switch (qual.ficoBand) {
+        case 'under580':
+          approval *= 0.75;
+          factorBase += 0.08;
+          break;
+        case '580-629':
+          approval *= 0.9;
+          factorBase += 0.04;
+          break;
+        case '630-679':
+          break;
+        case '680+':
+          approval *= 1.1;
+          factorBase -= 0.03;
+          break;
+        default:
+          break;
+      }
+
+      // Clamp factor and amount
+      let factor = factorBase;
+      if (factor < 1.15) factor = 1.15;
+      if (factor > 1.49) factor = 1.49;
+
+      if (approval < 5000) approval = 5000;
+      if (approval > 750000) approval = 750000;
+
+      const totalPayback = approval * factor;
+      const totalCost = totalPayback - approval;
+
+      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
+      const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
+      const dailyPayment = termMonths > 0 ? totalPayback / (termMonths * 22) : 0;
+
+      let payment = dailyPayment;
+      let paymentLabel = 'Est. Daily Payment';
+      if (paymentFrequency === 'weekly') {
+        payment = weeklyPayment;
+        paymentLabel = 'Est. Weekly Payment';
+      } else if (paymentFrequency === 'monthly') {
+        payment = monthlyPayment;
+        paymentLabel = 'Est. Monthly Payment';
+      }
+
+      let status;
+      const hasCoreFields = !!qual.tibBand && !!qual.ficoBand;
+      if (!hasCoreFields) {
+        status = 'Complete all fields to see a more accurate Sutton-style mock approval.';
+      } else {
+        status = 'This is a Sutton-style mock approval based on what you shared. Final terms are subject to full underwriting.';
+      }
+
+      return {
+        approvedAmount: approval,
+        factor,
+        termMonths,
+        payment,
+        paymentLabel,
+        totalPayback,
+        totalCost,
+        tier,
+        programLabel,
+        status
+      };
+    }
+
+    function renderMockApproval(result) {
+      if (!elements.summaryAmountOut) return;
+
+      elements.summaryAmountOut.textContent = formatCurrency(result.approvedAmount);
+      if (elements.summaryPaybackOut) {
+        elements.summaryPaybackOut.textContent = result.totalPayback ? formatCurrency(result.totalPayback) : '';
+      }
+      if (elements.summaryFactorOut) {
+        elements.summaryFactorOut.textContent = result.factor ? result.factor.toFixed(2) + 'x' : '—';
+      }
+      if (elements.summaryTermOut) {
+        elements.summaryTermOut.textContent = result.termMonths ? result.termMonths + ' mo' : '—';
+      }
+      if (elements.summaryCostOut) {
+        elements.summaryCostOut.textContent = result.totalCost ? formatCurrency(result.totalCost) : '—';
+      }
+      if (elements.summaryPaymentLabel) {
+        elements.summaryPaymentLabel.textContent = result.paymentLabel || 'Est. Payment';
+      }
+      if (elements.summaryPaymentValue) {
+        elements.summaryPaymentValue.textContent = result.payment ? formatCurrency(result.payment) : '—';
+      }
+
+      if (elements.mockTierLabel) {
+        const parts = [];
+        if (result.programLabel) parts.push(result.programLabel);
+        if (result.tier && result.tier !== result.programLabel) parts.push(result.tier);
+        elements.mockTierLabel.textContent = parts.join(' • ');
+      }
+
+      if (elements.mockStatusLabel) {
+        elements.mockStatusLabel.textContent = result.status;
+      }
+
+      if (elements.getFundingButton) {
+        if (result && result.approvedAmount && result.factor) {
+          elements.getFundingButton.classList.remove('hidden');
+        } else {
+          elements.getFundingButton.classList.add('hidden');
+        }
+      }
+    }
+
+    function runMockApproval() {
+      const qual = {
+        monthlyDeposits: parseNumberFromInput(elements.monthlyDepositsInput),
+        tibBand: elements.tibSelect ? elements.tibSelect.value : '',
+        ficoBand: elements.ficoBandSelect ? elements.ficoBandSelect.value : ''
+      };
+
+      updateBusinessNameDisplay();
+
+      const result = computeMockApproval(qual);
+      renderMockApproval(result);
+    }
+
+    function attachEventListeners() {
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', updateBusinessNameDisplay);
+      }
+      if (elements.monthlyDepositsInput) {
+        elements.monthlyDepositsInput.addEventListener('change', runMockApproval);
+        elements.monthlyDepositsInput.addEventListener('blur', runMockApproval);
+      }
+      if (elements.tibSelect) {
+        elements.tibSelect.addEventListener('change', runMockApproval);
+      }
+      if (elements.ficoBandSelect) {
+        elements.ficoBandSelect.addEventListener('change', runMockApproval);
+      }
+
+      if (elements.toggleDaily) {
+        elements.toggleDaily.addEventListener('click', () => {
+          paymentFrequency = 'daily';
+          updatePaymentToggleUI();
+          runMockApproval();
+        });
+      }
+      if (elements.toggleWeekly) {
+        elements.toggleWeekly.addEventListener('click', () => {
+          paymentFrequency = 'weekly';
+          updatePaymentToggleUI();
+          runMockApproval();
+        });
+      }
+      if (elements.toggleMonthly) {
+        elements.toggleMonthly.addEventListener('click', () => {
+          paymentFrequency = 'monthly';
+          updatePaymentToggleUI();
+          runMockApproval();
+        });
+      }
+
+      if (elements.runMockApprovalButton) {
+        elements.runMockApprovalButton.addEventListener('click', runMockApproval);
+      }
+
+      if (elements.themeToggleButton) {
+        elements.themeToggleButton.addEventListener('click', () => {
+          currentTheme = currentTheme === 'theme-corporate' ? 'theme-slate' : 'theme-corporate';
+          applyTheme();
+        });
+      }
+    }
+
+    (function init() {
+      try {
+        const stored = localStorage.getItem('suttonTheme');
+        if (stored === 'theme-corporate' || stored === 'theme-slate') {
+          currentTheme = stored;
+        }
+      } catch (e) {
+        console.warn('Theme load failed', e);
+      }
+
+      applyTheme();
+      attachEventListeners();
+      updatePaymentToggleUI();
+      updateBusinessNameDisplay();
+      const initial = computeMockApproval({ monthlyDeposits: 0 });
+      renderMockApproval(initial);
+
+      const yearSpan = document.getElementById('yearSpan');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+    })();
+  </script>
+</body>
+</html>
