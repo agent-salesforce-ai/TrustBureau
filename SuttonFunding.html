@@ -243,7 +243,7 @@
     <!-- OFFER CALCULATOR -->
     <div id="calculatorInputs" class="space-y-4 pt-2">
       <div id="businessNameContainer" class="px-1 mt-2">
-        <label for="businessNameInput" class="block text-xs font-semibold text-muted">Business Name (optional)</label>
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">Business Name</label>
         <input id="businessNameInput" type="text" class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field" placeholder="e.g., Acme Holdings LLC" />
       </div>
 
@@ -413,6 +413,8 @@
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
 
+      businessNameContainer: document.getElementById('businessNameContainer'),
+
       repSettingsToggle: document.getElementById('repSettingsToggle'),
       repSettingsPanel: document.getElementById('repSettingsPanel'),
       repNameInput: document.getElementById('repNameInput'),
@@ -446,14 +448,6 @@
     let savedOffers = [];
     let activeOfferIndex = -1;
     let isApprovalView = false;
-
-    // Helper to keep JS cap and slider.max in sync
-    function setAmountSliderMax(cap) {
-      amountSliderMax = cap;
-      if (elements.calcAmountSlider) {
-        elements.calcAmountSlider.max = String(cap);
-      }
-    }
 
     const formatCurrency = (num) => {
       const numericValue = Number(num);
@@ -516,7 +510,7 @@
       if (!offer) return;
 
       if (isApprovalView) {
-        setAmountSliderMax(offer.amount); // cap + update DOM max
+        amountSliderMax = offer.amount;
       }
 
       // Update sliders and inputs from a saved offer
@@ -725,9 +719,9 @@
 
       // In approval links, cap the primary amount at its approved value
       if (isApprovalView) {
-        setAmountSliderMax(amount);
+        amountSliderMax = amount;
       } else {
-        setAmountSliderMax(1000000);
+        amountSliderMax = 1000000;
       }
 
       elements.calcAmountInput.value = formatCurrency(amount);
@@ -776,6 +770,14 @@
         elements.factorContainer.style.display = 'none';
         elements.termContainer.style.display = 'none';
         elements.toggleContainer.style.display = 'none';
+
+        // Business name is display-only on client side
+        if (elements.businessNameContainer) {
+          elements.businessNameContainer.style.display = 'none';
+        }
+        if (elements.businessNameInput) {
+          elements.businessNameInput.disabled = true;
+        }
 
         elements.themeControls.style.display = 'none';
         if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
