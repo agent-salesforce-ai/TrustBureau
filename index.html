@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustBureau.ai - AI-Powered Business Verification & Underwriting</title>
+    
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans (headings) & Inter (body) --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- (AMOLED) Custom Tailwind Configuration --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-yellow': '#FACC15', // Main accent (from shield)
+                        'brand-dark': '#F1F5F9',   // Primary text (slate-100)
+                        'brand-gray': '#94A3B8',   // Secondary text (slate-400)
+                        'brand-bg': '#000000',     // Pure black background
+                        'brand-card': '#000000',   // Pure black card background
+                        'brand-border': '#334155', // (slate-700)
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.1);
+        }
+        .cta-button:active {
+            transform: translateY(0);
+        }
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+        }
+
+        /* (AMOLED) Styles for the score gauge (Updated to Yellow) */
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', 'sans-serif';
+            font-weight: 800;
+            font-size: 2.5rem;
+            border: 8px solid;
+        }
+        .score-red {
+            border-color: #450a0a; /* red-900 */
+            color: #f87171; /* red-400 */
+            background-color: #1f2937; /* gray-800 */
+        }
+        .score-yellow {
+            border-color: #422006; /* yellow-900 */
+            color: #fbbf24; /* yellow-400 */
+            background-color: #1f2937; /* gray-800 */
+        }
+        /* (MODIFIED) "Green" is now the brand yellow */
+        .score-green {
+            border-color: #422006; /* yellow-900 */
+            color: #FACC15; /* brand-yellow */
+            background-color: #1f2937; /* gray-800 */
+        }
+        
+        /* (AMOLED) Helper for list items in report */
+        .report-list-item {
+            padding-bottom: 0.75rem; /* Increased padding */
+            border-bottom: 1px solid #334155; /* brand-border */
+            margin-bottom: 0.75rem; /* Increased margin */
+        }
+        .report-list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        /* (AMOLED) Styles for Banking Charts */
+        .chart-visual {
+            border-left: 1px solid #334155; /* brand-border */
+            border-bottom: 1px solid #334155;
+            height: 150px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 10px 12px 6px 12px;
+            gap: 8px;
+        }
+        .chart-empty {
+            font-size: 0.875rem; /* text-sm */
+            color: #94A3B8; /* brand-gray */
+            padding: 16px 4px 8px 4px;
+            text-align: center;
+            width: 100%;
+        }
+        .bar-wrapper {
+            flex: 1;
+            max-width: 90px;
+            height: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            position: relative;
+        }
+        .bar {
+            width: 90%;
+            max-width: 40px;
+            background-color: #FACC15; /* brand-yellow */
+            position: relative;
+            min-height: 2px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease-out;
+        }
+        /* (MODIFIED) Removed gradients */
+        .bar-green { background-color: #FACC15; } /* brand-yellow */
+        .bar-grey { background-color: #64748B; } /* slate-500 */
+        .bar-yellow { background-color: #EAB308; } /* yellow-600 */
+        .bar-red { background-color: #DC2626; } /* red-600 */
+        
+        .bar-label {
+            font-size: 0.75rem; /* text-xs */
+            color: #94A3B8; /* brand-gray */
+            padding-top: 4px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem; /* text-xs */
+            color: #F1F5F9; /* brand-dark */
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* (AMOLED) Styles for Data Table */
+        .data-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.875rem; /* text-sm */
+            overflow-x: auto;
+            display: block;
+        }
+        .data-table th, .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #334155; /* brand-border */
+            text-align: left;
+            white-space: nowrap;
+        }
+        .data-table th {
+            background-color: #0f172a; /* slate-900 */
+            font-weight: 600;
+            color: #94A3B8; /* brand-gray */
+            font-size: 0.75rem; /* text-xs */
+            text-transform: uppercase;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table .monthly-avg {
+            font-weight: 600;
+            background-color: #0f172a; /* slate-900 */
+            color: #F1F5F9; /* brand-dark */
+            border-top: 2px solid #334155; /* brand-border */
+        }
+        .text-red-table { color: #f87171; } /* red-400 */
+        .text-green-table { color: #FACC15; } /* brand-yellow */
+
+        /* (AMOLED) Styles for Risk Checklist (Simplified) */
+        .risk-checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.875rem; /* text-sm */
+            margin-bottom: 0.75rem; /* mb-3 */
+            line-height: 1.4;
+        }
+        .risk-checklist-item:last-child { margin-bottom: 0; }
+        .risk-label {
+            flex: 0 0 160px; /* Basis 160px */
+            color: #F1F5F9; /* brand-dark */
+            font-weight: 500;
+        }
+        .risk-status {
+            flex: 1;
+            font-weight: 600;
+            text-align: left;
+        }
+        .risk-green { color: #FACC15; } /* brand-yellow */
+        .risk-red { color: #f87171; } /* red-400 */
+        .risk-yellow { color: #fde047; } /* yellow-300 */
+        .risk-grey { color: #94A3B8; } /* brand-gray */
+
+        /* (AMOLED) Hero Visuals */
+        .hero-visual {
+            background-color: #000000; /* brand-card */
+            border: 1px solid #334155; /* brand-border */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .hero-visual-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem; /* p-3 px-4 */
+            background-color: #0f172a; /* slate-900 */
+            border-bottom: 1px solid #334155; /* brand-border */
+        }
+        .hero-visual-header .dot {
+            height: 0.75rem; /* w-3 h-3 */
+            width: 0.75rem;
+            border-radius: 9999px; /* rounded-full */
+            background-color: #475569; /* slate-600 */
+            margin-right: 0.5rem; /* space-x-2 */
+        }
+        .hero-visual-body {
+            padding: 1.5rem; /* p-6 */
+        }
+    </style>
+</head>
+
+<!-- (AMOLED) Swapped to pure black background -->
+<body class="font-sans text-brand-dark bg-brand-bg">
+
+    <div id="main-app" class="relative min-h-screen">
+        
+        <!-- (AMOLED) Header -->
+        <header class="sticky top-0 z-40 bg-brand-bg/80 backdrop-blur-md border-b border-brand-border">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <a href="#" class="flex items-center space-x-2">
+                        <!-- (MODIFIED) Shield logo is yellow with dark check -->
+                        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7V17C2 21 6.6 23.4 12 23.4C17.4 23.4 22 21 22 17V7L12 2Z" fill="#FACC15"/>
+                            <path d="M10.5 15.1999L17.5 8.19995L16.1 6.79995L10.5 12.3999L7.7 9.59995L6.3 10.9999L10.5 15.1999Z" fill="#000000"/>
+                        </svg>
+                        <span class="font-heading font-bold text-xl text-brand-dark">TrustBureau.ai</span>
+                    </a>
+                    
+                    <!-- (MODIFIED) Removed Alpine.js attributes -->
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <a href="#demo" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Demo</a>
+                        <a href="#platform" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Platform</a>
+                        <a href="#pricing" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Pricing</a>
+                        <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-2 px-5 rounded-lg text-sm hover:bg-yellow-300">
+                            Search
+                        </a>
+                    </nav>
+                    
+                    <!-- (MODIFIED) Mobile Menu Button (Removed Alpine) -->
+                    <div class="md:hidden">
+                        <button id="mobile-menu-btn" class="text-brand-dark p-2" aria-label="Open menu">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- (MODIFIED) Mobile Menu Dropdown (Removed Alpine) -->
+                <div id="mobile-menu" class="hidden md:hidden mt-4">
+                    <nav class="flex flex-col space-y-4">
+                        <a href="#demo" class="mobile-nav-link text-lg font-medium text-brand-gray hover:text-brand-dark transition-colors">Demo</a>
+                        <a href="#platform" class="mobile-nav-link text-lg font-medium text-brand-gray hover:text-brand-dark transition-colors">Platform</a>
+                        <a href="#pricing" class="mobile-nav-link text-lg font-medium text-brand-gray hover:text-brand-dark transition-colors">Pricing</a>
+                        <a href="#demo" class="mobile-nav-link cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 text-center">
+                            Search
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <div id="main-page">
+            <!-- (AMOLED) Hero -->
+            <section class="relative py-24 md:py-32 bg-brand-bg overflow-hidden">
+                <div class="container mx-auto px-6 z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div class="text-center lg:text-left">
+                            <h1 class="font-heading font-extrabold text-5xl md:text-6xl lg:text-7xl text-brand-dark">
+                                AI Underwriting.
+                                <span class="block text-brand-yellow">Instant. Accurate. Fair.</span>
+                            </h1>
+                            <p class="mt-6 text-xl text-brand-gray max-w-xl mx-auto lg:mx-0">
+                                TrustBureau provides the world's most comprehensive AI-powered business verification and underwriting reports, enabling you to make decisions in seconds, not days.
+                            </p>
+                            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                                <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300">
+                                    Search
+                                </a>
+                                <a href="#platform" class="cta-button bg-brand-card text-brand-dark font-bold py-4 px-8 rounded-lg text-lg border border-brand-border hover:border-brand-gray">
+                                    Learn More
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Hero Visual (Static Report Example) -->
+                        <div class="hero-visual">
+                            <div class="hero-visual-header">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                            </div>
+                            <div class="hero-visual-body" style="min-height: 400px;">
+                                <!-- [START] Static Report Example -->
+                                <div class="space-y-4">
+                                    <!-- Header Stub -->
+                                    <div class="flex items-center space-x-4">
+                                        <div class="score-circle score-green" style="width: 80px; height: 80px; font-size: 1.75rem; border-width: 6px;">
+                                            <span>780</span>
+                                        </div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="h-6 bg-slate-700 rounded-md w-3/4"></div>
+                                            <div class="h-4 bg-slate-800 rounded-md w-1/2"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Recommendation Stub -->
+                                    <div class="p-3 border-l-4 rounded-r-lg bg-yellow-900/20 border-yellow-500 text-yellow-200">
+                                        <h5 class="font-heading font-bold text-lg text-yellow-400">Approve</h5>
+                                        <p class="text-sm mt-1">Strong financials and positive sentiment.</p>
+                                    </div>
+                                
+                                    <!-- Factors Stub -->
+                                    <div>
+                                        <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                                        <ul class="space-y-1.5">
+                                            <li class="flex items-start">
+                                                <svg class="w-4 h-4 text-yellow-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                                <span class="text-sm text-brand-dark">Active Corporate Filings</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <svg class="w-4 h-4 text-yellow-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                                <span class="text-sm text-brand-dark">Positive Cash Flow</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                
+                                    <!-- Chart Stub -->
+                                    <div class="chart-visual" style="height: 100px; padding: 10px 12px 0 12px;">
+                                        <div class="bar-wrapper">
+                                            <div class="bar bar-green" style="height: 60%;"></div>
+                                            <div class="bar-label" style="padding-top: 2px;">Sep</div>
+                                        </div>
+                                        <div class="bar-wrapper">
+                                            <div class="bar bar-green" style="height: 80%;"></div>
+                                            <div class="bar-label" style="padding-top: 2px;">Oct</div>
+                                        </div>
+                                        <div class="bar-wrapper">
+                                            <div class="bar bar-green" style="height: 75%;"></div>
+                                            <div class="bar-label" style="padding-top: 2px;">Nov</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- [END] Static Report Example -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) Report Generator -->
+            <section id="demo" class="py-24 bg-black">
+                <!-- (MODIFIED) Container is now simpler -->
+                <div class="container mx-auto px-6">
+                    
+                    <!-- [START] COMPREHENSIVE WIDGET -->
+                    <!-- (MODIFIED) This is the main card. It is now the *only* element. -->
+                    <!-- (MODIFIED) Card starts at max-w-7xl for the pre-filled report -->
+                    <div id="main-widget-container" class="max-w-7xl mx-auto w-full transition-all duration-300 ease-in-out">
+                        <!-- (AMOLED) Card styles updated to bg-black -->
+                        <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-6 flex flex-col relative">
+                            
+                            <!-- (MODIFIED) This search header is hidden by default AND MOVED INSIDE THE CARD -->
+                            <div id="report-search-header" class="max-w-xl mx-auto w-full" style="display: none;">
+                                <h2 class="font-heading font-bold text-4xl text-brand-dark text-center">Try the Demo</h2>
+                                <p class="text-lg text-brand-gray text-center mt-3 mb-8">
+                                    Enter any business name to generate a live, comprehensive report in seconds.
+                                </p>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="business-name" class="block text-sm font-medium text-brand-dark text-center">Enter any Business Name</label>
+                                        <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-yellow focus:border-brand-yellow sm:text-sm bg-brand-card text-brand-dark" placeholder="e.g., Tesla, Inc. or Apex Innovations">
+                                    </div>
+                                    <button id="generate-report-btn" class="group relative w-full flex justify-center cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-wait">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
+                                        </svg>
+                                        <span>Generate Report</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- (NEW) This wrapper holds the pre-filled report, loader, and error -->
+                            <div id="report-results-ui" class="w-full" style="display: block;">
+                                <!-- Loader -->
+                                <div id="report-loader" style="display: none;" class="flex flex-col items-center justify-center space-y-2 results-box py-16">
+                                    <svg class="animate-spin h-12 w-12 text-brand-yellow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-lg text-brand-gray font-medium">Building Comprehensive Report...</span>
+                                    <span class="text-sm text-brand-gray">This may take a moment as the AI performs multiple searches.</span>
+                                </div>
+
+                                <!-- Error -->
+                                <div id="report-error-container" style="display: none;" class="p-4 border border-red-900 rounded-lg bg-red-900/20 results-box flex flex-col items-center justify-center">
+                                    <p class="text-sm font-bold text-red-400">An Error Occurred</p>
+                                    <p class="text-sm text-red-500" id="report-error-message"></p>
+                                </div>
+
+                                <!-- (MODIFIED) This is the H3 from the *original* search box, now part of the pre-filled report -->
+                                <h3 id="report-static-header" class="text-2xl font-heading font-bold text-brand-dark mb-4 text-center">
+                                    Live AI Comprehensive Business Report
+                                </h3>
+                                
+                                <!-- Results Container -->
+                                <div id="report-content" class="w-full" style="display: block; margin-top: 1.5rem; border-top: 1px solid #374151; padding-top: 1.5rem;">
+                                    
+                                    <!-- Report Header -->
+                                    <div class="mb-6 pb-4 border-b border-brand-border">
+                                        <h2 id="report-company-name-header" class="text-3xl font-heading font-bold text-brand-dark text-center">Apple Inc. (Sample)</h2>
+                                        <p id="report-summary-header" class="text-center text-brand-gray text-lg mt-2 max-w-3xl mx-auto">A comprehensive AI-generated report on Apple Inc., focusing on key business, financial, and risk metrics.</p>
+                                    </div>
+
+                                    <!-- Main 2-Column Grid -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+                                        <!-- [SIDEBAR COLUMN: Vitals & Checks] -->
+                                        <div class="lg:col-span-2 space-y-6">
+                                            
+                                            <!-- AI Risk Score -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <div id="report-score-circle" class="score-circle mb-4 score-green">
+                                                        <span id="report-score-digit">810</span>
+                                                    </div>
+                                                    <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic">Excellent financial health, strong brand, and consistent market leadership.</p>
+                                                    
+                                                    <div class="w-full text-left">
+                                                        <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                                                        <!-- (MODIFIED) Pre-filled data -->
+                                                        <ul id="report-score-positives" class="space-y-1.5 mb-3">
+                                                            <li class="flex items-start"><svg class="w-4 h-4 text-yellow-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg><span class="text-sm text-brand-dark">Massive cash reserves</span></li>
+                                                            <li class="flex items-start"><svg class="w-4 h-4 text-yellow-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg><span class="text-sm text-brand-dark">High profitability</span></li>
+                                                        </ul>
+                                                        <ul id="report-score-negatives" class="space-y-1.5">
+                                                            <li class="flex items-start"><svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg><span class="text-sm text-brand-dark">Regulatory scrutiny</span></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Public Sentiment -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Sentiment</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <h5 id="report-sentiment-rating" class="font-heading font-bold text-2xl text-brand-dark mb-2">Positive (8/10)</h5>
+                                                    <p id="report-sentiment-justification" class="text-sm text-brand-gray italic">Sentiment is broadly positive, citing product quality and brand loyalty. Negative themes focus on high prices and antitrust concerns.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Public Records -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Records</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
+                                                        <li class="text-yellow-400"><strong>Clear:</strong> <span class="text-brand-gray">No liens, judgments, or bankruptcies found for Apple Inc.</span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Legal & Regulatory -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Legal & Regulatory</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-legal-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
+                                                        <li class="text-red-400"><strong>Lawsuit:</strong> <span class="text-brand-gray">Ongoing antitrust lawsuit from the DOJ regarding App Store policies.</span></li>
+                                                        <li class="text-red-400"><strong>Regulatory:</strong> <span class="text-brand-gray">Facing fines from the EU related to DMA compliance.</span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- AI Risk Checklist -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Checklist</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data. Class names updated -->
+                                                    <ul id="report-risk-checklist" class="space-y-3">
+                                                        <li class="risk-checklist-item"><span class="risk-label">Corporate Filings</span><span class="risk-status risk-green">Active & In Good Standing</span></li>
+                                                        <li class="risk-checklist-item"><span class="risk-label">Sanctions & PEP</span><span class="risk-status risk-green">No Hits Found</span></li>
+                                                        <li class="risk-checklist-item"><span class="risk-label">Adverse Media</span><span class="risk-status risk-yellow">Minor Hits (Antitrust)</span></li>
+                                                        <li class="risk-checklist-item"><span class="risk-label">Financial Health</span><span class="risk-status risk-green">Excellent</span></li>
+                                                        <li class="risk-checklist-item"><span class="risk-label">Public Records</span><span class="risk-status risk-green">Clear</span></li>
+                                                        <li class="risk-checklist-item"><span class="risk-label">Web Presence</span><span class="risk-status risk-green">Verified & Authoritative</span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- SWOT Analysis (MOVED HERE) -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">SWOT Analysis</h4>
+                                                <div class="space-y-4">
+                                                    <!-- (MODIFIED) Pre-filled data. Class names updated -->
+                                                    <div class="p-4 border border-yellow-800 rounded-lg bg-yellow-900/20">
+                                                        <h5 class="font-semibold text-yellow-400 mb-2">Strengths</h5>
+                                                        <ul id="report-swot-strengths" class="space-y-1 list-disc list-inside text-sm text-brand-gray"><li>Iconic brand and ecosystem</li><li>Exceptional profitability</li><li>Strong R&D pipeline</li></ul>
+                                                    </div>
+                                                    <div class="p-4 border border-red-900 rounded-lg bg-red-900/20">
+                                                        <h5 class="font-semibold text-red-400 mb-2">Weaknesses</h5>
+                                                        <ul id="report-swot-weaknesses" class="space-y-1 list-disc list-inside text-sm text-brand-gray"><li>High price point</li><li>Dependence on iPhone sales</li></ul>
+                                                    </div>
+                                                    <div class="p-4 border border-slate-700 rounded-lg bg-slate-900/20">
+                                                        <h5 class="font-semibold text-slate-400 mb-2">Opportunities</h5>
+                                                        <ul id="report-swot-opportunities" class="space-y-1 list-disc list-inside text-sm text-brand-gray"><li>Expansion in emerging markets</li><li>Growth in Services (App Store, TV+)</li></ul>
+                                                    </div>
+                                                    <div class="p-4 border border-amber-800 rounded-lg bg-amber-900/20">
+                                                        <h5 class="font-semibold text-amber-400 mb-2">Threats</h5>
+                                                        <ul id="report-swot-threats" class="space-y-1 list-disc list-inside text-sm text-brand-gray"><li>Intense competition</li><li>Global supply chain vulnerabilities</li><li>Antitrust regulation</li></ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        
+                                        <!-- [MAIN COLUMN: Story & Analysis] -->
+                                        <div class="lg:col-span-3 space-y-6">
+
+                                            <!-- AI Recommendation -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Underwriting Recommendation</h4>
+                                                <!-- (MODIFIED) Pre-filled data. Class names updated -->
+                                                <div id="report-recommendation-box" class="p-4 border-l-4 rounded-r-lg bg-yellow-900/20 border-yellow-500 text-yellow-200">
+                                                    <h5 id="report-recommendation-decision" class="font-heading font-bold text-2xl text-yellow-400">Approve</h5>
+                                                    <p id="report-recommendation-justification" class="text-sm mt-1">Recommendation is 'Approve' based on overwhelming financial strength, market dominance, and positive cash flow. Risk is negligible relative to operating income.</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Key Info -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Key Information</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul class="space-y-2 text-sm text-brand-gray">
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Website:</strong> <span id="report-key-website" class="font-medium text-brand-dark sm:text-right break-all"><a href="//apple.com" target="_blank" rel="noopener" class="text-brand-yellow hover:underline">apple.com</a></span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Industry:</strong> <span id="report-key-industry" class="font-medium text-brand-dark sm:text-right break-words">Technology, Consumer Electronics</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>CEO:</strong> <span id="report-key-ceo" class="font-medium text-brand-dark sm:text-right break-words">Tim Cook</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Founded:</strong> <span id="report-key-founded" class="font-medium text-brand-dark sm:text-right break-words">1976</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Employees:</strong> <span id="report-key-employees" class="font-medium text-brand-dark sm:text-right break-words">161,000+</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Phone:</strong> <span id="report-key-phone" class="font-medium text-brand-dark sm:text-right break-words">(800) 275-2273</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Address:</strong> <span id="report-key-address" class="font-medium text-brand-dark sm:text-right text-left break-words">One Apple Park Way, Cupertino, CA 95014</span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Business Location Map -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Business Location</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <iframe id="report-map-iframe" width="100%" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=One%20Apple%20Park%20Way%2C%20Cupertino%2C%20CA%2095014&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed" class="rounded-lg border border-brand-border filter invert-[90%] hue-rotate-[180deg]" aria-label="Business Location Map" style="display: block;">
+                                                    </iframe>
+                                                    <p id="report-map-fallback" class="text-sm text-brand-gray italic mt-2" style="display: none;">Map could not be loaded. Address may be missing or invalid.</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Corporate Filings -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul class="space-y-2 text-sm text-brand-gray">
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark sm:text-right break-words">APPLE INC.</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark sm:text-right break-words">Corporation</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark sm:text-right break-words text-yellow-400">Active</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark sm:text-right break-words">California</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark sm:text-right break-words">01/03/1977</span></li>
+                                                        <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark sm:text-right break-words">CORPORATION SERVICE COMPANY</span></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- (NEW) Top Counterparties -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Top Counterparties (Sample)</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-counterparties-list" class="space-y-3">
+                                                        <li class="report-list-item">
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                                                                <strong class="text-sm font-medium text-brand-dark">App Store (Inflow)</strong>
+                                                                <span class="text-sm font-bold text-yellow-400 sm:text-right">$1.2B / mo (Avg)</span>
+                                                            </div>
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                                                                <span>Type: Customer / Platform Fees</span>
+                                                                <span class="sm:text-right">Relationship: Internal</span>
+                                                            </div>
+                                                        </li>
+                                                        <li class="report-list-item">
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                                                                <strong class="text-sm font-medium text-brand-dark">Foxconn (Outflow)</strong>
+                                                                <span class="text-sm font-bold text-red-400 sm:text-right">$3.1B / mo (Avg)</span>
+                                                            </div>
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                                                                <span>Type: Vendor / Manufacturing</span>
+                                                                <span class="sm:text-right">Relationship: External</span>
+                                                            </div>
+                                                        </li>
+                                                        <li class="report-list-item">
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                                                                <strong class="text-sm font-medium text-brand-dark">TSMC (Outflow)</strong>
+                                                                <span class="text-sm font-bold text-red-400 sm:text-right">$1.5B / mo (Avg)</span>
+                                                            </div>
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                                                                <span>Type: Vendor / Components</span>
+                                                                <span class="sm:text-right">Relationship: External</span>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Extrapolated Debt Obligations -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Extrapolated Debt Obligations</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-debt-obligations-list" class="space-y-3">
+                                                        <li class="report-list-item">
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                                                                <strong class="text-sm font-medium text-brand-dark">Corporate Bond (Unsecured)</strong>
+                                                                <span class="text-sm font-bold text-red-400 sm:text-right">$920M / mo</span>
+                                                            </div>
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                                                                <span>Lender: Various (Public Bondholders)</span>
+                                                                <span class="sm:text-right">Est. Balance: $109.8B</span>
+                                                            </div>
+                                                        </li>
+                                                        <li class="report-list-item">
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                                                                <strong class="text-sm font-medium text-brand-dark">Commercial Paper</strong>
+                                                                <span class="text-sm font-bold text-red-400 sm:text-right">$150M / mo</span>
+                                                            </div>
+                                                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                                                                <span>Lender: Various Money Market Funds</span>
+                                                                <span class="sm:text-right">Est. Balance: $10.2B</span>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Financial Summary -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Summary</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <div id="report-fin-public" style="display: block;">
+                                                        <ul class="space-y-2 text-sm text-brand-gray">
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Public Company</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Ticker:</strong> <span id="report-fin-ticker" class="font-medium text-brand-dark sm:text-right break-words">AAPL</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Market Cap:</strong> <span id="report-fin-marketcap" class="font-medium text-brand-dark sm:text-right break-words">$2.85 Trillion</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Latest Revenue:</strong> <span id="report-fin-revenue" class="font-medium text-brand-dark sm:text-right break-words">$383.29 Billion (TTM)</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Net Income:</strong> <span id="report-fin-netincome" class="font-medium text-brand-dark sm:text-right break-words">$96.99 Billion (TTM)</span></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div id="report-fin-private" style="display: none;">
+                                                        <ul class="space-y-2 text-sm text-brand-gray">
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Private Company</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Annual Revenue:</strong> <span id="report-fin-est-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Profit Margin:</strong> <span id="report-fin-est-margin" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Cash on Hand:</strong> <span id="report-fin-est-cash" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                                                        </ul>
+                                                    </div>
+                                                    
+                                                    <!-- Credit Snapshot -->
+                                                    <div id="report-fin-credit" class="mt-4 pt-4 border-t border-brand-border">
+                                                        <h5 class="text-sm font-semibold uppercase text-brand-gray mb-3">Credit Snapshot</h5>
+                                                        <!-- (MODIFIED) Pre-filled data -->
+                                                        <ul class="space-y-2 text-sm text-brand-gray">
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Decision:</strong> <span id="report-fin-credit-decision" class="font-medium text-brand-dark sm:text-right break-words">Approve</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>FICO Score:</strong> <span id="report-fin-credit-score" class="font-medium text-brand-dark sm:text-right break-words">810 (Est.)</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Total Debt (Credit):</strong> <span id="report-fin-credit-total-debt" class="font-medium text-brand-dark sm:text-right break-words">$120.0B</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Revolving Debt:</strong> <span id="report-fin-credit-revolving-debt" class="font-medium text-brand-dark sm:text-right break-words">$0 (N/A)</span></li>
+                                                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Avg Monthly Revenue (Bank):</strong> <span id="report-fin-credit-avg-revenue" class="font-medium text-brand-dark sm:text-right break-words">$31.9B</span></li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <p id="report-fin-note" class="text-xs italic text-brand-gray mt-3 pt-3 border-t border-brand-border">Data sourced from public filings.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Recent News -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Recent News</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-news-list" class="space-y-3">
+                                                        <li class="report-list-item"> <strong class="text-sm font-medium text-brand-dark">Apple unveils new M4 chips and AI-focused Macs</strong> <p class="text-sm text-brand-gray mt-1 mb-2">Apple announced its next generation of chips, focusing heavily on on-device AI capabilities.</p> <span class="text-xs text-brand-gray font-medium">Bloomberg</span> </li>
+                                                        <li class="report-list-item"> <strong class="text-sm font-medium text-brand-dark">DOJ Antitrust Trial Begins</strong> <p class="text-sm text-brand-gray mt-1 mb-2">The Department of Justice has started its antitrust case against Apple, targeting App Store policies.</p> <span class="text-xs text-brand-gray font-medium">Reuters</span> </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Customer Reviews -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Customer Reviews</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-reviews-list" class="space-y-4">
+                                                        <blockquote class="p-4 border-l-4 border-brand-border bg-slate-900 report-list-item"> <div class="flex justify-between items-center mb-1"> <span class="text-sm font-medium text-brand-dark">Trustpilot</span> <span class="text-sm font-bold text-yellow-400">4.5/5</span> </div> <p class="text-sm italic text-brand-gray">"Incredible products, but the customer service for repairs can be slow."</p> </blockquote>
+                                                        <blockquote class="p-4 border-l-4 border-brand-border bg-slate-900 report-list-item"> <div class="flex justify-between items-center mb-1"> <span class="text-sm font-medium text-brand-dark">ConsumerAffairs</span> <span class="text-sm font-bold text-yellow-400">4.2/5</span> </div> <p class="text-sm italic text-brand-gray">"The ecosystem is seamless, but I'm worried about being locked in."</p> </blockquote>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Competitive Landscape -->
+                                            <div>
+                                                <h4 class="font-heading font-semibold text-brand-dark mb-3">Competitive Landscape</h4>
+                                                <!-- (AMOLED): Card styles updated to bg-black -->
+                                                <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <ul id="report-competitors-list" class="space-y-3">
+                                                        <li class="report-list-item"> <strong class="text-sm font-medium text-brand-dark">Samsung Electronics</strong> <p class="text-sm text-brand-gray mt-1">Direct competitor in smartphones, tablets, and wearables. Strong global presence.</p> </li>
+                                                        <li class="report-list-item"> <strong class="text-sm font-medium text-brand-dark">Microsoft</strong> <p class="text-sm text-brand-gray mt-1">Competes in personal computing (Surface) and operating systems (Windows).</p> </li>
+                                                        <li class="report-list-item"> <strong class="text-sm font-medium text-brand-dark">Google (Alphabet)</strong> <p class="text-sm text-brand-gray mt-1">Competes in operating systems (Android), smartphones (Pixel), and cloud services.</p> </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Banking Snapshot (MOVED HERE FOR FULL WIDTH) -->
+                                    <div class="mt-6">
+                                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Banking Snapshot & Trends (Fictional)</h4>
+                                        <!-- (AMOLED): Card styles updated to bg-black -->
+                                        <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <!-- True Revenue -->
+                                                <div>
+                                                    <h5 class="text-sm font-semibold text-brand-dark mb-2">True Revenue (Last 3 Months)</h5>
+                                                    <!-- (MODIFIED) Pre-filled data. Class names updated -->
+                                                    <div id="banking-chart-revenue" class="chart-visual">
+                                                        <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height: 94.8421%;"></div><div class="bar-label">Sep '24</div></div>
+                                                        <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height: 97.3684%;"></div><div class="bar-label">Oct '24</div></div>
+                                                        <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height: 100%;"></div><div class="bar-label">Nov '24</div></div>
+                                                    </div>
+                                                </div>
+                                                <!-- Average Daily Balance -->
+                                                <div>
+                                                    <h5 class="text-sm font-semibold text-brand-dark mb-2">Average Daily Balance</h5>
+                                                    <!-- (MODIFIED) Pre-filled data. Class names updated -->
+                                                    <div id="banking-chart-avg-balance" class="chart-visual">
+                                                        <div class="bar-wrapper" title="Sep '24: $45.2B"><div class="bar-value">$45.2B</div><div class="bar bar-grey" style="height: 100%;"></div><div class="bar-label">Sep '24</div></div>
+                                                        <div class="bar-wrapper" title="Oct '24: $42.1B"><div class="bar-value">$42.1B</div><div class="bar bar-grey" style="height: 93.1415%;"></div><div class="bar-label">Oct '24</div></div>
+                                                        <div class="bar-wrapper" title="Nov '24: $44.8B"><div class="bar-value">$44.8B</div><div class="bar bar-grey" style="height: 99.115%;"></div><div class="bar-label">Nov '24</div></div>
+                                                    </div>
+                                                </div>
+                                                <!-- Ending Balance -->
+                                                <div>
+                                                    <h5 class="text-sm font-semibold text-brand-dark mb-3">Ending Balance</h5>
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <div id="banking-chart-end-balance" class="chart-visual">
+                                                        <div class="bar-wrapper" title="Sep '24: $62.1B"><div class="bar-value">$62.1B</div><div class="bar bar-yellow" style="height: 100%;"></div><div class="bar-label">Sep '24</div></div>
+                                                        <div class="bar-wrapper" title="Oct '24: $61.5B"><div class="bar-value">$61.5B</div><div class="bar bar-yellow" style="height: 99.0338%;"></div><div class="bar-label">Oct '24</div></div>
+                                                        <div class="bar-wrapper" title="Nov '24: $61.9B"><div class="bar-value">$61.9B</div><div class="bar bar-yellow" style="height: 99.6779%;"></div><div class="bar-label">Nov '24</div></div>
+                                                    </div>
+                                                </div>
+                                                <!-- Debt Service -->
+                                                <div>
+                                                    <h5 class="text-sm font-semibold text-brand-dark mb-2">Debt Service (Monthly Payments)</h5>
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <div id="banking-chart-debt" class="chart-visual">
+                                                        <div class="bar-wrapper" title="Sep '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height: 100%;"></div><div class="bar-label">Sep '24</div></div>
+                                                        <div class="bar-wrapper" title="Oct '24: $1.1B"><div class="bar-value">$1.1B</div><div class="bar bar-red" style="height: 91.6667%;"></div><div class="bar-label">Oct '24</div></div>
+                                                        <div class="bar-wrapper" title="Nov '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height: 100%;"></div><div class="bar-label">Nov '24</div></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Monthly Financial Breakdown (MOVED HERE FOR FULL WIDTH) -->
+                                    <div class="mt-6">
+                                        <h4 class="font-heading font-semibold text-brand-dark mb-3">Monthly Financial Breakdown (Fictional)</h4>
+                                        <!-- (AMOLED): Card styles updated to bg-black -->
+                                        <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
+                                            <div class="overflow-x-auto">
+                                                <table class="data-table w-full">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Month</th>
+                                                            <th>Total Credits</th>
+                                                            <th>Total Debits</th>
+                                                            <th>Avg Balance</th>
+                                                            <th>Min Balance</th>
+                                                            <th>Days Neg</th>
+                                                            <th># NSFs</th>
+                                                            <th>Net Cashflow</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!-- (MODIFIED) Pre-filled data -->
+                                                    <tbody id="report-monthly-breakdown-body">
+                                                        <tr>
+                                                            <td class="font-medium text-brand-dark">November '24</td>
+                                                            <td class="text-yellow-400">$97.30B</td>
+                                                            <td class="text-red-400">$93.42B</td>
+                                                            <td>$44.8B</td>
+                                                            <td>$35.1B</td>
+                                                            <td class="">0</td>
+                                                            <td class="">0</td>
+                                                            <td class="font-medium text-yellow-400">$3.88B</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-medium text-brand-dark">October '24</td>
+                                                            <td class="text-yellow-400">$92.10B</td>
+                                                            <td class="text-red-400">$93.90B</td>
+                                                            <td>$42.1B</td>
+                                                            <td>$33.2B</td>
+                                                            <td class="">0</td>
+                                                            <td class="">0</td>
+                                                            <td class="font-medium text-red-400">-$1.80B</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-medium text-brand-dark">September '24</td>
+                                                            <td class="text-yellow-400">$89.50B</td>
+                                                            <td class="text-red-400">$87.20B</td>
+                                                            <td>$45.2B</td>
+                                                            <td class="text-red-400">$36.0B</td>
+                                                            <td class="">0</td>
+                                                            <td class="">0</td>
+                                                            <td class="font-medium text-yellow-400">$2.30B</td>
+                                                        </tr>
+                                                        <tr class="monthly-avg">
+                                                            <td>Average</td>
+                                                            <td>$92.97B</td>
+                                                            <td>$91.51B</td>
+                                                            <td>$44.0B</td>
+                                                            <td>$34.7B</td>
+                                                            <td class="">0</td>
+                                                            <td class="">0</td>
+                                                            <td class="font-medium text-yellow-400">$1.46B</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sources -->
+                                    <!-- (MODIFIED) Pre-filled data -->
+                                    <div id="report-sources-container" class="mt-8 border-t border-brand-border pt-6" style="display: block;">
+                                        <h5 class="text-sm font-semibold text-brand-gray uppercase mb-3">Data Sources</h5>
+                                        <ul id="report-sources" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 list-disc list-inside">
+                                            <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">Apple Inc. (AAPL) SEC Filings</a></li>
+                                            <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">Bloomberg Terminal Data</a></li>
+                                            <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">California Secretary of State</a></li>
+                                            <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">Reuters News Archive</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- [END] COMPREHENSIVE WIDGET -->
+                </div>
+            </section>
+        
+            <!-- (AMOLED) Platform -->
+            <section id="platform" class="py-24 bg-brand-bg">
+                <div class="container mx-auto px-6">
+                    <!-- (MODIFIED) Removed grid-cols-2 and the image container -->
+                    <div class="grid grid-cols-1 gap-16 items-center">
+                        
+                        <!-- (REMOVED) The hero-visual div containing the placeholder image was here -->
+
+                        <!-- (MODIFIED) Centered the text content -->
+                        <div class="mt-12 lg:mt-0">
+                            <span class="font-bold text-brand-yellow text-sm uppercase text-center block">The Platform</span>
+                            <h2 class="font-heading font-bold text-4xl text-brand-dark mt-3 mb-6 text-center">One Solution for AI Governance</h2>
+                            <p class="text-lg text-brand-gray mb-8 max-w-2xl mx-auto text-center">
+                                Our platform provides a complete, end-to-end solution for AI governance, risk, and compliance (GRC).
+                            </p>
+                            <!-- (MODIFIED) Added max-w-3xl and mx-auto to center the grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                                <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                                    <h3 class="font-semibold text-lg text-brand-dark">Model Auditing</h3>
+                                    <p class="mt-2 text-brand-gray">Generate independent audit reports for performance, safety, and security.</p>
+                                </div>
+                                <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                                    <h3 class="font-semibold text-lg text-brand-dark">Bias & Fairness</h3>
+                                    <p class="mt-2 text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p>
+                                </div>
+                                <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                                    <h3 class="font-semibold text-lg text-brand-dark">Security & Robustness</h3>
+                                    <p class="mt-2 text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p>
+                                </div>
+                                <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                                    <h3 class="font-semibold text-lg text-brand-dark">Explainable AI (XAI)</h3>
+                                    <p class="mt-2 text-brand-gray">Generate human-readable explanations for complex model decisions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) How it Works -->
+            <section id="how-it-works" class="py-24 bg-black">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-xs text-brand-yellow font-semibold text-center uppercase tracking-wider">How it Works</h2>
+                    <h3 class="font-heading font-bold text-4xl text-brand-dark text-center mt-3">From Search to Decision in Seconds</h3>
+                    <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">
+                        Our powerful AI engine rapidly aggregates and analyzes vast amounts of data to deliver actionable insights.
+                    </p>
+
+                    <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <div class="flex items-start mb-6">
+                                <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
+                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-xl font-semibold text-brand-dark">Search & Initiate</h4>
+                                    <p class="mt-1 text-brand-gray">Simply enter a business name to begin the AI underwriting process.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start mb-6">
+                                <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
+                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-4m0 0h4m-4 0l-4 4m4-4l4 4m6-6v4m0 0h-4m4 0l4-4m-4 4l-4-4m-6 0H6m0 0v-4m0 4l-4-4m4 4l-4 4m6-6v4"></path></svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-xl font-semibold text-brand-dark">AI-Powered Data Aggregation</h4>
+                                    <p class="mt-1 text-brand-gray">Our engine gathers and synthesizes data from thousands of sources in real-time.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
+                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-xl font-semibold text-brand-dark">Instant, Actionable Reports</h4>
+                                    <p class="mt-1 text-brand-gray">Receive a comprehensive, easy-to-understand report for immediate decision-making.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- (MODIFIED) Static Report Stub -->
+                        <div class="hero-visual mt-12 lg:mt-0">
+                            <div class="hero-visual-header">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                            </div>
+                            <div class="hero-visual-body">
+                                <!-- [START] Static Report Example -->
+                                <div class="space-y-4">
+                                    <!-- Header Stub -->
+                                    <div class="flex items-center space-x-4">
+                                        <div class="score-circle score-red" style="width: 80px; height: 80px; font-size: 1.75rem; border-width: 6px;">
+                                            <span>420</span>
+                                        </div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="h-6 bg-slate-700 rounded-md w-3/4"></div>
+                                            <div class="h-4 bg-slate-800 rounded-md w-1/2"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Recommendation Stub -->
+                                    <div class="p-3 border-l-4 rounded-r-lg bg-red-900/20 border-red-500 text-red-200">
+                                        <h5 class="font-heading font-bold text-lg text-red-400">Decline</h5>
+                                        <p class="text-sm mt-1">Multiple active tax liens and no web presence.</p>
+                                    </div>
+                                
+                                    <!-- Factors Stub -->
+                                    <div>
+                                        <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                                        <ul class="space-y-1.5">
+                                            <li class="flex items-start">
+                                                <svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                                <span class="text-sm text-brand-dark">Active State Tax Lien</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                                <span class="text-sm text-brand-dark">No verifiable web presence</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                
+                                    <!-- Chart Stub -->
+                                    <div class="chart-visual" style="height: 100px; padding: 10px 12px 0 12px;">
+                                        <div class="bar-wrapper">
+                                            <div class="bar bar-red" style="height: 60%;"></div>
+                                            <div class="bar-label" style="padding-top: 2px;">Sep</div>
+                                        </div>
+                                        <div class="bar-wrapper">
+                                            <div class="bar bar-red" style="height: 40%;"></div>
+                                            <div class="bar-label" style="padding-top: 2px;">Oct</div>
+                                        </div>
+                                        <div class="bar-wrapper">
+                                            <div class="bar bar-red" style="height: 35%;"></div>
+                                            <div class="bar-label" style="padding-top: 2px;">Nov</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- [END] Static Report Example -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        
+            <!-- (AMOLED) Pricing -->
+            <section id="pricing" class="py-24 bg-brand-bg">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-xs text-brand-yellow font-semibold text-center uppercase tracking-wider">Pricing</h2>
+                    <h3 class="font-heading font-bold text-4xl text-brand-dark text-center mt-3">Simple, Transparent Pricing</h3>
+                    <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">
+                        Choose the plan that's right for your business. No hidden fees, no long-term contracts.
+                    </p>
+                    <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Pricing Plan 1: Pay-as-you-go -->
+                        <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-8 flex flex-col">
+                            <h4 class="font-heading font-bold text-2xl text-brand-dark">Standard</h4>
+                            <p class="mt-2 text-brand-gray">For individuals and small teams.</p>
+                            <div class="mt-6">
+                                <span class="font-heading font-extrabold text-5xl text-brand-dark">$10</span>
+                                <span class="text-lg text-brand-gray">/ report</span>
+                            </div>
+                            <ul class="mt-8 space-y-4 text-brand-gray">
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Comprehensive AI Report
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Public Records Check
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Basic Risk Score
+                                </li>
+                            </ul>
+                            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">
+                                Get Started
+                            </a>
+                        </div>
+                        <!-- Pricing Plan 2: Pro (Featured) -->
+                        <div class="bg-brand-card border-2 border-brand-yellow rounded-lg shadow-2xl p-8 flex flex-col relative overflow-hidden">
+                            <span class="absolute top-0 right-0 bg-brand-yellow text-black text-xs font-bold px-4 py-1 rounded-bl-lg">Most Popular</span>
+                            <h4 class="font-heading font-bold text-2xl text-brand-dark">Pro</h4>
+                            <p class="mt-2 text-brand-gray">For growing businesses and lenders.</p>
+                            <div class="mt-6">
+                                <span class="font-heading font-extrabold text-5xl text-brand-dark">$500</span>
+                                <span class="text-lg text-brand-gray">/ mo</span>
+                            </div>
+                            <ul class="mt-8 space-y-4 text-brand-gray">
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    100 Reports / month
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Bank Data Analysis
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Advanced Risk Score
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Sentiment Analysis
+                                </li>
+                            </ul>
+                            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 mt-8">
+                                Get Started
+                            </a>
+                        </div>
+                        <!-- Pricing Plan 3: Enterprise -->
+                        <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-8 flex flex-col">
+                            <h4 class="font-heading font-bold text-2xl text-brand-dark">Enterprise</h4>
+                            <p class="mt-2 text-brand-gray">For large-scale operations.</p>
+                            <div class="mt-6">
+                                <span class="font-heading font-extrabold text-4xl text-brand-dark">Custom</span>
+                            </div>
+                            <ul class="mt-8 space-y-4 text-brand-gray">
+                                <li class="flex items-center">
+                                    <svg classs="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Unlimited Reports
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Full API Access
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    AI Governance Suite
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Dedicated Support
+                                </li>
+                            </ul>
+                            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">
+                                Contact Sales
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- (AMOLED) Footer -->
+        <footer class="bg-brand-bg border-t border-brand-border">
+            <div class="container mx-auto px-6 py-12">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <!-- (MODIFIED) Shield logo is yellow with dark check -->
+                        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7V17C2 21 6.6 23.4 12 23.4C17.4 23.4 22 21 22 17V7L12 2Z" fill="#FACC15"/>
+                            <path d="M10.5 15.1999L17.5 8.19995L16.1 6.79995L10.5 12.3999L7.7 9.59995L6.3 10.9999L10.5 15.1999Z" fill="#000000"/>
+                        </svg>
+                        <span class="font-heading font-bold text-xl text-brand-dark">TrustBureau.ai</span>
+                    </div>
+                    <nav class="flex space-x-6 mt-6 md:mt-0">
+                        <a href="#platform" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Platform</a>
+                        <a href="#pricing" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Pricing</a>
+                        <a href="#demo" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Demo</a>
+                    </nav>
+                </div>
+                <div class="mt-8 text-center text-brand-gray text-sm">
+                    &copy; 2025 TrustBureau.ai. All rights reserved.
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    
+
+    <!-- [START] GEMINI API SCRIPT (LIGHTWEIGHT VERSION) -->
+    <script>
+        // (MODIFIED) Wait for DOM content
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- UI Elements (Alphabetized & Centralized) ---
+            const bankingChartAvgBalance = document.getElementById('banking-chart-avg-balance');
+            const bankingChartDebt = document.getElementById('banking-chart-debt');
+            const bankingChartEndBalance = document.getElementById('banking-chart-end-balance');
+            const bankingChartRevenue = document.getElementById('banking-chart-revenue');
+            const businessNameInput = document.getElementById('business-name');
+            const companyNameHeader = document.getElementById('report-company-name-header');
+            const competitorsList = document.getElementById('report-competitors-list');
+            const contentContainer = document.getElementById('report-content');
+            const debtObligationsList = document.getElementById('report-debt-obligations-list');
+            const errorContainer = document.getElementById('report-error-container');
+            const errorMessage = document.getElementById('report-error-message');
+            const finCreditAvgRevenue = document.getElementById('report-fin-credit-avg-revenue');
+            const finCreditDecision = document.getElementById('report-fin-credit-decision');
+            const finCreditRevolvingDebt = document.getElementById('report-fin-credit-revolving-debt');
+            const finCreditScore = document.getElementById('report-fin-credit-score');
+            const finCreditTotalDebt = document.getElementById('report-fin-credit-total-debt');
+            const finEstCash = document.getElementById('report-fin-est-cash');
+            const finEstMargin = document.getElementById('report-fin-est-margin');
+            const finEstRevenue = document.getElementById('report-fin-est-revenue');
+            const finMarketCap = document.getElementById('report-fin-marketcap');
+            const finNetIncome = document.getElementById('report-fin-netincome');
+            const finNote = document.getElementById('report-fin-note');
+            const finPrivateDiv = document.getElementById('report-fin-private');
+            const finPublicDiv = document.getElementById('report-fin-public');
+            const finRevenue = document.getElementById('report-fin-revenue');
+            const finTicker = document.getElementById('report-fin-ticker');
+            const generateReportBtn = document.getElementById('generate-report-btn');
+            const keyAddress = document.getElementById('report-key-address');
+            const keyCeo = document.getElementById('report-key-ceo');
+            const keyEmployees = document.getElementById('report-key-employees');
+            const keyFounded = document.getElementById('report-key-founded');
+            const keyIndustry = document.getElementById('report-key-industry');
+            const keyPhone = document.getElementById('report-key-phone');
+            const keyWebsite = document.getElementById('report-key-website');
+            const legalList = document.getElementById('report-legal-list');
+            const loader = document.getElementById('report-loader');
+            const mainWidgetContainer = document.getElementById('main-widget-container');
+            const mapFallback = document.getElementById('report-map-fallback');
+            const mapIframe = document.getElementById('report-map-iframe');
+            const mobileMenu = document.getElementById('mobile-menu'); // <-- (NEW)
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn'); // <-- (NEW)
+            const monthlyBreakdownBody = document.getElementById('report-monthly-breakdown-body');
+            const newsList = document.getElementById('report-news-list');
+            const positiveList = document.getElementById('report-score-positives');
+            const recommendationBox = document.getElementById('report-recommendation-box');
+            const recommendationDecision = document.getElementById('report-recommendation-decision');
+            const recommendationJustification = document.getElementById('report-recommendation-justification');
+            const recordsList = document.getElementById('report-records-list');
+            const reportSearchHeader = document.getElementById('report-search-header'); // <-- DEFINED
+            const reportStaticHeader = document.getElementById('report-static-header'); // <-- DEFINED
+            const resultsUi = document.getElementById('report-results-ui'); // <-- (FIX) Defined results wrapper
+            const reviewsList = document.getElementById('report-reviews-list');
+            const riskChecklist = document.getElementById('report-risk-checklist');
+            const scoreCircle = document.getElementById('report-score-circle');
+            const scoreDigit = document.getElementById('report-score-digit');
+            const scoreJustification = document.getElementById('report-score-justification');
+            const counterpartiesList = document.getElementById('report-counterparties-list');
+            const negativeList = document.getElementById('report-score-negatives');
+            const sentimentJustification = document.getElementById('report-sentiment-justification');
+            const sentimentRating = document.getElementById('report-sentiment-rating');
+            const sosAgent = document.getElementById('report-sos-agent');
+            const sosDate = document.getElementById('report-sos-date');
+            const sosEntity = document.getElementById('report-sos-entity');
+            const sosJurisdiction = document.getElementById('report-sos-jurisdiction');
+            const sosName = document.getElementById('report-sos-name');
+            const sosStatus = document.getElementById('report-sos-status');
+            const sourcesContainer = document.getElementById('report-sources-container');
+            const sourcesList = document.getElementById('report-sources');
+            const summaryHeader = document.getElementById('report-summary-header');
+            const swotOpportunities = document.getElementById('report-swot-opportunities');
+            const swotStrengths = document.getElementById('report-swot-strengths');
+            const swotThreats = document.getElementById('report-swot-threats');
+            const swotWeaknesses = document.getElementById('report-swot-weaknesses');
+
+
+            // --- Helper Function: Show/Hide Report State ---
+            function showReportState(state, message = '') {
+                // (RESTRUCTURED) Simplified state logic
+                if(!loader || !errorContainer || !contentContainer || !resultsUi || !mainWidgetContainer) return;
+
+                resultsUi.style.display = 'block'; // (FIX) Show the results wrapper
+                
+                // (NEW) Ensure static header is hidden unless it's the default view
+                if(reportStaticHeader) reportStaticHeader.style.display = 'none';
+
+                if (state === 'loading') {
+                    loader.style.display = 'flex';
+                    errorContainer.style.display = 'none';
+                    contentContainer.style.display = 'none';
+                } else if (state === 'error') {
+                    loader.style.display = 'none';
+                    errorContainer.style.display = 'flex';
+                    contentContainer.style.display = 'none';
+                    if(errorMessage) errorMessage.innerHTML = message; // (FIX) Use innerHTML for the link
+                } else if (state === 'content') {
+                    loader.style.display = 'none';
+                    errorContainer.style.display = 'none';
+                    contentContainer.style.display = 'block';
+                    // (NEW) Expand card to full width for the report
+                    if(mainWidgetContainer) mainWidgetContainer.classList.add('max-w-7xl');
+                    if(mainWidgetContainer) mainWidgetContainer.classList.remove('max-w-xl');
+                }
+            }
+            
+            // --- Helper Function: Populate List (UL) ---
+            function populateGenericList(element, items, formatter, placeholder = 'No information found.') {
+                if(!element) return;
+                element.innerHTML = '';
+                if (items && items.length > 0) {
+                    items.forEach(item => {
+                        element.innerHTML += formatter(item);
+                    });
+                } else {
+                    element.innerHTML = `<li class="text-sm text-brand-gray italic">${placeholder}</li>`;
+                }
+            }
+            
+            // --- List Formatter Functions ---
+            const formatFinding = (finding) => {
+                const type = finding.type || 'Finding';
+                const details = finding.details || 'No details';
+                let color = 'text-brand-gray';
+                if (type.toLowerCase().includes('no records') || type.toLowerCase().includes('clear')) {
+                    color = 'text-yellow-400';
+                } else if (type.toLowerCase().includes('lien') || type.toLowerCase().includes('judgment') || type.toLowerCase().includes('lawsuit')) {
+                    color = 'text-red-400';
+                }
+                return `<li class="${color}"><strong>${type}:</strong> <span class="text-brand-gray">${details}</span></li>`;
+            };
+
+            const formatSwotItem = (item) => `<li class="text-sm text-brand-gray">${item}</li>`;
+
+            const formatNewsItem = (item) => {
+                return `<li class="report-list-item">
+                    <strong class="text-sm font-medium text-brand-dark">${item.title || 'No Title'}</strong>
+                    <p class="text-sm text-brand-gray mt-1 mb-2">${item.summary || 'No summary.'}</p>
+                    <span class="text-xs text-brand-gray font-medium">${item.source || 'Unknown Source'}</span>
+                </li>`;
+            };
+
+            const formatReviewItem = (item) => {
+                return `<blockquote class="p-4 border-l-4 border-brand-border bg-slate-900 report-list-item">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-brand-dark">${item.source || 'Unknown Source'}</span>
+                        <span class="text-sm font-bold text-yellow-400">${item.rating || ''}</span>
+                    </div>
+                    <p class="text-sm italic text-brand-gray">"${item.snippet || 'No snippet provided.'}"</p>
+                </blockquote>`;
+            };
+
+            const formatCompetitorItem = (item) => {
+                return `<li class="report-list-item">
+                    <strong class="text-sm font-medium text-brand-dark">${item.name || 'Unknown Competitor'}</strong>
+                    <p class="text-sm text-brand-gray mt-1">${item.summary || 'No summary.'}</p>
+                </li>`;
+            };
+
+            const formatDebtItem = (item) => {
+                return `<li class="report-list-item">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                        <strong class="text-sm font-medium text-brand-dark">${item.type || 'Unknown Debt'}</strong>
+                        <span class="text-sm font-bold text-red-400 sm:text-right">${item.monthlyPayment || 'N/A'} / mo</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                        <span>Lender: <strong>${item.lender || 'Unknown Lender'}</strong></span>
+                        <span class="sm:text-right">Est. Balance: <strong>${item.estimatedBalance || 'N/A'}</strong></span>
+                    </div>
+                </li>`;
+            };
+
+            const formatCounterpartyItem = (item) => {
+                const flowColor = (item.flow || 'outflow').toLowerCase() === 'inflow' ? 'text-yellow-400' : 'text-red-400';
+                return `<li class="report-list-item">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                        <strong class="text-sm font-medium text-brand-dark">${item.name || 'Unknown Counterparty'}</strong>
+                        <span class="text-sm font-bold ${flowColor} sm:text-right">${item.avgAmount || 'N/A'} / mo</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                        <span>Type: ${item.type || 'N/A'}</span>
+                        <span class="sm:text-right">Relationship: ${item.relationship || 'External'}</span>
+                    </div>
+                </li>`;
+            };
+
+            // --- Helper Function: Populate Banking Charts ---
+            function populateBankingCharts(element, data, barColorClass) {
+                if(!element) return;
+                element.innerHTML = '';
+                if (!data || data.length === 0) {
+                    element.innerHTML = `<div class="chart-empty">No recent data available.</div>`;
+                    return;
+                }
+
+                const maxAmount = Math.max(...data.map(d => d.amount || 0));
+                const scaleMax = maxAmount === 0 ? 1 : maxAmount * 1.1; 
+
+                data.forEach(item => {
+                    const barHeight = (item.amount / scaleMax) * 100;
+                    element.innerHTML += `
+                        <div class="bar-wrapper" title="${item.label}: ${item.value}">
+                            <div class="bar-value">${item.value || 'N/A'}</div>
+                            <div class="bar ${barColorClass || 'bar-green'}" style="height: ${barHeight}%;"></div>
+                            <div class="bar-label">${item.label || 'N/A'}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // --- Helper Function: Populate Monthly Breakdown Table ---
+            function populateMonthlyTable(bodyElement, months, averages) {
+                if(!bodyElement) return;
+                bodyElement.innerHTML = '';
+                if (!months || months.length === 0) {
+                    bodyElement.innerHTML = `<tr><td colspan="8" class="text-center italic text-brand-gray">No monthly statement breakdown available.</td></tr>`;
+                    return;
+                }
+
+                months.forEach(month => {
+                    const netColor = (month.netCashflow || '').startsWith('-') ? 'text-red-table' : 'text-green-table';
+                    bodyElement.innerHTML += `
+                        <tr>
+                            <td class="font-medium text-brand-dark">${month.month || 'N/A'}</td>
+                            <td class="text-green-table">${month.credits || '$0.00'}</td>
+                            <td class="text-red-table">${month.debits || '$0.00'}</td>
+                            <td>${month.avgBalance || '$0.00'}</td>
+                            <td>${month.minBalance || '$0.00'}</td>
+                            <td class="${(month.daysNeg || 0) > 0 ? 'text-red-table font-bold' : ''}">${month.daysNeg || 0}</td>
+                            <td class="${(month.nsfs || 0) > 0 ? 'text-red-table font-bold' : ''}">${month.nsfs || 0}</td>
+                            <td class="font-medium ${netColor}">${month.netCashflow || '$0.00'}</td>
+                        </tr>
+                    `;
+                });
+
+                if (averages) {
+                    const avgNetColor = (averages.netCashflow || '').startsWith('-') ? 'text-red-table' : 'text-green-table';
+                    bodyElement.innerHTML += `
+                        <tr class="monthly-avg">
+                            <td>Average</td>
+                            <td>${averages.credits || '$0.00'}</td>
+                            <td>${averages.debits || '$0.00'}</td>
+                            <td>${averages.avgBalance || '$0.00'}</td>
+                            <td>${averages.minBalance || '$0.00'}</td>
+                            <td>${averages.daysNeg || 0}</td>
+                            <td>${averages.nsfs || 0}</td>
+                            <td class="${avgNetColor}">${averages.netCashflow || '$0.00'}</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // --- Helper Function: Populate AI Risk Checklist ---
+            function populateRiskChecklist(element, items) {
+                if(!element) return;
+                element.innerHTML = '';
+                if (!items || items.length === 0) {
+                    element.innerHTML = `<li class="text-sm text-brand-gray italic">No checklist items available.</li>`;
+                    return;
+                }
+
+                items.forEach(item => {
+                    let colorClass = 'risk-grey';
+                    if (item.color === 'green') colorClass = 'risk-green';
+                    else if (item.color === 'red') colorClass = 'risk-red';
+                    else if (item.color === 'yellow') colorClass = 'risk-yellow';
+                    
+                    element.innerHTML += `
+                        <li class="risk-checklist-item">
+                            <span class="risk-label">${item.label || 'Unknown Check'}</span>
+                            <span class="risk-status ${colorClass}">${item.status || 'Not assessed.'}</span>
+                        </li>
+                    `;
+                });
+            }
+
+
+            // --- Helper Function: Populate Sources ---
+            function populateSources(sources) {
+                if(!sourcesList || !sourcesContainer) return;
+                sourcesList.innerHTML = ''; // Clear old sources
+                if (sources && sources.length > 0) {
+                    sources.forEach(source => {
+                        const li = document.createElement('li');
+                        li.className = 'text-xs truncate';
+                        li.innerHTML = `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">${source.title || source.uri}</a>`;
+                        sourcesList.appendChild(li);
+                    });
+                    sourcesContainer.style.display = 'block';
+                } else {
+                    sourcesContainer.style.display = 'none';
+                }
+            }
+            
+            // --- Helper Function: Populate Report Content (The "Master" Function) ---
+            function populateReport(data) {
+                if(!data) return;
+
+                // 1. Headers
+                if(companyNameHeader) companyNameHeader.innerText = data.keyInfo?.companyName || 'Business Report';
+                if(summaryHeader) summaryHeader.innerText = data.keyInfo?.summary || 'A comprehensive AI-generated report.';
+
+                // 2. AI Recommendation
+                const decision = data.aiRecommendation?.decision || 'Manual Review';
+                if(recommendationDecision) recommendationDecision.innerText = decision;
+                if(recommendationJustification) recommendationJustification.innerText = data.aiRecommendation?.justification || 'AI justification not provided.';
+                
+                if(recommendationBox) {
+                    recommendationBox.className = "p-4 border-l-4 rounded-r-lg"; // Reset
+                    if (decision.toLowerCase() === 'approve') {
+                        recommendationBox.classList.add('bg-yellow-900/20', 'border-yellow-500', 'text-yellow-200');
+                        if(recommendationDecision) recommendationDecision.className = "font-heading font-bold text-2xl text-yellow-400";
+                    } else if (decision.toLowerCase() === 'decline') {
+                        recommendationBox.classList.add('bg-red-900/20', 'border-red-500', 'text-red-200');
+                        if(recommendationDecision) recommendationDecision.className = "font-heading font-bold text-2xl text-red-400";
+                    } else {
+                        recommendationBox.classList.add('bg-amber-900/20', 'border-amber-500', 'text-amber-200');
+                        if(recommendationDecision) recommendationDecision.className = "font-heading font-bold text-2xl text-amber-400";
+                    }
+                }
+
+                // 3. AI Risk Score
+                const score = data.aiRiskScore?.score || 0;
+                if(scoreDigit) scoreDigit.innerText = score;
+                if(scoreJustification) scoreJustification.innerText = data.aiRiskScore?.justification || 'No justification provided.';
+                
+                if(scoreCircle) {
+                    scoreCircle.className = "score-circle mb-4"; // reset classes
+                    if (score < 550) scoreCircle.classList.add('score-red');
+                    else if (score < 700) scoreCircle.classList.add('score-yellow');
+                    else scoreCircle.classList.add('score-green');
+                }
+
+                const checkIcon = '<svg class="w-4 h-4 text-yellow-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+                const xIcon = '<svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+                
+                populateGenericList(positiveList, data.aiRiskScore?.positiveFactors, (item) => `<li class="flex items-start">${checkIcon}<span class="text-sm text-brand-dark">${item}</span></li>`, 'No positive factors noted.');
+                populateGenericList(negativeList, data.aiRiskScore?.negativeFactors, (item) => `<li class="flex items-start">${xIcon}<span class="text-sm text-brand-dark">${item}</span></li>`, 'No negative factors noted.');
+                
+                // 4. Key Info
+                if(keyWebsite) keyWebsite.innerHTML = data.keyInfo?.website ? `<a href="${data.keyInfo.website.startsWith('http') ? '' : '//'}${data.keyInfo.website}" target="_blank" rel="noopener" class="text-brand-yellow hover:underline">${data.keyInfo.website}</a>` : 'N/A';
+                if(keyIndustry) keyIndustry.innerText = data.keyInfo?.industry || 'N/A';
+                if(keyCeo) keyCeo.innerText = data.keyInfo?.ceoName || 'N/A';
+                if(keyFounded) keyFounded.innerText = data.keyInfo?.yearFounded || 'N/A';
+                if(keyEmployees) keyEmployees.innerText = data.keyInfo?.employeeCount || 'N/A';
+                if(keyPhone) keyPhone.innerText = data.keyInfo?.phone || 'N/A';
+                if(keyAddress) keyAddress.innerText = data.keyInfo?.fullAddress || 'N/A';
+
+                // 4b. Business Location Map
+                const address = data.keyInfo?.fullAddress;
+                if (address && address !== 'N/A' && mapIframe && mapFallback) {
+                    const encodedAddress = encodeURIComponent(address);
+                    mapIframe.src = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+                    mapIframe.style.display = 'block';
+                    mapFallback.style.display = 'none';
+                } else if(mapIframe && mapFallback) {
+                    mapIframe.style.display = 'none';
+                    mapFallback.style.display = 'block';
+                }
+
+                // 5. Corporate Filings
+                if(sosName) sosName.innerText = data.sos?.entityName || 'N/A';
+                if(sosStatus) sosStatus.innerText = data.sos?.status || 'N/A';
+                if(sosEntity) sosEntity.innerText = data.sos?.entityType || 'N/A';
+                if(sosJurisdiction) sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
+                if(sosDate) sosDate.innerText = data.sos?.formationDate || 'N/A';
+                if(sosAgent) sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
+                if(sosStatus) {
+                    sosStatus.className = "font-medium text-brand-dark sm:text-right break-words"; // reset
+                    if (data.sos?.status?.toLowerCase().includes('active')) {
+                        sosStatus.classList.add('text-yellow-400');
+                    } else if (data.sos?.status && !data.sos?.status.toLowerCase().includes('n/a')) {
+                        sosStatus.classList.add('text-red-400');
+                    }
+                }
+
+                // 6. Financial Summary (Conditional)
+                const fin = data.financialSummary;
+                if (fin && finPublicDiv && finPrivateDiv && finNote) {
+                    if (fin.isPublic) {
+                        finPublicDiv.style.display = 'block';
+                        finPrivateDiv.style.display = 'none';
+                        if(finTicker) finTicker.innerText = fin.tickerSymbol || 'N/A';
+                        if(finMarketCap) finMarketCap.innerText = fin.marketCap || 'N/A';
+                        if(finRevenue) finRevenue.innerText = fin.latestRevenue || 'N/A';
+                        if(finNetIncome) finNetIncome.innerText = fin.netIncome || 'N/A';
+                    } else {
+                        finPublicDiv.style.display = 'none';
+                        finPrivateDiv.style.display = 'block';
+                        if(finEstRevenue) finEstRevenue.innerText = fin.estAnnualRevenue || 'N/A';
+                        if(finEstMargin) finEstMargin.innerText = fin.estProfitMargin || 'N/A';
+                        if(finEstCash) finEstCash.innerText = fin.cashOnHand || 'N/A';
+                    }
+                    if(finCreditDecision) finCreditDecision.innerText = fin.creditDecision || 'N/A';
+                    if(finCreditScore) finCreditScore.innerText = fin.ficoScore || 'N/A';
+                    if(finCreditTotalDebt) finCreditTotalDebt.innerText = fin.totalDebt || 'N/A';
+                    if(finCreditRevolvingDebt) finCreditRevolvingDebt.innerText = fin.revolvingDebt || 'N/A';
+                    if(finCreditAvgRevenue) finCreditAvgRevenue.innerText = fin.avgMonthlyRevenue || 'N/A';
+                    
+                    finNote.innerText = fin.note || (fin.isPublic ? 'Data sourced from public filings.' : 'Fictional data generated by AI for demonstration.');
+                }
+
+                // 7. SWOT Analysis
+                populateGenericList(swotStrengths, data.swotAnalysis?.strengths, formatSwotItem, 'No strengths identified.');
+                populateGenericList(swotWeaknesses, data.swotAnalysis?.weaknesses, formatSwotItem, 'No weaknesses identified.');
+                populateGenericList(swotOpportunities, data.swotAnalysis?.opportunities, formatSwotItem, 'No opportunities identified.');
+                populateGenericList(swotThreats, data.swotAnalysis?.threats, formatSwotItem, 'No threats identified.');
+
+                // 8. Public Sentiment
+                if(sentimentRating) sentimentRating.innerText = data.publicSentiment?.rating || 'Neutral';
+                if(sentimentJustification) sentimentJustification.innerText = data.publicSentiment?.justification || 'No sentiment analysis available.';
+
+                // 9. Lists (News, Reviews, Competitors, Records, Legal)
+                populateGenericList(newsList, data.recentNews, formatNewsItem, 'No recent news found.');
+                populateGenericList(reviewsList, data.customerReviews, formatReviewItem, 'No customer reviews found.');
+                populateGenericList(competitorsList, data.competitors, formatCompetitorItem, 'No competitors identified.');
+                populateGenericList(recordsList, data.publicRecords?.findings, formatFinding, 'No public records found.');
+                populateGenericList(legalList, data.legalAndRegulatory?.findings, formatFinding, 'No legal or regulatory flags found.');
+
+                // 10. New Sections
+                populateBankingCharts(bankingChartRevenue, data.bankingSnapshot?.revenue, 'bar-green');
+                populateBankingCharts(bankingChartAvgBalance, data.bankingSnapshot?.avgDailyBalance, 'bar-grey');
+                populateBankingCharts(bankingChartEndBalance, data.bankingSnapshot?.endingBalance, 'bar-yellow');
+                populateBankingCharts(bankingChartDebt, data.bankingSnapshot?.debtService, 'bar-red');
+
+                populateMonthlyTable(monthlyBreakdownBody, data.monthlyBreakdown?.months, data.monthlyBreakdown?.averages);
+                
+                populateGenericList(debtObligationsList, data.debtObligations, formatDebtItem, 'No extrapolated debt obligations found.');
+                
+                populateGenericList(counterpartiesList, data.topCounterparties, formatCounterpartyItem, 'No counterparty data found.');
+                
+                populateRiskChecklist(riskChecklist, data.aiRiskChecklist);
+            }
+
+            /**
+             * -----------------------------------------------------------------
+             * API Helper Functions
+             * -----------------------------------------------------------------
+             */
+
+            /**
+             * A simple fetch wrapper with basic retry and error logging.
+             */
+            async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+                let lastError;
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (!response.ok) {
+                            let errorBody;
+                            try { errorBody = await response.json(); } catch (e) { errorBody = null; }
+                            const errorMessage = errorBody?.error?.message || response.statusText;
+                            lastError = new Error(`API Error: ${errorMessage} (Status: ${response.status})`);
+                            if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
+                                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                                continue;
+                            } else {
+                                throw lastError;
+                            }
+                        }
+                        return await response.json();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < retries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                        }
+                    }
+                }
+                throw lastError || new Error("API request failed after all retries.");
+            }
+
+            /**
+             * Asynchronous function to call the Gemini text generation API with Search.
+             */
+            async function callReportAPI(systemPrompt, userQuery, logId = 'api') {
+                // (SIMPLIFIED) Hardcoded to use the demo key (empty string)
+                const apiKey = ""; 
+                
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`; 
+
+                const textPayload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+
+                const result = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(textPayload) // Using text payload
+                });
+
+                const candidate = result.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                    throw new Error("No content received from API. The model may be adjusting.");
+                }
+                
+                let json = null;
+                try {
+                    // (FIX) More robust JSON parsing
+                    // Find the first '{' and the last '}'
+                    const startIndex = text.indexOf('{');
+                    const endIndex = text.lastIndexOf('}');
+
+                    if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+                        console.error("Raw text was:", text);
+                        throw new Error("Received non-JSON response from API.");
+                    }
+
+                    const jsonString = text.substring(startIndex, endIndex + 1).trim();
+                    json = JSON.parse(jsonString);  
+                } catch (e) {
+                    console.error(`[${logId}] Failed to parse JSON response:`, e);
+                    console.error("Raw text was:", text);
+                    // (FIX) Propagate the original error if it's the new one, otherwise the parse error
+                    if (e.message === "Received non-JSON response from API.") {
+                        throw e;
+                    }
+                    throw new Error("Received an invalid JSON response from the API.");
+                }
+
+                // Extract grounding sources
+                let sources = [];
+                const groundingMetadata = candidate.groundingMetadata;
+                if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                    sources = groundingMetadata.groundingAttributions
+                        .map(attribution => ({
+                            uri: attribution.web?.uri,
+                            title: attribution.web?.title,
+                        }))
+                        .filter(source => source.uri && source.title);
+                }
+
+                return { json, sources };
+            }
+
+            /**
+             * -----------------------------------------------------------------
+             * Prompt Generation
+             * -----------------------------------------------------------------
+             */
+
+            function getMasterPrompt() {
+                // This is the "Masterpiece" prompt
+                // (FIX) Made prompt stricter to enforce JSON-only output
+                return `You are a world-class Tier-4 Senior Underwriting Analyst and business intelligence expert. A user is requesting an 'insanely comprehensive' master report on a company. You MUST use Google Search extensively to find as much real-world data as possible.
+1.  First, determine if the company is public (has a stock ticker) or private.
+2.  Second, conduct multiple searches to find ALL of the following: \`keyInfo\` (companyName, website, fullAddress, phone, yearFounded, industry, ceoName, employeeCount, and a 1-2 sentence summary), \`sos\` (corporate filing info: entityName, status, entityType, jurisdiction, formationDate, registeredAgent), \`publicRecords\` (liens, judgments, UCC filings), \`legalAndRegulatory\` (lawsuits, regulatory flags), \`recentNews\` (top 3-5 headlines with summaries and source), \`customerReviews\` (3-5 snippets with ratings/source), and \`competitors\` (top 2-3 with a brief summary).
+3.  Third, based on all found data, GENERATE: \`publicSentiment\` (e.g., 'Positive (8/10)' with justification), a full \`swotAnalysis\` (3-4 bullets each for strengths, weaknesses, opportunities, threats), an \`aiRiskScore\` (fictional score 300-850 with justification & 2-3 positive/negative factors), and a final \`aiRecommendation\` ('Approve', 'Decline', or 'Manual Review' with detailed justification).
+4.  Fourth, for \`financialSummary\`: If the company is PUBLIC, find its real \`tickerSymbol\`, \`marketCap\`, \`latestRevenue\`, and \`netIncome\`. If the company is PRIVATE, generate *fictional but realistic* \`estAnnualRevenue\`, \`estProfitMargin\`, and \`cashOnHand\`. ALSO, find (or generate fictional) \`creditDecision\`, \`ficoScore\`, \`totalDebt\`, \`revolvingDebt\`, \`avgMonthlyRevenue\`. Add a \`note\` stating if data is real or fictional.
+5.  Fifth, generate a *fictional but realistic* \`bankingSnapshot\` for 4 charts (revenue, avgDailyBalance, endingBalance, debtService), each with 3 months of data (\`[{"label": "string", "value": "string", "amount": 0}]\`).
+6.  Sixth, generate a *fictional but realistic* \`monthlyBreakdown\` with 3 months of \`months\` data and one \`averages\` object, matching the table structure.
+7.  Seventh, generate an \`aiRiskChecklist\` with 6 items, each with a \`label\`, \`status\` (e.g., 'No declining trend found.'), and \`color\` ('green', 'red', 'yellow', or 'grey').
+8.  Eighth, generate a *fictional but realistic* list of \`debtObligations\` (e.g., MCA, term loan) extrapolated from financial data, with at least 2-3 entries. Each item MUST have \`type\`, \`lender\`, \`estimatedBalance\`, and \`monthlyPayment\`.
+9.  Ninth, generate a *fictional but realistic* list of 2-3 \`topCounterparties\` (customers or vendors), each with \`name\`, \`type\` (e.g., 'Customer', 'Vendor / Manufacturing'), \`flow\` ('inflow' or 'outflow'), \`avgAmount\`, and \`relationship\` ('External' or 'Internal').
+10. Respond ONLY with the single, valid JSON object. Do not include *any* other text, preamble, or explanation before or after the JSON object. The response must start with \`{\` and end with \`}\`. Fill all fields with 'N/A' or an empty array [] if no information can be found.
+
+\`{\"keyInfo\": {\"companyName\": \"string\", \"summary\": \"string\", \"website\": \"string\", \"fullAddress\": \"string\", \"phone\": \"string\", \"yearFounded\": \"string\", \"industry\": \"string\", \"ceoName\": \"string\", \"employeeCount\": \"string\"}, \"financialSummary\": {\"isPublic\": false, \"tickerSymbol\": \"string (if public)\", \"marketCap\": \"string (if public)\", \"latestRevenue\": \"string (if public)\", \"netIncome\": \"string (if public)\", \"estAnnualRevenue\": \"string (if private)\", \"estProfitMargin\": \"string (if private)\", \"cashOnHand\": \"string (if private)\", \"note\": \"string\", \"creditDecision\": \"string\", \"ficoScore\": \"string\", \"totalDebt\": \"string\", \"revolvingDebt\": \"string\", \"avgMonthlyRevenue\": \"string\"}, \"bankingSnapshot\": {\"revenue\": [{\"label\": \"string\", \"value\": \"string\", \"amount\": 0}], \"avgDailyBalance\": [{\"label\": \"string\", \"value\": \"string\", \"amount\": 0}], \"endingBalance\": [{\"label\": \"string\", \"value\": \"string\", \"amount\": 0}], \"debtService\": [{\"label\": "string", "value": "string", "amount": 0}]}, \"monthlyBreakdown\": {\"months\": [{\"month\": \"string\", \"credits\": \"string\", \"debits\": \"string\", \"avgBalance\": \"string\", \"minBalance\": \"string\", \"daysNeg\": 0, \"nsfs\": 0, "netCashflow": "string"}], \"averages\": {\"credits\": \"string\", \"debits\": \"string\", \"avgBalance\": \"string\", \"minBalance\": \"string\", "daysNeg": 0, "nsfs": 0, "netCashflow": "string"}}, "debtObligations": [{\"type\": \"string\", \"lender\": \"string\", \"estimatedBalance\": \"string\", \"monthlyPayment\": \"string\"}], "topCounterparties": [{\"name\": \"string\", \"type\": \"string\", \"flow\": \"string\", \"avgAmount\": \"string\", \"relationship\": \"string\"}], "sos\": {\"entityName\": \"string\", \"status\": \"string\", \"entityType\": \"string\", \"jurisdiction\": \"string\", \"formationDate\": \"string\", \"registeredAgent\": \"string\"}, \"publicRecords\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\"}]}, \"legalAndRegulatory\": {\"findings\": [{\"type\": \"string\", \"details\": \"string\", \"date\": \"string\"}]}, \"recentNews\": [{\"title\": \"string\", \"source\": \"string\", \"summary\": \"string\"}], \"customerReviews\": [{\"snippet\": \"string\", \"source\": \"string\", \"rating\": \"string\"}], \"competitors\": [{\"name\": \"string\", \"summary\": \"string\"}], \"publicSentiment\": {\"rating\": \"string\", \"justification\": \"string\"}, \"swotAnalysis\": {\"strengths\": [\"string\"], \"weaknesses\": [\"string\"], \"opportunities\": ["string"], \"threats\": ["string"]}, \"aiRiskScore\": {\"score\": 0, \"justification\": \"string\", \"positiveFactors\": [\"string\"], \"negativeFactors\": [\"string\"]}, \"aiRiskChecklist\": [{\"label\": \"string\", \"status\": \"string\", \"color\": \"string\"}], \"aiRecommendation\": {\"decision\": \"string\", \"justification\": \"string\"}}\``;
+            }
+
+            /**
+             * -----------------------------------------------------------------
+             * Event Listeners
+             * -----------------------------------------------------------------
+             */
+
+            // --- Main Event Listener for Combined Widget ---
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', async () => {
+                    
+                    const businessName = businessNameInput.value.trim();
+                    if (!businessName) {
+                        // (FIX) Hide search, show results (which shows error)
+                        if(resultsUi) resultsUi.style.display = 'block'; 
+                        if(reportSearchHeader) reportSearchHeader.style.display = 'none';
+                        showReportState('error', 'Please enter a business name.');
+                        return;
+                    }
+                    
+                    // (FIX) Hide search, show widget (which will show loader)
+                    if(resultsUi) resultsUi.style.display = 'block';
+                    if(reportSearchHeader) reportSearchHeader.style.display = 'none';
+                    
+                    showReportState('loading');
+                    generateReportBtn.disabled = true;
+
+                    const systemPrompt = getMasterPrompt();
+                    const userQuery = `Generate a master comprehensive AI business report for: "${businessName}"`;
+
+                    try {
+                        const { json, sources } = await callReportAPI(systemPrompt, userQuery, 'full-report');
+                        populateReport(json);
+                        populateSources(sources);
+                        showReportState('content');
+                    } catch (error) {
+                        console.error("Full Report Error:", error);
+                        showReportState('error', `Failed to generate report: ${error.message}. The AI may be unable to parse data for this company, or the response was invalid.`);
+                    } finally {
+                        generateReportBtn.disabled = false; // <-- (FIX) Explicitly re-enable the button
+                    }
+                });
+            }
+
+            // --- Page Navigation ---
+
+            // (NEW) Click listener for all "Search" / "Demo" buttons
+            const tryDemoBtns = document.querySelectorAll('a[href="#demo"]');
+            if(tryDemoBtns) {
+                tryDemoBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const demoSection = document.getElementById('demo');
+                        if (demoSection) {
+                            demoSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        // (RESTRUCTURED) Show search, hide results
+                        if(reportSearchHeader) {
+                            reportSearchHeader.style.display = 'block';
+                        }
+                        // (FIX) Hide the results UI
+                        if(resultsUi) {
+                            resultsUi.style.display = 'none';
+                        }
+                        // (NEW) Ensure card is small for search
+                        if(mainWidgetContainer) mainWidgetContainer.classList.add('max-w-xl');
+                        if(mainWidgetContainer) mainWidgetContainer.classList.remove('max-w-7xl');
+
+                        // (NEW) Close mobile menu if open
+                        if (mobileMenu) mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+
+            // (NEW) Mobile Menu Toggle
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // (NEW) Smooth scroll for platform/pricing links
+            const navLinks = document.querySelectorAll('a[href="#platform"], a[href="#pricing"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    // (NEW) Close mobile menu if open
+                    if (mobileMenu) mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // --- Initial Check on Load ---
+            // (NEW) Ensure search header is hidden and report is shown on load
+            if(reportSearchHeader) reportSearchHeader.style.display = 'none';
+            if(resultsUi) resultsUi.style.display = 'block';
+            // (NEW) Ensure card starts large for the pre-filled report
+            if(mainWidgetContainer) mainWidgetContainer.classList.add('max-w-7xl');
+            if(mainWidgetContainer) mainWidgetContainer.classList.remove('max-w-xl');
+
+
+        });
+    </script>
+    <!-- [END] GEMINI API SCRIPT -->
+
+</body>
+</html>
