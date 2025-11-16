@@ -17,8 +17,8 @@
     body { font-family: 'Inter', sans-serif; }
 
     /* Custom styles for input number fields (hide arrows) */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
+    input[type=number]::-webkit-inner-spin_button,
+    input[type=number]::-webkit-outer-spin_button {
       -webkit-appearance: none;
       margin: 0;
     }
@@ -197,7 +197,7 @@
         <span class="brand-georgia text-primary text-xl mt-2 tracking-wide">Sutton Funding</span>
       </div>
 
-      <!-- Theme Selector + Settings -->
+      <!-- Settings Button -->
       <div id="themeControls" class="flex items-center justify-center">
         <button id="repSettingsToggle" type="button" class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-accent flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
@@ -445,6 +445,7 @@
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let activeOfferIndex = -1;
+    let isApprovalView = false;
 
     const formatCurrency = (num) => {
       const numericValue = Number(num);
@@ -505,6 +506,10 @@
 
     function loadOfferIntoCalculator(offer) {
       if (!offer) return;
+
+      if (isApprovalView) {
+        amountSliderMax = offer.amount;
+      }
 
       // Update sliders and inputs from a saved offer
       elements.calcAmountSlider.value = offer.amount;
@@ -606,18 +611,27 @@
     }
 
     function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const isAmountSlider = (slider === elements.calcAmountSlider);
+      const getMax = () => (isAmountSlider ? amountSliderMax : max);
+
       const initialValue = parseFloat(slider.value);
       input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
 
       slider.addEventListener('input', () => {
-        const val = slider.value;
+        let val = parseFloat(slider.value);
+        const cap = getMax();
+        if (!isNaN(val) && val > cap) {
+          val = cap;
+          slider.value = val;
+        }
         input.value = isCurrency ? formatCurrency(val) : val;
         callback();
       });
 
       input.addEventListener('input', () => {
         let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
-        if (!isNaN(val) && val >= min && val <= max) {
+        const cap = getMax();
+        if (!isNaN(val) && val >= min && val <= cap) {
           slider.value = val;
           callback();
         } else if (input.value === '') {
@@ -627,8 +641,9 @@
 
       input.addEventListener('blur', () => {
         let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
         if (isNaN(val) || val < min) val = min;
-        if (val > max) val = max;
+        if (val > cap) val = cap;
         slider.value = val;
         input.value = isCurrency ? formatCurrency(val) : val.toString();
         callback();
@@ -694,9 +709,18 @@
       const repPhoneParam = params.get('repPhone') || '';
       const viewMode = params.get('view');
 
+      isApprovalView = (viewMode === 'approval');
+
       // Sutton defaults: dark + gold
       currentTheme = paramTheme || 'theme-slate';
       currentAccent = 'accent-sutton';
+
+      // In approval links, cap the primary amount at its approved value
+      if (isApprovalView) {
+        amountSliderMax = amount;
+      } else {
+        amountSliderMax = 1000000;
+      }
 
       elements.calcAmountInput.value = formatCurrency(amount);
       elements.calcAmountSlider.value = amount;
