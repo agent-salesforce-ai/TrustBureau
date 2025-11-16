@@ -231,7 +231,7 @@
     }
 
     .savings-amount {
-      font-size: 1.75rem; /* larger savings amount */
+      font-size: 1.75rem;
       letter-spacing: 0.04em;
     }
 
@@ -575,6 +575,7 @@
     let totalBusinessDays = 0;
     let isApprovalView = false; // declared once
     let paymentMode = 'daily';
+    let originalSharedAmount = null; // max amount allowed in client view
 
     function formatCurrency(num) {
       const n = Number(num);
@@ -759,6 +760,7 @@
         if (!isNaN(a)) {
           elements.amountSlider.value = String(a);
           elements.amountInput.value = formatCurrency(a);
+          originalSharedAmount = a;
         }
       }
 
@@ -901,7 +903,8 @@
       initializeFromURL();
 
       // Sync controls
-      syncInputs(elements.amountSlider, elements.amountInput, true, 5000, 500000, runCalculator);
+      const maxAmount = (isApprovalView && originalSharedAmount) ? originalSharedAmount : 500000;
+      syncInputs(elements.amountSlider, elements.amountInput, true, 5000, maxAmount, runCalculator);
       syncInputs(elements.factorSlider, elements.factorInput, false, 1.1, 1.5, runCalculator);
       syncInputs(elements.termSlider, elements.termInput, false, 3, 18, () => {
         computeBaseOffer();
