@@ -1,319 +1,368 @@
 <!DOCTYPE html>
-<!-- CapFront-branded version -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CapFront | Offer Calculator</title>
-  <!-- Load Tailwind CSS -->
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Load Inter font -->
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-  <!-- REMOVED html2canvas -->
+
   <style>
-    /* Use Inter as the default font */
     body { font-family: 'Inter', sans-serif; }
-    
-    /* Custom styles for input number fields (hide arrows) */
+
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
     input[type=number] { -moz-appearance: textfield; }
-    
-    /* Helper for icon positioning */
-    .input-icon { 
-      top: 50%; 
-      transform: translateY(-50%); 
-    }
-    
-    /********************************/
-    /* === BASE THEME SYSTEM === */
-    /********************************/
-    
-    /* 1. CapFront (Dark) */
-    html.theme-slate {
-      --bg-body: #111827; /* gray-900 */
-      --bg-card: #1f2937; /* gray-800 */
-      --bg-card-inner: #374151; /* gray-700 */
-      --bg-slider-track: #4b5563; /* gray-600 */
-      --bg-input: #1f2937;
-      --bg-toggle-inactive: #4b5563;
-      --border-primary: #4b5563;
-      --text-primary: #f9fafb; /* gray-50 */
-      --text-secondary: #e5e7eb; /* gray-200 */
-      --text-muted: #d1d5db; /* gray-300 */
-    }
-    html.theme-slate body {
-      background-color: var(--bg-body);
-    }
 
-    
-    /* 3. CapFront (Light) */
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    /* Base themes (dark + light) */
+    html.theme-slate {
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    html.theme-slate body { background-color: var(--bg-body); }
+
     html.theme-corporate {
-      --bg-body: #f5f7fb; /* soft light background */
+      --bg-body: #f4f7fb;
       --bg-card: #ffffff;
-      --bg-card-inner: #f9fafb; /* subtle inner contrast */
-      --bg-slider-track: #d1d5db; /* slightly darker track for contrast */
+      --bg-card-inner: #f9fbff;
+      --bg-slider-track: #dbe3f0;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
-      --border-primary: #e2e8f0; /* light border */
-      --text-primary: #0f172a; /* slate-900 */
-      --text-secondary: #334155; /* slate-700 */
-      --text-muted: #6b7280; /* gray-500 */
+      --border-primary: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #1f2937;
+      --text-muted: #6b7280;
     }
-    html.theme-corporate body {
-      background-color: var(--bg-body);
-    }
+    html.theme-corporate body { background-color: var(--bg-body); }
 
-    /********************************/
-    /* === ACCENT COLOR SYSTEM === */
-    /********************************/
-
-    /* 1. Blue */
-    html.accent-blue {
-      --accent-color: #00AEEF; /* CapFront light blue */
-      --accent-color-light: #6ED6FF; /* lighter CapFront blue */
-      --accent-color-dark: #00558C; /* CapFront dark blue */
+    /* CapFront accent */
+    html.accent-capfront {
+      --accent-color: #00a7ff;        /* primary blue */
+      --accent-color-light: #38bdf8;  /* lighter */
+      --accent-color-dark: #0369a1;   /* darker */
       --accent-text-inverted: #ffffff;
-      --accent-shadow: 0 0 18px rgba(0, 174, 239, 0.55); /* CapFront blue glow */
-      --button-text-color: #ffffff; 
+      --accent-shadow: 0 0 18px rgba(0, 167, 255, 0.55);
+      --button-text-color: #ffffff;
     }
-    
-    /* === THEME-AWARE CLASSES === */
-    body {
-      transition: background-color 0.2s;
-    }
-    .card-bg {
-      background-color: var(--bg-card);
-      border-color: var(--border-primary);
-    }
-    .card-inner-bg {
-      background-color: var(--bg-card-inner);
-      border: 1px solid var(--border-primary);
-    }
+
+    body { transition: background-color 0.2s; }
+
+    .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
+    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
     .border-primary { border-color: var(--border-primary); }
-    
-    .text-accent { color: var(--accent-color); }
-    
-    .slider-track {
-      background-color: var(--bg-slider-track);
-    }
-    .slider-thumb {
-      accent-color: var(--accent-color);
-    }
-    
+
+    .slider-track { background-color: var(--bg-slider-track); }
+    .slider-thumb { accent-color: var(--accent-color); }
+
     .input-field {
       background-color: var(--bg-input);
       border-color: var(--border-primary);
       color: var(--text-primary);
     }
-    .input-field:focus-within, .input-field:focus {
+    .input-field:focus,
+    .input-field:focus-within {
       border-color: var(--accent-color);
       box-shadow: 0 0 0 2px var(--accent-color-light);
     }
-    
+
     .text-hero {
       color: var(--accent-color);
-      text-shadow: var(--accent-shadow);
+      /* Strong neon glow for approved amount */
+      text-shadow:
+        0 0 8px rgba(0, 167, 255, 0.7),
+        0 0 18px rgba(0, 167, 255, 0.5),
+        0 0 32px rgba(0, 167, 255, 0.4);
     }
-    
+
     .toggle-inactive {
       background-color: var(--bg-toggle-inactive);
       color: var(--text-secondary);
     }
     .toggle-active {
-      background-color: var(--accent-color-dark);
-      color: var(--accent-text-inverted);
-    }
-
-    .header-icon {
-      color: var(--accent-color);
+      background-color: var(--accent-color-light);
+      color: #0f172a; /* dark navy text for readability */
     }
 
     .button-primary {
-      background-color: var(--accent-color);
-      color: var(--button-text-color);
+      background-color: var(--accent-color-light); /* lighter blue for readability */
+      color: #0f172a; /* dark navy text for readability */
       font-weight: 600;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1.5rem;
-      transition: background-color 0.2s;
+      border-radius: 0.75rem; /* a bit more pill-like */
+      padding: 0.6rem 1.75rem;
+      border: 1px solid rgba(0, 167, 255, 0.85);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
     }
     .button-primary:hover {
-      background-color: var(--accent-color-dark);
+      background-color: var(--accent-color-dark); /* darker on hover */
+      box-shadow:
+        0 0 0 1px rgba(0, 167, 255, 0.75),
+        0 0 18px rgba(0, 167, 255, 0.7);
+      transform: translateY(-1px) scale(1.02); /* subtle hover animation */
     }
     .button-primary:disabled {
       background-color: var(--bg-slider-track);
       color: var(--text-muted);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
-    .border-accent {
+
+    .brand-logo { filter: drop-shadow(0 0 18px rgba(0, 167, 255, 0.45)); }
+    .brand-georgia {
+      font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .shell {
       border-color: var(--accent-color);
-    }
-    .header-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 0.9rem;
-      border-radius: 9999px;
-      background-color: rgba(0, 174, 239, 0.08);
-      color: var(--accent-color);
-      border: 1px solid rgba(0, 174, 239, 0.35);
-      gap: 0.35rem;
-    }
-    .theme-toggle {
-      background-color: rgba(0, 174, 239, 0.06);
-      border-color: rgba(0, 174, 239, 0.4);
+      border-width: 2px;
+      /* Multi-hue glow using CapFront logo blues */
+      box-shadow:
+        0 0 0 3px rgba(0, 167, 255, 0.9),    /* inner electric blue ring */
+        0 0 25px rgba(0, 167, 255, 0.75),   /* mid glow, primary logo blue */
+        0 0 55px rgba(3, 105, 161, 0.7),    /* deeper blue outer glow */
+        0 0 90px rgba(56, 189, 248, 0.45); /* lighter cyan edge */
     }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
-  
-  <!-- Main Card -->
-  <div class="w-full max-w-xl card-bg text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border border-accent">
-    
+
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
-      <div class="flex items-center justify-center space-x-2 flex-shrink-0">
-        <!-- CapFront Logo -->
-        <img 
-          src="https://capfront.wpengine.com/wp-content/uploads/2020/07/Asset-1@500.png" 
-          alt="CapFront Logo" 
-          class="h-16 w-auto"
-        />
-        
+      <div class="flex flex-col items-center justify-center flex-shrink-0">
+        <img src="https://capfront.wpengine.com/wp-content/uploads/2020/07/Asset-1@500.png"
+             alt="CapFront Logo" class="brand-logo h-16 w-auto" />
+        <span class="brand-georgia text-primary text-xl mt-2 tracking-wide"></span>
       </div>
-
-      <!-- Theme/Accent Selectors (still available if you want variations) -->
-      <div id="themeControls" class="flex items-center gap-2">
-        <select id="themeSelector" class="input-field p-1.5 text-xs rounded-lg border-primary theme-toggle">
-          <option value="theme-corporate">CapFront – Light</option>
-          <option value="theme-slate">CapFront – Dark</option>
-        </select>
+      <div id="themeControls" class="flex items-center justify-center">
+        <button id="repSettingsToggle" type="button"
+                class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </svg>
+          Settings
+        </button>
       </div>
-
     </div>
-    <!-- END HEADER -->
+
+    <!-- REP SETTINGS PANEL -->
+    <div id="repSettingsPanel"
+         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Rep Settings</span>
+        <span class="text-[11px] text-muted">Shown on client approval view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        <div>
+          <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
+          <select id="themeSelector"
+                  class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+            <option value="theme-corporate">Light Theme</option>
+            <option value="theme-slate">Dark Theme</option>
+          </select>
+        </div>
+        <div>
+          <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
+          <input id="repNameInput" type="text"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Rep Name" />
+        </div>
+        <div>
+          <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
+          <input id="repEmailInput" type="email"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="rep@example.com" />
+        </div>
+        <div>
+          <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
+          <input id="repPhoneInput" type="tel"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="(555) 123-4567" />
+        </div>
+      </div>
+    </div>
 
     <!-- OFFER CALCULATOR -->
     <div id="calculatorInputs" class="space-y-4 pt-2">
-      <!-- Centered Heading -->
-      <h2 class="text-sm font-semibold flex items-center justify-center w-full">
-        <span class="header-chip">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M12 17h.01M15 17h.01M15 14h.01M18 17h.01M18 14h.01M18 11h.01M6 17h.01M6 14h.01M6 11h.01M6 7h.01M3 7h.01M3 11h.01M3 14h.01M3 17h.01M12 3v.01M12 6v.01M12 21v-.01M12 18v-.01" />
-          </svg>
-          Your Offer Calculator
-        </span>
-      </h2>
+      <div id="businessNameContainer" class="px-1 mt-2">
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+          Business Name
+        </label>
+        <input id="businessNameInput" type="text"
+               class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+               placeholder="e.g., Acme Holdings LLC" />
+      </div>
 
-      <!-- Sliders -->
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
-        
         <div id="amountContainer" class="space-y-1">
-          <label for="calcAmount" class="block text-xs font-semibold text-muted">Amount You Get ($)</label>
-          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
+          <label for="calcAmount" class="block text-xs font-semibold text-muted">
+            Amount You Get ($)
+          </label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000"
+                 value="50000"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
             <span class="absolute left-3 input-icon text-muted text-sm">$</span>
-            <input id="calcAmountInput" inputmode="numeric" class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcAmountInput" inputmode="numeric"
+                   class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="factorContainer" class="space-y-1">
           <label for="calcFactor" class="block text-xs font-semibold text-muted">Factor Rate</label>
-          <input id="calcFactorSlider" type="range" min="1.1" max="1.5" step="0.01" value="1.25" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <input id="calcFactorSlider" type="range" min="1.1" max="1.5" step="0.01" value="1.25"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12" />
             </svg>
-            <input id="calcFactorInput" type="number" step="0.01" class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcFactorInput" type="number" step="0.01"
+                   class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="termContainer" class="space-y-1">
-          <label for="calcTerm" class="block text-xs font-semibold text-muted">Term (Months)</label>
-          <input id="calcTermSlider" type="range" min="3" max="24" step="1" value="6" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <label for="calcTerm" class="block text-xs font-semibold text-muted">
+            Term (Months)
+          </label>
+          <input id="calcTermSlider" type="range" min="3" max="24" step="1" value="6"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
             </svg>
-            <input id="calcTermInput" type="number" step="1" class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcTermInput" type="number" step="1"
+                   class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
       </div>
 
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
-        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors duration-200">
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
           Daily
         </button>
-        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors duration-200">
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
           Weekly
         </button>
-        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors duration-200">
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
           Monthly
         </button>
       </div>
     </div>
-    <!-- === END: OFFER CALCULATOR === -->
 
-
-    <!-- OFFER PRESENTATION CARD -->
+    <!-- OFFER 1 CARD -->
     <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
-      <!-- Card Header -->
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
-        <h4 class="text-sm font-semibold header-chip">Your Approved Terms</h4>
+        <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
       </div>
-
-      <!-- Hero Amount -->
       <div class="text-center py-6">
+        <span id="businessNameDisplay"
+              class="text-sm font-semibold text-primary block mb-1 hidden"></span>
         <span class="text-sm font-semibold text-muted block">You Get</span>
-        <span id="summaryAmountOut" class="text-5xl font-semibold block my-2 text-hero">
-          $50,000
-        </span>
+        <span id="summaryAmountOut"
+              class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
         <span class="text-base font-medium text-secondary block">
           Total Payback:
           <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
         </span>
       </div>
-
-      <!-- Offer Details -->
       <div class="flex justify-center items-center border-b border-primary pb-2">
         <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
       </div>
-      
       <div class="pt-6">
         <div class="grid grid-cols-2 gap-4">
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Factor Rate</span>
-            <span id="summaryFactorOut" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryFactorOut"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Term</span>
-            <span id="summaryTermOut" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryTermOut"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Total Cost of Funds</span>
-            <span id="summaryCostOut" class="text-xl font-semibold text-primary block"></span>
+            <span id="summaryCostOut"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
-          <div id="summaryPaymentContainer" class="text-center">
-            <span id="summaryPaymentLabel" class="text-xs font-semibold text-muted block">Est. Daily Payment</span>
-            <span id="summaryPaymentValue" class="text-xl font-semibold text-primary block"></span>
+          <div class="text-center">
+            <span id="summaryPaymentLabel"
+                  class="text-xs font-semibold text-muted block">Est. Daily Payment</span>
+            <span id="summaryPaymentValue"
+                  class="text-xl font-semibold text-primary block"></span>
           </div>
         </div>
       </div>
+      <div id="repContactBlock"
+           class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
+        <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
+        <div id="repNameDisplay" class="font-medium"></div>
+        <div id="repEmailDisplay"></div>
+        <div id="repPhoneDisplay"></div>
+      </div>
     </div>
-    <!-- === END: OFFER PRESENTATION CARD === -->
-    
-    <!-- BUTTON LOCATION -->
+
+    <!-- STATIC ADDITIONAL OFFERS -->
+    <div id="savedOffersSection"
+         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+      <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
+        <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
+      </div>
+      <div id="savedOffersContainer"
+           class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- BUTTONS -->
     <div id="buttonContainer" class="pt-4 border-t border-primary">
-      <div class="relative flex justify-center">
+      <div class="relative flex justify-center gap-3 flex-wrap">
+        <button id="addOfferButton" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v16m8-8H4" />
+          </svg>
+          Add Offer
+        </button>
         <button id="shareLinkButton" class="button-primary flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
           </svg>
           Share Approval Link
         </button>
@@ -321,27 +370,20 @@
     </div>
 
   </div>
-  <!-- === END: Main Card === -->
 
   <script>
-    // === DOM Elements ===
     const elements = {
       calcAmountSlider: document.getElementById('calcAmountSlider'),
       calcFactorSlider: document.getElementById('calcFactorSlider'),
       calcTermSlider: document.getElementById('calcTermSlider'),
-      
       calcAmountInput: document.getElementById('calcAmountInput'),
       calcFactorInput: document.getElementById('calcFactorInput'),
       calcTermInput: document.getElementById('calcTermInput'),
-      
       toggleDaily: document.getElementById('toggleDaily'),
       toggleWeekly: document.getElementById('toggleWeekly'),
       toggleMonthly: document.getElementById('toggleMonthly'),
-      
       themeSelector: document.getElementById('themeSelector'),
-
       shareLinkButton: document.getElementById('shareLinkButton'),
-
       summaryAmountOut: document.getElementById('summaryAmountOut'),
       summaryPaybackOut: document.getElementById('summaryPaybackOut'),
       summaryFactorOut: document.getElementById('summaryFactorOut'),
@@ -349,24 +391,46 @@
       summaryCostOut: document.getElementById('summaryCostOut'),
       summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
       summaryPaymentValue: document.getElementById('summaryPaymentValue'),
-      
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      businessNameContainer: document.getElementById('businessNameContainer'),
+      repSettingsToggle: document.getElementById('repSettingsToggle'),
+      repSettingsPanel: document.getElementById('repSettingsPanel'),
+      repNameInput: document.getElementById('repNameInput'),
+      repEmailInput: document.getElementById('repEmailInput'),
+      repPhoneInput: document.getElementById('repPhoneInput'),
+      repContactBlock: document.getElementById('repContactBlock'),
+      repNameDisplay: document.getElementById('repNameDisplay'),
+      repEmailDisplay: document.getElementById('repEmailDisplay'),
+      repPhoneDisplay: document.getElementById('repPhoneDisplay'),
       headerContainer: document.getElementById('headerContainer'),
       themeControls: document.getElementById('themeControls'),
       calculatorInputs: document.getElementById('calculatorInputs'),
-      amountContainer: document.getElementById('amountContainer'),
       factorContainer: document.getElementById('factorContainer'),
       termContainer: document.getElementById('termContainer'),
       toggleContainer: document.getElementById('toggleContainer'),
       buttonContainer: document.getElementById('buttonContainer'),
+      addOfferButton: document.getElementById('addOfferButton'),
+      savedOffersSection: document.getElementById('savedOffersSection'),
+      savedOffersContainer: document.getElementById('savedOffersContainer'),
     };
 
-    // === State ===
     let paymentFrequency = 'daily';
-    let currentTheme = 'theme-corporate';
-    let currentAccent = 'accent-blue';
+    let currentTheme = 'theme-slate';
+    let currentAccent = 'accent-capfront';
     let amountSliderMax = 1000000;
+    const MAX_ADDITIONAL_OFFERS = 2;
+    let savedOffers = [];
+    let isApprovalView = false;
 
-    const formatCurrency = (num) => {
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
+
+    function formatCurrency(num) {
       const numericValue = Number(num);
       if (isNaN(numericValue)) return '$0';
       return new Intl.NumberFormat('en-US', {
@@ -375,26 +439,134 @@
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }).format(numericValue);
-    };
+    }
 
-    const parseFormattedNumber = (val) => {
+    function parseFormattedNumber(val) {
       if (typeof val !== 'string' || !val) return 0;
       return parseFloat(val.replace(/[\$,]/g, '')) || 0;
-    };
+    }
+
+    function computeOffer(amount, factor, termMonths, frequency) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
+      const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
+      const dailyPayment = termMonths > 0 ? totalPayback / (termMonths * 22) : 0;
+
+      let payment = dailyPayment;
+      let paymentLabel = 'Est. Daily Payment';
+
+      if (frequency === 'weekly') {
+        payment = weeklyPayment;
+        paymentLabel = 'Est. Weekly Payment';
+      } else if (frequency === 'monthly') {
+        payment = monthlyPayment;
+        paymentLabel = 'Est. Monthly Payment';
+      }
+
+      return {
+        amount,
+        factor,
+        termMonths,
+        totalPayback,
+        totalCost,
+        payment,
+        paymentLabel,
+        frequency,
+      };
+    }
+
+    function getCurrentOffer() {
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+      const termMonths = parseInt(elements.calcTermInput.value) || 3;
+      return computeOffer(amount, factor, termMonths, paymentFrequency);
+    }
+
+    function renderSavedOffers() {
+      if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+
+      const used = savedOffers.length;
+      if (used === 0) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
+        return;
+      }
+
+      elements.savedOffersSection.classList.remove('hidden');
+
+      const cardsHtml = savedOffers.map((offer, index) => {
+        const labelIndex = index + 2;
+        return `
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+            </div>
+            <div class="text-center mt-2">
+              <span class="text-[11px] font-semibold text-muted block">You Get</span>
+              <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Factor</span>
+                <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Term</span>
+                <span class="text-sm font-semibold text-primary block">${offer.termMonths} mo</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Payback</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">${offer.paymentLabel}</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      elements.savedOffersContainer.innerHTML = cardsHtml;
+    }
+
+    function updateAddOfferButtonState() {
+      if (!elements.addOfferButton) return;
+      const remaining = MAX_ADDITIONAL_OFFERS - savedOffers.length;
+      elements.addOfferButton.disabled = remaining <= 0;
+    }
+
+    function handleAddOffer() {
+      if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
+      const offer = getCurrentOffer();
+      savedOffers.push({ ...offer });
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
 
     function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const isAmountSlider = (slider === elements.calcAmountSlider);
+      const getMax = () => (isAmountSlider ? amountSliderMax : max);
+
       const initialValue = parseFloat(slider.value);
       input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
-      
+
       slider.addEventListener('input', () => {
-        const val = slider.value;
+        let val = parseFloat(slider.value);
+        const cap = getMax();
+        if (!isNaN(val) && val > cap) {
+          val = cap;
+          slider.value = val;
+        }
         input.value = isCurrency ? formatCurrency(val) : val;
         callback();
       });
 
       input.addEventListener('input', () => {
         let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
-        if (!isNaN(val) && val >= min && val <= max) {
+        const cap = getMax();
+        if (!isNaN(val) && val >= min && val <= cap) {
           slider.value = val;
           callback();
         } else if (input.value === '') {
@@ -404,8 +576,9 @@
 
       input.addEventListener('blur', () => {
         let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
         if (isNaN(val) || val < min) val = min;
-        if (val > max) val = max;
+        if (val > cap) val = cap;
         slider.value = val;
         input.value = isCurrency ? formatCurrency(val) : val.toString();
         callback();
@@ -415,19 +588,32 @@
     function applyTheme() {
       document.documentElement.className = `${currentTheme} ${currentAccent}`;
       localStorage.setItem('theme', currentTheme);
-      localStorage.setItem('accent', currentAccent);
     }
 
-    function initializeAppearance() {
-      applyTheme();
-      elements.themeSelector.value = currentTheme;
+    function updateRepDisplay() {
+      if (!elements.repContactBlock) return;
+      const name = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+      const email = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+      const phone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+
+      const hasAny = name || email || phone;
+
+      if (hasAny) {
+        elements.repContactBlock.classList.remove('hidden');
+      } else {
+        elements.repContactBlock.classList.add('hidden');
+      }
+
+      if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+      if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+      if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
     }
-    
+
     function updatePaymentToggleUI() {
       const toggles = [elements.toggleDaily, elements.toggleWeekly, elements.toggleMonthly];
       const frequencies = ['daily', 'weekly', 'monthly'];
-      
       toggles.forEach((toggle, index) => {
+        if (!toggle) return;
         toggle.classList.remove('toggle-active', 'toggle-inactive');
         if (paymentFrequency === frequencies[index]) {
           toggle.classList.add('toggle-active');
@@ -439,87 +625,118 @@
 
     function initializeFromURL() {
       const params = new URLSearchParams(window.location.search);
-      
+
       const amountParam = params.get('amount');
       const amount = amountParam ? parseFloat(amountParam) : 50000;
-      const factor = params.get('factor') || 1.25; 
+      const factor = params.get('factor') || 1.25;
       const term = params.get('term') || 6;
       const freq = params.get('freq');
       const paramTheme = params.get('theme');
+      const offersParam = params.get('offers');
+      const businessNameParam = params.get('businessName') || '';
+      const repNameParam = params.get('repName') || '';
+      const repEmailParam = params.get('repEmail') || '';
+      const repPhoneParam = params.get('repPhone') || '';
       const viewMode = params.get('view');
 
-      // CapFront defaults: light + blue
-      currentTheme = paramTheme || 'theme-corporate';
-      currentAccent = 'accent-blue';
-      
+      isApprovalView = (viewMode === 'approval');
+
+      currentTheme = paramTheme || 'theme-slate';
+      currentAccent = 'accent-capfront';
+
+      if (isApprovalView) {
+        setAmountSliderMax(amount);
+      } else {
+        setAmountSliderMax(1000000);
+      }
+
       elements.calcAmountInput.value = formatCurrency(amount);
       elements.calcAmountSlider.value = amount;
       elements.calcFactorSlider.value = factor;
       elements.calcTermSlider.value = term;
-      
+
+      if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+      if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+      if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+      if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
+
       paymentFrequency = freq || 'daily';
 
-      if (viewMode === 'approval') {
-        amountSliderMax = amount > 0 ? amount : 50000;
-      } else {
-        amountSliderMax = 1000000;
+      savedOffers = [];
+      if (offersParam) {
+        try {
+          const rawOffers = JSON.parse(offersParam);
+          if (Array.isArray(rawOffers)) {
+            savedOffers = rawOffers.map((raw) => {
+              const a = Number(raw.a ?? raw.amount ?? 0);
+              const f = Number(raw.f ?? raw.factor ?? 1.1);
+              const tRaw = raw.t ?? raw.term ?? 3;
+              const t = parseInt(tRaw, 10);
+              const termMonths = Number.isNaN(t) ? 3 : t;
+              const q = raw.q ?? raw.frequency ?? 'daily';
+              return computeOffer(a, f, termMonths, q);
+            });
+          }
+        } catch (err) {
+          console.error('Error parsing offers from URL', err);
+        }
       }
-      elements.calcAmountSlider.max = amountSliderMax;
 
-      if (viewMode === 'approval') {
+      if (isApprovalView) {
         elements.factorContainer.style.display = 'none';
         elements.termContainer.style.display = 'none';
         elements.toggleContainer.style.display = 'none';
-        
+
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+        if (elements.businessNameInput) elements.businessNameInput.disabled = true;
+
         elements.themeControls.style.display = 'none';
+        if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
+        if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
+        elements.buttonContainer.style.display = 'none';
+
         elements.headerContainer.classList.remove('justify-between');
         elements.headerContainer.classList.add('justify-center');
-        
-        elements.buttonContainer.style.display = 'none';
       }
     }
-    
+
     function runCalculator() {
       try {
         const amount = parseFormattedNumber(elements.calcAmountInput.value);
         const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
         const termMonths = parseInt(elements.calcTermInput.value) || 3;
 
-        const totalPayback = amount * factor;
-        const totalCost = totalPayback - amount;
-        
-        const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
-        const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
-        const dailyPayment = termMonths > 0 ? totalPayback / (termMonths * 22) : 0; 
+        const offer = computeOffer(amount, factor, termMonths, paymentFrequency);
 
-        elements.summaryAmountOut.textContent = formatCurrency(amount);
-        elements.summaryPaybackOut.textContent = formatCurrency(totalPayback);
-        elements.summaryFactorOut.textContent = `${factor.toFixed(2)}x`;
-        elements.summaryTermOut.textContent = `${termMonths} mo`;
-        elements.summaryCostOut.textContent = formatCurrency(totalCost);
-        
-        switch (paymentFrequency) {
-          case 'daily':
-            elements.summaryPaymentLabel.textContent = 'Est. Daily Payment';
-            elements.summaryPaymentValue.textContent = formatCurrency(dailyPayment);
-            break;
-          case 'weekly':
-            elements.summaryPaymentLabel.textContent = 'Est. Weekly Payment';
-            elements.summaryPaymentValue.textContent = formatCurrency(weeklyPayment);
-            break;
-          case 'monthly':
-            elements.summaryPaymentLabel.textContent = 'Est. Monthly Payment';
-            elements.summaryPaymentValue.textContent = formatCurrency(monthlyPayment);
-            break;
+        const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+        if (elements.businessNameDisplay) {
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
         }
+
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
+        elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
+        elements.summaryTermOut.textContent = `${offer.termMonths} mo`;
+        elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+        elements.summaryPaymentLabel.textContent = offer.paymentLabel;
+        elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+
+        updateRepDisplay();
       } catch (e) {
-        console.error("Calculator error:", e);
+        console.error('Calculator error:', e);
       }
     }
 
     function initializeCalculator() {
       initializeFromURL();
-      initializeAppearance();
+      applyTheme();
+      elements.themeSelector.value = currentTheme;
 
       syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
       syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.1, 1.5, runCalculator);
@@ -541,21 +758,49 @@
         runCalculator();
       });
 
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.repSettingsToggle && elements.repSettingsPanel) {
+        elements.repSettingsToggle.addEventListener('click', () => {
+          elements.repSettingsPanel.classList.toggle('hidden');
+        });
+      }
+      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+
       elements.themeSelector.addEventListener('change', (e) => {
         currentTheme = e.target.value;
         applyTheme();
       });
-      
+
+      if (elements.addOfferButton) {
+        elements.addOfferButton.addEventListener('click', handleAddOffer);
+      }
+
       elements.shareLinkButton.addEventListener('click', () => {
         const shareBtn = elements.shareLinkButton;
         const originalText = shareBtn.innerText;
-        
+
         const amount = parseFormattedNumber(elements.calcAmountInput.value);
         const factor = parseFloat(elements.calcFactorInput.value);
         const term = parseInt(elements.calcTermInput.value);
         const freq = paymentFrequency;
         const theme = currentTheme;
-        
+        const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+        const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+        const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+        const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+
+        const offersForUrl = savedOffers.map((offer) => ({
+          a: offer.amount,
+          f: offer.factor,
+          t: offer.termMonths,
+          q: offer.frequency || freq,
+        }));
+
         const url = new URL(window.location.href);
         const params = new URLSearchParams({
           amount,
@@ -563,10 +808,15 @@
           term,
           freq,
           theme,
-          view: 'approval'
+          businessName,
+          repName,
+          repEmail,
+          repPhone,
+          offers: JSON.stringify(offersForUrl),
+          view: 'approval',
         });
         url.search = params.toString();
-        
+
         const textArea = document.createElement('textarea');
         textArea.value = url.toString();
         textArea.style.position = 'fixed';
@@ -575,21 +825,27 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
           document.execCommand('copy');
           shareBtn.innerText = 'Copied!';
-          setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          setTimeout(() => {
+            shareBtn.innerText = originalText;
+          }, 2000);
         } catch (errFallback) {
           console.error('Fallback copy failed:', errFallback);
           shareBtn.innerText = 'Error';
-          setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          setTimeout(() => {
+            shareBtn.innerText = originalText;
+          }, 2000);
         }
         document.body.removeChild(textArea);
       });
 
       updatePaymentToggleUI();
-      runCalculator(); 
+      runCalculator();
+      renderSavedOffers();
+      updateAddOfferButtonState();
     }
 
     initializeCalculator();
