@@ -1,18 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Critical Financing – Offer Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="Critical Financing offer builder – estimate your approvals and payments."
-  />
+  <title>Critical Financing | Offer Builder</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Poppins font -->
+  <!-- Poppins (matches your Critical Financing page) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -22,905 +17,840 @@
 
   <style>
     :root {
-      --cf-navy: #0b184b;   /* deep blue */
-      --cf-red: #dc2626;    /* bold red (accent only) */
-      --cf-light: #f9fafb;  /* soft white */
+      /* Backgrounds */
+      --bg-body: #f4f6fb;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f8fafc;
+
+      /* Borders / lines */
+      --border-primary: #e5e7eb;
+
+      /* Brand colors (red / white / blue) */
+      --brand-navy: #132347;
+      --brand-blue: #264f9c;
+      --brand-red: #c53030;
+
+      /* Text */
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #9ca3af;
+
+      /* Slider track */
+      --slider-track: #e5e7eb;
+      --slider-thumb: #132347;
+
+      /* Buttons */
+      --btn-bg: #132347;
+      --btn-bg-hover: #1d3162;
+      --btn-text: #ffffff;
+
+      /* Frequency toggle */
+      --freq-bg: #ffffff;
+      --freq-border: #e5e7eb;
+      --freq-active-bg: #132347;
+      --freq-active-text: #ffffff;
+      --freq-inactive-bg: #ffffff;
+      --freq-inactive-text: #4b5563;
+
+      /* Live preview pill green */
+      --live-green: #22c55e;
+      --live-green-soft: rgba(34, 197, 94, 0.15);
     }
 
     body {
-      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-      background: var(--cf-light);
-      color: #0b184b;
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
     }
 
-    .cf-shell {
+    .shell {
+      background-color: var(--bg-card);
+      border-radius: 1.75rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    }
+
+    .card-inner {
+      background-color: var(--bg-card-inner);
       border-radius: 1.5rem;
-      background: #ffffff;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.06),
-        0 16px 40px rgba(15, 23, 42, 0.16);
+      border: 1px solid var(--border-primary);
     }
 
-    /* Primary CTA: solid navy */
-    .cf-primary-btn {
-      border-radius: 999px;
-      background-color: var(--cf-navy);
-      color: #ffffff;
-      padding: 0.55rem 1.6rem;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border: 1px solid rgba(15, 23, 42, 0.9);
-      box-shadow:
-        0 4px 10px rgba(15, 23, 42, 0.35);
-      transition:
-        transform 0.12s ease-out,
-        box-shadow 0.12s ease-out,
-        background-color 0.12s ease-out;
-    }
-
-    .cf-primary-btn:hover {
-      background-color: #020617;
-      transform: translateY(-1px);
-      box-shadow:
-        0 8px 18px rgba(15, 23, 42, 0.45);
-    }
-
-    .cf-secondary-btn {
-      border-radius: 999px;
-      padding: 0.55rem 1.6rem;
-      font-size: 0.8rem;
-      border: 1px solid #cbd5f5;
-      background: #ffffff;
-      color: #0b184b;
-      font-weight: 500;
-      transition:
-        background-color 0.12s ease-out,
-        border-color 0.12s ease-out,
-        transform 0.12s ease-out,
-        color 0.12s ease-out;
-    }
-
-    .cf-secondary-btn:hover {
-      background: #e5edff;
-      border-color: #93c5fd;
-      color: #0b184b;
-      transform: translateY(-1px);
-    }
-
-    .cf-tag {
+    .field-label {
       font-size: 0.7rem;
-      letter-spacing: 0.14em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--cf-navy);
+      color: var(--text-secondary);
     }
 
-    .cf-input {
-      background: #ffffff;
-      border-radius: 0.75rem;
-      border: 1px solid #d1d5db;
-      color: #0b184b;
-      font-size: 0.9rem;
-      padding: 0.6rem 0.75rem;
+    .field-input {
+      border-radius: 0.9rem;
+      border: 1px solid var(--border-primary);
+      background-color: #ffffff;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+    }
+
+    .field-input:focus {
+      border-color: var(--brand-blue);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
       outline: none;
+    }
+
+    /* Sliders */
+    .slider-track {
       width: 100%;
-      transition:
-        border-color 0.12s ease-out,
-        box-shadow 0.12s ease-out,
-        background-color 0.12s ease-out;
+      height: 4px;
+      border-radius: 999px;
+      background-color: var(--slider-track);
+      cursor: pointer;
     }
 
-    .cf-input::placeholder {
-      color: #9ca3af;
+    input[type='range'].slider-track {
+      -webkit-appearance: none;
+      appearance: none;
     }
 
-    .cf-input:focus {
-      border-color: var(--cf-navy);
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.6),
-        0 0 0 3px rgba(191, 219, 254, 0.8);
-      background: #ffffff;
+    input[type='range'].slider-track::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background-color: var(--slider-thumb);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 2px rgba(19, 35, 71, 0.3);
+      cursor: pointer;
     }
 
-    /* Remove number input arrows */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
+    input[type='range'].slider-track::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background-color: var(--slider-thumb);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 2px rgba(19, 35, 71, 0.3);
+      cursor: pointer;
+    }
+
+    .freq-toggle {
+      border-radius: 999px;
+      border: 1px solid var(--freq-border);
+      background-color: var(--freq-bg);
+      padding: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .freq-btn {
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      background-color: transparent;
+      color: var(--freq-inactive-text);
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .freq-btn.active {
+      background-color: var(--freq-active-bg);
+      color: var(--freq-active-text);
+    }
+
+    .primary-btn {
+      border-radius: 999px;
+      background-color: var(--btn-bg);
+      color: var(--btn-text);
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      padding: 0.7rem 1.6rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+    }
+
+    .primary-btn:hover {
+      background-color: var(--btn-bg-hover);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .primary-btn:disabled {
+      background-color: #e5e7eb;
+      color: var(--text-muted);
+      box-shadow: none;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    .hero-amount {
+      color: var(--brand-navy);
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .live-pill {
+      border-radius: 999px;
+      background-color: #ffffff;
+      border: 1px solid var(--border-primary);
+      padding: 0.25rem 0.9rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
+
+    .live-dot-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .live-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background-color: var(--live-green);
+      box-shadow: 0 0 0 4px var(--live-green-soft);
+    }
+
+    /* Saved offer cards */
+    .saved-card {
+      border-radius: 1rem;
+      border: 1px solid var(--border-primary);
+      background-color: #ffffff;
+    }
+
+    /* Remove number spinners */
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    input[type=number] { -moz-appearance: textfield; }
-
-    /* Sliders: solid navy tone */
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 0.38rem;
-      border-radius: 999px;
-      background-color: #e5e7eb;
-      accent-color: var(--cf-navy);
-    }
-
-    input[type=range]::-webkit-slider-runnable-track {
-      height: 0.38rem;
-      border-radius: 999px;
-      background-color: #e5e7eb;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 0.9rem;
-      width: 0.9rem;
-      border-radius: 999px;
-      background-color: var(--cf-navy);
-      border: 1px solid #020617;
-      box-shadow: 0 0 0 2px #e5e7eb;
-      margin-top: -0.26rem;
-    }
-
-    input[type=range]::-moz-range-track {
-      height: 0.38rem;
-      border-radius: 999px;
-      background-color: #e5e7eb;
-    }
-
-    input[type=range]::-moz-range-thumb {
-      height: 0.9rem;
-      width: 0.9rem;
-      border-radius: 999px;
-      background-color: var(--cf-navy);
-      border: 1px solid #020617;
-    }
-
-    .cf-toggle-btn {
-      border-radius: 9999px;
-      border: 1px solid #cbd5f5;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-      background: #ffffff;
-      color: #0b184b;
-      transition:
-        background-color 0.12s ease-out,
-        color 0.12s ease-out,
-        border-color 0.12s ease-out,
-        box-shadow 0.12s ease-out;
-    }
-
-    .cf-toggle-btn.cf-toggle-active {
-      background-color: var(--cf-navy);
-      color: #ffffff;
-      border-color: rgba(15, 23, 42, 0.95);
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.9),
-        0 0 10px rgba(15, 23, 42, 0.55);
-    }
-
-    .cf-offer-shell {
-      border-radius: 1.25rem;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      background: #ffffff;
-      box-shadow:
-        0 0 0 1px rgba(148, 163, 184, 0.45),
-        0 16px 40px rgba(15, 23, 42, 0.16);
-    }
-
-    .cf-offer-hero-amount {
-      color: var(--cf-navy);
-    }
-
-    .cf-offer-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      border-radius: 999px;
-      background: #ffffff;
-      color: var(--cf-navy);
-      border: 1px solid rgba(15, 23, 42, 0.2);
-      padding: 0.18rem 0.6rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .cf-offer-pill .dot {
-      height: 0.45rem;
-      width: 0.45rem;
-      border-radius: 999px;
-      background-color: #22c55e; /* live green */
-      box-shadow:
-        0 0 0 2px rgba(34, 197, 94, 0.3),
-        0 0 10px rgba(34, 197, 94, 0.9);
-    }
-
-    .cf-saved-offer-card {
-      border-radius: 0.9rem;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      padding: 0.8rem 0.9rem;
+    input[type='number'] {
+      -moz-appearance: textfield;
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center px-3 py-6">
-  <div class="w-full max-w-xl">
-    <section class="cf-shell p-4 sm:p-6 space-y-4">
-      <header class="space-y-3 text-center flex flex-col items-center">
+<body class="min-h-screen flex items-center justify-center px-3 py-8">
+  <div class="w-full max-w-xl shell px-5 py-6 md:px-8 md:py-8 space-y-6">
+    <!-- HEADER -->
+    <header class="flex flex-col items-center gap-3 pb-4 border-b border-slate-200">
+      <div class="flex flex-col items-center">
+        <!-- Swap src for your actual Critical Financing logo -->
         <img
-          src="https://static.wixstatic.com/media/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png"
+          src="https://static.wixstatic.com/media/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png/v1/fill/w_240,h_106,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png"
           alt="Critical Financing"
-          class="h-8 w-auto mb-1"
+          class="h-10 w-auto"
         />
-        <p class="cf-tag text-[0.65rem] tracking-[0.24em] text-slate-500">
-          Offer builder
-        </p>
-        <span class="cf-offer-pill text-[0.7rem] mt-1">
-          <span class="dot"></span>
-          Live preview
+        <div
+          class="mt-2 text-[0.7rem] tracking-[0.24em] uppercase text-slate-500 font-semibold"
+        >
+          Offer Builder
+        </div>
+      </div>
+      <div class="live-pill">
+        <span class="live-dot-wrap">
+          <span class="live-dot"></span>
         </span>
-      </header>
+        <span>Live Preview</span>
+      </div>
+    </header>
 
-      <!-- CALCULATOR -->
-      <section id="cf-offer-calculator" class="cf-offer-shell p-4 space-y-4">
-        <div class="space-y-3">
-          <div>
-            <label
-              for="cf-biz-name"
-              class="block mb-1 text-xs text-slate-600 font-medium"
-            >
-              Business Name (optional)
-            </label>
-            <input
-              id="cf-biz-name"
-              type="text"
-              class="cf-input text-sm"
-              placeholder="e.g., Acme Holdings LLC"
-            />
-          </div>
+    <!-- INPUT CARD -->
+    <section class="card-inner px-4 py-4 md:px-5 md:py-5 space-y-4">
+      <!-- Business name -->
+      <div class="space-y-1">
+        <label for="businessNameInput" class="field-label">Business Name (optional)</label>
+        <input
+          id="businessNameInput"
+          type="text"
+          class="field-input w-full px-3 py-2"
+          placeholder="e.g., Acme Holdings LLC"
+        />
+      </div>
 
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between text-xs text-slate-600">
-              <span class="font-medium">Amount You Get</span>
-              <span id="cf-amount-label" class="font-semibold text-slate-900">
-                $50,000
-              </span>
-            </div>
-            <input
-              id="cf-amount-slider"
-              type="range"
-              min="5000"
-              max="1000000"
-              step="1000"
-              value="50000"
-              class="w-full h-1.5 rounded-lg cursor-pointer bg-slate-200"
-            />
-            <input
-              id="cf-amount-input"
-              type="text"
-              inputmode="numeric"
-              class="cf-input text-sm mt-1"
-              placeholder="Enter amount"
-            />
-          </div>
-
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between text-xs text-slate-600">
-              <span class="font-medium">Factor Rate</span>
-              <span id="cf-factor-label" class="font-semibold text-slate-900">
-                1.25x
-              </span>
-            </div>
-            <input
-              id="cf-factor-slider"
-              type="range"
-              min="1.10"
-              max="1.50"
-              step="0.01"
-              value="1.25"
-              class="w-full h-1.5 rounded-lg cursor-pointer bg-slate-200"
-            />
-            <input
-              id="cf-factor-input"
-              type="number"
-              step="0.01"
-              class="cf-input text-sm mt-1"
-              placeholder="1.25"
-            />
-          </div>
-
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between text-xs text-slate-600">
-              <span class="font-medium">Term (Months)</span>
-              <span id="cf-term-label" class="font-semibold text-slate-900">
-                12 months
-              </span>
-            </div>
-            <input
-              id="cf-term-slider"
-              type="range"
-              min="3"
-              max="36"
-              step="1"
-              value="12"
-              class="w-full h-1.5 rounded-lg cursor-pointer bg-slate-200"
-            />
-            <input
-              id="cf-term-input"
-              type="number"
-              step="1"
-              class="cf-input text-sm mt-1"
-              placeholder="12"
-            />
-          </div>
-
-          <div class="flex items-center justify-center gap-2 pt-1">
-            <button
-              id="cf-toggle-daily"
-              type="button"
-              class="cf-toggle-btn text-xs"
-            >
-              Daily
-            </button>
-            <button
-              id="cf-toggle-weekly"
-              type="button"
-              class="cf-toggle-btn text-xs"
-            >
-              Weekly
-            </button>
-            <button
-              id="cf-toggle-monthly"
-              type="button"
-              class="cf-toggle-btn text-xs"
-            >
-              Monthly
-            </button>
-          </div>
+      <!-- Amount -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="field-label">Amount You Get</label>
+          <span id="amountMaxLabel" class="text-[0.7rem] text-muted"></span>
         </div>
-
-        <div class="border-t border-slate-200 pt-4 space-y-4">
-          <div class="text-center space-y-1">
-            <span class="text-xs font-semibold text-slate-500 block">
-              You get
-            </span>
-            <p
-              id="cf-summary-amount"
-              class="text-3xl sm:text-4xl font-semibold cf-offer-hero-amount"
-            >
-              $50,000
-            </p>
-            <p class="text-xs text-slate-600">
-              Total payback:
-              <span
-                id="cf-summary-payback"
-                class="font-semibold text-slate-900"
-              ></span>
-            </p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3 text-xs">
-            <div class="text-center space-y-0.5">
-              <p class="text-[0.7rem] text-slate-500 font-medium">
-                Factor Rate
-              </p>
-              <p
-                id="cf-summary-factor"
-                class="text-sm font-semibold text-slate-900"
-              >
-                1.25x
-              </p>
-            </div>
-            <div class="text-center space-y-0.5">
-              <p class="text-[0.7rem] text-slate-500 font-medium">
-                Term
-              </p>
-              <p
-                id="cf-summary-term"
-                class="text-sm font-semibold text-slate-900"
-              >
-                12 months
-              </p>
-            </div>
-            <div class="text-center space-y-0.5">
-              <p class="text-[0.7rem] text-slate-500 font-medium">
-                Total Cost of Funds
-              </p>
-              <p
-                id="cf-summary-cost"
-                class="text-sm font-semibold text-slate-900"
-              ></p>
-            </div>
-            <div class="text-center space-y-0.5">
-              <p
-                id="cf-summary-payment-label"
-                class="text-[0.7rem] text-slate-500 font-medium"
-              >
-                Est. Daily Payment
-              </p>
-              <p
-                id="cf-summary-payment-value"
-                class="text-sm font-semibold text-slate-900"
-              ></p>
-            </div>
-          </div>
+        <input
+          id="calcAmountSlider"
+          type="range"
+          min="5000"
+          max="1000000"
+          step="1000"
+          value="50000"
+          class="slider-track"
+        />
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">$</span>
+          <input
+            id="calcAmountInput"
+            class="field-input w-full pl-7 pr-3 py-2"
+            inputmode="numeric"
+          />
         </div>
+      </div>
 
-        <div
-          class="border-t border-slate-200 pt-3 mt-2 flex flex-wrap gap-2 justify-center"
-        >
-          <button
-            id="cf-add-offer"
-            type="button"
-            class="cf-primary-btn text-xs flex items-center gap-1 justify-center w-full sm:w-auto"
+      <!-- Factor -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="field-label">Factor Rate</label>
+          <span id="factorMaxLabel" class="text-[0.7rem] text-muted"></span>
+        </div>
+        <input
+          id="calcFactorSlider"
+          type="range"
+          min="1.1"
+          max="1.5"
+          step="0.01"
+          value="1.25"
+          class="slider-track"
+        />
+        <div class="relative">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
           >
-            <span>+ Add Offer</span>
-          </button>
-          <button
-            id="cf-share-link"
-            type="button"
-            class="cf-secondary-btn text-xs flex items-center gap-1 justify-center w-full sm:w-auto"
-          >
-            Copy Shareable Link
-          </button>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+          <input
+            id="calcFactorInput"
+            type="number"
+            step="0.01"
+            class="field-input w-full pl-8 pr-3 py-2"
+          />
         </div>
+      </div>
 
-        <div
-          id="cf-saved-offers-section"
-          class="border-t border-slate-200 pt-4 mt-4 hidden"
-        >
-          <p class="text-xs font-semibold text-slate-700 mb-2">
-            Additional offers
-          </p>
-          <div
-            id="cf-saved-offers-container"
-            class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"
-          ></div>
+      <!-- Term -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="field-label">Term (Months)</label>
+          <span id="termMaxLabel" class="text-[0.7rem] text-muted"></span>
         </div>
-      </section>
+        <input
+          id="calcTermSlider"
+          type="range"
+          min="3"
+          max="24"
+          step="1"
+          value="12"
+          class="slider-track"
+        />
+        <div class="relative">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"
+            />
+          </svg>
+          <input
+            id="calcTermInput"
+            type="number"
+            step="1"
+            class="field-input w-full pl-8 pr-3 py-2"
+          />
+        </div>
+      </div>
+
+      <!-- Frequency -->
+      <div class="flex justify-center pt-1">
+        <div class="freq-toggle">
+          <button id="toggleDaily" class="freq-btn active" type="button">Daily</button>
+          <button id="toggleWeekly" class="freq-btn" type="button">Weekly</button>
+          <button id="toggleMonthly" class="freq-btn" type="button">Monthly</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUMMARY CARD -->
+    <section class="rounded-2xl border border-slate-200 bg-white px-4 py-5 md:px-6 md:py-6">
+      <div class="text-center space-y-1">
+        <span
+          id="businessNameDisplay"
+          class="text-xs font-semibold text-slate-500 tracking-wide hidden"
+        ></span>
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.16em]">
+          You get
+        </div>
+        <div
+          id="summaryAmountOut"
+          class="hero-amount text-4xl md:text-5xl font-semibold mt-1 mb-1"
+        >
+          $50,000
+        </div>
+        <div class="text-sm text-slate-600">
+          Total payback:
+          <span id="summaryPaybackOut" class="font-semibold text-slate-800"></span>
+        </div>
+      </div>
+
+      <div class="mt-5 border-t border-slate-200 pt-4">
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div class="space-y-1">
+            <div class="field-label">Factor Rate</div>
+            <div id="summaryFactorOut" class="text-lg font-semibold text-slate-900"></div>
+          </div>
+          <div class="space-y-1">
+            <div class="field-label">Term</div>
+            <div id="summaryTermOut" class="text-lg font-semibold text-slate-900"></div>
+          </div>
+          <div class="space-y-1">
+            <div class="field-label">Total Cost of Funds</div>
+            <div id="summaryCostOut" class="text-lg font-semibold text-slate-900"></div>
+          </div>
+          <div class="space-y-1">
+            <div id="summaryPaymentLabel" class="field-label">Est. Daily Payment</div>
+            <div
+              id="summaryPaymentValue"
+              class="text-lg font-semibold text-slate-900"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADDITIONAL OFFERS -->
+    <section
+      id="savedOffersSection"
+      class="rounded-2xl border border-slate-200 bg-white px-4 py-4 md:px-5 md:py-5 hidden"
+    >
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-slate-700">Additional Offers</h3>
+      </div>
+      <div id="savedOffersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- BUTTONS -->
+    <section class="pt-1 border-t border-slate-200 mt-2">
+      <div class="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+        <button id="addOfferButton" class="primary-btn w-full sm:w-auto" type="button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>+ Add Offer</span>
+        </button>
+        <button id="shareLinkButton" class="primary-btn w-full sm:w-auto" type="button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"
+            />
+          </svg>
+          <span>Copy Shareable Link</span>
+        </button>
+      </div>
     </section>
   </div>
 
   <script>
-    // ---- Calculator Logic ----
-    const cfEls = {
-      bizName: document.getElementById("cf-biz-name"),
+    // --- Utility functions ---
+    function formatCurrency(num) {
+      if (!isFinite(num)) return '$0';
+      return num.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      });
+    }
 
-      amountSlider: document.getElementById("cf-amount-slider"),
-      amountInput: document.getElementById("cf-amount-input"),
-      amountLabel: document.getElementById("cf-amount-label"),
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
 
-      factorSlider: document.getElementById("cf-factor-slider"),
-      factorInput: document.getElementById("cf-factor-input"),
-      factorLabel: document.getElementById("cf-factor-label"),
+    // --- Elements ---
+    const amountSlider = document.getElementById('calcAmountSlider');
+    const amountInput = document.getElementById('calcAmountInput');
+    const factorSlider = document.getElementById('calcFactorSlider');
+    const factorInput = document.getElementById('calcFactorInput');
+    const termSlider = document.getElementById('calcTermSlider');
+    const termInput = document.getElementById('calcTermInput');
 
-      termSlider: document.getElementById("cf-term-slider"),
-      termInput: document.getElementById("cf-term-input"),
-      termLabel: document.getElementById("cf-term-label"),
+    const amountMaxLabel = document.getElementById('amountMaxLabel');
+    const factorMaxLabel = document.getElementById('factorMaxLabel');
+    const termMaxLabel = document.getElementById('termMaxLabel');
 
-      toggleDaily: document.getElementById("cf-toggle-daily"),
-      toggleWeekly: document.getElementById("cf-toggle-weekly"),
-      toggleMonthly: document.getElementById("cf-toggle-monthly"),
+    const businessNameInput = document.getElementById('businessNameInput');
+    const businessNameDisplay = document.getElementById('businessNameDisplay');
 
-      summaryAmount: document.getElementById("cf-summary-amount"),
-      summaryPayback: document.getElementById("cf-summary-payback"),
-      summaryFactor: document.getElementById("cf-summary-factor"),
-      summaryTerm: document.getElementById("cf-summary-term"),
-      summaryCost: document.getElementById("cf-summary-cost"),
-      summaryPaymentLabel: document.getElementById("cf-summary-payment-label"),
-      summaryPaymentValue: document.getElementById("cf-summary-payment-value"),
+    const summaryAmountOut = document.getElementById('summaryAmountOut');
+    const summaryPaybackOut = document.getElementById('summaryPaybackOut');
+    const summaryFactorOut = document.getElementById('summaryFactorOut');
+    const summaryTermOut = document.getElementById('summaryTermOut');
+    const summaryCostOut = document.getElementById('summaryCostOut');
+    const summaryPaymentLabel = document.getElementById('summaryPaymentLabel');
+    const summaryPaymentValue = document.getElementById('summaryPaymentValue');
 
-      addOffer: document.getElementById("cf-add-offer"),
-      shareLink: document.getElementById("cf-share-link"),
+    const toggleDaily = document.getElementById('toggleDaily');
+    const toggleWeekly = document.getElementById('toggleWeekly');
+    const toggleMonthly = document.getElementById('toggleMonthly');
 
-      savedSection: document.getElementById("cf-saved-offers-section"),
-      savedContainer: document.getElementById("cf-saved-offers-container"),
+    const addOfferButton = document.getElementById('addOfferButton');
+    const shareLinkButton = document.getElementById('shareLinkButton');
+    const savedOffersSection = document.getElementById('savedOffersSection');
+    const savedOffersContainer = document.getElementById('savedOffersContainer');
+
+    // State
+    const state = {
+      amount: parseInt(amountSlider.value, 10),
+      factor: parseFloat(factorSlider.value),
+      termMonths: parseInt(termSlider.value, 10),
+      frequency: 'daily',
+      savedOffers: [],
     };
 
-    let cfPaymentFrequency = "daily";
-    const cfMaxAdditionalOffers = 2;
-    let cfSavedOffers = [];
+    // Pre-fill labels for min/max
+    amountMaxLabel.textContent = formatCurrency(parseInt(amountSlider.max, 10));
+    factorMaxLabel.textContent = `${parseFloat(factorSlider.value).toFixed(2)}x`;
+    termMaxLabel.textContent = `${termSlider.max} months`;
 
-    function cfFormatCurrency(num) {
-      const n = Number(num);
-      if (isNaN(n)) return "$0";
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(n);
+    function updateBusinessName() {
+      const name = businessNameInput.value.trim();
+      if (name) {
+        businessNameDisplay.textContent = name;
+        businessNameDisplay.classList.remove('hidden');
+      } else {
+        businessNameDisplay.textContent = '';
+        businessNameDisplay.classList.add('hidden');
+      }
     }
 
-    function cfParseCurrency(str) {
-      if (!str) return 0;
-      return parseFloat(String(str).replace(/[$,]/g, "")) || 0;
-    }
+    function computeSchedule(amount, factor, termMonths, frequency) {
+      const payback = amount * factor;
+      const cost = payback - amount;
 
-    function cfComputeOffer(amount, factor, termMonths, frequency) {
-      const totalPayback = amount * factor;
-      const totalCost = totalPayback - amount;
-
-      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
-      const weeklyPayment =
-        termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
-      const dailyPayment =
-        termMonths > 0 ? totalPayback / (termMonths * 22) : 0;
-
-      let payment = dailyPayment;
-      let paymentLabel = "Est. Daily Payment";
-
-      if (frequency === "weekly") {
-        payment = weeklyPayment;
-        paymentLabel = "Est. Weekly Payment";
-      } else if (frequency === "monthly") {
-        payment = monthlyPayment;
-        paymentLabel = "Est. Monthly Payment";
+      let payments = 0;
+      if (frequency === 'daily') {
+        // assume 21 business days per month
+        payments = termMonths * 21;
+      } else if (frequency === 'weekly') {
+        payments = Math.round((termMonths * 21) / 5);
+      } else {
+        payments = termMonths;
       }
 
-      return {
+      const payment = payments > 0 ? payback / payments : 0;
+      return { payback, cost, payments, payment };
+    }
+
+    function refreshSummary() {
+      const { amount, factor, termMonths, frequency } = state;
+      const { payback, cost, payments, payment } = computeSchedule(
         amount,
         factor,
         termMonths,
-        totalPayback,
-        totalCost,
-        payment,
-        paymentLabel,
-        frequency,
-      };
+        frequency
+      );
+
+      summaryAmountOut.textContent = formatCurrency(amount);
+      summaryPaybackOut.textContent = formatCurrency(payback);
+      summaryFactorOut.textContent = `${factor.toFixed(2)}x`;
+      summaryTermOut.textContent = `${termMonths} months`;
+      summaryCostOut.textContent = formatCurrency(cost);
+
+      if (frequency === 'daily') {
+        summaryPaymentLabel.textContent = 'Est. Daily Payment';
+      } else if (frequency === 'weekly') {
+        summaryPaymentLabel.textContent = 'Est. Weekly Payment';
+      } else {
+        summaryPaymentLabel.textContent = 'Est. Monthly Payment';
+      }
+      summaryPaymentValue.textContent = `${formatCurrency(payment)}${
+        payments ? '' : ''
+      }`;
+
+      updateBusinessName();
     }
 
-    function cfGetCurrentValues() {
-      const amount = cfParseCurrency(cfEls.amountInput.value);
-      const factor = parseFloat(cfEls.factorInput.value) || 1.25;
-      const term = parseInt(cfEls.termInput.value, 10) || 12;
-      return { amount, factor, term };
+    // --- Sync functions ---
+    function syncAmountFromSlider() {
+      const raw = parseInt(amountSlider.value, 10) || 0;
+      state.amount = clamp(raw, parseInt(amountSlider.min, 10), parseInt(amountSlider.max, 10));
+      amountSlider.value = state.amount;
+      amountInput.value = state.amount.toLocaleString('en-US');
+      refreshSummary();
     }
 
-    function cfUpdateToggleUI() {
-      const map = [
-        { btn: cfEls.toggleDaily, mode: "daily" },
-        { btn: cfEls.toggleWeekly, mode: "weekly" },
-        { btn: cfEls.toggleMonthly, mode: "monthly" },
-      ];
-
-      map.forEach(({ btn, mode }) => {
-        if (!btn) return;
-        btn.classList.remove("cf-toggle-active");
-        if (cfPaymentFrequency === mode) {
-          btn.classList.add("cf-toggle-active");
-        }
-      });
+    function syncAmountFromInput() {
+      const numeric = parseInt(amountInput.value.replace(/[^0-9]/g, ''), 10) || 0;
+      state.amount = clamp(
+        numeric,
+        parseInt(amountSlider.min, 10),
+        parseInt(amountSlider.max, 10)
+      );
+      amountSlider.value = state.amount;
+      amountInput.value = state.amount.toLocaleString('en-US');
+      refreshSummary();
     }
 
-    function cfRenderSavedOffers() {
-      if (!cfEls.savedSection || !cfEls.savedContainer) return;
+    function syncFactorFromSlider() {
+      const raw = parseFloat(factorSlider.value) || 1.0;
+      state.factor = clamp(raw, parseFloat(factorSlider.min), parseFloat(factorSlider.max));
+      factorSlider.value = state.factor.toFixed(2);
+      factorInput.value = state.factor.toFixed(2);
+      factorMaxLabel.textContent = `${parseFloat(factorSlider.max).toFixed(2)}x`;
+      refreshSummary();
+    }
 
-      if (!cfSavedOffers.length) {
-        cfEls.savedSection.classList.add("hidden");
-        cfEls.savedContainer.innerHTML = "";
+    function syncFactorFromInput() {
+      const raw = parseFloat(factorInput.value) || 1.0;
+      state.factor = clamp(raw, parseFloat(factorSlider.min), parseFloat(factorSlider.max));
+      factorSlider.value = state.factor.toFixed(2);
+      factorInput.value = state.factor.toFixed(2);
+      refreshSummary();
+    }
+
+    function syncTermFromSlider() {
+      const raw = parseInt(termSlider.value, 10) || 0;
+      state.termMonths = clamp(
+        raw,
+        parseInt(termSlider.min, 10),
+        parseInt(termSlider.max, 10)
+      );
+      termSlider.value = state.termMonths;
+      termInput.value = state.termMonths;
+      termMaxLabel.textContent = `${termSlider.max} months`;
+      refreshSummary();
+    }
+
+    function syncTermFromInput() {
+      const raw = parseInt(termInput.value, 10) || 0;
+      state.termMonths = clamp(
+        raw,
+        parseInt(termSlider.min, 10),
+        parseInt(termSlider.max, 10)
+      );
+      termSlider.value = state.termMonths;
+      termInput.value = state.termMonths;
+      refreshSummary();
+    }
+
+    function setFrequency(freq) {
+      state.frequency = freq;
+      toggleDaily.classList.toggle('active', freq === 'daily');
+      toggleWeekly.classList.toggle('active', freq === 'weekly');
+      toggleMonthly.classList.toggle('active', freq === 'monthly');
+      refreshSummary();
+    }
+
+    // --- Saved offers ---
+    function renderSavedOffers() {
+      savedOffersContainer.innerHTML = '';
+      if (!state.savedOffers.length) {
+        savedOffersSection.classList.add('hidden');
         return;
       }
+      savedOffersSection.classList.remove('hidden');
 
-      cfEls.savedSection.classList.remove("hidden");
+      state.savedOffers.forEach((offer, index) => {
+        const card = document.createElement('div');
+        card.className = 'saved-card px-3 py-3 space-y-2';
 
-      const html = cfSavedOffers
-        .map((offer, idx) => {
-          const labelIndex = idx + 2;
-          return `
-            <div class="cf-saved-offer-card space-y-1.5">
-              <div class="flex items-center justify-between text-[0.7rem] text-slate-500">
-                <span class="font-semibold">Offer ${labelIndex}</span>
-              </div>
-              <div class="text-center mt-1">
-                <p class="text-[0.7rem] text-slate-500">You get</p>
-                <p class="text-sm font-semibold text-slate-900">
-                  ${cfFormatCurrency(offer.amount)}
-                </p>
-              </div>
-              <div class="grid grid-cols-2 gap-2 mt-2 text-[0.7rem] text-slate-600">
-                <div class="text-center">
-                  <p class="font-medium text-slate-500">Factor</p>
-                  <p class="font-semibold text-slate-900">${offer.factor.toFixed(
-                    2
-                  )}x</p>
-                </div>
-                <div class="text-center">
-                  <p class="font-medium text-slate-500">Term</p>
-                  <p class="font-semibold text-slate-900">${offer.termMonths} mo</p>
-                </div>
-                <div class="text-center">
-                  <p class="font-medium text-slate-500">Payback</p>
-                  <p class="font-semibold text-slate-900">${cfFormatCurrency(
-                    offer.totalPayback
-                  )}</p>
-                </div>
-                <div class="text-center">
-                  <p class="font-medium text-slate-500">${offer.paymentLabel}</p>
-                  <p class="font-semibold text-slate-900">${cfFormatCurrency(
-                    offer.payment
-                  )}</p>
-                </div>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
+        const headerRow = document.createElement('div');
+        headerRow.className = 'flex items-center justify-between';
 
-      cfEls.savedContainer.innerHTML = html;
-    }
+        const title = document.createElement('div');
+        title.className = 'text-xs font-semibold text-slate-600 uppercase tracking-wide';
+        title.textContent = `Offer ${index + 1}`;
 
-    function cfUpdateSummary() {
-      const { amount, factor, term } = cfGetCurrentValues();
-      const offer = cfComputeOffer(amount, factor, term, cfPaymentFrequency);
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'text-xs text-slate-400 hover:text-slate-600';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          state.savedOffers.splice(index, 1);
+          renderSavedOffers();
+        });
 
-      if (cfEls.amountLabel)
-        cfEls.amountLabel.textContent = cfFormatCurrency(amount);
-      if (cfEls.factorLabel)
-        cfEls.factorLabel.textContent = `${factor.toFixed(2)}x`;
-      if (cfEls.termLabel)
-        cfEls.termLabel.textContent = `${term} months`;
+        headerRow.appendChild(title);
+        headerRow.appendChild(removeBtn);
 
-      if (cfEls.summaryAmount)
-        cfEls.summaryAmount.textContent = cfFormatCurrency(amount);
-      if (cfEls.summaryPayback)
-        cfEls.summaryPayback.textContent = cfFormatCurrency(offer.totalPayback);
-      if (cfEls.summaryFactor)
-        cfEls.summaryFactor.textContent = `${factor.toFixed(2)}x`;
-      if (cfEls.summaryTerm)
-        cfEls.summaryTerm.textContent = `${term} months`;
-      if (cfEls.summaryCost)
-        cfEls.summaryCost.textContent = cfFormatCurrency(offer.totalCost);
-      if (cfEls.summaryPaymentLabel)
-        cfEls.summaryPaymentLabel.textContent = offer.paymentLabel;
-      if (cfEls.summaryPaymentValue)
-        cfEls.summaryPaymentValue.textContent = cfFormatCurrency(offer.payment);
-    }
+        const amountEl = document.createElement('div');
+        amountEl.className = 'text-lg font-semibold text-slate-900';
+        amountEl.textContent = formatCurrency(offer.amount);
 
-    function cfSyncSliderAndInput(slider, input, labelCallback, min, max, isCurrency) {
-      if (!slider || !input) return;
+        const paybackEl = document.createElement('div');
+        paybackEl.className = 'text-xs text-slate-500';
+        paybackEl.textContent = `Total payback ${formatCurrency(offer.payback)} · ${
+          offer.termMonths
+        } mo · ${offer.factor.toFixed(2)}x`;
 
-      // init input from slider
-      const initialVal = parseFloat(slider.value || min);
-      input.value = isCurrency
-        ? cfFormatCurrency(initialVal)
-        : initialVal.toString();
-      if (labelCallback) labelCallback(initialVal);
+        const paymentEl = document.createElement('div');
+        paymentEl.className = 'text-xs text-slate-600';
+        const label =
+          offer.frequency === 'daily'
+            ? 'Est. Daily Payment'
+            : offer.frequency === 'weekly'
+            ? 'Est. Weekly Payment'
+            : 'Est. Monthly Payment';
+        paymentEl.textContent = `${label} ${formatCurrency(offer.payment)}`;
 
-      slider.addEventListener("input", () => {
-        let val = parseFloat(slider.value || min);
-        if (val < min) val = min;
-        if (val > max) val = max;
-        input.value = isCurrency ? cfFormatCurrency(val) : val.toString();
-        if (labelCallback) labelCallback(val);
-        cfUpdateSummary();
-      });
+        card.appendChild(headerRow);
+        card.appendChild(amountEl);
+        card.appendChild(paybackEl);
+        card.appendChild(paymentEl);
 
-      input.addEventListener("input", () => {
-        const raw = input.value;
-        let val = isCurrency ? cfParseCurrency(raw) : parseFloat(raw);
-        if (isNaN(val)) return;
-        if (val < min) val = min;
-        if (val > max) val = max;
-        slider.value = String(val);
-        if (labelCallback) labelCallback(val);
-        cfUpdateSummary();
-      });
-
-      input.addEventListener("blur", () => {
-        let val = isCurrency ? cfParseCurrency(input.value) : parseFloat(input.value);
-        if (isNaN(val) || val < min) val = min;
-        if (val > max) val = max;
-        slider.value = String(val);
-        input.value = isCurrency ? cfFormatCurrency(val) : val.toString();
-        if (labelCallback) labelCallback(val);
-        cfUpdateSummary();
+        savedOffersContainer.appendChild(card);
       });
     }
 
-    function cfApplyUrlParams() {
-      const params = new URLSearchParams(window.location.search);
+    function handleAddOffer() {
+      const { amount, factor, termMonths, frequency } = state;
+      const { payback, cost, payments, payment } = computeSchedule(
+        amount,
+        factor,
+        termMonths,
+        frequency
+      );
 
-      const amountParam = params.get("amount");
-      const factorParam = params.get("factor");
-      const termParam = params.get("term");
-      const freqParam = params.get("freq");
-      const bizNameParam = params.get("bizName");
-      const offersParam = params.get("offers");
+      state.savedOffers.push({
+        amount,
+        factor,
+        termMonths,
+        frequency,
+        payback,
+        cost,
+        payments,
+        payment,
+      });
 
-      if (amountParam && cfEls.amountSlider && cfEls.amountInput) {
-        const amount = parseFloat(amountParam) || 50000;
-        cfEls.amountSlider.value = String(amount);
-        cfEls.amountInput.value = cfFormatCurrency(amount);
-      }
-
-      if (factorParam && cfEls.factorSlider && cfEls.factorInput) {
-        const factor = parseFloat(factorParam) || 1.25;
-        cfEls.factorSlider.value = String(factor);
-        cfEls.factorInput.value = factor.toFixed(2);
-      }
-
-      if (termParam && cfEls.termSlider && cfEls.termInput) {
-        const term = parseInt(termParam, 10) || 12;
-        cfEls.termSlider.value = String(term);
-        cfEls.termInput.value = String(term);
-      }
-
-      if (freqParam && ["daily", "weekly", "monthly"].includes(freqParam)) {
-        cfPaymentFrequency = freqParam;
-      }
-
-      if (bizNameParam && cfEls.bizName) {
-        cfEls.bizName.value = bizNameParam;
-      }
-
-      // Restore any additional offers from the URL, if present
-      if (offersParam) {
-        try {
-          const rawOffers = JSON.parse(offersParam);
-          if (Array.isArray(rawOffers)) {
-            cfSavedOffers = rawOffers
-              .map((raw) => {
-                const a = Number(raw.a ?? raw.amount ?? 0);
-                const f = Number(raw.f ?? raw.factor ?? 1.25);
-                const tRaw = raw.t ?? raw.term ?? 12;
-                const t = parseInt(tRaw, 10);
-                const termMonths = Number.isNaN(t) ? 12 : t;
-                const q = raw.q ?? raw.frequency ?? freqParam ?? "daily";
-                return cfComputeOffer(a, f, termMonths, q);
-              })
-              .slice(0, cfMaxAdditionalOffers);
-          }
-        } catch (err) {
-          console.error("Error parsing offers from URL", err);
-          cfSavedOffers = [];
-        }
-      }
+      renderSavedOffers();
     }
 
-    function cfInitCalculator() {
-      // Sync sliders & inputs
-      cfSyncSliderAndInput(
-        cfEls.amountSlider,
-        cfEls.amountInput,
-        (val) => {
-          if (cfEls.amountLabel) cfEls.amountLabel.textContent = cfFormatCurrency(val);
-        },
-        5000,
-        1000000,
-        true
-      );
+    // --- Share link ---
+    function handleShareLink() {
+      const params = new URLSearchParams();
+      params.set('a', String(state.amount));
+      params.set('f', String(state.factor));
+      params.set('t', String(state.termMonths));
+      params.set('q', state.frequency);
 
-      cfSyncSliderAndInput(
-        cfEls.factorSlider,
-        cfEls.factorInput,
-        (val) => {
-          if (cfEls.factorLabel)
-            cfEls.factorLabel.textContent = `${parseFloat(val).toFixed(2)}x`;
-        },
-        1.1,
-        1.5,
-        false
-      );
+      const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
 
-      cfSyncSliderAndInput(
-        cfEls.termSlider,
-        cfEls.termInput,
-        (val) => {
-          if (cfEls.termLabel)
-            cfEls.termLabel.textContent = `${parseInt(val, 10)} months`;
-        },
-        3,
-        36,
-        false
-      );
-
-      // Toggles
-      if (cfEls.toggleDaily) {
-        cfEls.toggleDaily.addEventListener("click", () => {
-          cfPaymentFrequency = "daily";
-          cfUpdateToggleUI();
-          cfUpdateSummary();
-        });
-      }
-      if (cfEls.toggleWeekly) {
-        cfEls.toggleWeekly.addEventListener("click", () => {
-          cfPaymentFrequency = "weekly";
-          cfUpdateToggleUI();
-          cfUpdateSummary();
-        });
-      }
-      if (cfEls.toggleMonthly) {
-        cfEls.toggleMonthly.addEventListener("click", () => {
-          cfPaymentFrequency = "monthly";
-          cfUpdateToggleUI();
-          cfUpdateSummary();
-        });
-      }
-
-      // Add offer
-      if (cfEls.addOffer) {
-        cfEls.addOffer.addEventListener("click", () => {
-          if (cfSavedOffers.length >= cfMaxAdditionalOffers) return;
-          const { amount, factor, term } = cfGetCurrentValues();
-          const offer = cfComputeOffer(
-            amount,
-            factor,
-            term,
-            cfPaymentFrequency
-          );
-          cfSavedOffers.push(offer);
-          cfRenderSavedOffers();
-        });
-      }
-
-      // Share link (prefills calculator with current values)
-      if (cfEls.shareLink) {
-        cfEls.shareLink.addEventListener("click", () => {
-          const { amount, factor, term } = cfGetCurrentValues();
-          const freq = cfPaymentFrequency;
-          const bizName = cfEls.bizName ? cfEls.bizName.value.trim() : "";
-
-          const url = new URL(window.location.href);
-          // Start from a clean query string each time
-          url.search = "";
-          url.hash = "";
-
-          url.searchParams.set("amount", String(amount));
-          url.searchParams.set("factor", String(factor.toFixed(2)));
-          url.searchParams.set("term", String(term));
-          url.searchParams.set("freq", freq);
-          if (bizName) {
-            url.searchParams.set("bizName", bizName);
-          }
-
-          // Persist any additional offers into the link
-          if (cfSavedOffers.length) {
-            const offersForUrl = cfSavedOffers.map((offer) => ({
-              a: offer.amount,
-              f: offer.factor,
-              t: offer.termMonths,
-              q: offer.frequency || freq,
-            }));
-            try {
-              const encoded = JSON.stringify(offersForUrl);
-              url.searchParams.set("offers", encoded);
-            } catch (err) {
-              console.error("Error stringifying offers for URL", err);
-            }
-          }
-
-          const textArea = document.createElement("textarea");
-          textArea.value = url.toString();
-          textArea.style.position = "fixed";
-          textArea.style.top = "0";
-          textArea.style.left = "0";
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-
-          try {
-            document.execCommand("copy");
-            const original = cfEls.shareLink.textContent;
-            cfEls.shareLink.textContent = "Link Copied";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(url)
+          .then(() => {
+            shareLinkButton.textContent = 'Link Copied!';
             setTimeout(() => {
-              cfEls.shareLink.textContent = original;
-            }, 1800);
-          } catch (err) {
-            console.error("Copy failed", err);
-          } finally {
-            document.body.removeChild(textArea);
-          }
-        });
+              shareLinkButton.innerHTML =
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/></svg><span>Copy Shareable Link</span>';
+            }, 1600);
+          })
+          .catch(() => {
+            alert(url);
+          });
+      } else {
+        alert(url);
       }
-
-      // Apply URL params and finalize
-      cfApplyUrlParams();
-      cfUpdateToggleUI();
-      cfUpdateSummary();
-      cfRenderSavedOffers();
     }
 
-    cfInitCalculator();
+    // --- Event listeners ---
+    amountSlider.addEventListener('input', syncAmountFromSlider);
+    amountInput.addEventListener('change', syncAmountFromInput);
+    amountInput.addEventListener('blur', syncAmountFromInput);
+
+    factorSlider.addEventListener('input', syncFactorFromSlider);
+    factorInput.addEventListener('change', syncFactorFromInput);
+    factorInput.addEventListener('blur', syncFactorFromInput);
+
+    termSlider.addEventListener('input', syncTermFromSlider);
+    termInput.addEventListener('change', syncTermFromInput);
+    termInput.addEventListener('blur', syncTermFromInput);
+
+    businessNameInput.addEventListener('input', updateBusinessName);
+
+    toggleDaily.addEventListener('click', () => setFrequency('daily'));
+    toggleWeekly.addEventListener('click', () => setFrequency('weekly'));
+    toggleMonthly.addEventListener('click', () => setFrequency('monthly'));
+
+    addOfferButton.addEventListener('click', handleAddOffer);
+    shareLinkButton.addEventListener('click', handleShareLink);
+
+    // --- Init ---
+    function initFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const a = parseInt(params.get('a') || '', 10);
+      const f = parseFloat(params.get('f') || '');
+      const t = parseInt(params.get('t') || '', 10);
+      const q = params.get('q');
+
+      if (!Number.isNaN(a)) {
+        state.amount = clamp(a, parseInt(amountSlider.min, 10), parseInt(amountSlider.max, 10));
+      }
+      if (!Number.isNaN(f)) {
+        state.factor = clamp(f, parseFloat(factorSlider.min), parseFloat(factorSlider.max));
+      }
+      if (!Number.isNaN(t)) {
+        state.termMonths = clamp(
+          t,
+          parseInt(termSlider.min, 10),
+          parseInt(termSlider.max, 10)
+        );
+      }
+      if (q === 'daily' || q === 'weekly' || q === 'monthly') {
+        state.frequency = q;
+      }
+
+      amountSlider.value = state.amount;
+      amountInput.value = state.amount.toLocaleString('en-US');
+
+      factorSlider.value = state.factor.toFixed(2);
+      factorInput.value = state.factor.toFixed(2);
+
+      termSlider.value = state.termMonths;
+      termInput.value = state.termMonths;
+
+      setFrequency(state.frequency);
+      refreshSummary();
+    }
+
+    initFromQuery();
   </script>
 </body>
 </html>
