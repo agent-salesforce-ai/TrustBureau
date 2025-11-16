@@ -7,12 +7,15 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       transition: background-color 0.2s;
+      background:
+        radial-gradient(circle at top left, rgba(148, 163, 184, 0.35), transparent 55%),
+        linear-gradient(to bottom, #e5e7eb, #f9fafb);
     }
 
     input[type=number]::-webkit-inner-spin-button,
@@ -48,29 +51,26 @@
 
     /* Light corporate theme tuned for Critical Financing */
     html.theme-corporate {
-      --bg-body: #f1f5f9;      /* soft slate background */
-      --bg-card: #ffffff;      /* primary card surface */
-      --bg-card-inner: #f8fafc;/* inner panels */
-      --bg-slider-track: #d1d5db;
+      --bg-body: #f3f4f6;      /* site light background */
+      --bg-card: #ffffff;      /* card surface */
+      --bg-card-inner: #f9fafb;/* inner panels */
+      --bg-slider-track: #e5e7eb;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
-      --border-primary: #cbd5e1; /* slightly stronger border */
-      --text-primary: #020617;
+      --border-primary: #e5e7eb;
+      --text-primary: #0f172a;
       --text-secondary: #0f172a;
-      --text-muted: #64748b;
-    }
-    html.theme-corporate body {
-      background-color: var(--bg-body);
+      --text-muted: #6b7280;
     }
     html.theme-corporate body {
       background-color: var(--bg-body);
     }
 
-    /* Critical Financing accent: navy + red */
+    /* Critical Financing accent using #396191 and #862022 */
     html.accent-critical {
-      --accent-color: #396191;        /* brand blue */
-      --accent-color-light: #4a75a6;  /* lighter blue */
-      --accent-color-dark: #2d4b70;   /* deeper blue hover */
+      --accent-color: #15235F;        /* slightly lighter brand navy */
+      --accent-color-light: #203271;  /* lighter navy */
+      --accent-color-dark: #0B184B;   /* original navy as hover */
       --accent-alt: #862022;          /* brand red accent */
       --accent-text-inverted: #ffffff;
       --accent-shadow: none;
@@ -80,10 +80,15 @@
     .card-bg {
       background-color: var(--bg-card);
       border-color: var(--border-primary);
+      box-shadow:
+        0 0 0 1px rgba(21, 35, 95, 0.3),        /* stronger inner ring */
+        0 12px 30px rgba(15, 23, 42, 0.2);       /* more pronounced lift */
     }
     .card-inner-bg {
       background-color: var(--bg-card-inner);
       border: 1px solid var(--border-primary);
+      box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.08);
     }
 
     .text-primary {
@@ -103,23 +108,26 @@
       background-color: var(--bg-slider-track);
     }
     .slider-thumb {
-      accent-color: var(--accent-color);
+      accent-color: var(--accent-alt); /* use brand red for slider handles */
     }
 
     .input-field {
-      background-color: var(--bg-input);
-      border-color: var(--border-primary);
-      color: var(--text-primary);
+      background-color: #ffffff;
+      border-radius: 0.75rem;
+      border: 1px solid #d1d5db;
+      color: #0f172a;
+      font-size: 0.9rem;
     }
     .input-field:focus,
     .input-field:focus-within {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px rgba(57, 97, 145, 0.3); /* #396191 */
+      border-color: #15235F; /* slightly lighter navy */
+      box-shadow: 0 0 0 1px rgba(21, 35, 95, 0.35);
+      background-color: #ffffff;
       outline: none;
     }
 
     .text-hero {
-      color: var(--accent-color);
+      color: #15235F; /* slightly lighter navy */
     }
 
     .toggle-inactive {
@@ -133,28 +141,26 @@
 
     .button-primary {
       background-color: var(--accent-color); /* brand blue */
-      color: var(--accent-text-inverted);
+      color: #ffffff;
       font-weight: 600;
-      border-radius: 0.75rem;
-      padding: 0.6rem 1.75rem;
-      border: 1px solid rgba(134, 32, 34, 0.7); /* #862022 subtle edge */
+      border-radius: 999px;
+      padding: 0.7rem 1.9rem;
+      border: 1px solid #2d4b70; /* darker blue edge */ /* red accent edge */
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(21, 35, 95, 0.25);
       transition:
-        background-color 0.15s ease,
-        box-shadow 0.15s ease,
-        transform 0.1s ease;
+        background-color 0.12s ease-out,
+        box-shadow 0.12s ease-out,
+        transform 0.12s ease-out;
     }
     .button-primary:hover {
       background-color: var(--accent-color-dark);
-      box-shadow:
-        0 0 0 1px rgba(57, 97, 145, 0.9),        /* blue ring */
-        0 6px 16px rgba(57, 97, 145, 0.5);       /* blue drop shadow */
       transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(21, 35, 95, 0.35);
     }
     .button-primary:active {
       transform: translateY(0);
-      box-shadow:
-        0 0 0 1px rgba(57, 97, 145, 0.9),
-        0 3px 10px rgba(57, 97, 145, 0.5);
+      box-shadow: 0 8px 18px rgba(21, 35, 95, 0.35);
     }
     .button-primary:disabled {
       background-color: var(--bg-slider-track);
@@ -167,38 +173,99 @@
       filter: none;
     }
     .brand-georgia {
-      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.18em;
       font-weight: 700;
       text-transform: uppercase;
     }
 
     .shell {
-      border-color: var(--accent-color);
-      border-width: 2px;
-      border-radius: 0.9rem;
+      position: relative;
+      border-radius: 1.5rem;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
       box-shadow:
-        0 0 0 1px rgba(57, 97, 145, 0.9),          /* tight blue ring (#396191) */
-        0 0 18px rgba(57, 97, 145, 0.85),           /* strong blue glow */
-        0 0 40px rgba(134, 32, 34, 0.45);           /* soft red halo (#862022) */
+        0 0 0 1px rgba(21, 35, 95, 0.8),         /* strong blue outline */
+        0 0 30px rgba(21, 35, 95, 0.95),         /* intense border glow */
+        0 0 80px rgba(21, 35, 95, 0.7),          /* wide blue halo */
+        0 30px 80px rgba(15, 23, 42, 0.5);        /* deep drop shadow */
+    }
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      border-radius: inherit;
+      background: radial-gradient(circle at top left, rgba(21, 35, 95, 0.18), transparent 55%);
+      z-index: -1;
+      pointer-events: none;
+    }
+      
+      /* Gradient emphasis for approved amount */
+    #summaryAmountOut {
+      color: #15235F; /* slightly lighter navy for approved amount */
+      display: inline-block;
+      letter-spacing: 0.03em;
+      /* very soft glow behind the amount */
+      text-shadow:
+        0 0 12px rgba(21, 35, 95, 0.22),   /* subtle navy halo */
+        0 3px 6px rgba(15, 23, 42, 0.16);  /* light depth under text */
+    }
+      /* CFI stacked logo styles */
+    .cfi-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .cfi-logo-top {
+      display: flex;
+      align-items: center; /* align visual centers like reference logo */
+      justify-content: center;
+      gap: 0.8rem; /* space between bars and CFI text */
+    }
+    .cfi-bars {
+      display: flex;
+      gap: 4px; /* spacing between red bars */
+    }
+    .cfi-bar {
+      width: 5px;
+      height: 28px; /* slightly shorter bars */
+      background: linear-gradient(180deg, #B22234 0%, #8B1A1D 100%);
+      border-radius: 2px;
+    }
+    .cfi-text {
+      font-size: 34px; /* slightly taller text like reference */
+      line-height: 0.98;
+      font-weight: 800;
+      letter-spacing: 0.06em; /* tracking similar to reference */
+      color: #15235F; /* slightly lighter navy */
+    }
+    .cfi-subtitle {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #6b7280;
     }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
 
-  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl p-4 md:p-6 space-y-4 border">
 
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
       <div class="flex flex-col items-center justify-center flex-shrink-0">
-        <img
-          src="https://static.wixstatic.com/media/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png/v1/fill/w_240,h_106,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png"
-          alt="Critical Financing Logo"
-          class="brand-logo h-16 w-auto"
-        />
-        <span class="brand-georgia text-primary text-sm mt-2 tracking-[0.28em]">
-          CRITICAL&nbsp;FINANCING
-        </span>
+        <div class="cfi-logo">
+          <div class="cfi-logo-top">
+            <div class="cfi-bars">
+              <div class="cfi-bar"></div>
+              <div class="cfi-bar"></div>
+              <div class="cfi-bar"></div>
+            </div>
+            <div class="cfi-text">CFI</div>
+          </div>
+          <div class="cfi-subtitle">CRITICAL FINANCING</div>
+        </div>
       </div>
       <div id="themeControls" class="flex items-center justify-center">
         <button
@@ -893,7 +960,7 @@
       initializeFromURL();
       applyTheme();
       if (elements.themeSelector) {
-      elements.themeSelector.value = currentTheme;
+        elements.themeSelector.value = currentTheme;
       }
 
       syncInputs(
@@ -951,10 +1018,10 @@
       if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
       if (elements.themeSelector) {
-      elements.themeSelector.addEventListener('change', (e) => {
-        currentTheme = e.target.value;
-        applyTheme();
-      });
+        elements.themeSelector.addEventListener('change', (e) => {
+          currentTheme = e.target.value;
+          applyTheme();
+        });
       }
 
       if (elements.addOfferButton) {
@@ -1031,9 +1098,4 @@
       updateAddOfferButtonState();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeCalculator();
-    });
-  </script>
-</body>
-</html>
+  
