@@ -179,10 +179,6 @@
       letter-spacing: 0.08em;
       font-weight: 700;
     }
-    .saved-offer-active {
-      outline: 2px solid var(--accent-color);
-      outline-offset: 2px;
-    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
@@ -445,7 +441,6 @@
     let amountSliderMax = 1000000;
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
-    let activeOfferIndex = -1;
     let isApprovalView = false;
 
     // Helper to keep JS cap and slider.max in sync
@@ -554,7 +549,7 @@
         .map((offer, index) => {
           const labelIndex = index + 2; // Offers 2 and 3
           return `
-            <div class="card-bg rounded-lg border border-primary p-3 space-y-3 saved-offer-card cursor-pointer hover:border-accent${index === activeOfferIndex ? ' saved-offer-active' : ''}" data-offer-index="${index}">
+            <div class="card-bg rounded-lg border border-primary p-3 space-y-3 saved-offer-card cursor-pointer hover:border-accent" data-offer-index="${index}">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
                 <span class="text-[11px] text-muted">${offer.paymentLabel}</span>
@@ -588,7 +583,7 @@
 
       elements.savedOffersContainer.innerHTML = cardsHtml;
 
-      // Make saved offer cards clickable to load into the main calculator
+      // Make saved offer cards clickable to load into the main calculator (snapshot, not edit-in-place)
       const savedCards = elements.savedOffersContainer.querySelectorAll('.saved-offer-card');
       savedCards.forEach((card) => {
         const idxAttr = card.getAttribute('data-offer-index');
@@ -596,7 +591,6 @@
         if (!Number.isNaN(idx) && idx >= 0) {
           card.addEventListener('click', () => {
             const offer = savedOffers[idx];
-            activeOfferIndex = idx;
             loadOfferIntoCalculator(offer);
           });
         }
@@ -612,9 +606,7 @@
     function handleAddOffer() {
       if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
       const offer = getCurrentOffer();
-      const index = savedOffers.length;
-      savedOffers.push(offer);
-      activeOfferIndex = index;
+      savedOffers.push({ ...offer }); // snapshot
       renderSavedOffers();
       updateAddOfferButtonState();
     }
@@ -828,11 +820,6 @@
         elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
 
         updateRepDisplay();
-
-        if (activeOfferIndex >= 0 && activeOfferIndex < savedOffers.length) {
-          savedOffers[activeOfferIndex] = offer;
-          renderSavedOffers();
-        }
       } catch (e) {
         console.error('Calculator error:', e);
       }
