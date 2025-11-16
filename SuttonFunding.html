@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Sutton Funding-branded version with business name, rep settings, and additional offers persisted in approval links -->
+<!-- Sutton Funding-branded version with business name, rep settings, and functional sliders for all offers -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -203,7 +203,6 @@
           Settings
         </button>
       </div>
-
     </div>
     <!-- END HEADER -->
 
@@ -245,7 +244,6 @@
 
       <!-- Sliders -->
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
-
         <div id="amountContainer" class="space-y-1">
           <label for="calcAmount" class="block text-xs font-semibold text-muted">Amount You Get ($)</label>
           <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
@@ -368,7 +366,7 @@
         </button>
         <button id="shareLinkButton" class="button-primary flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367-2.684z" />
           </svg>
           Share Approval Link
         </button>
@@ -441,7 +439,6 @@
     let savedOffers = [];
     let isApprovalView = false;
 
-    // Helper to keep JS cap and slider.max in sync
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
       if (elements.calcAmountSlider) {
@@ -506,34 +503,10 @@
       return computeOffer(amount, factor, termMonths, paymentFrequency);
     }
 
-    function loadOfferIntoCalculator(offer) {
-      if (!offer) return;
-
-      if (isApprovalView) {
-        setAmountSliderMax(offer.amount); // cap + update DOM max
-      }
-
-      // Update sliders and inputs from a saved offer
-      elements.calcAmountSlider.value = offer.amount;
-      elements.calcAmountInput.value = formatCurrency(offer.amount);
-
-      elements.calcFactorSlider.value = offer.factor;
-      elements.calcFactorInput.value = offer.factor.toFixed(2);
-
-      elements.calcTermSlider.value = offer.termMonths;
-      elements.calcTermInput.value = offer.termMonths.toString();
-
-      paymentFrequency = offer.frequency || 'daily';
-      updatePaymentToggleUI();
-      runCalculator();
-    }
-
     function renderSavedOffers() {
       if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
 
       const used = savedOffers.length;
-      const max = MAX_ADDITIONAL_OFFERS;
-
       if (used === 0) {
         elements.savedOffersSection.classList.add('hidden');
         elements.savedOffersContainer.innerHTML = '';
@@ -542,58 +515,79 @@
 
       elements.savedOffersSection.classList.remove('hidden');
 
-      const cardsHtml = savedOffers
-        .map((offer, index) => {
-          const labelIndex = index + 2; // Offers 2 and 3
-          return `
-            <div class="card-bg rounded-lg border border-primary p-3 space-y-3 saved-offer-card" data-offer-index="${index}">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
-                <span class="text-[11px] text-muted">${offer.paymentLabel}</span>
+      const cardsHtml = savedOffers.map((offer, index) => {
+        const labelIndex = index + 2; // Offer 2 and 3
+        return `
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3" data-offer-index="${index}">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+              <span class="text-[11px] text-muted" data-role="label">${offer.paymentLabel}</span>
+            </div>
+            <div class="mt-2 mb-1">
+              <input type="range"
+                     class="w-full h-1.5 slider-track slider-thumb saved-offer-slider"
+                     min="5000"
+                     max="${offer.amount}"
+                     value="${offer.amount}"
+                     data-offer-index="${index}" />
+            </div>
+            <div class="text-center">
+              <span class="text-[11px] font-semibold text-muted block">You Get</span>
+              <span class="text-2xl font-semibold text-hero block" data-role="amount">${formatCurrency(offer.amount)}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Factor</span>
+                <span class="text-sm font-semibold text-primary block" data-role="factor">${offer.factor.toFixed(2)}x</span>
               </div>
-              <div class="text-center">
-                <span class="text-[11px] font-semibold text-muted block">You Get</span>
-                <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Term</span>
+                <span class="text-sm font-semibold text-primary block" data-role="term">${offer.termMonths} mo</span>
               </div>
-              <div class="grid grid-cols-2 gap-3 text-center text-xs">
-                <div>
-                  <span class="text-[11px] font-semibold text-muted block">Factor</span>
-                  <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
-                </div>
-                <div>
-                  <span class="text-[11px] font-semibold text-muted block">Term</span>
-                  <span class="text-sm font-semibold text-primary block">${offer.termMonths} mo</span>
-                </div>
-                <div>
-                  <span class="text-[11px] font-semibold text-muted block">Payback</span>
-                  <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span>
-                </div>
-                <div>
-                  <span class="text-[11px] font-semibold text-muted block">Payment</span>
-                  <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
-                </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Payback</span>
+                <span class="text-sm font-semibold text-primary block" data-role="payback">${formatCurrency(offer.totalPayback)}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block" data-role="payment-label">${offer.paymentLabel}</span>
+                <span class="text-sm font-semibold text-primary block" data-role="payment">${formatCurrency(offer.payment)}</span>
               </div>
             </div>
-          `;
-        })
-        .join('');
+          </div>
+        `;
+      }).join('');
 
       elements.savedOffersContainer.innerHTML = cardsHtml;
 
-      // In rep view, allow clicking saved offers to load into slider for comparison
-      if (!isApprovalView) {
-        const savedCards = elements.savedOffersContainer.querySelectorAll('.saved-offer-card');
-        savedCards.forEach((card) => {
-          const idxAttr = card.getAttribute('data-offer-index');
+      // Make each offer's slider functional for its own card (what-if, does not update others)
+      const sliders = elements.savedOffersContainer.querySelectorAll('.saved-offer-slider');
+      sliders.forEach((slider) => {
+        slider.addEventListener('input', () => {
+          const idxAttr = slider.getAttribute('data-offer-index');
           const idx = idxAttr != null ? parseInt(idxAttr, 10) : -1;
-          if (!Number.isNaN(idx) && idx >= 0) {
-            card.addEventListener('click', () => {
-              const offer = savedOffers[idx];
-              loadOfferIntoCalculator(offer);
-            });
-          }
+          if (Number.isNaN(idx) || idx < 0 || idx >= savedOffers.length) return;
+
+          const base = savedOffers[idx];
+          const newAmount = parseFloat(slider.value);
+          const updated = computeOffer(newAmount, base.factor, base.termMonths, base.frequency);
+
+          const card = slider.closest('[data-offer-index]');
+          if (!card) return;
+          const amtEl = card.querySelector('[data-role="amount"]');
+          const factorEl = card.querySelector('[data-role="factor"]');
+          const termEl = card.querySelector('[data-role="term"]');
+          const paybackEl = card.querySelector('[data-role="payback"]');
+          const payLabelEl = card.querySelector('[data-role="payment-label"]');
+          const paymentEl = card.querySelector('[data-role="payment"]');
+
+          if (amtEl) amtEl.textContent = formatCurrency(updated.amount);
+          if (factorEl) factorEl.textContent = `${updated.factor.toFixed(2)}x`;
+          if (termEl) termEl.textContent = `${updated.termMonths} mo`;
+          if (paybackEl) paybackEl.textContent = formatCurrency(updated.totalPayback);
+          if (payLabelEl) payLabelEl.textContent = updated.paymentLabel;
+          if (paymentEl) paymentEl.textContent = formatCurrency(updated.payment);
         });
-      }
+      });
     }
 
     function updateAddOfferButtonState() {
@@ -605,7 +599,7 @@
     function handleAddOffer() {
       if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
       const offer = getCurrentOffer();
-      savedOffers.push({ ...offer }); // snapshot
+      savedOffers.push({ ...offer });
       renderSavedOffers();
       updateAddOfferButtonState();
     }
@@ -711,11 +705,9 @@
 
       isApprovalView = (viewMode === 'approval');
 
-      // Sutton defaults: dark + gold
       currentTheme = paramTheme || 'theme-slate';
       currentAccent = 'accent-sutton';
 
-      // In approval links, cap the primary amount at its approved value
       if (isApprovalView) {
         setAmountSliderMax(amount);
       } else {
@@ -727,18 +719,10 @@
       elements.calcFactorSlider.value = factor;
       elements.calcTermSlider.value = term;
 
-      if (elements.businessNameInput) {
-        elements.businessNameInput.value = businessNameParam;
-      }
-      if (elements.repNameInput) {
-        elements.repNameInput.value = repNameParam;
-      }
-      if (elements.repEmailInput) {
-        elements.repEmailInput.value = repEmailParam;
-      }
-      if (elements.repPhoneInput) {
-        elements.repPhoneInput.value = repPhoneParam;
-      }
+      if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+      if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+      if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+      if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
 
       paymentFrequency = freq || 'daily';
 
@@ -760,49 +744,31 @@
           }
         } catch (err) {
           console.error('Error parsing offers from URL', err);
-          savedOffers = [];
         }
       }
 
       if (viewMode === 'approval') {
-        // Client sees a static approval, not controls
-
-        // Hide sliders and toggles
+        // Lock calculator controls except main amount slider
         elements.factorContainer.style.display = 'none';
         elements.termContainer.style.display = 'none';
         elements.toggleContainer.style.display = 'none';
 
-        // Hide amount slider + input entirely on client side
-        if (elements.amountContainer) {
-          elements.amountContainer.style.display = 'none';
-        }
-        if (elements.calcAmountSlider) {
-          elements.calcAmountSlider.disabled = true;
-        }
-        if (elements.calcAmountInput) {
-          elements.calcAmountInput.readOnly = true;
-        }
+        // Main amount slider stays visible but is capped by amountSliderMax
+        // Keep calcAmountSlider enabled so client can move it within the cap
 
-        // Business name is display-only on client side
-        if (elements.businessNameContainer) {
-          elements.businessNameContainer.style.display = 'none';
-        }
-        if (elements.businessNameInput) {
-          elements.businessNameInput.disabled = true;
-        }
+        // Hide editable Business Name field
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+        if (elements.businessNameInput) elements.businessNameInput.disabled = true;
 
-        // Hide theme/rep controls
+        // Hide theme/settings + buttons
         elements.themeControls.style.display = 'none';
         if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
 
-        // Center header
+        elements.buttonContainer.style.display = 'none';
+
         elements.headerContainer.classList.remove('justify-between');
         elements.headerContainer.classList.add('justify-center');
-
-        // Hide bottom buttons
-        elements.buttonContainer.style.display = 'none';
-        // savedOffersSection remains visible so additional offers show in approval view
       }
     }
 
@@ -873,16 +839,9 @@
           elements.repSettingsPanel.classList.toggle('hidden');
         });
       }
-
-      if (elements.repNameInput) {
-        elements.repNameInput.addEventListener('input', updateRepDisplay);
-      }
-      if (elements.repEmailInput) {
-        elements.repEmailInput.addEventListener('input', updateRepDisplay);
-      }
-      if (elements.repPhoneInput) {
-        elements.repPhoneInput.addEventListener('input', updateRepDisplay);
-      }
+      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
       elements.themeSelector.addEventListener('change', (e) => {
         currentTheme = e.target.value;
@@ -907,7 +866,6 @@
         const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
         const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
 
-        // Persist additional offers into the link (only minimal fields)
         const offersForUrl = savedOffers.map((offer) => ({
           a: offer.amount,
           f: offer.factor,
