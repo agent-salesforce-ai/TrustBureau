@@ -1,460 +1,481 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth theme-corporate accent-critical">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Critical Financing | Offer Builder</title>
+  <title>Critical Financing | Offer Calculator</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Poppins (matches your Critical Financing page) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 
   <style>
-    :root {
-      /* Backgrounds */
-      --bg-body: #f4f6fb;
-      --bg-card: #ffffff;
-      --bg-card-inner: #f8fafc;
-
-      /* Borders / lines */
-      --border-primary: #e5e7eb;
-
-      /* Brand colors (red / white / blue) */
-      --brand-navy: #132347;
-      --brand-blue: #264f9c;
-      --brand-red: #c53030;
-
-      /* Text */
-      --text-primary: #111827;
-      --text-secondary: #4b5563;
-      --text-muted: #9ca3af;
-
-      /* Slider track */
-      --slider-track: #e5e7eb;
-      --slider-thumb: #132347;
-
-      /* Buttons */
-      --btn-bg: #132347;
-      --btn-bg-hover: #1d3162;
-      --btn-text: #ffffff;
-
-      /* Frequency toggle */
-      --freq-bg: #ffffff;
-      --freq-border: #e5e7eb;
-      --freq-active-bg: #132347;
-      --freq-active-text: #ffffff;
-      --freq-inactive-bg: #ffffff;
-      --freq-inactive-text: #4b5563;
-
-      /* Live preview pill green */
-      --live-green: #22c55e;
-      --live-green-soft: rgba(34, 197, 94, 0.15);
-    }
-
     body {
-      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        sans-serif;
-      background-color: var(--bg-body);
-      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.2s;
     }
 
-    .shell {
-      background-color: var(--bg-card);
-      border-radius: 1.75rem;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
-    }
-
-    .card-inner {
-      background-color: var(--bg-card-inner);
-      border-radius: 1.5rem;
-      border: 1px solid var(--border-primary);
-    }
-
-    .field-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
-    .field-input {
-      border-radius: 0.9rem;
-      border: 1px solid var(--border-primary);
-      background-color: #ffffff;
-      color: var(--text-primary);
-      font-size: 0.875rem;
-    }
-
-    .field-input:focus {
-      border-color: var(--brand-blue);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
-      outline: none;
-    }
-
-    /* Sliders */
-    .slider-track {
-      width: 100%;
-      height: 4px;
-      border-radius: 999px;
-      background-color: var(--slider-track);
-      cursor: pointer;
-    }
-
-    input[type='range'].slider-track {
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    input[type='range'].slider-track::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 999px;
-      background-color: var(--slider-thumb);
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 0 2px rgba(19, 35, 71, 0.3);
-      cursor: pointer;
-    }
-
-    input[type='range'].slider-track::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 999px;
-      background-color: var(--slider-thumb);
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 0 2px rgba(19, 35, 71, 0.3);
-      cursor: pointer;
-    }
-
-    .freq-toggle {
-      border-radius: 999px;
-      border: 1px solid var(--freq-border);
-      background-color: var(--freq-bg);
-      padding: 4px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .freq-btn {
-      border-radius: 999px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      background-color: transparent;
-      color: var(--freq-inactive-text);
-      transition: background-color 0.15s ease, color 0.15s ease;
-    }
-
-    .freq-btn.active {
-      background-color: var(--freq-active-bg);
-      color: var(--freq-active-text);
-    }
-
-    .primary-btn {
-      border-radius: 999px;
-      background-color: var(--btn-bg);
-      color: var(--btn-text);
-      font-size: 0.875rem;
-      font-weight: 600;
-      border: 1px solid rgba(15, 23, 42, 0.05);
-      padding: 0.7rem 1.6rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-    }
-
-    .primary-btn:hover {
-      background-color: var(--btn-bg-hover);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
-      transform: translateY(-1px);
-    }
-
-    .primary-btn:disabled {
-      background-color: #e5e7eb;
-      color: var(--text-muted);
-      box-shadow: none;
-      transform: none;
-      cursor: not-allowed;
-    }
-
-    .hero-amount {
-      color: var(--brand-navy);
-      letter-spacing: -0.02em;
-      text-shadow: 0 0 16px rgba(15, 23, 42, 0.06);
-    }
-
-    .live-pill {
-      border-radius: 999px;
-      background-color: #ffffff;
-      border: 1px solid var(--border-primary);
-      padding: 0.25rem 0.9rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
-    }
-
-    .live-dot-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .live-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background-color: var(--live-green);
-      box-shadow: 0 0 0 4px var(--live-green-soft);
-    }
-
-    /* Saved offer cards */
-    .saved-card {
-      border-radius: 1rem;
-      border: 1px solid var(--border-primary);
-      background-color: #ffffff;
-    }
-
-    /* Remove number spinners */
-    input[type='number']::-webkit-inner-spin-button,
-    input[type='number']::-webkit-outer-spin-button {
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    input[type='number'] {
+    input[type=number] {
       -moz-appearance: textfield;
+    }
+
+    .input-icon {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Base themes (dark + light) */
+    html.theme-slate {
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    html.theme-slate body {
+      background-color: var(--bg-body);
+    }
+
+    /* Light corporate theme tuned for Critical Financing */
+    html.theme-corporate {
+      --bg-body: #f3f4f6;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+      --bg-slider-track: #e5e7eb;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #e5e7eb;
+      --text-primary: #0b1120;
+      --text-secondary: #111827;
+      --text-muted: #6b7280;
+    }
+    html.theme-corporate body {
+      background-color: var(--bg-body);
+    }
+
+    /* Critical Financing accent: navy + red */
+    html.accent-critical {
+      --accent-color: #0b184b;         /* Navy (sliders, focus) */
+      --accent-color-light: #b91c1c;   /* Red (buttons) */
+      --accent-color-dark: #7f1d1d;    /* Darker red hover */
+      --accent-text-inverted: #ffffff;
+      --accent-shadow: 0 0 18px rgba(11, 24, 75, 0.7);
+      --button-text-color: #ffffff;
+    }
+
+    .card-bg {
+      background-color: var(--bg-card);
+      border-color: var(--border-primary);
+    }
+    .card-inner-bg {
+      background-color: var(--bg-card-inner);
+      border: 1px solid var(--border-primary);
+    }
+
+    .text-primary {
+      color: var(--text-primary);
+    }
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+    .text-muted {
+      color: var(--text-muted);
+    }
+    .border-primary {
+      border-color: var(--border-primary);
+    }
+
+    .slider-track {
+      background-color: var(--bg-slider-track);
+    }
+    .slider-thumb {
+      accent-color: var(--accent-color);
+    }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(11, 24, 75, 0.25);
+      outline: none;
+    }
+
+    .text-hero {
+      color: var(--accent-color);
+      text-shadow: var(--accent-shadow);
+    }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-secondary);
+    }
+    .toggle-active {
+      background-color: var(--accent-color);
+      color: #f9fafb;
+    }
+
+    .button-primary {
+      background-color: var(--accent-color-light); /* Red */
+      color: var(--accent-text-inverted);
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.6rem 1.75rem;
+      border: 1px solid rgba(185, 28, 28, 0.85);
+      transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.1s ease;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-dark);
+      box-shadow:
+        0 0 0 1px rgba(185, 28, 28, 0.75),
+        0 0 18px rgba(11, 24, 75, 0.6);
+      transform: translateY(-1px);
+    }
+    .button-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 0 1px rgba(185, 28, 28, 0.75),
+        0 0 10px rgba(11, 24, 75, 0.5);
+    }
+    .button-primary:disabled {
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .brand-logo {
+      filter: drop-shadow(0 0 16px rgba(11, 24, 75, 0.45));
+    }
+    .brand-georgia {
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .shell {
+      border-color: var(--accent-color);
+      border-width: 2px;
+      box-shadow:
+        0 0 0 3px rgba(11, 24, 75, 0.9),    /* inner navy ring */
+        0 0 25px rgba(185, 28, 28, 0.7),    /* red mid-glow */
+        0 0 55px rgba(15, 23, 42, 0.75),    /* deep navy outer */
+        0 0 90px rgba(59, 130, 246, 0.55);  /* blue halo */
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center px-3 py-8">
-  <div class="w-full max-w-xl shell px-5 py-6 md:px-8 md:py-8 space-y-6">
+<body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
+
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+
     <!-- HEADER -->
-    <header class="flex flex-col items-center gap-3 pb-4 border-b border-slate-200">
-      <div class="flex flex-col items-center">
-        <!-- Swap src for your actual Critical Financing logo -->
+    <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
+      <div class="flex flex-col items-center justify-center flex-shrink-0">
         <img
           src="https://static.wixstatic.com/media/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png/v1/fill/w_240,h_106,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/1f882d_99935d5cbc724087b0185595d80ae6a8~mv2.png"
-          alt="Critical Financing"
-          class="h-10 w-auto"
+          alt="Critical Financing Logo"
+          class="brand-logo h-16 w-auto"
         />
-        <div
-          class="mt-2 text-[0.7rem] tracking-[0.24em] uppercase text-slate-500 font-semibold"
+        <span class="brand-georgia text-primary text-sm mt-2 tracking-[0.28em]">
+          CRITICAL&nbsp;FINANCING
+        </span>
+      </div>
+      <div id="themeControls" class="flex items-center justify-center">
+        <button
+          id="repSettingsToggle"
+          type="button"
+          class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1"
         >
-          Offer Builder
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </svg>
+          Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- REP SETTINGS PANEL -->
+    <div
+      id="repSettingsPanel"
+      class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden"
+    >
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Rep Settings</span>
+        <span class="text-[11px] text-muted">Shown on client approval view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        <div>
+          <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
+          <select
+            id="themeSelector"
+            class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field"
+          >
+            <option value="theme-corporate">Light Theme</option>
+            <option value="theme-slate">Dark Theme</option>
+          </select>
+        </div>
+        <div>
+          <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
+          <input
+            id="repNameInput"
+            type="text"
+            class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+            placeholder="Funding Specialist Name"
+          />
+        </div>
+        <div>
+          <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
+          <input
+            id="repEmailInput"
+            type="email"
+            class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+            placeholder="you@criticalfi.com"
+          />
+        </div>
+        <div>
+          <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
+          <input
+            id="repPhoneInput"
+            type="tel"
+            class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+            placeholder="(555) 123-4567"
+          />
         </div>
       </div>
-      <div class="live-pill">
-        <span class="live-dot-wrap">
-          <span class="live-dot"></span>
-        </span>
-        <span>Live Preview</span>
-      </div>
-    </header>
+    </div>
 
-    <!-- INPUT CARD -->
-    <section class="card-inner px-4 py-4 md:px-5 md:py-5 space-y-4">
-      <!-- Business name -->
-      <div class="space-y-1">
-        <label for="businessNameInput" class="field-label">Business Name (optional)</label>
+    <!-- OFFER CALCULATOR -->
+    <div id="calculatorInputs" class="space-y-4 pt-2">
+      <div id="businessNameContainer" class="px-1 mt-2">
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+          Business Name
+        </label>
         <input
           id="businessNameInput"
           type="text"
-          class="field-input w-full px-3 py-2"
+          class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
           placeholder="e.g., Acme Holdings LLC"
         />
       </div>
 
-      <!-- Amount -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="field-label">Amount You Get</label>
-          <span id="amountMaxLabel" class="text-[0.7rem] text-muted"></span>
-        </div>
-        <input
-          id="calcAmountSlider"
-          type="range"
-          min="5000"
-          max="1000000"
-          step="1000"
-          value="50000"
-          class="slider-track"
-        />
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">$</span>
+      <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
+        <div id="amountContainer" class="space-y-1">
+          <label for="calcAmount" class="block text-xs font-semibold text-muted">
+            Amount You Get ($)
+          </label>
           <input
-            id="calcAmountInput"
-            class="field-input w-full pl-7 pr-3 py-2"
-            inputmode="numeric"
+            id="calcAmountSlider"
+            type="range"
+            min="5000"
+            max="1000000"
+            step="1000"
+            value="50000"
+            class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2"
           />
-        </div>
-      </div>
-
-      <!-- Factor -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="field-label">Factor Rate</label>
-          <span id="factorMaxLabel" class="text-[0.7rem] text-muted"></span>
-        </div>
-        <input
-          id="calcFactorSlider"
-          type="range"
-          min="1.1"
-          max="1.5"
-          step="0.01"
-          value="1.25"
-          class="slider-track"
-        />
-        <div class="relative">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
-          <input
-            id="calcFactorInput"
-            type="number"
-            step="0.01"
-            class="field-input w-full pl-8 pr-3 py-2"
-          />
-        </div>
-      </div>
-
-      <!-- Term -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="field-label">Term (Months)</label>
-          <span id="termMaxLabel" class="text-[0.7rem] text-muted"></span>
-        </div>
-        <input
-          id="calcTermSlider"
-          type="range"
-          min="3"
-          max="24"
-          step="1"
-          value="12"
-          class="slider-track"
-        />
-        <div class="relative">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-sm">$</span>
+            <input
+              id="calcAmountInput"
+              inputmode="numeric"
+              class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field"
             />
-          </svg>
+          </div>
+        </div>
+
+        <div id="factorContainer" class="space-y-1">
+          <label for="calcFactor" class="block text-xs font-semibold text-muted">
+            Factor Rate
+          </label>
           <input
-            id="calcTermInput"
-            type="number"
-            step="1"
-            class="field-input w-full pl-8 pr-3 py-2"
+            id="calcFactorSlider"
+            type="range"
+            min="1.1"
+            max="1.5"
+            step="0.01"
+            value="1.25"
+            class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb"
           />
+          <div class="relative group">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 absolute left-3 input-icon text-muted"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+            <input
+              id="calcFactorInput"
+              type="number"
+              step="0.01"
+              class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field"
+            />
+          </div>
+        </div>
+
+        <div id="termContainer" class="space-y-1">
+          <label for="calcTerm" class="block text-xs font-semibold text-muted">
+            Term (Months)
+          </label>
+          <input
+            id="calcTermSlider"
+            type="range"
+            min="3"
+            max="24"
+            step="1"
+            value="6"
+            class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb"
+          />
+          <div class="relative group">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 absolute left-3 input-icon text-muted"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            </svg>
+            <input
+              id="calcTermInput"
+              type="number"
+              step="1"
+              class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field"
+            />
+          </div>
         </div>
       </div>
 
-      <!-- Frequency -->
-      <div class="flex justify-center pt-1">
-        <div class="freq-toggle">
-          <button id="toggleDaily" class="freq-btn active" type="button">Daily</button>
-          <button id="toggleWeekly" class="freq-btn" type="button">Weekly</button>
-          <button id="toggleMonthly" class="freq-btn" type="button">Monthly</button>
-        </div>
+      <div id="toggleContainer" class="flex items-center justify-center space-x-2">
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Daily
+        </button>
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Weekly
+        </button>
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Monthly
+        </button>
       </div>
-    </section>
+    </div>
 
-    <!-- SUMMARY CARD -->
-    <section class="rounded-2xl border border-slate-200 bg-white px-4 py-5 md:px-6 md:py-6">
-      <div class="text-center space-y-1">
+    <!-- OFFER 1 CARD -->
+    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
+      <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
+        <h4 class="text-sm font-semibold text-secondary">
+          Offer 1 – Your Approved Terms
+        </h4>
+      </div>
+      <div class="text-center py-6">
         <span
           id="businessNameDisplay"
-          class="text-xs font-semibold text-slate-500 tracking-wide hidden"
+          class="text-sm font-semibold text-primary block mb-1 hidden"
         ></span>
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-[0.16em]">
-          You get
-        </div>
-        <div
+        <span class="text-sm font-semibold text-muted block">You Get</span>
+        <span
           id="summaryAmountOut"
-          class="hero-amount text-4xl md:text-5xl font-semibold mt-1 mb-1"
+          class="text-5xl font-semibold block my-2 text-hero"
         >
           $50,000
-        </div>
-        <div class="text-sm text-slate-600">
-          Total payback:
-          <span id="summaryPaybackOut" class="font-semibold text-slate-800"></span>
-        </div>
+        </span>
+        <span class="text-base font-medium text-secondary block">
+          Total Payback:
+          <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
+        </span>
       </div>
-
-      <div class="mt-5 border-t border-slate-200 pt-4">
-        <div class="grid grid-cols-2 gap-4 text-center">
-          <div class="space-y-1">
-            <div class="field-label">Factor Rate</div>
-            <div id="summaryFactorOut" class="text-lg font-semibold text-slate-900"></div>
+      <div class="flex justify-center items-center border-b border-primary pb-2">
+        <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
+      </div>
+      <div class="pt-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Factor Rate</span>
+            <span
+              id="summaryFactorOut"
+              class="text-xl font-semibold text-primary block"
+            ></span>
           </div>
-          <div class="space-y-1">
-            <div class="field-label">Term</div>
-            <div id="summaryTermOut" class="text-lg font-semibold text-slate-900"></div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Term</span>
+            <span
+              id="summaryTermOut"
+              class="text-xl font-semibold text-primary block"
+            ></span>
           </div>
-          <div class="space-y-1">
-            <div class="field-label">Total Cost of Funds</div>
-            <div id="summaryCostOut" class="text-lg font-semibold text-slate-900"></div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Total Cost of Funds</span>
+            <span
+              id="summaryCostOut"
+              class="text-xl font-semibold text-primary block"
+            ></span>
           </div>
-          <div class="space-y-1">
-            <div id="summaryPaymentLabel" class="field-label">Est. Daily Payment</div>
-            <div
+          <div class="text-center">
+            <span
+              id="summaryPaymentLabel"
+              class="text-xs font-semibold text-muted block"
+            >
+              Est. Daily Payment
+            </span>
+            <span
               id="summaryPaymentValue"
-              class="text-lg font-semibold text-slate-900"
-            ></div>
+              class="text-xl font-semibold text-primary block"
+            ></span>
           </div>
         </div>
       </div>
-    </section>
+      <div
+        id="repContactBlock"
+        class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden"
+      >
+        <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
+        <div id="repNameDisplay" class="font-medium"></div>
+        <div id="repEmailDisplay"></div>
+        <div id="repPhoneDisplay"></div>
+      </div>
+    </div>
 
     <!-- ADDITIONAL OFFERS -->
-    <section
+    <div
       id="savedOffersSection"
-      class="rounded-2xl border border-slate-200 bg-white px-4 py-4 md:px-5 md:py-5 hidden"
+      class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden"
     >
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-slate-700">Additional Offers</h3>
+      <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
+        <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
       </div>
-      <div id="savedOffersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </section>
+      <div
+        id="savedOffersContainer"
+        class="grid grid-cols-1 md:grid-cols-2 gap-4"
+      ></div>
+    </div>
 
     <!-- BUTTONS -->
-    <section class="pt-1 border-t border-slate-200 mt-2">
-      <div class="flex flex-col sm:flex-row justify-center gap-3 pt-4">
-        <button id="addOfferButton" class="primary-btn w-full sm:w-auto" type="button">
+    <div id="buttonContainer" class="pt-4 border-t border-primary">
+      <div class="relative flex justify-center gap-3 flex-wrap">
+        <button id="addOfferButton" class="button-primary flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -463,11 +484,12 @@
             stroke-width="2"
             stroke="currentColor"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v16m8-8H4" />
           </svg>
-          <span>+ Add Offer</span>
+          Add Offer
         </button>
-        <button id="shareLinkButton" class="primary-btn w-full sm:w-auto" type="button">
+        <button id="shareLinkButton" class="button-primary flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -476,381 +498,533 @@
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
           </svg>
-          <span>Copy Shareable Link</span>
+          Share Approval Link
         </button>
       </div>
-    </section>
+    </div>
+
   </div>
 
   <script>
-    // --- Utility functions ---
-    function formatCurrency(num) {
-      if (!isFinite(num)) return '$0';
-      return num.toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 0,
-      });
-    }
-
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
-    }
-
-    // --- Elements ---
-    const amountSlider = document.getElementById('calcAmountSlider');
-    const amountInput = document.getElementById('calcAmountInput');
-    const factorSlider = document.getElementById('calcFactorSlider');
-    const factorInput = document.getElementById('calcFactorInput');
-    const termSlider = document.getElementById('calcTermSlider');
-    const termInput = document.getElementById('calcTermInput');
-
-    const amountMaxLabel = document.getElementById('amountMaxLabel');
-    const factorMaxLabel = document.getElementById('factorMaxLabel');
-    const termMaxLabel = document.getElementById('termMaxLabel');
-
-    const businessNameInput = document.getElementById('businessNameInput');
-    const businessNameDisplay = document.getElementById('businessNameDisplay');
-
-    const summaryAmountOut = document.getElementById('summaryAmountOut');
-    const summaryPaybackOut = document.getElementById('summaryPaybackOut');
-    const summaryFactorOut = document.getElementById('summaryFactorOut');
-    const summaryTermOut = document.getElementById('summaryTermOut');
-    const summaryCostOut = document.getElementById('summaryCostOut');
-    const summaryPaymentLabel = document.getElementById('summaryPaymentLabel');
-    const summaryPaymentValue = document.getElementById('summaryPaymentValue');
-
-    const toggleDaily = document.getElementById('toggleDaily');
-    const toggleWeekly = document.getElementById('toggleWeekly');
-    const toggleMonthly = document.getElementById('toggleMonthly');
-
-    const addOfferButton = document.getElementById('addOfferButton');
-    const shareLinkButton = document.getElementById('shareLinkButton');
-    const savedOffersSection = document.getElementById('savedOffersSection');
-    const savedOffersContainer = document.getElementById('savedOffersContainer');
-
-    // State
-    const state = {
-      amount: parseInt(amountSlider.value, 10),
-      factor: parseFloat(factorSlider.value),
-      termMonths: parseInt(termSlider.value, 10),
-      frequency: 'daily',
-      savedOffers: [],
+    const elements = {
+      calcAmountSlider: document.getElementById('calcAmountSlider'),
+      calcFactorSlider: document.getElementById('calcFactorSlider'),
+      calcTermSlider: document.getElementById('calcTermSlider'),
+      calcAmountInput: document.getElementById('calcAmountInput'),
+      calcFactorInput: document.getElementById('calcFactorInput'),
+      calcTermInput: document.getElementById('calcTermInput'),
+      toggleDaily: document.getElementById('toggleDaily'),
+      toggleWeekly: document.getElementById('toggleWeekly'),
+      toggleMonthly: document.getElementById('toggleMonthly'),
+      themeSelector: document.getElementById('themeSelector'),
+      shareLinkButton: document.getElementById('shareLinkButton'),
+      summaryAmountOut: document.getElementById('summaryAmountOut'),
+      summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+      summaryFactorOut: document.getElementById('summaryFactorOut'),
+      summaryTermOut: document.getElementById('summaryTermOut'),
+      summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+      summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      businessNameContainer: document.getElementById('businessNameContainer'),
+      repSettingsToggle: document.getElementById('repSettingsToggle'),
+      repSettingsPanel: document.getElementById('repSettingsPanel'),
+      repNameInput: document.getElementById('repNameInput'),
+      repEmailInput: document.getElementById('repEmailInput'),
+      repPhoneInput: document.getElementById('repPhoneInput'),
+      repContactBlock: document.getElementById('repContactBlock'),
+      repNameDisplay: document.getElementById('repNameDisplay'),
+      repEmailDisplay: document.getElementById('repEmailDisplay'),
+      repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+      headerContainer: document.getElementById('headerContainer'),
+      themeControls: document.getElementById('themeControls'),
+      calculatorInputs: document.getElementById('calculatorInputs'),
+      factorContainer: document.getElementById('factorContainer'),
+      termContainer: document.getElementById('termContainer'),
+      toggleContainer: document.getElementById('toggleContainer'),
+      buttonContainer: document.getElementById('buttonContainer'),
+      addOfferButton: document.getElementById('addOfferButton'),
+      savedOffersSection: document.getElementById('savedOffersSection'),
+      savedOffersContainer: document.getElementById('savedOffersContainer'),
     };
 
-    // Pre-fill labels for min/max
-    amountMaxLabel.textContent = formatCurrency(parseInt(amountSlider.max, 10));
-    factorMaxLabel.textContent = `${parseFloat(factorSlider.value).toFixed(2)}x`;
-    termMaxLabel.textContent = `${termSlider.max} months`;
+    let paymentFrequency = 'daily';
+    let currentTheme = 'theme-corporate';
+    let currentAccent = 'accent-critical';
+    let amountSliderMax = 1000000;
+    const MAX_ADDITIONAL_OFFERS = 2;
+    let savedOffers = [];
+    let isApprovalView = false;
 
-    function updateBusinessName() {
-      const name = businessNameInput.value.trim();
-      if (name) {
-        businessNameDisplay.textContent = name;
-        businessNameDisplay.classList.remove('hidden');
-      } else {
-        businessNameDisplay.textContent = '';
-        businessNameDisplay.classList.add('hidden');
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
       }
     }
 
-    function computeSchedule(amount, factor, termMonths, frequency) {
-      const payback = amount * factor;
-      const cost = payback - amount;
-
-      let payments = 0;
-      if (frequency === 'daily') {
-        // assume 21 business days per month
-        payments = termMonths * 21;
-      } else if (frequency === 'weekly') {
-        payments = Math.round((termMonths * 21) / 5);
-      } else {
-        payments = termMonths;
-      }
-
-      const payment = payments > 0 ? payback / payments : 0;
-      return { payback, cost, payments, payment };
+    function formatCurrency(num) {
+      const numericValue = Number(num);
+      if (isNaN(numericValue)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(numericValue);
     }
 
-    function refreshSummary() {
-      const { amount, factor, termMonths, frequency } = state;
-      const { payback, cost, payments, payment } = computeSchedule(
+    function parseFormattedNumber(val) {
+      if (typeof val !== 'string' || !val) return 0;
+      return parseFloat(val.replace(/[\$,]/g, '')) || 0;
+    }
+
+    function computeOffer(amount, factor, termMonths, frequency) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
+      const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
+      const dailyPayment = termMonths > 0 ? totalPayback / (termMonths * 22) : 0;
+
+      let payment = dailyPayment;
+      let paymentLabel = 'Est. Daily Payment';
+
+      if (frequency === 'weekly') {
+        payment = weeklyPayment;
+        paymentLabel = 'Est. Weekly Payment';
+      } else if (frequency === 'monthly') {
+        payment = monthlyPayment;
+        paymentLabel = 'Est. Monthly Payment';
+      }
+
+      return {
         amount,
         factor,
         termMonths,
-        frequency
-      );
-
-      summaryAmountOut.textContent = formatCurrency(amount);
-      summaryPaybackOut.textContent = formatCurrency(payback);
-      summaryFactorOut.textContent = `${factor.toFixed(2)}x`;
-      summaryTermOut.textContent = `${termMonths} months`;
-      summaryCostOut.textContent = formatCurrency(cost);
-
-      if (frequency === 'daily') {
-        summaryPaymentLabel.textContent = 'Est. Daily Payment';
-      } else if (frequency === 'weekly') {
-        summaryPaymentLabel.textContent = 'Est. Weekly Payment';
-      } else {
-        summaryPaymentLabel.textContent = 'Est. Monthly Payment';
-      }
-      summaryPaymentValue.textContent = `${formatCurrency(payment)}${
-        payments ? '' : ''
-      }`;
-
-      updateBusinessName();
+        totalPayback,
+        totalCost,
+        payment,
+        paymentLabel,
+        frequency,
+      };
     }
 
-    // --- Sync functions ---
-    function syncAmountFromSlider() {
-      const raw = parseInt(amountSlider.value, 10) || 0;
-      state.amount = clamp(raw, parseInt(amountSlider.min, 10), parseInt(amountSlider.max, 10));
-      amountSlider.value = state.amount;
-      amountInput.value = state.amount.toLocaleString('en-US');
-      refreshSummary();
+    function getCurrentOffer() {
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+      const termMonths = parseInt(elements.calcTermInput.value) || 3;
+      return computeOffer(amount, factor, termMonths, paymentFrequency);
     }
 
-    function syncAmountFromInput() {
-      const numeric = parseInt(amountInput.value.replace(/[^0-9]/g, ''), 10) || 0;
-      state.amount = clamp(
-        numeric,
-        parseInt(amountSlider.min, 10),
-        parseInt(amountSlider.max, 10)
-      );
-      amountSlider.value = state.amount;
-      amountInput.value = state.amount.toLocaleString('en-US');
-      refreshSummary();
-    }
-
-    function syncFactorFromSlider() {
-      const raw = parseFloat(factorSlider.value) || 1.0;
-      state.factor = clamp(raw, parseFloat(factorSlider.min), parseFloat(factorSlider.max));
-      factorSlider.value = state.factor.toFixed(2);
-      factorInput.value = state.factor.toFixed(2);
-      factorMaxLabel.textContent = `${parseFloat(factorSlider.max).toFixed(2)}x`;
-      refreshSummary();
-    }
-
-    function syncFactorFromInput() {
-      const raw = parseFloat(factorInput.value) || 1.0;
-      state.factor = clamp(raw, parseFloat(factorSlider.min), parseFloat(factorSlider.max));
-      factorSlider.value = state.factor.toFixed(2);
-      factorInput.value = state.factor.toFixed(2);
-      refreshSummary();
-    }
-
-    function syncTermFromSlider() {
-      const raw = parseInt(termSlider.value, 10) || 0;
-      state.termMonths = clamp(
-        raw,
-        parseInt(termSlider.min, 10),
-        parseInt(termSlider.max, 10)
-      );
-      termSlider.value = state.termMonths;
-      termInput.value = state.termMonths;
-      termMaxLabel.textContent = `${termSlider.max} months`;
-      refreshSummary();
-    }
-
-    function syncTermFromInput() {
-      const raw = parseInt(termInput.value, 10) || 0;
-      state.termMonths = clamp(
-        raw,
-        parseInt(termSlider.min, 10),
-        parseInt(termSlider.max, 10)
-      );
-      termSlider.value = state.termMonths;
-      termInput.value = state.termMonths;
-      refreshSummary();
-    }
-
-    function setFrequency(freq) {
-      state.frequency = freq;
-      toggleDaily.classList.toggle('active', freq === 'daily');
-      toggleWeekly.classList.toggle('active', freq === 'weekly');
-      toggleMonthly.classList.toggle('active', freq === 'monthly');
-      refreshSummary();
-    }
-
-    // --- Saved offers ---
     function renderSavedOffers() {
-      savedOffersContainer.innerHTML = '';
-      if (!state.savedOffers.length) {
-        savedOffersSection.classList.add('hidden');
+      if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+
+      const used = savedOffers.length;
+      if (used === 0) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
         return;
       }
-      savedOffersSection.classList.remove('hidden');
 
-      state.savedOffers.forEach((offer, index) => {
-        const card = document.createElement('div');
-        card.className = 'saved-card px-3 py-3 space-y-2';
+      elements.savedOffersSection.classList.remove('hidden');
 
-        const headerRow = document.createElement('div');
-        headerRow.className = 'flex items-center justify-between';
+      const cardsHtml = savedOffers
+        .map((offer, index) => {
+          const labelIndex = index + 2;
+          return `
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+            </div>
+            <div class="text-center mt-2">
+              <span class="text-[11px] font-semibold text-muted block">You Get</span>
+              <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Factor</span>
+                <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Term</span>
+                <span class="text-sm font-semibold text-primary block">${offer.termMonths} mo</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Payback</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">${offer.paymentLabel}</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        })
+        .join('');
 
-        const title = document.createElement('div');
-        title.className = 'text-xs font-semibold text-slate-600 uppercase tracking-wide';
-        title.textContent = `Offer ${index + 1}`;
+      elements.savedOffersContainer.innerHTML = cardsHtml;
+    }
 
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'text-xs text-slate-400 hover:text-slate-600';
-        removeBtn.textContent = 'Remove';
-        removeBtn.addEventListener('click', () => {
-          state.savedOffers.splice(index, 1);
-          renderSavedOffers();
-        });
-
-        headerRow.appendChild(title);
-        headerRow.appendChild(removeBtn);
-
-        const amountEl = document.createElement('div');
-        amountEl.className = 'text-lg font-semibold text-slate-900';
-        amountEl.textContent = formatCurrency(offer.amount);
-
-        const paybackEl = document.createElement('div');
-        paybackEl.className = 'text-xs text-slate-500';
-        paybackEl.textContent = `Total payback ${formatCurrency(offer.payback)} · ${
-          offer.termMonths
-        } mo · ${offer.factor.toFixed(2)}x`;
-
-        const paymentEl = document.createElement('div');
-        paymentEl.className = 'text-xs text-slate-600';
-        const label =
-          offer.frequency === 'daily'
-            ? 'Est. Daily Payment'
-            : offer.frequency === 'weekly'
-            ? 'Est. Weekly Payment'
-            : 'Est. Monthly Payment';
-        paymentEl.textContent = `${label} ${formatCurrency(offer.payment)}`;
-
-        card.appendChild(headerRow);
-        card.appendChild(amountEl);
-        card.appendChild(paybackEl);
-        card.appendChild(paymentEl);
-
-        savedOffersContainer.appendChild(card);
-      });
+    function updateAddOfferButtonState() {
+      if (!elements.addOfferButton) return;
+      const remaining = MAX_ADDITIONAL_OFFERS - savedOffers.length;
+      elements.addOfferButton.disabled = remaining <= 0;
     }
 
     function handleAddOffer() {
-      const { amount, factor, termMonths, frequency } = state;
-      const { payback, cost, payments, payment } = computeSchedule(
-        amount,
-        factor,
-        termMonths,
-        frequency
-      );
+      if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
+      const offer = getCurrentOffer();
+      savedOffers.push({ ...offer });
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
 
-      state.savedOffers.push({
-        amount,
-        factor,
-        termMonths,
-        frequency,
-        payback,
-        cost,
-        payments,
-        payment,
+    function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const isAmountSlider = slider === elements.calcAmountSlider;
+      const getMax = () => (isAmountSlider ? amountSliderMax : max);
+
+      const initialValue = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        const cap = getMax();
+        if (!isNaN(val) && val > cap) {
+          val = cap;
+          slider.value = val;
+        }
+        input.value = isCurrency ? formatCurrency(val) : val;
+        callback();
       });
 
-      renderSavedOffers();
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
+        if (!isNaN(val) && val >= min && val <= cap) {
+          slider.value = val;
+          callback();
+        } else if (input.value === '') {
+          callback();
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
+        if (isNaN(val) || val < min) val = min;
+        if (val > cap) val = cap;
+        slider.value = val;
+        input.value = isCurrency ? formatCurrency(val) : val.toString();
+        callback();
+      });
     }
 
-    // --- Share link ---
-    function handleShareLink() {
-      const params = new URLSearchParams();
-      params.set('a', String(state.amount));
-      params.set('f', String(state.factor));
-      params.set('t', String(state.termMonths));
-      params.set('q', state.frequency);
+    function applyTheme() {
+      document.documentElement.className = currentTheme + ' ' + currentAccent;
+      try {
+        localStorage.setItem('criticalfi_theme', currentTheme);
+      } catch (e) {
+        // ignore
+      }
+    }
 
-      const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    function updateRepDisplay() {
+      if (!elements.repContactBlock) return;
+      const name = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+      const email = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+      const phone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard
-          .writeText(url)
-          .then(() => {
-            shareLinkButton.textContent = 'Link Copied!';
-            setTimeout(() => {
-              shareLinkButton.innerHTML =
-                '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/></svg><span>Copy Shareable Link</span>';
-            }, 1600);
-          })
-          .catch(() => {
-            alert(url);
-          });
+      const hasAny = name || email || phone;
+
+      if (hasAny) {
+        elements.repContactBlock.classList.remove('hidden');
       } else {
-        alert(url);
+        elements.repContactBlock.classList.add('hidden');
       }
+
+      if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+      if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+      if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
     }
 
-    // --- Event listeners ---
-    amountSlider.addEventListener('input', syncAmountFromSlider);
-    amountInput.addEventListener('change', syncAmountFromInput);
-    amountInput.addEventListener('blur', syncAmountFromInput);
+    function updatePaymentToggleUI() {
+      const toggles = [elements.toggleDaily, elements.toggleWeekly, elements.toggleMonthly];
+      const frequencies = ['daily', 'weekly', 'monthly'];
+      toggles.forEach((toggle, index) => {
+        if (!toggle) return;
+        toggle.classList.remove('toggle-active', 'toggle-inactive');
+        if (paymentFrequency === frequencies[index]) {
+          toggle.classList.add('toggle-active');
+        } else {
+          toggle.classList.add('toggle-inactive');
+        }
+      });
+    }
 
-    factorSlider.addEventListener('input', syncFactorFromSlider);
-    factorInput.addEventListener('change', syncFactorFromInput);
-    factorInput.addEventListener('blur', syncFactorFromInput);
-
-    termSlider.addEventListener('input', syncTermFromSlider);
-    termInput.addEventListener('change', syncTermFromInput);
-    termInput.addEventListener('blur', syncTermFromInput);
-
-    businessNameInput.addEventListener('input', updateBusinessName);
-
-    toggleDaily.addEventListener('click', () => setFrequency('daily'));
-    toggleWeekly.addEventListener('click', () => setFrequency('weekly'));
-    toggleMonthly.addEventListener('click', () => setFrequency('monthly'));
-
-    addOfferButton.addEventListener('click', handleAddOffer);
-    shareLinkButton.addEventListener('click', handleShareLink);
-
-    // --- Init ---
-    function initFromQuery() {
+    function initializeFromURL() {
       const params = new URLSearchParams(window.location.search);
-      const a = parseInt(params.get('a') || '', 10);
-      const f = parseFloat(params.get('f') || '');
-      const t = parseInt(params.get('t') || '', 10);
-      const q = params.get('q');
 
-      if (!Number.isNaN(a)) {
-        state.amount = clamp(a, parseInt(amountSlider.min, 10), parseInt(amountSlider.max, 10));
+      const amountParam = params.get('amount');
+      const amount = amountParam ? parseFloat(amountParam) : 50000;
+      const factor = params.get('factor') || 1.25;
+      const term = params.get('term') || 6;
+      const freq = params.get('freq');
+      const paramTheme = params.get('theme');
+      const offersParam = params.get('offers');
+      const businessNameParam = params.get('businessName') || '';
+      const repNameParam = params.get('repName') || '';
+      const repEmailParam = params.get('repEmail') || '';
+      const repPhoneParam = params.get('repPhone') || '';
+      const viewMode = params.get('view');
+
+      isApprovalView = viewMode === 'approval';
+
+      // Prefer theme from URL or localStorage, otherwise default to light
+      let storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem('criticalfi_theme');
+      } catch (e) {
+        storedTheme = null;
       }
-      if (!Number.isNaN(f)) {
-        state.factor = clamp(f, parseFloat(factorSlider.min), parseFloat(factorSlider.max));
-      }
-      if (!Number.isNaN(t)) {
-        state.termMonths = clamp(
-          t,
-          parseInt(termSlider.min, 10),
-          parseInt(termSlider.max, 10)
-        );
-      }
-      if (q === 'daily' || q === 'weekly' || q === 'monthly') {
-        state.frequency = q;
+
+      currentTheme = paramTheme || storedTheme || 'theme-corporate';
+      currentAccent = 'accent-critical';
+
+      if (isApprovalView) {
+        setAmountSliderMax(amount);
+      } else {
+        setAmountSliderMax(1000000);
       }
 
-      amountSlider.value = state.amount;
-      amountInput.value = state.amount.toLocaleString('en-US');
+      elements.calcAmountInput.value = formatCurrency(amount);
+      elements.calcAmountSlider.value = amount;
+      elements.calcFactorSlider.value = factor;
+      elements.calcTermSlider.value = term;
 
-      factorSlider.value = state.factor.toFixed(2);
-      factorInput.value = state.factor.toFixed(2);
+      if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+      if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+      if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+      if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
 
-      termSlider.value = state.termMonths;
-      termInput.value = state.termMonths;
+      paymentFrequency = freq || 'daily';
 
-      setFrequency(state.frequency);
-      refreshSummary();
+      savedOffers = [];
+      if (offersParam) {
+        try {
+          const rawOffers = JSON.parse(offersParam);
+          if (Array.isArray(rawOffers)) {
+            savedOffers = rawOffers.map((raw) => {
+              const a = Number(raw.a ?? raw.amount ?? 0);
+              const f = Number(raw.f ?? raw.factor ?? 1.1);
+              const tRaw = raw.t ?? raw.term ?? 3;
+              const t = parseInt(tRaw, 10);
+              const termMonths = Number.isNaN(t) ? 3 : t;
+              const q = raw.q ?? raw.frequency ?? 'daily';
+              return computeOffer(a, f, termMonths, q);
+            });
+          }
+        } catch (err) {
+          console.error('Error parsing offers from URL', err);
+        }
+      }
+
+      if (isApprovalView) {
+        elements.factorContainer.style.display = 'none';
+        elements.termContainer.style.display = 'none';
+        elements.toggleContainer.style.display = 'none';
+
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+        if (elements.businessNameInput) elements.businessNameInput.disabled = true;
+
+        elements.themeControls.style.display = 'none';
+        if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
+        if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
+        elements.buttonContainer.style.display = 'none';
+
+        elements.headerContainer.classList.remove('justify-between');
+        elements.headerContainer.classList.add('justify-center');
+      }
     }
 
-    initFromQuery();
+    function runCalculator() {
+      try {
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+        const termMonths = parseInt(elements.calcTermInput.value) || 3;
+
+        const offer = computeOffer(amount, factor, termMonths, paymentFrequency);
+
+        const businessName = elements.businessNameInput
+          ? elements.businessNameInput.value.trim()
+          : '';
+        if (elements.businessNameDisplay) {
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
+        }
+
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
+        elements.summaryFactorOut.textContent = offer.factor.toFixed(2) + 'x';
+        elements.summaryTermOut.textContent = offer.termMonths + ' mo';
+        elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+        elements.summaryPaymentLabel.textContent = offer.paymentLabel;
+        elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+
+        updateRepDisplay();
+      } catch (e) {
+        console.error('Calculator error:', e);
+      }
+    }
+
+    function initializeCalculator() {
+      initializeFromURL();
+      applyTheme();
+      elements.themeSelector.value = currentTheme;
+
+      syncInputs(
+        elements.calcAmountSlider,
+        elements.calcAmountInput,
+        true,
+        5000,
+        amountSliderMax,
+        runCalculator
+      );
+      syncInputs(
+        elements.calcFactorSlider,
+        elements.calcFactorInput,
+        false,
+        1.1,
+        1.5,
+        runCalculator
+      );
+      syncInputs(
+        elements.calcTermSlider,
+        elements.calcTermInput,
+        false,
+        3,
+        24,
+        runCalculator
+      );
+
+      elements.toggleDaily.addEventListener('click', () => {
+        paymentFrequency = 'daily';
+        updatePaymentToggleUI();
+        runCalculator();
+      });
+      elements.toggleWeekly.addEventListener('click', () => {
+        paymentFrequency = 'weekly';
+        updatePaymentToggleUI();
+        runCalculator();
+      });
+      elements.toggleMonthly.addEventListener('click', () => {
+        paymentFrequency = 'monthly';
+        updatePaymentToggleUI();
+        runCalculator();
+      });
+
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.repSettingsToggle && elements.repSettingsPanel) {
+        elements.repSettingsToggle.addEventListener('click', () => {
+          elements.repSettingsPanel.classList.toggle('hidden');
+        });
+      }
+      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+
+      elements.themeSelector.addEventListener('change', (e) => {
+        currentTheme = e.target.value;
+        applyTheme();
+      });
+
+      if (elements.addOfferButton) {
+        elements.addOfferButton.addEventListener('click', handleAddOffer);
+      }
+
+      elements.shareLinkButton.addEventListener('click', () => {
+        const shareBtn = elements.shareLinkButton;
+        const originalText = shareBtn.innerText;
+
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value);
+        const term = parseInt(elements.calcTermInput.value);
+        const freq = paymentFrequency;
+        const theme = currentTheme;
+        const businessName = elements.businessNameInput
+          ? elements.businessNameInput.value.trim()
+          : '';
+        const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+        const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+        const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+
+        const offersForUrl = savedOffers.map((offer) => ({
+          a: offer.amount,
+          f: offer.factor,
+          t: offer.termMonths,
+          q: offer.frequency || freq,
+        }));
+
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams({
+          amount,
+          factor,
+          term,
+          freq,
+          theme,
+          businessName,
+          repName,
+          repEmail,
+          repPhone,
+          offers: JSON.stringify(offersForUrl),
+          view: 'approval',
+        });
+        url.search = params.toString();
+
+        const textArea = document.createElement('textarea');
+        textArea.value = url.toString();
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand('copy');
+          shareBtn.innerText = 'Copied!';
+          setTimeout(() => {
+            shareBtn.innerText = originalText;
+          }, 2000);
+        } catch (errFallback) {
+          console.error('Fallback copy failed:', errFallback);
+          shareBtn.innerText = 'Error';
+          setTimeout(() => {
+            shareBtn.innerText = originalText;
+          }, 2000);
+        }
+        document.body.removeChild(textArea);
+      });
+
+      updatePaymentToggleUI();
+      runCalculator();
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    initializeCalculator();
   </script>
 </body>
 </html>
