@@ -50,9 +50,9 @@
     html.theme-corporate body { background-color: var(--bg-body); }
 
     html.accent-sutton {
-      --accent-color: #d29b2a;
-      --accent-color-light: #f2c365;
-      --accent-color-dark: #9b6e15;
+      --accent-color: #d29b2a;      /* mid gold */
+      --accent-color-light: #f2c365;/* lighter */
+      --accent-color-dark: #9b6e15; /* deeper */
       --accent-text-inverted: #111827;
       --accent-shadow: 0 0 18px rgba(210, 155, 42, 0.55);
       --button-text-color: #111827;
@@ -82,32 +82,45 @@
       box-shadow: 0 0 0 2px var(--accent-color-light);
     }
 
-    .text-hero { color: var(--accent-color); text-shadow: var(--accent-shadow); }
+    /* Approved amount – clean gold text only */
+    .text-hero {
+      color: var(--accent-color);
+    }
 
     .toggle-inactive {
       background-color: var(--bg-toggle-inactive);
       color: var(--text-secondary);
     }
     .toggle-active {
-      background-color: var(--accent-color-dark);
-      color: var(--accent-text-inverted);
+      background-color: var(--accent-color); /* mid gold */
+      color: #0f172a; /* dark text for readability */
     }
 
     .button-primary {
-      background-color: var(--accent-color);
-      color: var(--button-text-color);
+      background-color: var(--accent-color); /* darker gold than before */
+      color: #0f172a; /* dark text */
       font-weight: 600;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1.5rem;
-      transition: background-color 0.2s;
+      border-radius: 0.75rem; /* more pill-like */
+      padding: 0.6rem 1.75rem;
+      border: 1px solid rgba(210, 155, 42, 0.95);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
     }
     .button-primary:hover {
-      background-color: var(--accent-color-dark);
+      background-color: var(--accent-color-dark); /* deepest gold on hover */
+      box-shadow:
+        0 0 0 1px rgba(210, 155, 42, 0.85),
+        0 0 18px rgba(210, 155, 42, 0.7);
+      transform: translateY(-1px) scale(1.02); /* subtle hover lift + scale */
     }
     .button-primary:disabled {
       background-color: var(--bg-slider-track);
       color: var(--text-muted);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .brand-logo { filter: drop-shadow(0 0 18px rgba(210, 155, 42, 0.45)); }
@@ -116,11 +129,21 @@
       letter-spacing: 0.08em;
       font-weight: 700;
     }
+
+    /* Gold border glow around whole calculator */
+    .shell {
+      border-color: var(--accent-color);
+      border-width: 2px;
+      box-shadow:
+        0 0 0 3px rgba(210, 155, 42, 0.85),
+        0 0 30px rgba(210, 155, 42, 0.65),
+        0 0 80px rgba(210, 155, 42, 0.4);
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
 
-  <div class="w-full max-w-xl card-bg text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border border-accent">
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
 
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
@@ -228,11 +251,11 @@
           <input id="calcTermSlider" type="range" min="3" max="24" step="1" value="6"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg"
+            <svg xmlns="http://www.w3.org/0/svg"
                  class="h-4 w-4 absolute left-3 input-icon text-muted"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
             </svg>
             <input id="calcTermInput" type="number" step="1"
                    class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
