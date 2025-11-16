@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sutton Funding – Pre-Qualification</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sutton-bg: #020617;          /* very dark navy */
+      --sutton-card: #020617;        /* dark shell */
+      --sutton-gold: #d29b2a;        /* mid gold */
+      --sutton-gold-light: #f2c365;  /* light gold */
+      --sutton-gold-dark: #9b6e15;   /* deep gold */
+      --sutton-text: #e5e7eb;        /* light slate */
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--sutton-bg);
+      color: var(--sutton-text);
+    }
+
+    .app-bg {
+      background-color: transparent;
+    }
+
+    .calculator-card {
+      background-color: var(--sutton-card);
+      border-radius: 1.25rem;
+      border: 2px solid var(--sutton-gold);
+      box-shadow:
+        0 0 0 3px rgba(210, 155, 42, 0.75),
+        0 0 30px rgba(210, 155, 42, 0.55),
+        0 0 80px rgba(210, 155, 42, 0.35);
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    
+    /* Custom range slider styles */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #1f2937; /* slate-800 track */
+      border-radius: 9999px;
+      outline: none;
+      opacity: 0.95;
+      transition: opacity .2s;
+    }
+    
+    input[type="range"]:hover {
+      opacity: 1;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--sutton-gold);
+      border: 2px solid #020617;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 0 1px rgba(210, 155, 42, 0.6);
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: var(--sutton-gold);
+      border: 2px solid #020617;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 0 1px rgba(210, 155, 42, 0.6);
+    }
+
+    /* Expandable list */
+    .lender-item-details {
+      display: none;
+    }
+    .lender-item-details.expanded {
+      display: block;
+    }
+    .expand-icon.rotate-180 {
+      transform: rotate(180deg);
+    }
+
+    .sutton-input-shell {
+      background-color: rgba(15, 23, 42, 0.9); /* slate-900/90 */
+      border: 1px solid rgba(148, 163, 184, 0.7); /* slate-400 */
+    }
+
+    .sutton-input-shell:focus-within {
+      border-color: var(--sutton-gold);
+      box-shadow: 0 0 0 1px var(--sutton-gold-light);
+    }
+
+    .sutton-button-primary {
+      background: radial-gradient(circle at 30% 0%, var(--sutton-gold-light), var(--sutton-gold));
+      color: #0f172a;
+      font-weight: 600;
+      border-radius: 9999px;
+      padding: 0.75rem 1.75rem;
+      border: 1px solid rgba(210, 155, 42, 0.95);
+      box-shadow:
+        0 0 0 1px rgba(210, 155, 42, 0.85),
+        0 0 18px rgba(210, 155, 42, 0.7);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+    }
+
+    .sutton-button-primary:hover {
+      background: radial-gradient(circle at 30% 0%, var(--sutton-gold), var(--sutton-gold-dark));
+      box-shadow:
+        0 0 0 1px rgba(210, 155, 42, 0.95),
+        0 0 24px rgba(210, 155, 42, 0.9);
+      transform: translateY(-1px) scale(1.01);
+    }
+
+    .sutton-pill-label {
+      border-radius: 9999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: radial-gradient(circle at 0% 50%, rgba(210, 155, 42, 0.15), rgba(15, 23, 42, 0.95));
+    }
+
+        .sutton-card-inner {
+      background: radial-gradient(circle at 0% 0%, rgba(210, 155, 42, 0.14), rgba(15, 23, 42, 0.98));
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .sutton-logo-glow {
+      filter: drop-shadow(0 0 18px rgba(210, 155, 42, 0.55));
+    }
+
+  </style>
+</head>
+
+<body class="h-full min-h-screen app-bg flex items-center justify-center px-4 py-10 text-slate-100">
+  <main class="w-full">
+    <!-- STAGE 1: INPUT FORM -->
+    <section id="form-section" class="calculator-card relative p-6 sm:p-8 max-w-lg mx-auto">
+      <!-- Header -->
+      <div class="mb-6 flex items-center gap-3">
+        <img src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Funding Bridge Logo" class="h-10 w-auto sutton-logo-glow" />
+        <div>
+          <p class="text-[10px] font-semibold tracking-[0.3em] uppercase text-amber-300">
+            Sutton Funding
+          </p>
+          <h1 class="mt-1 text-2xl font-semibold text-slate-50">
+            Smart Pre-Qualification
+          </h1>
+          <p class="mt-1 text-slate-400 text-xs sm:text-sm">
+            Enter a few quick details to see Sutton-style market capacity and risk.
+          </p>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <div class="space-y-5 text-sm">
+        <!-- Estimated monthly revenue -->
+        <div>
+          <label for="revenue-input" class="text-xs font-medium text-slate-200">
+            Estimated monthly revenue
+          </label>
+          <div class="mt-1.5 flex items-center gap-2 rounded-2xl sutton-input-shell px-3.5 py-2.5 text-sm">
+            <span class="text-slate-400 text-xs">$</span>
+            <input
+              id="revenue-input"
+              type="text"
+              inputmode="decimal"
+              value="75000"
+              class="bg-transparent text-slate-50 text-sm flex-1 outline-none border-none p-0 placeholder:text-slate-500"
+              aria-label="Estimated monthly revenue" />
+            <span class="text-[11px] text-slate-500">per month</span>
+          </div>
+        </div>
+
+        <!-- Average Daily Balance -->
+        <div>
+          <label for="adbb-input" class="text-xs font-medium text-slate-200">
+            Average daily balance (bank)
+          </label>
+          <div class="mt-1.5 flex items-center gap-2 rounded-2xl sutton-input-shell px-3.5 py-2.5 text-sm">
+            <span class="text-slate-400 text-xs">$</span>
+            <input
+              id="adbb-input"
+              type="text"
+              inputmode="decimal"
+              value="5000"
+              class="bg-transparent text-slate-50 text-sm flex-1 outline-none border-none p-0 placeholder:text-slate-500"
+              aria-label="Average Daily Balance" />
+            <span class="text-[11px] text-slate-500">avg balance</span>
+          </div>
+        </div>
+        
+        <!-- Negative Days -->
+        <div>
+          <label for="neg-days-slider" class="text-xs font-medium text-slate-200">
+            Negative days (per month)
+          </label>
+          <div class="mt-1.5">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+              <span>0–10+ days</span>
+              <span id="neg-days-label">2 days</span>
+            </div>
+            <input id="neg-days-slider" type="range" min="0" max="10" value="2" class="w-full" />
+          </div>
+        </div>
+
+        <!-- Owner FICO -->
+        <div>
+          <label for="fico-slider" class="text-xs font-medium text-slate-200">
+            Owner FICO score (estimated)
+          </label>
+          <div class="mt-1.5">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+              <span>300–850</span>
+              <span id="fico-label">700</span>
+            </div>
+            <input id="fico-slider" type="range" min="300" max="850" value="700" class="w-full" /> 
+          </div>
+        </div>
+
+        <!-- Industry -->
+        <div>
+          <label for="industry-select" class="text-xs font-medium text-slate-200">
+            Industry
+          </label>
+          <div class="mt-1.5 rounded-2xl sutton-input-shell px-3.5 py-2.5 text-sm">
+            <select
+              id="industry-select"
+              class="w-full bg-transparent text-slate-50 text-sm outline-none border-none p-0">
+              <option value="general">General / Other</option>
+              <option value="restaurant">Restaurant / Food Service</option>
+              <option value="construction">Construction / Contracting</option>
+              <option value="retail">Retail / Storefront</option>
+              <option value="ecommerce">E-commerce / Online</option>
+              <option value="transportation">Transportation / Trucking</option>
+              <option value="healthcare">Healthcare / Medical</option>
+              <option value="auto_repair">Auto Repair / Dealer</option>
+              <option value="beauty">Beauty / Salon / Spa</option>
+              <option value="professional_services">Professional Services</option>
+              <option value="manufacturing">Manufacturing / Industrial</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Time in business -->
+        <div>
+          <label for="tib-slider" class="text-xs font-medium text-slate-200">
+            Time in business (months)
+          </label>
+          <div class="mt-1.5">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+              <span>0–60+ months</span>
+              <span id="tib-label">24 months</span>
+            </div>
+            <input id="tib-slider" type="range" min="0" max="60" value="24" class="w-full" />
+          </div>
+        </div>
+        
+        <!-- Calculate Button -->
+        <div class="pt-4">
+          <button id="calculate-btn" type="button" class="w-full sutton-button-primary text-sm">
+            See Your Sutton Estimates
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 2: RESULTS -->
+    <section id="results-section" class="calculator-card relative p-6 sm:p-8 max-w-3xl mx-auto hidden mt-8">
+      <!-- Header -->
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+          <img src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Funding Bridge Logo" class="h-9 w-auto sutton-logo-glow" />
+          <div>
+            <p class="text-[10px] font-semibold tracking-[0.3em] uppercase text-amber-300">
+              Sutton Funding
+            </p>
+            <h1 class="mt-1 text-2xl font-semibold text-slate-50">
+              Pre-Qualification Results
+            </h1>
+            <p class="mt-1 text-slate-400 text-xs sm:text-sm">
+              Based on your inputs, here is a Sutton-style view of market capacity and risk.
+            </p>
+          </div>
+        </div>
+        <button id="start-over-btn" type="button" class="text-[11px] font-medium text-slate-300 hover:text-amber-300 transition-colors">
+          &larr; Start over
+        </button>
+      </div>
+
+      <div class="space-y-8">
+        <!-- Global Estimate & Risk -->
+        <div class="sutton-card-inner p-4 sm:p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold">
+                Blended market estimate
+              </p>
+              <p id="global-amount" class="mt-1 text-3xl font-semibold text-amber-300">
+                $0
+              </p>
+              <p class="text-sm text-slate-300">
+                Top 5 range: <span id="global-range" class="font-medium text-slate-100">$0 – $0</span>
+              </p>
+            </div>
+            <div class="text-left sm:text-right w-full sm:w-auto">
+              <p class="uppercase tracking-[0.16em] font-semibold mb-1 text-slate-400">
+                Risk profile
+              </p>
+              <div class="flex flex-col items-start sm:items-end gap-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span id="risk-label" class="sutton-pill-label inline-flex items-center px-2.5 py-1 text-[11px] font-semibold text-amber-200">
+                    Low risk
+                  </span>
+                  <span class="text-[11px] text-slate-300">
+                    Score <span id="score-value">0.0</span> · Grade <span id="score-grade">-</span> · Tier <span id="score-tier">-</span>
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-400">
+                  Higher score = stronger file. ≥ 1.20 typically lands in Sutton A-tier.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lender list -->
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-sm font-semibold text-slate-100 uppercase tracking-[0.16em]">
+              Lender estimates (sorted by term)
+            </h2>
+            <button id="toggle-declined" class="text-[11px] font-medium text-slate-300 hover:text-amber-300 transition-colors">
+              Show declined lenders
+            </button>
+          </div>
+          
+          <div id="lender-list-container" class="space-y-2">
+            <!-- JS will populate -->
+          </div>
+
+          <!-- Error message -->
+          <div id="api-error-container" class="hidden p-4 rounded-2xl bg-red-900/40 border border-red-500 text-red-100 text-sm">
+            <strong>Error:</strong> <span id="api-error-message">Could not compute estimates.</span>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="mt-6 p-4 rounded-2xl border border-slate-700 bg-slate-950/80 text-[11px] text-slate-300">
+          <h3 class="font-semibold text-slate-100 mb-1 text-xs">Your initial data</h3>
+          <ul class="flex flex-wrap gap-x-4 gap-y-1">
+            <li><strong>Revenue:</strong> <span id="summary-revenue">$0</span> / mo</li>
+            <li><strong>ADBB:</strong> <span id="summary-adbb">$0</span></li>
+            <li><strong>Neg days:</strong> <span id="summary-neg-days">0</span></li>
+            <li><strong>FICO:</strong> <span id="summary-fico">0</span></li>
+            <li><strong>Time in biz:</strong> <span id="summary-tib">0</span> months</li>
+            <li><strong>Industry:</strong> <span id="summary-industry">N/A</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      // --- DOM HOOKS ---
+      var formSection = document.getElementById('form-section');
+      var revenueInput = document.getElementById('revenue-input');
+      var adbbInput = document.getElementById('adbb-input');
+      var negDaysSlider = document.getElementById('neg-days-slider');
+      var negDaysLabel = document.getElementById('neg-days-label');
+      var ficoSlider = document.getElementById('fico-slider');
+      var ficoLabel = document.getElementById('fico-label');
+      var industrySelect = document.getElementById('industry-select');
+      var tibSlider = document.getElementById('tib-slider');
+      var tibLabel = document.getElementById('tib-label');
+      var calculateBtn = document.getElementById('calculate-btn');
+
+      var resultsSection = document.getElementById('results-section');
+      var startOverBtn = document.getElementById('start-over-btn');
+
+      var summaryRevenue = document.getElementById('summary-revenue');
+      var summaryAdbb = document.getElementById('summary-adbb');
+      var summaryNegDays = document.getElementById('summary-neg-days');
+      var summaryFico = document.getElementById('summary-fico');
+      var summaryTib = document.getElementById('summary-tib');
+      var summaryIndustry = document.getElementById('summary-industry');
+      
+      var globalAmountEl = document.getElementById('global-amount');
+      var globalRangeEl = document.getElementById('global-range');
+      var scoreValueEl = document.getElementById('score-value');
+      var scoreGradeEl = document.getElementById('score-grade');
+      var scoreTierEl = document.getElementById('score-tier');
+      var riskLabelEl = document.getElementById('risk-label');
+      var lenderListContainer = document.getElementById('lender-list-container');
+      var toggleDeclinedBtn = document.getElementById('toggle-declined');
+      var apiErrorContainer = document.getElementById('api-error-container');
+      var apiErrorMessage = document.getElementById('api-error-message');
+
+      // --- STATE ---
+      var state = {
+        revenue: 75000,
+        adbb: 5000,
+        negDays: 2,
+        fico: 700,
+        industry: 'restaurant',
+        timeMonths: 24,
+        product: 'mca'
+      };
+      
+      var declinedVisible = false;
+
+      // --- LENDER DATA ---
+      var LENDERS = [
+        { name: 'Trust Capital Funding',       baseFactor: 1.39, baseTerm: 78,  baseMult: 11.111, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 1000000, industryRestrictions: ['transportation'] },
+        { name: 'Fund Now LLC',                baseFactor: 1.42, baseTerm: 24,  baseMult: 8.333,  minRevenue: 100000, minFico: 500, minTib: 6,  minAdbb: 2000, maxNegDays: 3, maxAmount: 1000000, industryRestrictions: ['transportation'] },
+        { name: 'Everest Business Funding',    baseFactor: 1.35, baseTerm: 110, baseMult: 8.333,  minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Wide Merchant Group',         baseFactor: 1.49, baseTerm: 125, baseMult: 10.000, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Ondeck',                      baseFactor: 1.28, baseTerm: 65,  baseMult: 11.979, minRevenue: 25000,  minFico: 625, minTib: 12, minAdbb: 2500, maxNegDays: 3, maxAmount: 250000,  industryRestrictions: ['construction'] },
+        { name: 'Cromwell Capital',            baseFactor: 1.39, baseTerm: 105, baseMult: 8.333,  minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Kapitus',                     baseFactor: 1.25, baseTerm: 46,  baseMult: 14.313, minRevenue: 20000,  minFico: 600, minTib: 12, minAdbb: 2000, maxNegDays: 4, maxAmount: 300000,  industryRestrictions: [] },
+        { name: 'Alternative Funding Group',   baseFactor: 1.42, baseTerm: 33,  baseMult: 11.957, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Rapid Finance',               baseFactor: 1.22, baseTerm: 66,  baseMult: 16.250, minRevenue: 15000,  minFico: 575, minTib: 6,  minAdbb: 1500, maxNegDays: 5, maxAmount: 1000000, industryRestrictions: [] },
+        { name: 'CREDIBILY',                   baseFactor: 1.30, baseTerm: 61,  baseMult: 8.333,  minRevenue: 10000,  minFico: 580, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 250000,  industryRestrictions: [] },
+        { name: 'LendR',                       baseFactor: 1.37, baseTerm: 44,  baseMult: 14.286, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Bitty Advance',               baseFactor: 1.45, baseTerm: 54,  baseMult: 10.417, minRevenue: 10000,  minFico: 500, minTib: 4,  minAdbb: 500,  maxNegDays: 7, maxAmount: 50000,   industryRestrictions: [] },
+        { name: 'EXPANSION',                   baseFactor: 1.34, baseTerm: 205, baseMult: 14.505, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'JRG Funding',                 baseFactor: 1.37, baseTerm: 38,  baseMult: 14.359, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'eFinancial Tree',             baseFactor: 1.42, baseTerm: 129, baseMult: 10.250, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Canacap (Canada Only)',       baseFactor: 1.48, baseTerm: 84,  baseMult: 9.091,  minRevenue: 10000,  minFico: 500, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 100000,  industryRestrictions: [] },
+        { name: 'Fox Business Funding',        baseFactor: 1.45, baseTerm: 20,  baseMult: 6.557,  minRevenue: 12200,  minFico: 500, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Fundfi Merchant Funding',     baseFactor: 1.36, baseTerm: 180, baseMult: 10.000, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'G and G Funding',             baseFactor: 1.40, baseTerm: 270, baseMult: 10.000, minRevenue: 84080,  minFico: 600, minTib: 12, minAdbb: 5000, maxNegDays: 3, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Kalamata Capital',            baseFactor: 1.28, baseTerm: 78,  baseMult: 20.000, minRevenue: 15000,  minFico: 600, minTib: 12, minAdbb: 1500, maxNegDays: 5, maxAmount: 300000,  industryRestrictions: [] },
+        { name: 'Silverline Funding',          baseFactor: 1.48, baseTerm: 25,  baseMult: 10.000, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Smart Step Funding',          baseFactor: 1.30, baseTerm: 52,  baseMult: 28.571, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] },
+        { name: 'Velocity CG',                 baseFactor: 1.38, baseTerm: 36,  baseMult: 16.667, minRevenue: 10000,  minFico: 550, minTib: 6,  minAdbb: 1000, maxNegDays: 5, maxAmount: 500000,  industryRestrictions: [] }
+      ];
+
+      // --- HELPERS ---
+      function clamp(x, lo, hi) {
+        if (!Number.isFinite(x)) return lo;
+        return Math.max(lo, Math.min(x, hi));
+      }
+
+      function parseRevenue(value) {
+        if (!value) return 0;
+        var cleaned = value.toString().replace(/[^0-9.]/g, '');
+        var num = parseFloat(cleaned);
+        return Number.isFinite(num) ? num : 0;
+      }
+
+      function formatCurrency(value) {
+        if (!Number.isFinite(value) || value <= 0) return '$0';
+        var rounded = value;
+        if (value > 100000) {
+          rounded = Math.round(value / 1000) * 1000;
+        } else if (value > 10000) {
+          rounded = Math.round(value / 100) * 100;
+        } else {
+          rounded = Math.round(value);
+        }
+        return rounded.toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0
+        });
+      }
+      
+      function mapFreq(term) {
+        if (term > 40) return { frequency: 'daily', label: 'business day' };
+        if (term > 10) return { frequency: 'weekly', label: 'week' };
+        return { frequency: 'monthly', label: 'month' };
+      }
+
+      // --- RISK LOGIC ---
+      function ficoToComponent(score) {
+        var minScore = 500;
+        var maxScore = 850;
+        var normalized = (score - minScore) / (maxScore - minScore);
+        var component = 0.2 + normalized * (1.5 - 0.2);
+        return clamp(component, 0.2, 1.5);
+      }
+
+      function revenueToComponent(rev) {
+        return clamp(rev / 100000, 0.2, 1.5);
+      }
+
+      function tibToComponent(months) {
+        return clamp(months / 36, 0.2, 1.5);
+      }
+      
+      function adbbToComponent(adbb, rev) {
+        if (rev <= 0) return 0.1;
+        var dailyRevenue = rev / 22;
+        if (dailyRevenue <= 0) return 0.1;
+        var adbbRatio = adbb / dailyRevenue;
+        return clamp(adbbRatio / 1.0, 0.1, 1.5);
+      }
+      
+      function negDaysToComponent(negDays) {
+        return clamp(1 - (negDays / 5), 0.1, 1.0);
+      }
+
+      function industryToComponent(industry) {
+        var highRisk = ['construction', 'transportation', 'auto_repair'];
+        var midRisk = ['restaurant', 'retail', 'manufacturing', 'beauty'];
+        if (highRisk.includes(industry)) return 0.5;
+        if (midRisk.includes(industry)) return 0.8;
+        return 1.0;
+      }
+
+      function computeRiskScore(s) {
+        var fico = ficoToComponent(s.fico);
+        var rev = revenueToComponent(s.revenue);
+        var tib = tibToComponent(s.timeMonths);
+        var adbb = adbbToComponent(s.adbb, s.revenue);
+        var negs = negDaysToComponent(s.negDays);
+        var ind = industryToComponent(s.industry);
+        var components = [fico, rev, tib, adbb, negs, ind];
+        var total = components.reduce(function (sum, c) { return sum + c; }, 0);
+        return total / components.length;
+      }
+
+      function computeLenderDecision(s, l, riskScore) {
+        var declineReason = null;
+        if (s.revenue < l.minRevenue)         declineReason = 'Monthly revenue below $' + l.minRevenue;
+        else if (s.fico < l.minFico)         declineReason = 'FICO score below ' + l.minFico;
+        else if (s.timeMonths < l.minTib)    declineReason = 'Time in business below ' + l.minTib + ' months';
+        else if (s.adbb < l.minAdbb)         declineReason = 'Average daily balance below $' + l.minAdbb;
+        else if (s.negDays > l.maxNegDays)   declineReason = 'Negative days exceed ' + l.maxNegDays;
+        else if (l.industryRestrictions.includes(s.industry))
+          declineReason = 'Industry (' + s.industry + ') is restricted';
+        
+        if (declineReason) {
+          return { name: l.name, status: 'Declined', reason: declineReason };
+        }
+
+        var MIN_SCORE = 0.2;
+        var MAX_SCORE = 1.5;
+        var normalizedRisk = (riskScore - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
+        normalizedRisk = clamp(normalizedRisk, 0.0, 1.0);
+
+        var finalFactorRate = l.baseFactor;
+        var baseAmount = s.revenue * (l.baseMult / 10);
+        var riskAdjustedAmount = baseAmount * riskScore;
+        var finalAmount = clamp(riskAdjustedAmount, 0, l.maxAmount);
+        
+        if (finalAmount < 1000) {
+          return { name: l.name, status: 'Declined', reason: 'Calculated approval below $1,000' };
+        }
+
+        var term = l.baseTerm;
+        var freq = mapFreq(term);
+        var payment = (finalAmount * finalFactorRate) / term;
+        var totalRepayment = finalAmount * finalFactorRate;
+
+        return {
+          name: l.name,
+          status: 'Estimated',
+          amount: finalAmount,
+          maxLenderAmount: l.maxAmount,
+          factorRate: finalFactorRate,
+          term: term,
+          payment: payment,
+          totalRepayment: totalRepayment,
+          freqLabel: freq.label,
+          reason: null
+        };
+      }
+      
+      function runFullCalculation() {
+        var riskScore = computeRiskScore(state);
+        
+        var decisions = LENDERS.map(function(lender) {
+          return computeLenderDecision(state, lender, riskScore);
+        });
+        
+        var approvals = decisions.filter(function(d) { return d.status === 'Estimated'; });
+        var declines  = decisions.filter(function(d) { return d.status === 'Declined'; });
+
+        approvals.sort(function(a, b) {
+          return (b.term || 0) - (a.term || 0);
+        });
+        var top5Approvals = approvals.slice(0, 5);
+
+        var globalMin = 0;
+        var globalMax = 0;
+        var globalAmount = 0;
+        
+        if (top5Approvals.length > 0) {
+          var amounts = top5Approvals.map(function(d) { return d.amount; });
+          globalMin = Math.min.apply(null, amounts);
+          globalMax = Math.max.apply(null, amounts);
+          var sumAmt = amounts.reduce(function(sum, d) { return sum + (d || 0); }, 0);
+          globalAmount = sumAmt / top5Approvals.length;
+        }
+
+        globalAmountEl.textContent = formatCurrency(globalAmount);
+        globalRangeEl.textContent  = formatCurrency(globalMin) + ' – ' + formatCurrency(globalMax);
+
+        // Risk profile display
+        scoreValueEl.textContent = riskScore.toFixed(2);
+        var grade = 'F';
+        if (riskScore > 1.2)       grade = 'A+';
+        else if (riskScore > 1.0)  grade = 'A';
+        else if (riskScore > 0.8)  grade = 'B';
+        else if (riskScore > 0.6)  grade = 'C';
+        else if (riskScore > 0.4)  grade = 'D';
+        scoreGradeEl.textContent = grade;
+        scoreTierEl.textContent  = Math.ceil(clamp(5 - (riskScore / 0.3), 1, 5));
+
+        if (riskLabelEl) {
+          var riskLabel = 'High risk';
+          var riskClasses = 'sutton-pill-label inline-flex items-center px-2.5 py-1 text-[11px] font-semibold ';
+          if (riskScore > 1.25) {
+            riskLabel = 'Elite / Top tier';
+            riskClasses += 'text-amber-200';
+          } else if (riskScore > 1.05) {
+            riskLabel = 'Low risk';
+            riskClasses += 'text-amber-200';
+          } else if (riskScore > 0.85) {
+            riskLabel = 'Moderate risk';
+            riskClasses += 'text-amber-200';
+          } else if (riskScore > 0.65) {
+            riskLabel = 'Elevated risk';
+            riskClasses += 'text-orange-200';
+          } else {
+            riskLabel = 'High risk';
+            riskClasses += 'text-red-200';
+          }
+          riskLabelEl.textContent = riskLabel;
+          riskLabelEl.className = riskClasses;
+        }
+
+        lenderListContainer.innerHTML = '';
+        var decisionsToRender = approvals.concat(declines);
+        
+        decisionsToRender.forEach(function (d, index) {
+          var isDeclined = d.status !== 'Estimated';
+          var isExpanded = index < 5;
+          var item = createLenderItem(d, isDeclined, isExpanded);
+          var rowClass = isDeclined ? 'declined-row' : 'approved-row';
+          if (!declinedVisible && isDeclined) {
+            rowClass += ' hidden';
+          }
+          item.className += ' ' + rowClass;
+          lenderListContainer.appendChild(item);
+        });
+        
+        addExpansionListeners();
+      }
+
+      function createLenderItem(d, isDeclined, isExpanded) {
+        var statusColor    = isDeclined ? 'text-red-300'     : 'text-emerald-300';
+        var statusDotColor = isDeclined ? 'bg-red-500'       : 'bg-emerald-400';
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'rounded-2xl border border-slate-700 bg-slate-900/70 overflow-hidden';
+
+        var header = document.createElement('div');
+        header.className = 'flex items-center justify-between gap-4 px-4 py-3 cursor-pointer hover:bg-slate-800/80 transition-colors duration-150 lender-item-header';
+        
+        var details = document.createElement('div');
+        details.className = 'lender-item-details border-t border-slate-800 bg-slate-900/90 px-4 py-3 text-xs' + (isExpanded ? ' expanded' : '');
+
+        var headerLeft = document.createElement('div');
+        headerLeft.className = 'flex items-center gap-3 min-w-0';
+        
+        var dot = document.createElement('span');
+        dot.className = 'h-2 w-2 rounded-full flex-shrink-0 ' + statusDotColor;
+        
+        var name = document.createElement('span');
+        name.className = 'font-medium text-slate-50 text-sm truncate';
+        name.textContent = d.name;
+        
+        headerLeft.appendChild(dot);
+        headerLeft.appendChild(name);
+
+        var headerRight = document.createElement('div');
+        headerRight.className = 'flex items-center gap-4 text-sm flex-shrink-0';
+        
+        var amount = document.createElement('span');
+        amount.className = 'font-semibold ' + (isDeclined ? 'text-slate-500' : 'text-amber-200');
+        amount.textContent = d.amount ? formatCurrency(d.amount) : '—';
+        
+        var status = document.createElement('span');
+        status.className = 'font-medium text-xs w-20 text-right ' + statusColor;
+        status.textContent = d.status;
+        
+        var icon = document.createElement('span');
+        icon.className = 'text-slate-500 transform transition-transform duration-200 expand-icon' + (isExpanded ? ' rotate-180' : '');
+        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z"></path></svg>';
+
+        headerRight.appendChild(amount);
+        headerRight.appendChild(status);
+        headerRight.appendChild(icon);
+        
+        header.appendChild(headerLeft);
+        header.appendChild(headerRight);
+
+        if (isDeclined) {
+          details.innerHTML = '<p class="text-slate-300">' + (d.reason || 'This lender has declined based on the provided data.') + '</p>';
+        } else {
+          details.innerHTML = `
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div>
+                <span class="block text-slate-400 tracking-wide uppercase text-[10px] font-semibold">Approval amount</span>
+                <span class="block text-slate-100 mt-0.5">${formatCurrency(d.amount)}</span>
+              </div>
+              <div>
+                <span class="block text-slate-400 tracking-wide uppercase text-[10px] font-semibold">Factor rate</span>
+                <span class="block text-slate-100 mt-0.5">${d.factorRate ? d.factorRate.toFixed(3) + '×' : '—'}</span>
+              </div>
+              <div>
+                <span class="block text-slate-400 tracking-wide uppercase text-[10px] font-semibold">Term</span>
+                <span class="block text-slate-100 mt-0.5">${d.term ? d.term + ' pmts' : '—'}</span>
+              </div>
+              <div>
+                <span class="block text-slate-400 tracking-wide uppercase text-[10px] font-semibold">Payment</span>
+                <span class="block text-slate-100 mt-0.5">${d.payment ? formatCurrency(Math.round(d.payment)) + ' / ' + d.freqLabel : '—'}</span>
+              </div>
+              <div>
+                <span class="block text-slate-400 tracking-wide uppercase text-[10px] font-semibold">Total repayment</span>
+                <span class="block text-slate-100 mt-0.5">${d.totalRepayment ? formatCurrency(Math.round(d.totalRepayment)) : '—'}</span>
+              </div>
+            </div>
+          `;
+        }
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(details);
+        return wrapper;
+      }
+      
+      function addExpansionListeners() {
+        var headers = lenderListContainer.querySelectorAll('.lender-item-header');
+        headers.forEach(function(header) {
+          header.addEventListener('click', function() {
+            var details = header.nextElementSibling;
+            var icon = header.querySelector('.expand-icon');
+            if (details) details.classList.toggle('expanded');
+            if (icon) icon.classList.toggle('rotate-180');
+          });
+        });
+      }
+      
+      function updateSummary() {
+        summaryRevenue.textContent = (state.revenue || 0).toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0
+        });
+        summaryAdbb.textContent = (state.adbb || 0).toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0
+        });
+        summaryNegDays.textContent = state.negDays || 0;
+        summaryFico.textContent    = state.fico || 0;
+        summaryTib.textContent     = state.timeMonths || 0;
+        var selectedOption = industrySelect.querySelector('option[value="' + state.industry + '"]');
+        summaryIndustry.textContent = selectedOption ? selectedOption.textContent : state.industry;
+      }
+
+      function setupInputFormatting(inputElement) {
+        inputElement.addEventListener('input', function (e) {
+          var raw = e.target.value;
+          var numeric = parseRevenue(raw);
+          var stateKey = e.target.id === 'revenue-input' ? 'revenue' : 'adbb';
+          state[stateKey] = numeric; 
+          if (raw.replace(/[^0-9]/g, '').length > 0) {
+            e.target.value = numeric.toLocaleString('en-US', { maximumFractionDigits: 0 });
+          } else {
+            e.target.value = '';
+          }
+        });
+        
+        inputElement.addEventListener('blur', function (e) {
+          var numeric = parseRevenue(e.target.value);
+          var stateKey = e.target.id === 'revenue-input' ? 'revenue' : 'adbb';
+          state[stateKey] = numeric;
+          if (numeric > 0) {
+            e.target.value = numeric.toLocaleString('en-US', { maximumFractionDigits: 0 });
+          } else if (e.target.value.length > 0) {
+            e.target.value = '0';
+          } else {
+            e.target.value = '';
+          }
+        });
+      }
+      
+      setupInputFormatting(revenueInput);
+      setupInputFormatting(adbbInput);
+
+      negDaysSlider.addEventListener('input', function (e) {
+        var days = parseInt(e.target.value, 10);
+        state.negDays = Number.isFinite(days) ? days : 0;
+        negDaysLabel.textContent = days + (days >= 10 ? '+ days' : ' days');
+      });
+
+      ficoSlider.addEventListener('input', function (e) {
+        var score = parseInt(e.target.value, 10);
+        state.fico = Number.isFinite(score) ? score : 0;
+        ficoLabel.textContent = score;
+      });
+
+      industrySelect.addEventListener('change', function (e) {
+        state.industry = e.target.value || 'general';
+      });
+
+      tibSlider.addEventListener('input', function (e) {
+        var months = parseInt(e.target.value, 10);
+        state.timeMonths = Number.isFinite(months) ? months : 0;
+        tibLabel.textContent = months + (months >= 60 ? '+ months' : ' months');
+      });
+
+      calculateBtn.addEventListener('click', function() {
+        state.revenue    = parseRevenue(revenueInput.value);
+        state.adbb       = parseRevenue(adbbInput.value);
+        state.negDays    = parseInt(negDaysSlider.value, 10) || 0;
+        state.fico       = parseInt(ficoSlider.value, 10) || 0;
+        state.industry   = industrySelect.value;
+        state.timeMonths = parseInt(tibSlider.value, 10) || 0;
+
+        try {
+          apiErrorContainer.classList.add('hidden');
+          runFullCalculation();
+        } catch (error) {
+          console.error('Calculation failed:', error);
+          apiErrorMessage.textContent = error.message || 'An unknown error occurred during calculation.';
+          apiErrorContainer.classList.remove('hidden');
+          lenderListContainer.innerHTML = '';
+        }
+
+        updateSummary();
+        formSection.classList.add('hidden');
+        resultsSection.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      });
+
+      toggleDeclinedBtn.addEventListener('click', function () {
+        declinedVisible = !declinedVisible;
+        var rows = lenderListContainer.querySelectorAll('.declined-row');
+        for (var i = 0; i < rows.length; i++) {
+          rows[i].classList.toggle('hidden', !declinedVisible);
+        }
+        toggleDeclinedBtn.textContent = declinedVisible ? 'Hide declined lenders' : 'Show declined lenders';
+
+        if (!declinedVisible) {
+          rows.forEach(function(row) {
+            var details = row.querySelector('.lender-item-details');
+            var icon = row.querySelector('.expand-icon');
+            if (details) details.classList.remove('expanded');
+            if (icon) icon.classList.remove('rotate-180');
+          });
+        }
+      });
+
+      startOverBtn.addEventListener('click', function() {
+        resultsSection.classList.add('hidden');
+        formSection.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      });
+
+      // --- INITIALIZATION ---
+      function init() {
+        state.revenue    = parseRevenue(revenueInput.value);
+        state.adbb       = parseRevenue(adbbInput.value);
+        state.negDays    = parseInt(negDaysSlider.value, 10) || 0;
+        state.fico       = parseInt(ficoSlider.value, 10) || 0;
+        state.industry   = industrySelect.value;
+        state.timeMonths = parseInt(tibSlider.value, 10) || 0;
+
+        negDaysLabel.textContent = state.negDays + (state.negDays >= 10 ? '+ days' : ' days');
+        ficoLabel.textContent    = state.fico;
+        tibLabel.textContent     = state.timeMonths + (state.timeMonths >= 60 ? '+ months' : ' months');
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
