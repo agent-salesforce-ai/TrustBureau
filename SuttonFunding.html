@@ -132,18 +132,6 @@
       color: var(--accent-text-inverted);
     }
 
-    .header-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 0.9rem;
-      border-radius: 9999px;
-      background-color: rgba(210, 155, 42, 0.08);
-      color: var(--accent-color);
-      border: 1px solid rgba(210, 155, 42, 0.35);
-      gap: 0.35rem;
-    }
-
     .button-primary {
       background-color: var(--accent-color);
       color: var(--button-text-color);
@@ -194,7 +182,6 @@
         </button>
       </div>
     </div>
-    <!-- END HEADER -->
 
     <!-- REP SETTINGS PANEL -->
     <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
@@ -278,8 +265,7 @@
         </button>
       </div>
     </div>
-    <!-- === END: OFFER CALCULATOR === -->
-
+    <!-- END CALCULATOR -->
 
     <!-- OFFER 1 CARD -->
     <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
@@ -312,7 +298,7 @@
             <span class="text-xs font-semibold text-muted block">Total Cost of Funds</span>
             <span id="summaryCostOut" class="text-xl font-semibold text-primary block"></span>
           </div>
-          <div id="summaryPaymentContainer" class="text-center">
+          <div class="text-center">
             <span id="summaryPaymentLabel" class="text-xs font-semibold text-muted block">Est. Daily Payment</span>
             <span id="summaryPaymentValue" class="text-xl font-semibold text-primary block"></span>
           </div>
@@ -326,7 +312,7 @@
       </div>
     </div>
 
-    <!-- ADDITIONAL OFFERS (2 & 3) -->
+    <!-- ADDITIONAL OFFERS -->
     <div id="savedOffersSection" class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
       <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
         <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
@@ -334,7 +320,7 @@
       <div id="savedOffersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
-    <!-- BUTTON LOCATION -->
+    <!-- BUTTONS -->
     <div id="buttonContainer" class="pt-4 border-t border-primary">
       <div class="relative flex justify-center gap-3 flex-wrap">
         <button id="addOfferButton" class="button-primary flex items-center gap-2">
@@ -352,7 +338,7 @@
       </div>
     </div>
 
-  </div>
+  </div><!-- end main card -->
 
   <script>
     const elements = {
@@ -736,7 +722,7 @@
         elements.termContainer.style.display = 'none';
         elements.toggleContainer.style.display = 'none';
 
-        // Hide editable Business Name field
+        // Hide editable Business Name field – client sees name only in hero
         if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
         if (elements.businessNameInput) elements.businessNameInput.disabled = true;
 
@@ -775,7 +761,6 @@
         elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
         elements.summaryTermOut.textContent = `${offer.termMonths} mo`;
         elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
-
         elements.summaryPaymentLabel.textContent = offer.paymentLabel;
         elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
 
