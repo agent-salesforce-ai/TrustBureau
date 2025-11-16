@@ -447,6 +447,14 @@
     let activeOfferIndex = -1;
     let isApprovalView = false;
 
+    // Helper to keep JS cap and slider.max in sync
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
+
     const formatCurrency = (num) => {
       const numericValue = Number(num);
       if (isNaN(numericValue)) return '$0';
@@ -508,7 +516,7 @@
       if (!offer) return;
 
       if (isApprovalView) {
-        amountSliderMax = offer.amount;
+        setAmountSliderMax(offer.amount); // cap + update DOM max
       }
 
       // Update sliders and inputs from a saved offer
@@ -717,9 +725,9 @@
 
       // In approval links, cap the primary amount at its approved value
       if (isApprovalView) {
-        amountSliderMax = amount;
+        setAmountSliderMax(amount);
       } else {
-        amountSliderMax = 1000000;
+        setAmountSliderMax(1000000);
       }
 
       elements.calcAmountInput.value = formatCurrency(amount);
