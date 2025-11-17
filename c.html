@@ -209,13 +209,13 @@
       color: var(--text-secondary);
     }
     .toggle-active {
-      background-color: var(--accent-color);
-      color: var(--text-primary);
+      background-color: var(--accent-color-light);
+      color: #0f172a;
     }
 
     .button-primary {
-      background-color: var(--accent-color);
-      color: var(--text-primary);
+      background-color: var(--accent-color-light);
+      color: #0f172a;
       font-weight: 600;
       border-radius: 0.75rem;
       padding: 0.6rem 1.75rem;
@@ -549,7 +549,7 @@
           </svg>
           Add Offer
         </button>
-        <button id="shareLinkButton" class="button-primary flex items-center gap-2">
+        <button id="shareLinkButton" class="button-primary flex items-center gap-2" type="button">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
                fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -980,31 +980,31 @@
       if (elements.calcAmountSlider && elements.calcAmountInput) {
         syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
       }
-      if (elements.calcFactorSlider && elements.calcFactorInput) {
+      if (elements.calcFactorSlider && elements.calcFactorInput && !isApprovalView) {
         syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
       }
-      if (elements.calcTermSlider && elements.calcTermInput) {
+      if (elements.calcTermSlider && elements.calcTermInput && !isApprovalView) {
         syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
       }
-      if (elements.originationSlider && elements.originationInput) {
+      if (elements.originationSlider && elements.originationInput && !isApprovalView) {
         syncInputs(elements.originationSlider, elements.originationInput, false, 0, 10, runCalculator);
       }
 
-      if (elements.toggleDaily) {
+      if (elements.toggleDaily && !isApprovalView) {
         elements.toggleDaily.addEventListener('click', () => {
           paymentFrequency = 'daily';
           updatePaymentToggleUI();
           runCalculator();
         });
       }
-      if (elements.toggleWeekly) {
+      if (elements.toggleWeekly && !isApprovalView) {
         elements.toggleWeekly.addEventListener('click', () => {
           paymentFrequency = 'weekly';
           updatePaymentToggleUI();
           runCalculator();
         });
       }
-      if (elements.toggleMonthly) {
+      if (elements.toggleMonthly && !isApprovalView) {
         elements.toggleMonthly.addEventListener('click', () => {
           paymentFrequency = 'monthly';
           updatePaymentToggleUI();
@@ -1012,11 +1012,11 @@
         });
       }
 
-      if (elements.businessNameInput) {
+      if (elements.businessNameInput && !isApprovalView) {
         elements.businessNameInput.addEventListener('input', runCalculator);
       }
 
-      if (elements.termLengthMonthsInput) {
+      if (elements.termLengthMonthsInput && !isApprovalView) {
         elements.termLengthMonthsInput.addEventListener('input', () => {
           termLengthManualDirty = true;
           runCalculator();
@@ -1033,42 +1033,44 @@
         });
       }
 
-      if (elements.repSettingsToggle && elements.repSettingsPanel) {
+      if (elements.repSettingsToggle && elements.repSettingsPanel && !isApprovalView) {
         elements.repSettingsToggle.addEventListener('click', () => {
           elements.repSettingsPanel.classList.toggle('hidden');
         });
       }
 
-      if (elements.themePanelToggle && elements.repSettingsPanel) {
+      if (elements.themePanelToggle && elements.repSettingsPanel && !isApprovalView) {
         elements.themePanelToggle.addEventListener('click', () => {
           elements.repSettingsPanel.classList.remove('hidden');
         });
       }
 
-      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
-      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
-      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+      if (!isApprovalView) {
+        if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+        if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+        if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
-      if (elements.themeSelector) {
-        elements.themeSelector.addEventListener('change', e => {
-          currentTheme = e.target.value;
-          applyTheme();
-        });
+        if (elements.themeSelector) {
+          elements.themeSelector.addEventListener('change', e => {
+            currentTheme = e.target.value;
+            applyTheme();
+          });
+        }
+
+        if (elements.accentSelector) {
+          elements.accentSelector.addEventListener('change', e => {
+            currentAccent = e.target.value;
+            applyTheme();
+          });
+        }
+
+        if (elements.addOfferButton) {
+          elements.addOfferButton.addEventListener('click', handleAddOffer);
+        }
       }
 
-      if (elements.accentSelector) {
-        elements.accentSelector.addEventListener('change', e => {
-          currentAccent = e.target.value;
-          applyTheme();
-        });
-      }
-
-      if (elements.addOfferButton) {
-        elements.addOfferButton.addEventListener('click', handleAddOffer);
-      }
-
-      if (elements.shareLinkButton) {
-        elements.shareLinkButton.addEventListener('click', () => {
+      if (elements.shareLinkButton && !isApprovalView) {
+        elements.shareLinkButton.addEventListener('click', async () => {
           const shareBtn = elements.shareLinkButton;
           const originalText = shareBtn.innerText;
 
@@ -1106,26 +1108,34 @@
             view: 'approval',
           });
           url.search = params.toString();
+          const shareUrl = url.toString();
 
-          const ta = document.createElement('textarea');
-          ta.value = url.toString();
-          ta.style.position = 'fixed';
-          ta.style.top = '0';
-          ta.style.left = '0';
-          document.body.appendChild(ta);
-          ta.focus();
-          ta.select();
+          const setStatus = (msg) => {
+            shareBtn.innerText = msg;
+            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          };
 
           try {
-            document.execCommand('copy');
-            shareBtn.innerText = 'Copied!';
-            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(shareUrl);
+            } else {
+              const ta = document.createElement('textarea');
+              ta.value = shareUrl;
+              ta.style.position = 'fixed';
+              ta.style.top = '0';
+              ta.style.left = '0';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+            }
+            setStatus('Copied!');
           } catch (e) {
             console.error('Copy failed', e);
-            shareBtn.innerText = 'Error';
-            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+            setStatus('Error');
           }
-          document.body.removeChild(ta);
         });
       }
 
