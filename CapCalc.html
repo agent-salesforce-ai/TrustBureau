@@ -87,7 +87,6 @@
 
     .text-hero {
       color: var(--accent-color);
-      /* glow removed for cleaner typography */
     }
 
     .toggle-inactive {
@@ -266,6 +265,18 @@
                    class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
+
+        <!-- Manual Term Length (Months - Display Only) -->
+        <div id="termLengthMonthsContainer" class="space-y-1">
+          <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">
+            Term Length (Months - Display Only)
+          </label>
+          <div class="relative group">
+            <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
+                   class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+                   placeholder="Auto" />
+          </div>
+        </div>
       </div>
 
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
@@ -381,6 +392,7 @@
       calcAmountInput: document.getElementById('calcAmountInput'),
       calcFactorInput: document.getElementById('calcFactorInput'),
       calcTermInput: document.getElementById('calcTermInput'),
+      termLengthMonthsInput: document.getElementById('termLengthMonthsInput'),
 
       toggleDaily: document.getElementById('toggleDaily'),
       toggleWeekly: document.getElementById('toggleWeekly'),
@@ -417,6 +429,7 @@
       calculatorInputs: document.getElementById('calculatorInputs'),
       factorContainer: document.getElementById('factorContainer'),
       termContainer: document.getElementById('termContainer'),
+      termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
       toggleContainer: document.getElementById('toggleContainer'),
       buttonContainer: document.getElementById('buttonContainer'),
 
@@ -432,6 +445,7 @@
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
+    let termLengthManualDirty = false;
 
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
@@ -468,8 +482,8 @@
       // Approximate term length in months from # of payments and payment frequency
       let rawMonths;
       if (frequency === 'weekly') {
-      // 52 weeks = 12 months
-      rawMonths = termPayments * (12 / 52);
+        // 52 weeks = 12 months
+        rawMonths = termPayments * (12 / 52);
       } else if (frequency === 'monthly') {
         rawMonths = termPayments;
       } else {
@@ -608,7 +622,11 @@
 
     function applyTheme() {
       document.documentElement.className = `${currentTheme} ${currentAccent}`;
-      localStorage.setItem('theme', currentTheme);
+      try {
+        localStorage.setItem('theme', currentTheme);
+      } catch (e) {
+        // ignore storage errors
+      }
     }
 
     function updateRepDisplay() {
@@ -706,6 +724,7 @@
       if (isApprovalView) {
         if (elements.factorContainer) elements.factorContainer.style.display = 'none';
         if (elements.termContainer) elements.termContainer.style.display = 'none';
+        if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
         if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
 
         if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
@@ -748,14 +767,31 @@
         elements.summaryPaymentLabel.textContent = offer.paymentLabel;
         elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
 
-        // Display computed term length in months (rounded to nearest 0.5) under the approved amount
+        // Display term length in months, allowing manual override by setup user
         if (elements.summaryTermLengthOut) {
-          const months = offer.termLengthMonths;
+          let months = offer.termLengthMonths;
+
+          if (elements.termLengthMonthsInput) {
+            // On first run (not dirty), prefill the input with the auto-calculated term
+            if (!termLengthManualDirty) {
+              const autoRounded = Math.round(months * 2) / 2;
+              elements.termLengthMonthsInput.value = Number.isInteger(autoRounded)
+                ? autoRounded.toString()
+                : autoRounded.toFixed(1);
+            }
+
+            const manualVal = parseFloat(elements.termLengthMonthsInput.value);
+            if (!isNaN(manualVal) && manualVal > 0) {
+              months = manualVal;
+            }
+          }
+
           if (months && months > 0) {
-            const monthsDisplay = Number.isInteger(months)
-              ? months.toString()
-              : months.toFixed(1); // will be .0 or .5
-            elements.summaryTermLengthOut.textContent = `${monthsDisplay} months`;
+            const rounded = Math.round(months * 2) / 2;
+            const display = Number.isInteger(rounded)
+              ? rounded.toString()
+              : rounded.toFixed(1);
+            elements.summaryTermLengthOut.textContent = `${display} months`;
           } else {
             elements.summaryTermLengthOut.textContent = '';
           }
@@ -770,30 +806,86 @@
     function initializeCalculator() {
       initializeFromURL();
       applyTheme();
-      elements.themeSelector.value = currentTheme;
 
-      syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
-      syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
-      syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
+      if (elements.themeSelector) {
+        elements.themeSelector.value = currentTheme;
+      }
 
-      elements.toggleDaily.addEventListener('click', () => {
-        paymentFrequency = 'daily';
-        updatePaymentToggleUI();
-        runCalculator();
-      });
-      elements.toggleWeekly.addEventListener('click', () => {
-        paymentFrequency = 'weekly';
-        updatePaymentToggleUI();
-        runCalculator();
-      });
-      elements.toggleMonthly.addEventListener('click', () => {
-        paymentFrequency = 'monthly';
-        updatePaymentToggleUI();
-        runCalculator();
-      });
+      // Wire inputs
+      if (elements.calcAmountSlider && elements.calcAmountInput) {
+        syncInputs(
+          elements.calcAmountSlider,
+          elements.calcAmountInput,
+          true,
+          5000,
+          amountSliderMax,
+          runCalculator
+        );
+      }
+
+      if (elements.calcFactorSlider && elements.calcFactorInput) {
+        syncInputs(
+          elements.calcFactorSlider,
+          elements.calcFactorInput,
+          false,
+          1.05,
+          1.7,
+          runCalculator
+        );
+      }
+
+      if (elements.calcTermSlider && elements.calcTermInput) {
+        syncInputs(
+          elements.calcTermSlider,
+          elements.calcTermInput,
+          false,
+          1,
+          528,
+          runCalculator
+        );
+      }
+
+      if (elements.toggleDaily) {
+        elements.toggleDaily.addEventListener('click', () => {
+          paymentFrequency = 'daily';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleWeekly) {
+        elements.toggleWeekly.addEventListener('click', () => {
+          paymentFrequency = 'weekly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleMonthly) {
+        elements.toggleMonthly.addEventListener('click', () => {
+          paymentFrequency = 'monthly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
 
       if (elements.businessNameInput) {
         elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.termLengthMonthsInput) {
+        elements.termLengthMonthsInput.addEventListener('input', () => {
+          termLengthManualDirty = true;
+          runCalculator();
+        });
+        elements.termLengthMonthsInput.addEventListener('blur', () => {
+          const v = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(v) && v > 0) {
+            const rounded = Math.round(v * 2) / 2;
+            elements.termLengthMonthsInput.value = Number.isInteger(rounded)
+              ? rounded.toString()
+              : rounded.toFixed(1);
+          }
+          runCalculator();
+        });
       }
 
       if (elements.repSettingsToggle && elements.repSettingsPanel) {
@@ -805,76 +897,82 @@
       if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
       if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
-      elements.themeSelector.addEventListener('change', (e) => {
-        currentTheme = e.target.value;
-        applyTheme();
-      });
+      if (elements.themeSelector) {
+        elements.themeSelector.addEventListener('change', (e) => {
+          currentTheme = e.target.value;
+          applyTheme();
+        });
+      }
 
       if (elements.addOfferButton) {
         elements.addOfferButton.addEventListener('click', handleAddOffer);
       }
 
-      elements.shareLinkButton.addEventListener('click', () => {
-        const shareBtn = elements.shareLinkButton;
-        const originalText = shareBtn.innerText;
+      if (elements.shareLinkButton) {
+        elements.shareLinkButton.addEventListener('click', () => {
+          const shareBtn = elements.shareLinkButton;
+          const originalText = shareBtn.innerText;
 
-        const amount = parseFormattedNumber(elements.calcAmountInput.value);
-        const factor = parseFloat(elements.calcFactorInput.value);
-        const term = parseInt(elements.calcTermInput.value) || 1;
-        const freq = paymentFrequency;
-        const theme = currentTheme;
-        const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
-        const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
-        const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
-        const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+          const amount = parseFormattedNumber(elements.calcAmountInput.value);
+          const factor = parseFloat(elements.calcFactorInput.value);
+          const term = parseInt(elements.calcTermInput.value) || 1;
+          const freq = paymentFrequency;
+          const theme = currentTheme;
+          const businessName = elements.businessNameInput
+            ? elements.businessNameInput.value.trim()
+            : '';
+          const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+          const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+          const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
 
-        const offersForUrl = savedOffers.map((offer) => ({
-          a: offer.amount,
-          f: offer.factor,
-          t: offer.termMonths,
-          q: offer.frequency || freq,
-        }));
+          const offersForUrl = savedOffers.map((offer) => ({
+            a: offer.amount,
+            f: offer.factor,
+            t: offer.termMonths,
+            q: offer.frequency || freq,
+          }));
 
-        const url = new URL(window.location.href);
-        const params = new URLSearchParams({
-          amount,
-          factor,
-          term,
-          freq,
-          theme,
-          businessName,
-          repName,
-          repEmail,
-          repPhone,
-          offers: JSON.stringify(offersForUrl),
-          view: 'approval',
+          const url = new URL(window.location.href);
+          const params = new URLSearchParams({
+            amount,
+            factor,
+            term,
+            freq,
+            theme,
+            businessName,
+            repName,
+            repEmail,
+            repPhone,
+            offers: JSON.stringify(offersForUrl),
+            view: 'approval',
+          });
+          url.search = params.toString();
+
+          const textArea = document.createElement('textarea');
+          textArea.value = url.toString();
+          textArea.style.position = 'fixed';
+          textArea.style.top = '0';
+          textArea.style.left = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+
+          try {
+            document.execCommand('copy');
+            shareBtn.innerText = 'Copied!';
+            setTimeout(() => {
+              shareBtn.innerText = originalText;
+            }, 2000);
+          } catch (errFallback) {
+            console.error('Fallback copy failed:', errFallback);
+            shareBtn.innerText = 'Error';
+            setTimeout(() => {
+              shareBtn.innerText = originalText;
+            }, 2000);
+          }
+          document.body.removeChild(textArea);
         });
-        url.search = params.toString();
-
-        const textArea = document.createElement('textarea');
-        textArea.value = url.toString();
-        textArea.style.position = 'fixed';
-        textArea.style.top = '0';
-        textArea.style.left = '0';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        try {
-          document.execCommand('copy');
-          shareBtn.innerText = 'Copied!';
-          setTimeout(() => {
-            shareBtn.innerText = originalText;
-          }, 2000);
-        } catch (errFallback) {
-          console.error('Fallback copy failed:', errFallback);
-          shareBtn.innerText = 'Error';
-          setTimeout(() => {
-            shareBtn.innerText = originalText;
-          }, 2000);
-        }
-        document.body.removeChild(textArea);
-      });
+      }
 
       updatePaymentToggleUI();
       runCalculator();
