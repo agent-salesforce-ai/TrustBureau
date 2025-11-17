@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CapFront | Offer Calculator</title>
+  <title>CapFront | Payments Offer Calculator</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -50,7 +50,7 @@
     }
     html.theme-corporate body { background-color: var(--bg-body); }
 
-    /* CapFront accent (two blues from logo-ish) */
+    /* CapFront accent */
     html.accent-capfront {
       --accent-color: #00a7ff;        /* primary blue */
       --accent-color-light: #38bdf8;  /* lighter */
@@ -82,9 +82,12 @@
     .input-field:focus-within {
       border-color: var(--accent-color);
       box-shadow: 0 0 0 2px var(--accent-color-light);
+      outline: none;
     }
 
-    .text-hero { color: var(--accent-color); text-shadow: var(--accent-shadow); }
+    .text-hero {
+      color: var(--accent-color);
+    }
 
     .toggle-inactive {
       background-color: var(--bg-toggle-inactive);
@@ -96,22 +99,30 @@
     }
 
     .button-primary {
-      background-color: var(--accent-color-light); /* lighter blue for readability */
-      color: #0f172a; /* dark navy text for readability */
+      background-color: var(--accent-color-light);
+      color: #0f172a;
       font-weight: 600;
-      border-radius: 0.75rem; /* a bit more pill-like */
+      border-radius: 0.75rem;
       padding: 0.6rem 1.75rem;
       border: 1px solid rgba(0, 167, 255, 0.85);
-      transition: background-color 0.15s ease, box-shadow 0.15s ease;
-    }}
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+    }
     .button-primary:hover {
-      background-color: var(--accent-color-dark); /* darker on hover */
-      box-shadow: 0 0 0 1px rgba(0, 167, 255, 0.75), 0 0 18px rgba(0, 167, 255, 0.7);
+      background-color: var(--accent-color-dark);
+      box-shadow:
+        0 0 0 1px rgba(0, 167, 255, 0.75),
+        0 0 18px rgba(0, 167, 255, 0.7);
+      transform: translateY(-1px) scale(1.02);
     }
     .button-primary:disabled {
       background-color: var(--bg-slider-track);
       color: var(--text-muted);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .brand-logo { filter: drop-shadow(0 0 18px rgba(0, 167, 255, 0.45)); }
@@ -124,12 +135,11 @@
     .shell {
       border-color: var(--accent-color);
       border-width: 2px;
-      /* Multi-hue glow using CapFront logo blues */
       box-shadow:
-        0 0 0 3px rgba(0, 167, 255, 0.9),    /* inner electric blue ring */
-        0 0 25px rgba(0, 167, 255, 0.75),   /* mid glow, primary logo blue */
-        0 0 55px rgba(3, 105, 161, 0.7),    /* deeper blue outer glow */
-        0 0 90px rgba(56, 189, 248, 0.45); /* lighter cyan edge */
+        0 0 0 3px rgba(0, 167, 255, 0.9),
+        0 0 25px rgba(0, 167, 255, 0.75),
+        0 0 55px rgba(3, 105, 161, 0.7),
+        0 0 90px rgba(56, 189, 248, 0.45);
     }
   </style>
 </head>
@@ -223,7 +233,7 @@
 
         <div id="factorContainer" class="space-y-1">
           <label for="calcFactor" class="block text-xs font-semibold text-muted">Factor Rate</label>
-          <input id="calcFactorSlider" type="range" min="1.1" max="1.5" step="0.01" value="1.25"
+          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
             <svg xmlns="http://www.w3.org/2000/svg"
@@ -237,11 +247,12 @@
           </div>
         </div>
 
+        <!-- Number of Payments (drives math) -->
         <div id="termContainer" class="space-y-1">
           <label for="calcTerm" class="block text-xs font-semibold text-muted">
-            Term (Months)
+            Number of Payments
           </label>
-          <input id="calcTermSlider" type="range" min="3" max="24" step="1" value="6"
+          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="6"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
             <svg xmlns="http://www.w3.org/2000/svg"
@@ -252,6 +263,18 @@
             </svg>
             <input id="calcTermInput" type="number" step="1"
                    class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Manual Term Length (Months - Display Only) -->
+        <div id="termLengthMonthsContainer" class="space-y-1">
+          <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">
+            Term Length (Months - Display Only)
+          </label>
+          <div class="relative group">
+            <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
+                   class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+                   placeholder="Auto" />
           </div>
         </div>
       </div>
@@ -289,14 +312,19 @@
         <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
       </div>
       <div class="pt-6">
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4 justify-items-center">
+          <div class="text-center col-span-2">
+            <span class="text-xs font-semibold text-muted block">Term Length</span>
+            <span id="summaryTermLengthOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
           <div class="text-center">
             <span class="text-xs font-semibold text-muted block">Factor Rate</span>
             <span id="summaryFactorOut"
                   class="text-xl font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
-            <span class="text-xs font-semibold text-muted block">Term</span>
+            <span class="text-xs font-semibold text-muted block">Payments</span>
             <span id="summaryTermOut"
                   class="text-xl font-semibold text-primary block"></span>
           </div>
@@ -364,11 +392,15 @@
       calcAmountInput: document.getElementById('calcAmountInput'),
       calcFactorInput: document.getElementById('calcFactorInput'),
       calcTermInput: document.getElementById('calcTermInput'),
+      termLengthMonthsInput: document.getElementById('termLengthMonthsInput'),
+
       toggleDaily: document.getElementById('toggleDaily'),
       toggleWeekly: document.getElementById('toggleWeekly'),
       toggleMonthly: document.getElementById('toggleMonthly'),
+
       themeSelector: document.getElementById('themeSelector'),
       shareLinkButton: document.getElementById('shareLinkButton'),
+
       summaryAmountOut: document.getElementById('summaryAmountOut'),
       summaryPaybackOut: document.getElementById('summaryPaybackOut'),
       summaryFactorOut: document.getElementById('summaryFactorOut'),
@@ -376,9 +408,12 @@
       summaryCostOut: document.getElementById('summaryCostOut'),
       summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
       summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      summaryTermLengthOut: document.getElementById('summaryTermLengthOut'),
+
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
       businessNameContainer: document.getElementById('businessNameContainer'),
+
       repSettingsToggle: document.getElementById('repSettingsToggle'),
       repSettingsPanel: document.getElementById('repSettingsPanel'),
       repNameInput: document.getElementById('repNameInput'),
@@ -388,13 +423,16 @@
       repNameDisplay: document.getElementById('repNameDisplay'),
       repEmailDisplay: document.getElementById('repEmailDisplay'),
       repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+
       headerContainer: document.getElementById('headerContainer'),
       themeControls: document.getElementById('themeControls'),
       calculatorInputs: document.getElementById('calculatorInputs'),
       factorContainer: document.getElementById('factorContainer'),
       termContainer: document.getElementById('termContainer'),
+      termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
       toggleContainer: document.getElementById('toggleContainer'),
       buttonContainer: document.getElementById('buttonContainer'),
+
       addOfferButton: document.getElementById('addOfferButton'),
       savedOffersSection: document.getElementById('savedOffersSection'),
       savedOffersContainer: document.getElementById('savedOffersContainer'),
@@ -407,6 +445,7 @@
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
+    let termLengthManualDirty = false;
 
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
@@ -431,31 +470,42 @@
       return parseFloat(val.replace(/[\$,]/g, '')) || 0;
     }
 
-    function computeOffer(amount, factor, termMonths, frequency) {
+    // termMonths here represents NUMBER OF PAYMENTS driving the math.
+    // We also compute an approximate term length in MONTHS, rounded to the nearest 0.5 month.
+    function computeOffer(amount, factor, termPayments, frequency) {
       const totalPayback = amount * factor;
       const totalCost = totalPayback - amount;
-      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
-      const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
-      const dailyPayment = termMonths > 0 ? totalPayback / (termMonths * 22) : 0;
 
-      let payment = dailyPayment;
-      let paymentLabel = 'Est. Daily Payment';
+      const paymentsCount = termPayments > 0 ? termPayments : 1;
+      const paymentAmount = totalPayback / paymentsCount;
 
+      // Approximate term length in months from # of payments and payment frequency
+      let rawMonths;
       if (frequency === 'weekly') {
-        payment = weeklyPayment;
-        paymentLabel = 'Est. Weekly Payment';
+        // 52 weeks = 12 months
+        rawMonths = termPayments * (12 / 52);
       } else if (frequency === 'monthly') {
-        payment = monthlyPayment;
-        paymentLabel = 'Est. Monthly Payment';
+        rawMonths = termPayments;
+      } else {
+        // daily – 250 daily payments = 12 months
+        // => months = payments * (12 / 250)
+        rawMonths = termPayments * (12 / 250);
       }
+      // Round to nearest 0.5 month
+      const termLengthMonths = Math.round(rawMonths * 2) / 2;
+
+      let paymentLabel = 'Est. Daily Payment';
+      if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
+      if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
 
       return {
         amount,
         factor,
-        termMonths,
+        termMonths: termPayments,     // still used as "# of payments" everywhere
+        termLengthMonths,             // new display field (months, rounded to nearest 0.5)
         totalPayback,
         totalCost,
-        payment,
+        payment: paymentAmount,
         paymentLabel,
         frequency,
       };
@@ -463,9 +513,9 @@
 
     function getCurrentOffer() {
       const amount = parseFormattedNumber(elements.calcAmountInput.value);
-      const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
-      const termMonths = parseInt(elements.calcTermInput.value) || 3;
-      return computeOffer(amount, factor, termMonths, paymentFrequency);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
+      const termPayments = parseInt(elements.calcTermInput.value) || 1;
+      return computeOffer(amount, factor, termPayments, paymentFrequency);
     }
 
     function renderSavedOffers() {
@@ -497,8 +547,8 @@
                 <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
               </div>
               <div>
-                <span class="text-[11px] font-semibold text-muted block">Term</span>
-                <span class="text-sm font-semibold text-primary block">${offer.termMonths} mo</span>
+                <span class="text-[11px] font-semibold text-muted block">Payments</span>
+                <span class="text-sm font-semibold text-primary block">${offer.termMonths}</span>
               </div>
               <div>
                 <span class="text-[11px] font-semibold text-muted block">Payback</span>
@@ -572,7 +622,11 @@
 
     function applyTheme() {
       document.documentElement.className = `${currentTheme} ${currentAccent}`;
-      localStorage.setItem('theme', currentTheme);
+      try {
+        localStorage.setItem('theme', currentTheme);
+      } catch (e) {
+        // ignore storage errors
+      }
     }
 
     function updateRepDisplay() {
@@ -614,7 +668,7 @@
       const amountParam = params.get('amount');
       const amount = amountParam ? parseFloat(amountParam) : 50000;
       const factor = params.get('factor') || 1.25;
-      const term = params.get('term') || 6;
+      const term = params.get('term') || 6; // interpreted as number of payments
       const freq = params.get('freq');
       const paramTheme = params.get('theme');
       const offersParam = params.get('offers');
@@ -657,9 +711,9 @@
               const f = Number(raw.f ?? raw.factor ?? 1.1);
               const tRaw = raw.t ?? raw.term ?? 3;
               const t = parseInt(tRaw, 10);
-              const termMonths = Number.isNaN(t) ? 3 : t;
+              const termPayments = Number.isNaN(t) ? 1 : t;
               const q = raw.q ?? raw.frequency ?? 'daily';
-              return computeOffer(a, f, termMonths, q);
+              return computeOffer(a, f, termPayments, q);
             });
           }
         } catch (err) {
@@ -668,17 +722,18 @@
       }
 
       if (isApprovalView) {
-        elements.factorContainer.style.display = 'none';
-        elements.termContainer.style.display = 'none';
-        elements.toggleContainer.style.display = 'none';
+        if (elements.factorContainer) elements.factorContainer.style.display = 'none';
+        if (elements.termContainer) elements.termContainer.style.display = 'none';
+        if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
+        if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
 
         if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
         if (elements.businessNameInput) elements.businessNameInput.disabled = true;
 
-        elements.themeControls.style.display = 'none';
+        if (elements.themeControls) elements.themeControls.style.display = 'none';
         if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
-        elements.buttonContainer.style.display = 'none';
+        if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
 
         elements.headerContainer.classList.remove('justify-between');
         elements.headerContainer.classList.add('justify-center');
@@ -689,9 +744,9 @@
       try {
         const amount = parseFormattedNumber(elements.calcAmountInput.value);
         const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
-        const termMonths = parseInt(elements.calcTermInput.value) || 3;
+        const termPayments = parseInt(elements.calcTermInput.value) || 1; // number of payments
 
-        const offer = computeOffer(amount, factor, termMonths, paymentFrequency);
+        const offer = computeOffer(amount, factor, termPayments, paymentFrequency);
 
         const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
         if (elements.businessNameDisplay) {
@@ -707,10 +762,40 @@
         elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
         elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
         elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
-        elements.summaryTermOut.textContent = `${offer.termMonths} mo`;
+        elements.summaryTermOut.textContent = `${offer.termMonths} payments`;
         elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
         elements.summaryPaymentLabel.textContent = offer.paymentLabel;
         elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+
+        // Display term length in months, allowing manual override by setup user
+        if (elements.summaryTermLengthOut) {
+          let months = offer.termLengthMonths;
+
+          if (elements.termLengthMonthsInput) {
+            // On first run (not dirty), prefill the input with the auto-calculated term
+            if (!termLengthManualDirty) {
+              const autoRounded = Math.round(months * 2) / 2;
+              elements.termLengthMonthsInput.value = Number.isInteger(autoRounded)
+                ? autoRounded.toString()
+                : autoRounded.toFixed(1);
+            }
+
+            const manualVal = parseFloat(elements.termLengthMonthsInput.value);
+            if (!isNaN(manualVal) && manualVal > 0) {
+              months = manualVal;
+            }
+          }
+
+          if (months && months > 0) {
+            const rounded = Math.round(months * 2) / 2;
+            const display = Number.isInteger(rounded)
+              ? rounded.toString()
+              : rounded.toFixed(1);
+            elements.summaryTermLengthOut.textContent = `${display} months`;
+          } else {
+            elements.summaryTermLengthOut.textContent = '';
+          }
+        }
 
         updateRepDisplay();
       } catch (e) {
@@ -721,30 +806,86 @@
     function initializeCalculator() {
       initializeFromURL();
       applyTheme();
-      elements.themeSelector.value = currentTheme;
 
-      syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
-      syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.1, 1.5, runCalculator);
-      syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 3, 24, runCalculator);
+      if (elements.themeSelector) {
+        elements.themeSelector.value = currentTheme;
+      }
 
-      elements.toggleDaily.addEventListener('click', () => {
-        paymentFrequency = 'daily';
-        updatePaymentToggleUI();
-        runCalculator();
-      });
-      elements.toggleWeekly.addEventListener('click', () => {
-        paymentFrequency = 'weekly';
-        updatePaymentToggleUI();
-        runCalculator();
-      });
-      elements.toggleMonthly.addEventListener('click', () => {
-        paymentFrequency = 'monthly';
-        updatePaymentToggleUI();
-        runCalculator();
-      });
+      // Wire inputs
+      if (elements.calcAmountSlider && elements.calcAmountInput) {
+        syncInputs(
+          elements.calcAmountSlider,
+          elements.calcAmountInput,
+          true,
+          5000,
+          amountSliderMax,
+          runCalculator
+        );
+      }
+
+      if (elements.calcFactorSlider && elements.calcFactorInput) {
+        syncInputs(
+          elements.calcFactorSlider,
+          elements.calcFactorInput,
+          false,
+          1.05,
+          1.7,
+          runCalculator
+        );
+      }
+
+      if (elements.calcTermSlider && elements.calcTermInput) {
+        syncInputs(
+          elements.calcTermSlider,
+          elements.calcTermInput,
+          false,
+          1,
+          528,
+          runCalculator
+        );
+      }
+
+      if (elements.toggleDaily) {
+        elements.toggleDaily.addEventListener('click', () => {
+          paymentFrequency = 'daily';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleWeekly) {
+        elements.toggleWeekly.addEventListener('click', () => {
+          paymentFrequency = 'weekly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleMonthly) {
+        elements.toggleMonthly.addEventListener('click', () => {
+          paymentFrequency = 'monthly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
 
       if (elements.businessNameInput) {
         elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.termLengthMonthsInput) {
+        elements.termLengthMonthsInput.addEventListener('input', () => {
+          termLengthManualDirty = true;
+          runCalculator();
+        });
+        elements.termLengthMonthsInput.addEventListener('blur', () => {
+          const v = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(v) && v > 0) {
+            const rounded = Math.round(v * 2) / 2;
+            elements.termLengthMonthsInput.value = Number.isInteger(rounded)
+              ? rounded.toString()
+              : rounded.toFixed(1);
+          }
+          runCalculator();
+        });
       }
 
       if (elements.repSettingsToggle && elements.repSettingsPanel) {
@@ -756,76 +897,82 @@
       if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
       if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
-      elements.themeSelector.addEventListener('change', (e) => {
-        currentTheme = e.target.value;
-        applyTheme();
-      });
+      if (elements.themeSelector) {
+        elements.themeSelector.addEventListener('change', (e) => {
+          currentTheme = e.target.value;
+          applyTheme();
+        });
+      }
 
       if (elements.addOfferButton) {
         elements.addOfferButton.addEventListener('click', handleAddOffer);
       }
 
-      elements.shareLinkButton.addEventListener('click', () => {
-        const shareBtn = elements.shareLinkButton;
-        const originalText = shareBtn.innerText;
+      if (elements.shareLinkButton) {
+        elements.shareLinkButton.addEventListener('click', () => {
+          const shareBtn = elements.shareLinkButton;
+          const originalText = shareBtn.innerText;
 
-        const amount = parseFormattedNumber(elements.calcAmountInput.value);
-        const factor = parseFloat(elements.calcFactorInput.value);
-        const term = parseInt(elements.calcTermInput.value);
-        const freq = paymentFrequency;
-        const theme = currentTheme;
-        const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
-        const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
-        const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
-        const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+          const amount = parseFormattedNumber(elements.calcAmountInput.value);
+          const factor = parseFloat(elements.calcFactorInput.value);
+          const term = parseInt(elements.calcTermInput.value) || 1;
+          const freq = paymentFrequency;
+          const theme = currentTheme;
+          const businessName = elements.businessNameInput
+            ? elements.businessNameInput.value.trim()
+            : '';
+          const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+          const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+          const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
 
-        const offersForUrl = savedOffers.map((offer) => ({
-          a: offer.amount,
-          f: offer.factor,
-          t: offer.termMonths,
-          q: offer.frequency || freq,
-        }));
+          const offersForUrl = savedOffers.map((offer) => ({
+            a: offer.amount,
+            f: offer.factor,
+            t: offer.termMonths,
+            q: offer.frequency || freq,
+          }));
 
-        const url = new URL(window.location.href);
-        const params = new URLSearchParams({
-          amount,
-          factor,
-          term,
-          freq,
-          theme,
-          businessName,
-          repName,
-          repEmail,
-          repPhone,
-          offers: JSON.stringify(offersForUrl),
-          view: 'approval',
+          const url = new URL(window.location.href);
+          const params = new URLSearchParams({
+            amount,
+            factor,
+            term,
+            freq,
+            theme,
+            businessName,
+            repName,
+            repEmail,
+            repPhone,
+            offers: JSON.stringify(offersForUrl),
+            view: 'approval',
+          });
+          url.search = params.toString();
+
+          const textArea = document.createElement('textarea');
+          textArea.value = url.toString();
+          textArea.style.position = 'fixed';
+          textArea.style.top = '0';
+          textArea.style.left = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+
+          try {
+            document.execCommand('copy');
+            shareBtn.innerText = 'Copied!';
+            setTimeout(() => {
+              shareBtn.innerText = originalText;
+            }, 2000);
+          } catch (errFallback) {
+            console.error('Fallback copy failed:', errFallback);
+            shareBtn.innerText = 'Error';
+            setTimeout(() => {
+              shareBtn.innerText = originalText;
+            }, 2000);
+          }
+          document.body.removeChild(textArea);
         });
-        url.search = params.toString();
-
-        const textArea = document.createElement('textarea');
-        textArea.value = url.toString();
-        textArea.style.position = 'fixed';
-        textArea.style.top = '0';
-        textArea.style.left = '0';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        try {
-          document.execCommand('copy');
-          shareBtn.innerText = 'Copied!';
-          setTimeout(() => {
-            shareBtn.innerText = originalText;
-          }, 2000);
-        } catch (errFallback) {
-          console.error('Fallback copy failed:', errFallback);
-          shareBtn.innerText = 'Error';
-          setTimeout(() => {
-            shareBtn.innerText = originalText;
-          }, 2000);
-        }
-        document.body.removeChild(textArea);
-      });
+      }
 
       updatePaymentToggleUI();
       runCalculator();
