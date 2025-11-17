@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CapFront | Payments Offer Calculator</title>
+  <title>TrustBureau | Offer Calculator</title>
+
+  <!-- Outseta Quickstart script -->
+  <script>
+    var o_options = {
+      domain: 'trustbureauai.outseta.com',
+      load: 'auth,nocode'
+    };
+  </script>
+  <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -50,13 +59,13 @@
     }
     html.theme-corporate body { background-color: var(--bg-body); }
 
-    /* CapFront accent */
-    html.accent-capfront {
-      --accent-color: #00a7ff;        /* primary blue */
-      --accent-color-light: #38bdf8;  /* lighter */
-      --accent-color-dark: #0369a1;   /* darker */
+    /* Dynamic accent (loaded from localStorage) */
+    :root {
+      --accent-color: #10b981;        /* default fallback */
+      --accent-color-light: #34d399;
+      --accent-color-dark: #059669;
       --accent-text-inverted: #ffffff;
-      --accent-shadow: 0 0 18px rgba(0, 167, 255, 0.55);
+      --accent-shadow: 0 0 18px rgba(16, 185, 129, 0.55);
       --button-text-color: #ffffff;
     }
 
@@ -151,8 +160,8 @@
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
       <div class="flex flex-col items-center justify-center flex-shrink-0">
-        <img src="https://capfront.wpengine.com/wp-content/uploads/2020/07/Asset-1@500.png"
-             alt="CapFront Logo" class="brand-logo h-16 w-auto" />
+        <img id="dynamicLogo" src="../tb-logo.png"
+             alt="Logo" class="brand-logo h-16 w-auto" />
         <span class="brand-georgia text-primary text-xl mt-2 tracking-wide"></span>
       </div>
       <div id="themeControls" class="flex items-center justify-center">
@@ -883,6 +892,49 @@
     }
 
     initializeCalculator();
+
+    // Load branding from localStorage (set in dashboard)
+    (function loadBranding() {
+      const STORAGE_COLOR_KEY = 'tbAccentColor';
+      const STORAGE_LOGO_KEY = 'tbLogoDataUrl';
+      
+      // Load accent color
+      try {
+        const savedColor = localStorage.getItem(STORAGE_COLOR_KEY);
+        if (savedColor) {
+          // Convert hex to RGB for shadow calculations
+          const hex = savedColor.replace('#', '');
+          const r = parseInt(hex.substr(0, 2), 16);
+          const g = parseInt(hex.substr(2, 2), 16);
+          const b = parseInt(hex.substr(4, 2), 16);
+          
+          // Calculate lighter and darker variants
+          const lighten = (val) => Math.min(255, Math.floor(val + (255 - val) * 0.3));
+          const darken = (val) => Math.floor(val * 0.6);
+          
+          const lightColor = `#${lighten(r).toString(16).padStart(2, '0')}${lighten(g).toString(16).padStart(2, '0')}${lighten(b).toString(16).padStart(2, '0')}`;
+          const darkColor = `#${darken(r).toString(16).padStart(2, '0')}${darken(g).toString(16).padStart(2, '0')}${darken(b).toString(16).padStart(2, '0')}`;
+          
+          document.documentElement.style.setProperty('--accent-color', savedColor);
+          document.documentElement.style.setProperty('--accent-color-light', lightColor);
+          document.documentElement.style.setProperty('--accent-color-dark', darkColor);
+          document.documentElement.style.setProperty('--accent-shadow', `0 0 18px rgba(${r}, ${g}, ${b}, 0.55)`);
+        }
+      } catch (e) {
+        console.error('Error loading accent color:', e);
+      }
+      
+      // Load logo
+      try {
+        const savedLogo = localStorage.getItem(STORAGE_LOGO_KEY);
+        const logoEl = document.getElementById('dynamicLogo');
+        if (savedLogo && logoEl) {
+          logoEl.src = savedLogo;
+        }
+      } catch (e) {
+        console.error('Error loading logo:', e);
+      }
+    })();
   </script>
 </body>
 </html>
