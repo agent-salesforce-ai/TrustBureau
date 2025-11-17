@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-slate">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CapFront | Payments Offer Calculator</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    input[type=number]::-webkit-inner-spin_button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    /* Single dark theme */
+    html.theme-slate {
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-tag: rgba(30, 64, 175, 0.22);
+      --bg-tag-soft: rgba(30, 64, 175, 0.35);
+      --bg-tag-soft-2: rgba(37, 99, 235, 0.25);
+      --bg-toggle-active: rgba(37, 99, 235, 0.9);
+      --bg-toggle-inactive: rgba(15, 23, 42, 1);
+      --bg-hero-badge: rgba(30, 64, 175, 0.25);
+      --gradient-hero:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.45), transparent 50%),
+        radial-gradient(circle at top right, rgba(14, 165, 233, 0.2), transparent 55%),
+        radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.16), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.55), transparent 50%);
+      --card-glow: 0 0 0 1px rgba(56, 189, 248, 0.2), 0 0 40px rgba(59, 130, 246, 0.4);
+      --text-primary: #e5e7eb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --text-hero: #f9fafb;
+      --border-primary: rgba(148, 163, 184, 0.35);
+      --border-subtle: rgba(148, 163, 184, 0.25);
+      --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.7);
+      --shadow-tag: 0 0 30px rgba(59, 130, 246, 0.55);
+      --accent-capfront: #06b6d4;
+      --accent-soft: rgba(6, 182, 212, 0.35);
+      --accent-strong: #22d3ee;
+    }
+
+    .bg-body {
+      background-color: var(--bg-body);
+    }
+
+    .card-bg {
+      background-color: var(--bg-card);
+    }
+
+    .card-inner-bg {
+      background-color: var(--bg-card-inner);
+    }
+
+    .card-glow {
+      box-shadow: var(--card-glow);
+    }
+
+    .slider-track-bg {
+      background-color: var(--bg-slider-track);
+    }
+
+    .input-bg {
+      background-color: var(--bg-input);
+    }
+
+    .tag-bg {
+      background-color: var(--bg-tag);
+      box-shadow: var(--shadow-tag);
+    }
+
+    .tag-soft-bg {
+      background-color: var(--bg-tag-soft);
+    }
+
+    .tag-soft-bg-2 {
+      background-color: var(--bg-tag-soft-2);
+    }
+
+    .hero-badge-bg {
+      background-color: var(--bg-hero-badge);
+    }
+
+    .text-primary {
+      color: var(--text-primary);
+    }
+
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+
+    .text-muted {
+      color: var(--text-muted);
+    }
+
+    .text-hero {
+      color: var(--text-hero);
+    }
+
+    .border-primary {
+      border-color: var(--border-primary);
+    }
+
+    .border-subtle {
+      border-color: var(--border-subtle);
+    }
+
+    .shadow-soft {
+      box-shadow: var(--shadow-soft);
+    }
+
+    .accent-capfront {
+      color: var(--accent-capfront);
+    }
+
+    .accent-soft-bg {
+      background-color: var(--accent-soft);
+    }
+
+    .accent-strong {
+      color: var(--accent-strong);
+    }
+
+    .hero-gradient {
+      background-image: var(--gradient-hero);
+    }
+
+    .outline-glow {
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4), 0 0 40px rgba(59, 130, 246, 0.7);
+    }
+
+    .outline-glow-soft {
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.22), 0 0 35px rgba(59, 130, 246, 0.5);
+    }
+
+    .outline-glow-subtle {
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.25), 0 0 25px rgba(15, 23, 42, 0.85);
+    }
+
+    .toggle-active {
+      background-color: var(--bg-toggle-active);
+      color: #f9fafb;
+    }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-muted);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .slider-thumb::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 999px;
+      background: #f9fafb;
+      border: 2px solid var(--accent-capfront);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25);
+      cursor: pointer;
+      margin-top: -6px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .slider-thumb::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 999px;
+      background: #f9fafb;
+      border: 2px solid var(--accent-capfront);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25);
+      cursor: pointer;
+      position: relative;
+      z-index: 10;
+    }
+
+    .slider-thumb::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to right, rgba(56, 189, 248, 0.9), rgba(37, 99, 235, 0.95));
+      box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.9);
+    }
+
+    .slider-thumb::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to right, rgba(56, 189, 248, 0.9), rgba(37, 99, 235, 0.95));
+      box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.9);
+    }
+
+    .slider-thumb::-ms-track {
+      height: 6px;
+      border-radius: 999px;
+      background: transparent;
+      border-color: transparent;
+      color: transparent;
+    }
+
+    .slider-thumb::-ms-fill-lower {
+      background: linear-gradient(to right, rgba(56, 189, 248, 0.9), rgba(37, 99, 235, 0.95));
+    }
+
+    .slider-thumb::-ms-fill-upper {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    ::placeholder {
+      color: rgba(148, 163, 184, 0.6);
+    }
+
+    #savedOffersContainer::-webkit-scrollbar {
+      height: 5px;
+    }
+
+    #savedOffersContainer::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    #savedOffersContainer::-webkit-scrollbar-thumb {
+      background: rgba(55, 65, 81, 0.9);
+      border-radius: 999px;
+    }
+
+    #savedOffersContainer::-webkit-scrollbar-thumb:hover {
+      background: rgba(75, 85, 99, 1);
+    }
+
+    .logo-text {
+      letter-spacing: 0.08em;
+    }
+
+    .summary-badge {
+      background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.55), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.35), transparent 45%),
+        linear-gradient(to bottom right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.92));
+      border-color: rgba(148, 163, 184, 0.55);
+    }
+
+    .summary-badge .text-muted {
+      color: rgba(229, 231, 235, 0.92);
+      text-shadow: 0 0 14px rgba(15, 23, 42, 0.9);
+    }
+
+    .summary-amount {
+      text-shadow: 0 0 30px rgba(59, 130, 246, 0.7);
+    }
+
+    .summary-pill {
+      background: rgba(15, 23, 42, 0.96);
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    .summary-pill-highlight {
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.28), transparent 55%),
+        rgba(15, 23, 42, 0.98);
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 32px rgba(56, 189, 248, 0.55);
+    }
+
+    .pill-label {
+      color: rgba(148, 163, 184, 0.88);
+    }
+
+    .pill-value {
+      color: #e5e7eb;
+    }
+
+    .freq-pill-active {
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.4), transparent 55%), rgba(15, 23, 42, 1);
+      border-color: rgba(59, 130, 246, 0.7);
+      box-shadow: 0 0 26px rgba(56, 189, 248, 0.8);
+    }
+
+    .freq-pill-inactive {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(55, 65, 81, 0.9);
+      color: rgba(156, 163, 175, 0.9);
+    }
+
+    .tag-chip {
+      border-radius: 999px;
+      border-width: 1px;
+      border-color: rgba(148, 163, 184, 0.35);
+      background-color: rgba(15, 23, 42, 0.9);
+    }
+
+    .tag-chip-accent {
+      border-radius: 999px;
+      border-width: 1px;
+      border-color: rgba(56, 189, 248, 0.5);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.3), transparent 55%),
+        rgba(15, 23, 42, 0.95);
+      box-shadow: 0 0 32px rgba(56, 189, 248, 0.6);
+    }
+
+    .divider-gradient {
+      border-top: 1px solid rgba(31, 41, 55, 1);
+      box-shadow: 0 -1px 0 rgba(15, 23, 42, 0.9);
+    }
+
+    .rep-input {
+      background-color: rgba(15, 23, 42, 0.9);
+      border-color: rgba(55, 65, 81, 0.9);
+      color: var(--text-primary);
+    }
+
+    .rep-input:focus {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.8);
+    }
+  </style>
+</head>
+<body class="bg-body text-primary min-h-screen">
+  <div class="min-h-screen flex flex-col">
+    <main class="flex-grow">
+      <div class="max-w-6xl mx-auto px-4 pb-16 pt-10 md:pt-12">
+        <!-- Header -->
+        <div id="headerContainer" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <div class="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-400/40 flex items-center justify-center outline-glow-subtle">
+                <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-sky-400 via-cyan-300 to-sky-500 flex items-center justify-center shadow-soft">
+                  <span class="text-slate-950 font-black text-xl">C</span>
+                </div>
+              </div>
+              <div class="flex flex-col leading-tight">
+                <span class="text-xs uppercase tracking-[0.25em] text-sky-400/80 logo-text">CAPFRONT</span>
+                <span class="text-[10px] text-slate-400">Payments Offer Snapshot</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rep Settings only (no theme selector) -->
+          <div id="themeControls" class="flex items-center gap-3 justify-end">
+            <button id="repSettingsToggle" class="inline-flex items-center gap-1.5 rounded-full border border-subtle px-3 py-1.5 text-[11px] text-secondary hover:border-sky-500/60 hover:text-sky-300 transition-colors">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Rep Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- Rep Settings Panel -->
+        <div id="repSettingsPanel" class="mb-6 hidden">
+          <div class="card-bg border border-subtle rounded-2xl px-4 py-3 outline-glow-subtle">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] uppercase tracking-[0.16em] text-muted mb-1">Rep Name</label>
+                  <input id="repNameInput" type="text" class="rep-input w-full rounded-xl px-3 py-2 text-xs focus:outline-none" placeholder="Jordan at CapFront" />
+                </div>
+                <div>
+                  <label class="block text-[11px] uppercase tracking-[0.16em] text-muted mb-1">Rep Email</label>
+                  <input id="repEmailInput" type="email" class="rep-input w-full rounded-xl px-3 py-2 text-xs focus:outline-none" placeholder="jordan@capfront.net" />
+                </div>
+                <div>
+                  <label class="block text-[11px] uppercase tracking-[0.16em] text-muted mb-1">Rep Phone</label>
+                  <input id="repPhoneInput" type="tel" class="rep-input w-full rounded-xl px-3 py-2 text-xs focus:outline_none" placeholder="(555) 123-4567" />
+                </div>
+              </div>
+              <div class="text-xs text-muted max-w-xs">
+                This information is shown in the approval snapshot so your client knows exactly who to contact.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="grid lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+          <!-- Left Column: Hero + Calculator -->
+          <div class="space-y-5" id="calculatorInputs">
+            <!-- Hero Panel -->
+            <div class="relative card-bg rounded-3xl border border-primary shadow-soft hero-gradient outline-glow p-5 md:p-6 overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-b from-slate-900/10 via-slate-950/60 to-slate-950/95"></div>
+
+              <div class="relative flex flex-col gap-3">
+                <div class="inline-flex items-center gap-2 rounded-full hero-badge-bg border border-sky-500/40 px-3 py-1.5 w-fit tag-soft-bg-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span class="text-[10px] uppercase tracking-[0.24em] text-sky-100/90">LIVE PAYMENTS SNAPSHOT</span>
+                </div>
+
+                <div class="space-y-2">
+                  <h1 class="text-2xl md:text-[26px] font-semibold text-hero tracking-tight">
+                    Visualize your payment terms like your client will see them.
+                  </h1>
+                  <p class="text-[13px] text-secondary max-w-xl">
+                    Set your funded amount, factor, and number of payments. Toggle between daily, weekly, or monthly payment structures and instantly preview a clean, client-ready approval view.
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                  <div class="tag-chip-accent px-3 py-1 text-[11px] flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Client-facing approval snapshot</span>
+                  </div>
+                  <div class="tag-chip px-3 py-1 text-[11px] text-secondary">Copy link for a locked-in view</div>
+                  <div class="tag-chip px-3 py-1 text-[11px] text-secondary">Terms stay underwriter-controlled</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Deal Inputs Card -->
+            <div class="card-bg rounded-3xl border border-primary outline-glow-soft shadow-soft p-4 md:p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h2 class="text-[13px] font-semibold text-primary tracking-wide">
+                    Deal setup
+                  </h2>
+                  <p class="text-[11px] text-muted mt-0.5">You control the offer terms. The client only sees the snapshot.</p>
+                </div>
+
+                <div id="businessNameContainer" class="hidden md:block">
+                  <label class="block text-[10px] uppercase tracking-[0.2em] text-muted mb-1">Business Name (Optional)</label>
+                  <input
+                    id="businessNameInput"
+                    type="text"
+                    class="input-bg border border-subtle rounded-full px-3 py-1.5 text-[11px] text-primary w-52 focus:outline-none focus:ring-1 focus:ring-sky-500/70"
+                    placeholder="Business Name for Snapshot"
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <!-- Amount -->
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <label class="text-[11px] uppercase tracking-[0.18em] text-muted">Funded Amount</label>
+                    <span class="text-[11px] text-secondary">Min $5,000 · Max $1,000,000</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                      <input
+                        id="calcAmountSlider"
+                        type="range"
+                        min="5000"
+                        max="1000000"
+                        value="50000"
+                        class="w-full slider-thumb cursor-pointer bg-transparent"
+                      />
+                    </div>
+                    <div class="relative">
+                      <span class="absolute left-2 input-icon text-[11px] text-muted">$</span>
+                      <input
+                        id="calcAmountInput"
+                        type="text"
+                        class="input-bg border border-subtle rounded-full pl-5 pr-3 py-1.5 w-28 text-[11px] text-primary text-right focus:outline-none focus:ring-1 focus:ring-sky-500/70"
+                        value="$50,000"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Factor -->
+                <div id="factorContainer" class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <label class="text-[11px] uppercase tracking-[0.18em] text-muted">Factor Rate</label>
+                    <span class="text-[11px] text-secondary">Range: 1.05x – 1.70x</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                      <input
+                        id="calcFactorSlider"
+                        type="range"
+                        min="1.05"
+                        max="1.7"
+                        step="0.01"
+                        value="1.25"
+                        class="w-full slider-thumb cursor-pointer bg-transparent"
+                      />
+                    </div>
+                    <div class="relative">
+                      <input
+                        id="calcFactorInput"
+                        type="number"
+                        step="0.01"
+                        min="1.05"
+                        max="1.7"
+                        class="input-bg border border-subtle rounded-full px-3 py-1.5 w-20 text-[11px] text-primary text-right focus:outline-none focus:ring-1 focus:ring-sky-500/70"
+                        value="1.25"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Term (Number of Payments) -->
+                <div id="termContainer" class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <label class="text-[11px] uppercase tracking-[0.18em] text-muted">Number of Payments</label>
+                    <span class="text-[11px] text-secondary">Up to 528 payments</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                      <input
+                        id="calcTermSlider"
+                        type="range"
+                        min="1"
+                        max="528"
+                        step="1"
+                        value="180"
+                        class="w-full slider-thumb cursor-pointer bg-transparent"
+                      />
+                    </div>
+                    <div class="relative">
+                      <input
+                        id="calcTermInput"
+                        type="number"
+                        min="1"
+                        max="528"
+                        step="1"
+                        class="input-bg border border-subtle rounded-full px-3 py-1.5 w-20 text-[11px] text-primary text-right focus:outline-none focus:ring-1 focus:ring-sky-500/70"
+                        value="180"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Frequency Toggle -->
+                <div id="toggleContainer" class="space-y-2 pt-1">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] uppercase tracking-[0.18em] text-muted">Payment Frequency</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button
+                      id="toggleDaily"
+                      type="button"
+                      class="flex-1 text-[11px] px-3 py-2 rounded-full border border-subtle freq-pill-active"
+                    >
+                      Daily (M–F)
+                    </button>
+                    <button
+                      id="toggleWeekly"
+                      type="button"
+                      class="flex-1 text-[11px] px-3 py-2 rounded-full border border-subtle freq-pill-inactive"
+                    >
+                      Weekly
+                    </button>
+                    <button
+                      id="toggleMonthly"
+                      type="button"
+                      class="flex-1 text-[11px] px-3 py-2 rounded-full border border-subtle freq-pill-inactive"
+                    >
+                      Monthly
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Buttons -->
+                <div id="buttonContainer" class="pt-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                  <button
+                    id="shareLinkButton"
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-500/90 hover:bg-sky-400 text-[12px] font-medium text-slate-950 px-4 py-2.5 shadow-soft focus:outline-none focus:ring-2 focus:ring-sky-500/80"
+                  >
+                    <span>Copy Approval View Link</span>
+                  </button>
+
+                  <button
+                    id="addOfferButton"
+                    type="button"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-full border border-subtle text-[11px] text-secondary px-4 py-2.5 hover:border-sky-500/60 hover:text-sky-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <span class="text-base leading-none">
+                      +
+                    </span>
+                    <span>Add additional comparison offer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Saved Offers (Additional Offers) -->
+            <div id="savedOffersSection" class="hidden">
+              <div class="card-bg rounded-3xl border border-primary outline-glow-subtle shadow-soft p-4 md:p-5">
+                <div class="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 class="text-[13px] font-semibold text-primary">Additional Offer Comparisons</h3>
+                    <p class="text-[11px] text-muted">
+                      Save up to two alternative structures to show side by side in the approval view.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  id="savedOffersContainer"
+                  class="flex gap-3 overflow-x-auto pb-1.5 mt-2"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Approval Snapshot -->
+          <div>
+            <div class="card-bg rounded-3xl border border-primary outline-glow shadow-soft p-4 md:p-5">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="text-[10px] uppercase tracking-[0.2em] text-muted mb-1">Client-Facing View</p>
+                  <h2 class="text-[13px] font-semibold text-primary">Approval Snapshot</h2>
+                </div>
+              </div>
+
+              <!-- Snapshot Card -->
+              <div class="relative rounded-3xl border summary-badge p-4 md:p-5 mt-2">
+                <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-sky-500/10 via-slate-900/60 to-slate-950/95"></div>
+                <div class="relative space-y-4">
+                  <!-- Header: Business + Status -->
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="space-y-1">
+                      <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Approval Summary</p>
+                      <div class="flex items-center gap-1.5">
+                        <h3 id="businessNameDisplay" class="text-sm font-medium text-primary leading-tight hidden"></h3>
+                        <span class="text-[11px] text-muted" id="defaultBusinessName">Your Business</span>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col items-end gap-1">
+                      <div class="inline-flex items-center rounded-full bg-emerald-400/10 border border-emerald-400/60 px-2.5 py-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1"></span>
+                        <span class="text-[10px] font-medium text-emerald-200 uppercase tracking-[0.16em]">Pre-Qualified</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">Subject to final underwriting & verification.</p>
+                    </div>
+                  </div>
+
+                  <!-- Amount + Payment -->
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="space-y-2">
+                      <p class="text-[11px] text-muted uppercase tracking-[0.18em]">You Get</p>
+                      <div class="flex items-baseline gap-2">
+                        <span id="summaryAmountOut" class="text-3xl md:text-[32px] font-semibold text-hero summary-amount">
+                          $50,000
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="rounded-2xl summary-pill-highlight border px-3.5 py-2.5 min-w-[190px]">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex flex-col">
+                          <span id="summaryPaymentLabel" class="text-[10px] uppercase tracking-[0.18em] pill-label">Est. Daily Payment</span>
+                          <span id="summaryPaymentValue" class="text-lg font-semibold pill-value">$0</span>
+                        </div>
+                        <div class="text-right text-[10px] text-muted">
+                          <p>Includes all fixed costs of capital.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Terms Grid -->
+                  <div class="grid grid-cols-2 gap-3 mt-2 text-[11px]">
+                    <div class="summary-pill border rounded-2xl px-3 py-2.5">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="pill-label">Total Payback</span>
+                        <span id="summaryPaybackOut" class="pill-value">$0</span>
+                      </div>
+                    </div>
+                    <div class="summary-pill border rounded-2xl px-3 py-2.5">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="pill-label">Factor Rate</span>
+                        <span id="summaryFactorOut" class="pill-value">1.25x</span>
+                      </div>
+                    </div>
+                    <div class="summary-pill border rounded-2xl px-3 py-2.5">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="pill-label">Number of Payments / Term</span>
+                        <span id="summaryTermOut" class="pill-value">180 payments</span>
+                      </div>
+                    </div>
+                    <div class="summary-pill border rounded-2xl px-3 py-2.5">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="pill-label">Cost of Capital</span>
+                        <span id="summaryCostOut" class="pill-value">$0</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Rep Contact -->
+                  <div id="repContactBlock" class="mt-3 border-t border-slate-800/80 pt-3 flex items-center justify-between gap-3 hidden">
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full bg-sky-500/20 border border-sky-400/50 flex items-center justify-center text-[11px] font-medium text-sky-100">
+                        CF
+                      </div>
+                      <div class="text-[11px] text-secondary">
+                        <p id="repNameDisplay" class="font-medium text-primary"></p>
+                        <p class="flex items-center gap-2">
+                          <span id="repEmailDisplay"></span>
+                          <span class="w-1 h-1 rounded-full bg-slate-500/70"></span>
+                          <span id="repPhoneDisplay"></span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-[10px] text-muted text-right max-w-[160px]">
+                      Your dedicated CapFront rep is here to walk through these terms and next steps.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- /Right Column -->
+        </div> <!-- /Grid -->
+      </div>
+    </main>
+  </div>
+
+<script>
+  const elements = {
+    calcAmountSlider: document.getElementById('calcAmountSlider'),
+    calcFactorSlider: document.getElementById('calcFactorSlider'),
+    calcTermSlider: document.getElementById('calcTermSlider'),
+    calcAmountInput: document.getElementById('calcAmountInput'),
+    calcFactorInput: document.getElementById('calcFactorInput'),
+    calcTermInput: document.getElementById('calcTermInput'),
+    toggleDaily: document.getElementById('toggleDaily'),
+    toggleWeekly: document.getElementById('toggleWeekly'),
+    toggleMonthly: document.getElementById('toggleMonthly'),
+    shareLinkButton: document.getElementById('shareLinkButton'),
+    summaryAmountOut: document.getElementById('summaryAmountOut'),
+    summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+    summaryFactorOut: document.getElementById('summaryFactorOut'),
+    summaryTermOut: document.getElementById('summaryTermOut'),
+    summaryCostOut: document.getElementById('summaryCostOut'),
+    summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+    summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+    businessNameInput: document.getElementById('businessNameInput'),
+    businessNameDisplay: document.getElementById('businessNameDisplay'),
+    businessNameContainer: document.getElementById('businessNameContainer'),
+    repSettingsToggle: document.getElementById('repSettingsToggle'),
+    repSettingsPanel: document.getElementById('repSettingsPanel'),
+    repNameInput: document.getElementById('repNameInput'),
+    repEmailInput: document.getElementById('repEmailInput'),
+    repPhoneInput: document.getElementById('repPhoneInput'),
+    repContactBlock: document.getElementById('repContactBlock'),
+    repNameDisplay: document.getElementById('repNameDisplay'),
+    repEmailDisplay: document.getElementById('repEmailDisplay'),
+    repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+    headerContainer: document.getElementById('headerContainer'),
+    themeControls: document.getElementById('themeControls'),
+    calculatorInputs: document.getElementById('calculatorInputs'),
+    factorContainer: document.getElementById('factorContainer'),
+    termContainer: document.getElementById('termContainer'),
+    toggleContainer: document.getElementById('toggleContainer'),
+    buttonContainer: document.getElementById('buttonContainer'),
+    addOfferButton: document.getElementById('addOfferButton'),
+    savedOffersSection: document.getElementById('savedOffersSection'),
+    savedOffersContainer: document.getElementById('savedOffersContainer'),
+  };
+
+  let paymentFrequency = 'daily';
+  let amountSliderMax = 1000000;
+  const MAX_ADDITIONAL_OFFERS = 2;
+  let savedOffers = [];
+  let isApprovalView = false;
+
+  function setAmountSliderMax(cap) {
+    amountSliderMax = cap;
+    if (elements.calcAmountSlider) {
+      elements.calcAmountSlider.max = String(cap);
+    }
+  }
+
+  function formatCurrency(num) {
+    const numericValue = Number(num);
+    if (isNaN(numericValue)) return '$0';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(numericValue);
+  }
+
+  function parseFormattedNumber(val) {
+    if (typeof val !== 'string' || !val) return 0;
+    return parseFloat(val.replace(/[\$,]/g, '')) || 0;
+  }
+
+  // payments -> months, rounded to nearest 0.5
+  function calculateApproxMonths(termPayments, frequency) {
+    if (!termPayments || termPayments <= 0) return 0;
+    let months;
+
+    if (frequency === 'weekly') {
+      months = termPayments / 4.3333;      // ≈ weeks per month
+    } else if (frequency === 'monthly') {
+      months = termPayments;               // 1 payment per month
+    } else {
+      months = termPayments / 22;          // ≈ business days per month
+    }
+
+    return Math.round(months * 2) / 2;     // nearest 0.5
+  }
+
+  function formatMonthsValue(months) {
+    if (!months || isNaN(months)) return '0';
+    return months % 1 === 0 ? months.toFixed(0) : months.toFixed(1);
+  }
+
+  // termMonths = number of payments
+  function computeOffer(amount, factor, termMonths, frequency) {
+    const totalPayback = amount * factor;
+    const totalCost = totalPayback - amount;
+
+    const paymentsCount = termMonths > 0 ? termMonths : 1;
+    const paymentAmount = totalPayback / paymentsCount;
+
+    let paymentLabel = 'Est. Daily Payment';
+    if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
+    if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
+
+    return {
+      amount,
+      factor,
+      termMonths,
+      totalPayback,
+      totalCost,
+      payment: paymentAmount,
+      paymentLabel,
+      frequency,
+    };
+  }
+
+  function getCurrentOffer() {
+    const amount = parseFormattedNumber(elements.calcAmountInput.value);
+    const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
+    const termMonths = parseInt(elements.calcTermInput.value) || 1;
+    return computeOffer(amount, factor, termMonths, paymentFrequency);
+  }
+
+  function renderSavedOffers() {
+    if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+
+    const used = savedOffers.length;
+    if (used === 0) {
+      elements.savedOffersSection.classList.add('hidden');
+      elements.savedOffersContainer.innerHTML = '';
+      return;
+    }
+
+    elements.savedOffersSection.classList.remove('hidden');
+
+    const cardsHtml = savedOffers.map((offer, index) => {
+      const labelIndex = index + 2;
+      const approxMonths = calculateApproxMonths(offer.termMonths, offer.frequency);
+      const approxMonthsText = formatMonthsValue(approxMonths);
+
+      return `
+        <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+          </div>
+          <div class="text-center mt-2">
+            <span class="text-[11px] font-semibold text-muted block">You Get</span>
+            <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
+            <div>
+              <span class="text-[11px] font-semibold text-muted block">Factor</span>
+              <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
+            </div>
+            <div>
+              <span class="text-[11px] font-semibold text-muted block">Payments / Term</span>
+              <span class="text-sm font-semibold text-primary block">${offer.termMonths} (${approxMonthsText} mo)</span>
+            </div>
+            <div>
+              <span class="text-[11px] font-semibold text-muted block">Payback</span>
+              <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span>
+            </div>
+            <div>
+              <span class="text-[11px] font-semibold text-muted block">${offer.paymentLabel}</span>
+              <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    elements.savedOffersContainer.innerHTML = cardsHtml;
+  }
+
+  function updateAddOfferButtonState() {
+    if (!elements.addOfferButton) return;
+    const remaining = MAX_ADDITIONAL_OFFERS - savedOffers.length;
+    elements.addOfferButton.disabled = remaining <= 0;
+  }
+
+  function handleAddOffer() {
+    if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
+    const offer = getCurrentOffer();
+    savedOffers.push({ ...offer });
+    renderSavedOffers();
+    updateAddOfferButtonState();
+  }
+
+  function syncInputs(slider, input, isCurrency, min, max, callback) {
+    const isAmountSlider = (slider === elements.calcAmountSlider);
+    const getMax = () => (isAmountSlider ? amountSliderMax : max);
+
+    const initialValue = parseFloat(slider.value);
+    input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+
+    slider.addEventListener('input', () => {
+      let val = parseFloat(slider.value);
+      const cap = getMax();
+      if (!isNaN(val) && val > cap) {
+        val = cap;
+        slider.value = val;
+      }
+      input.value = isCurrency ? formatCurrency(val) : val;
+      callback();
+    });
+
+    input.addEventListener('input', () => {
+      let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+      const cap = getMax();
+      if (!isNaN(val) && val >= min && val <= cap) {
+        slider.value = val;
+        callback();
+      } else if (input.value === '') {
+        callback();
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+      const cap = getMax();
+      if (isNaN(val) || val < min) val = min;
+      if (val > cap) val = cap;
+      slider.value = val;
+      input.value = isCurrency ? formatCurrency(val) : val.toString();
+      callback();
+    });
+  }
+
+  function updateRepDisplay() {
+    if (!elements.repContactBlock) return;
+    const name = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+    const email = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+    const phone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+
+    const hasAny = name || email || phone;
+
+    if (hasAny) {
+      elements.repContactBlock.classList.remove('hidden');
+    } else {
+      elements.repContactBlock.classList.add('hidden');
+    }
+
+    if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+    if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+    if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
+  }
+
+  function updatePaymentToggleUI() {
+    const toggles = [elements.toggleDaily, elements.toggleWeekly, elements.toggleMonthly];
+    const frequencies = ['daily', 'weekly', 'monthly'];
+    toggles.forEach((toggle, index) => {
+      if (!toggle) return;
+      toggle.classList.remove('toggle-active', 'toggle-inactive', 'freq-pill-active', 'freq-pill-inactive');
+      const isActive = paymentFrequency === frequencies[index];
+      if (isActive) {
+        toggle.classList.add('toggle-active', 'freq-pill-active');
+      } else {
+        toggle.classList.add('toggle-inactive', 'freq-pill-inactive');
+      }
+    });
+  }
+
+  function initializeFromURL() {
+    const params = new URLSearchParams(window.location.search);
+
+    const amountParam = params.get('amount');
+    const amount = amountParam ? parseFloat(amountParam) : 50000;
+    const factorParam = params.get('factor');
+    const factor = factorParam ? parseFloat(factorParam) : 1.25;
+    const termParam = params.get('term');
+    const term = termParam ? parseInt(termParam, 10) : 180; // number of payments
+    const freq = params.get('freq');
+    const offersParam = params.get('offers');
+    const businessNameParam = params.get('businessName') || '';
+    const repNameParam = params.get('repName') || '';
+    const repEmailParam = params.get('repEmail') || '';
+    const repPhoneParam = params.get('repPhone') || '';
+    const viewMode = params.get('view');
+
+    isApprovalView = (viewMode === 'approval');
+
+    if (isApprovalView) {
+      setAmountSliderMax(amount);
+    } else {
+      setAmountSliderMax(1000000);
+    }
+
+    elements.calcAmountInput.value = formatCurrency(amount);
+    elements.calcAmountSlider.value = amount;
+    elements.calcFactorSlider.value = factor;
+    elements.calcTermSlider.value = term;
+
+    if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+    if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+    if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+    if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
+
+    paymentFrequency = freq || 'daily';
+
+    savedOffers = [];
+    if (offersParam) {
+      try {
+        const rawOffers = JSON.parse(offersParam);
+        if (Array.isArray(rawOffers)) {
+          savedOffers = rawOffers.map((raw) => {
+            const a = Number(raw.a ?? raw.amount ?? 0);
+            const f = Number(raw.f ?? raw.factor ?? 1.1);
+            const tRaw = raw.t ?? raw.term ?? 3;
+            const t = parseInt(tRaw, 10);
+            const termMonths = Number.isNaN(t) ? 1 : t;
+            const q = raw.q ?? raw.frequency ?? 'daily';
+            return computeOffer(a, f, termMonths, q);
+          });
+        }
+      } catch (err) {
+        console.error('Error parsing offers from URL', err);
+      }
+    }
+
+    if (isApprovalView) {
+      elements.factorContainer.style.display = 'none';
+      elements.termContainer.style.display = 'none';
+      elements.toggleContainer.style.display = 'none';
+
+      if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+      if (elements.businessNameInput) elements.businessNameInput.disabled = true;
+
+      if (elements.themeControls) elements.themeControls.style.display = 'none';
+      if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
+      if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
+      elements.buttonContainer.style.display = 'none';
+
+      elements.headerContainer.classList.remove('justify-between');
+      elements.headerContainer.classList.add('justify-center');
+    }
+  }
+
+  function runCalculator() {
+    try {
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+      const termMonths = parseInt(elements.calcTermInput.value) || 1; // number of payments
+
+      const offer = computeOffer(amount, factor, termMonths, paymentFrequency);
+
+      const approxMonths = calculateApproxMonths(offer.termMonths, offer.frequency);
+      const approxMonthsText = formatMonthsValue(approxMonths);
+
+      const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+      if (elements.businessNameDisplay) {
+        if (businessName) {
+          elements.businessNameDisplay.textContent = businessName;
+          elements.businessNameDisplay.classList.remove('hidden');
+          const def = document.getElementById('defaultBusinessName');
+          if (def) def.classList.add('hidden');
+        } else {
+          elements.businessNameDisplay.textContent = '';
+          elements.businessNameDisplay.classList.add('hidden');
+          const def = document.getElementById('defaultBusinessName');
+          if (def) def.classList.remove('hidden');
+        }
+      }
+
+      elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+      elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
+      elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
+      elements.summaryTermOut.textContent = `${offer.termMonths} payments (${approxMonthsText} months)`;
+      elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+      elements.summaryPaymentLabel.textContent = offer.paymentLabel;
+      elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+
+      updateRepDisplay();
+    } catch (e) {
+      console.error('Calculator error:', e);
+    }
+  }
+
+  function initializeCalculator() {
+    initializeFromURL();
+    updatePaymentToggleUI();
+
+    syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
+    syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
+    syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
+
+    elements.toggleDaily.addEventListener('click', () => {
+      paymentFrequency = 'daily';
+      updatePaymentToggleUI();
+      runCalculator();
+    });
+    elements.toggleWeekly.addEventListener('click', () => {
+      paymentFrequency = 'weekly';
+      updatePaymentToggleUI();
+      runCalculator();
+    });
+    elements.toggleMonthly.addEventListener('click', () => {
+      paymentFrequency = 'monthly';
+      updatePaymentToggleUI();
+      runCalculator();
+    });
+
+    if (elements.businessNameInput) {
+      elements.businessNameInput.addEventListener('input', runCalculator);
+    }
+
+    if (elements.repSettingsToggle && elements.repSettingsPanel) {
+      elements.repSettingsToggle.addEventListener('click', () => {
+        elements.repSettingsPanel.classList.toggle('hidden');
+      });
+    }
+    if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+    if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+    if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+
+    if (elements.addOfferButton) {
+      elements.addOfferButton.addEventListener('click', handleAddOffer);
+    }
+
+    elements.shareLinkButton.addEventListener('click', () => {
+      const shareBtn = elements.shareLinkButton;
+      const originalText = shareBtn.innerText;
+
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value);
+      const term = parseInt(elements.calcTermInput.value) || 1;
+      const freq = paymentFrequency;
+      const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+      const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+      const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+      const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+
+      const offersForUrl = savedOffers.map((offer) => ({
+        a: offer.amount,
+        f: offer.factor,
+        t: offer.termMonths,
+        q: offer.frequency || freq,
+      }));
+
+      const url = new URL(window.location.href);
+      const params = new URLSearchParams({
+        amount,
+        factor,
+        term,
+        freq,
+        businessName,
+        repName,
+        repEmail,
+        repPhone,
+        offers: JSON.stringify(offersForUrl),
+        view: 'approval',
+      });
+      url.search = params.toString();
+
+      const textArea = document.createElement('textarea');
+      textArea.value = url.toString();
+      textArea.style.position = 'fixed';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        shareBtn.innerText = 'Copied!';
+        setTimeout(() => {
+          shareBtn.innerText = originalText;
+        }, 2000);
+      } catch (errFallback) {
+        console.error('Fallback copy failed:', errFallback);
+        shareBtn.innerText = 'Error';
+        setTimeout(() => {
+          shareBtn.innerText = originalText;
+        }, 2000);
+      }
+      document.body.removeChild(textArea);
+    });
+
+    runCalculator();
+    renderSavedOffers();
+    updateAddOfferButtonState();
+  }
+
+  initializeCalculator();
+</script>
+
+</body>
+</html>
