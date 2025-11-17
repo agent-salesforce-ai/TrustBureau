@@ -980,31 +980,31 @@
       if (elements.calcAmountSlider && elements.calcAmountInput) {
         syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
       }
-      if (elements.calcFactorSlider && elements.calcFactorInput && !isApprovalView) {
+      if (!isApprovalView && elements.calcFactorSlider && elements.calcFactorInput) {
         syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
       }
-      if (elements.calcTermSlider && elements.calcTermInput && !isApprovalView) {
+      if (!isApprovalView && elements.calcTermSlider && elements.calcTermInput) {
         syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
       }
-      if (elements.originationSlider && elements.originationInput && !isApprovalView) {
+      if (!isApprovalView && elements.originationSlider && elements.originationInput) {
         syncInputs(elements.originationSlider, elements.originationInput, false, 0, 10, runCalculator);
       }
 
-      if (elements.toggleDaily && !isApprovalView) {
+      if (!isApprovalView && elements.toggleDaily) {
         elements.toggleDaily.addEventListener('click', () => {
           paymentFrequency = 'daily';
           updatePaymentToggleUI();
           runCalculator();
         });
       }
-      if (elements.toggleWeekly && !isApprovalView) {
+      if (!isApprovalView && elements.toggleWeekly) {
         elements.toggleWeekly.addEventListener('click', () => {
           paymentFrequency = 'weekly';
           updatePaymentToggleUI();
           runCalculator();
         });
       }
-      if (elements.toggleMonthly && !isApprovalView) {
+      if (!isApprovalView && elements.toggleMonthly) {
         elements.toggleMonthly.addEventListener('click', () => {
           paymentFrequency = 'monthly';
           updatePaymentToggleUI();
@@ -1012,11 +1012,11 @@
         });
       }
 
-      if (elements.businessNameInput && !isApprovalView) {
+      if (!isApprovalView && elements.businessNameInput) {
         elements.businessNameInput.addEventListener('input', runCalculator);
       }
 
-      if (elements.termLengthMonthsInput && !isApprovalView) {
+      if (!isApprovalView && elements.termLengthMonthsInput) {
         elements.termLengthMonthsInput.addEventListener('input', () => {
           termLengthManualDirty = true;
           runCalculator();
@@ -1033,43 +1033,41 @@
         });
       }
 
-      if (elements.repSettingsToggle && elements.repSettingsPanel && !isApprovalView) {
+      if (!isApprovalView && elements.repSettingsToggle && elements.repSettingsPanel) {
         elements.repSettingsToggle.addEventListener('click', () => {
           elements.repSettingsPanel.classList.toggle('hidden');
         });
       }
 
-      if (elements.themePanelToggle && elements.repSettingsPanel && !isApprovalView) {
+      if (!isApprovalView && elements.themePanelToggle && elements.repSettingsPanel) {
         elements.themePanelToggle.addEventListener('click', () => {
           elements.repSettingsPanel.classList.remove('hidden');
         });
       }
 
-      if (!isApprovalView) {
-        if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
-        if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
-        if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+      if (!isApprovalView && elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (!isApprovalView && elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (!isApprovalView && elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
-        if (elements.themeSelector) {
-          elements.themeSelector.addEventListener('change', e => {
-            currentTheme = e.target.value;
-            applyTheme();
-          });
-        }
-
-        if (elements.accentSelector) {
-          elements.accentSelector.addEventListener('change', e => {
-            currentAccent = e.target.value;
-            applyTheme();
-          });
-        }
-
-        if (elements.addOfferButton) {
-          elements.addOfferButton.addEventListener('click', handleAddOffer);
-        }
+      if (!isApprovalView && elements.themeSelector) {
+        elements.themeSelector.addEventListener('change', e => {
+          currentTheme = e.target.value;
+          applyTheme();
+        });
       }
 
-      if (elements.shareLinkButton && !isApprovalView) {
+      if (!isApprovalView && elements.accentSelector) {
+        elements.accentSelector.addEventListener('change', e => {
+          currentAccent = e.target.value;
+          applyTheme();
+        });
+      }
+
+      if (!isApprovalView && elements.addOfferButton) {
+        elements.addOfferButton.addEventListener('click', handleAddOffer);
+      }
+
+      if (!isApprovalView && elements.shareLinkButton) {
         elements.shareLinkButton.addEventListener('click', async () => {
           const shareBtn = elements.shareLinkButton;
           const originalText = shareBtn.innerText;
@@ -1110,7 +1108,7 @@
           url.search = params.toString();
           const shareUrl = url.toString();
 
-          const setStatus = (msg) => {
+          const setStatus = msg => {
             shareBtn.innerText = msg;
             setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
           };
@@ -1118,7 +1116,13 @@
           try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
               await navigator.clipboard.writeText(shareUrl);
+              setStatus('Copied!');
             } else {
+              throw new Error('Clipboard API not available');
+            }
+          } catch (err) {
+            console.warn('Clipboard API failed, falling back:', err);
+            try {
               const ta = document.createElement('textarea');
               ta.value = shareUrl;
               ta.style.position = 'fixed';
@@ -1128,13 +1132,18 @@
               document.body.appendChild(ta);
               ta.focus();
               ta.select();
-              document.execCommand('copy');
+              const ok = document.execCommand('copy');
               document.body.removeChild(ta);
+              if (ok) {
+                setStatus('Copied!');
+              } else {
+                throw new Error('execCommand copy failed');
+              }
+            } catch (fallbackErr) {
+              console.error('All copy methods failed, showing prompt:', fallbackErr);
+              window.prompt('Copy this approval link:', shareUrl);
+              setStatus('Link shown');
             }
-            setStatus('Copied!');
-          } catch (e) {
-            console.error('Copy failed', e);
-            setStatus('Error');
           }
         });
       }
