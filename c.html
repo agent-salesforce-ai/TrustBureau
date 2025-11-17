@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payments Offer Calculator</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    /* Base themes */
+    html.theme-light {
+      --bg-body: #f4f7fb;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fbff;
+      --bg-slider-track: #dbe3f0;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #1f2937;
+      --text-muted: #6b7280;
+    }
+    html.theme-light body { background-color: var(--bg-body); }
+
+    html.theme-dark {
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    html.theme-dark body { background-color: var(--bg-body); }
+
+    html.theme-black {
+      --bg-body: #000000;
+      --bg-card: #000000;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #111827;
+      --bg-input: #000000;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    html.theme-black body { background-color: var(--bg-body); }
+
+    /* Rainbow accents */
+    html.accent-red {
+      --accent-color: #ef4444;
+      --accent-color-light: #f97373;
+      --accent-color-dark: #b91c1c;
+      --accent-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
+    }
+    html.accent-orange {
+      --accent-color: #f97316;
+      --accent-color-light: #fdba74;
+      --accent-color-dark: #c2410c;
+      --accent-shadow: 0 0 18px rgba(249, 115, 22, 0.55);
+    }
+    html.accent-yellow {
+      --accent-color: #eab308;
+      --accent-color-light: #fde047;
+      --accent-color-dark: #a16207;
+      --accent-shadow: 0 0 18px rgba(234, 179, 8, 0.55);
+    }
+    html.accent-green {
+      --accent-color: #22c55e;
+      --accent-color-light: #4ade80;
+      --accent-color-dark: #15803d;
+      --accent-shadow: 0 0 18px rgba(34, 197, 94, 0.55);
+    }
+    html.accent-blue,
+    html.accent-primary {
+      --accent-color: #3b82f6;
+      --accent-color-light: #60a5fa;
+      --accent-color-dark: #1d4ed8;
+      --accent-shadow: 0 0 18px rgba(59, 130, 246, 0.55);
+    }
+    html.accent-indigo {
+      --accent-color: #6366f1;
+      --accent-color-light: #818cf8;
+      --accent-color-dark: #4338ca;
+      --accent-shadow: 0 0 18px rgba(99, 102, 241, 0.55);
+    }
+    html.accent-violet {
+      --accent-color: #a855f7;
+      --accent-color-light: #c084fc;
+      --accent-color-dark: #7e22ce;
+      --accent-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
+    }
+
+    body { transition: background-color 0.2s; }
+
+    .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
+    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-muted); }
+    .border-primary { border-color: var(--border-primary); }
+
+    .slider-track { background-color: var(--bg-slider-track); }
+    .slider-thumb { accent-color: var(--accent-color); }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px var(--accent-color-light);
+      outline: none;
+    }
+
+    .text-hero {
+      color: var(--accent-color);
+    }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-secondary);
+    }
+    .toggle-active {
+      background-color: var(--accent-color-light);
+      color: #0f172a;
+    }
+
+    .button-primary {
+      background-color: var(--accent-color-light);
+      color: #0f172a;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.6rem 1.75rem;
+      border: 1px solid var(--accent-color-dark);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-dark);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.45),
+        0 0 18px var(--accent-shadow);
+      transform: translateY(-1px) scale(1.02);
+    }
+    .button-primary:disabled {
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .shell {
+      border-color: var(--accent-color);
+      border-width: 2px;
+      box-shadow:
+        0 0 0 3px var(--accent-shadow),
+        0 0 25px var(--accent-shadow);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+
+    <!-- HEADER -->
+    <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
+      <div class="flex flex-col items-center justify-center flex-shrink-0">
+        <span class="text-xs font-semibold text-muted uppercase tracking-[0.18em]">
+          PAYMENTS OFFER CALCULATOR
+        </span>
+      </div>
+      <div id="themeControls" class="flex items-center justify-center gap-2">
+        <button id="repSettingsToggle" type="button"
+                class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </svg>
+          Settings
+        </button>
+        <button id="themePanelToggle" type="button"
+                class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 3c2.755 0 5 2.245 5 5 0 4-5 9-5 9s-5-5-5-9c0-2.755 2.245-5 5-5zm0 3a2 2 0 100 4 2 2 0 000-4z" />
+          </svg>
+          Theme
+        </button>
+      </div>
+    </div>
+
+    <!-- REP + THEME SETTINGS PANEL -->
+    <div id="repSettingsPanel"
+         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Rep & Theme Settings</span>
+        <span class="text-[11px] text-muted">Shown on client approval view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
+            <select id="themeSelector"
+                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+              <option value="theme-light">Light</option>
+              <option value="theme-dark">Dark</option>
+              <option value="theme-black">Black</option>
+            </select>
+          </div>
+          <div>
+            <label for="accentSelector" class="block font-semibold text-muted">Accent Color</label>
+            <select id="accentSelector"
+                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+              <option value="accent-red">Red</option>
+              <option value="accent-orange">Orange</option>
+              <option value="accent-yellow">Yellow</option>
+              <option value="accent-green">Green</option>
+              <option value="accent-blue">Blue</option>
+              <option value="accent-indigo">Indigo</option>
+              <option value="accent-violet">Violet</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
+          <input id="repNameInput" type="text"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Rep Name" />
+        </div>
+        <div>
+          <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
+          <input id="repEmailInput" type="email"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="rep@example.com" />
+        </div>
+        <div>
+          <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
+          <input id="repPhoneInput" type="tel"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="(555) 123-4567" />
+        </div>
+      </div>
+    </div>
+
+    <!-- CALCULATOR -->
+    <div id="calculatorInputs" class="space-y-4 pt-2">
+      <div id="businessNameContainer" class="px-1 mt-2">
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+          Business Name
+        </label>
+        <input id="businessNameInput" type="text"
+               class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+               placeholder="e.g., Acme Holdings LLC" />
+      </div>
+
+      <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
+        <!-- Amount -->
+        <div id="amountContainer" class="space-y-1">
+          <label for="calcAmount" class="block text-xs font-semibold text-muted">
+            Amount You Get ($)
+          </label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000"
+                 value="50000"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-sm">$</span>
+            <input id="calcAmountInput" inputmode="numeric"
+                   class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Factor -->
+        <div id="factorContainer" class="space-y-1">
+          <label for="calcFactor" class="block text-xs font-semibold text-muted">Factor Rate</label>
+          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <div class="relative group">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12" />
+            </svg>
+            <input id="calcFactorInput" type="number" step="0.01"
+                   class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Number of Payments -->
+        <div id="termContainer" class="space-y-1">
+          <label for="calcTerm" class="block text-xs font-semibold text-muted">
+            Number of Payments
+          </label>
+          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="6"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <div class="relative group">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            </svg>
+            <input id="calcTermInput" type="number" step="1"
+                   class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Origination Fee -->
+        <div id="originationContainer" class="space-y-1">
+          <label for="originationSlider" class="block text-xs font-semibold text-muted">
+            Origination Fee (%)
+          </label>
+          <input id="originationSlider" type="range" min="0" max="10" step="0.1" value="0"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-xs">%</span>
+            <input id="originationInput" type="number" step="0.1" min="0" max="10"
+                   class="w-full p-1.5 pl-7 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Manual Term Length (Months - Display Only) -->
+        <div id="termLengthMonthsContainer" class="space-y-1">
+          <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">
+            Term Length (Months - Display Only)
+          </label>
+          <div class="relative group">
+            <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
+                   class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+                   placeholder="Auto" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Frequency toggle -->
+      <div id="toggleContainer" class="flex items-center justify-center space-x-2">
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Daily
+        </button>
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Weekly
+        </button>
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Monthly
+        </button>
+      </div>
+    </div>
+
+    <!-- OFFER CARD -->
+    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary mt-4">
+      <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
+        <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
+      </div>
+      <div class="text-center py-6">
+        <span id="businessNameDisplay"
+              class="text-sm font-semibold text-primary block mb-1 hidden"></span>
+        <span class="text-sm font-semibold text-muted block">You Get</span>
+        <span id="summaryAmountOut"
+              class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
+        <span class="text-base font-medium text-secondary block">
+          Total Payback:
+          <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
+        </span>
+      </div>
+      <div class="flex justify-center items-center border-b border-primary pb-2">
+        <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
+      </div>
+      <div class="pt-6">
+        <div class="grid grid-cols-2 gap-4 justify-items-center">
+          <div class="text-center col-span-2">
+            <span class="text-xs font-semibold text-muted block">Term Length</span>
+            <span id="summaryTermLengthOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Factor Rate</span>
+            <span id="summaryFactorOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Payments</span>
+            <span id="summaryTermOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Total Cost of Funds</span>
+            <span id="summaryCostOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+          <div class="text-center">
+            <span id="summaryPaymentLabel"
+                  class="text-xs font-semibold text-muted block">Est. Daily Payment</span>
+            <span id="summaryPaymentValue"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Origination Fee (%)</span>
+            <span id="summaryOriginationPercentOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+          <div class="text-center">
+            <span class="text-xs font-semibold text-muted block">Origination Fee ($)</span>
+            <span id="summaryOriginationAmountOut"
+                  class="text-xl font-semibold text-primary block"></span>
+          </div>
+        </div>
+      </div>
+      <div id="repContactBlock"
+           class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
+        <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
+        <div id="repNameDisplay" class="font-medium"></div>
+        <div id="repEmailDisplay"></div>
+        <div id="repPhoneDisplay"></div>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL OFFERS -->
+    <div id="savedOffersSection"
+         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+      <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
+        <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
+      </div>
+      <div id="savedOffersContainer"
+           class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div id="buttonContainer" class="pt-4 border-t border-primary mt-4">
+      <div class="relative flex justify-center gap-3 flex-wrap">
+        <button id="addOfferButton" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v16m8-8H4" />
+          </svg>
+          Add Offer
+        </button>
+        <button id="shareLinkButton" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
+          </svg>
+          Share Approval Link
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const elements = {
+      calcAmountSlider: document.getElementById('calcAmountSlider'),
+      calcFactorSlider: document.getElementById('calcFactorSlider'),
+      calcTermSlider: document.getElementById('calcTermSlider'),
+      calcAmountInput: document.getElementById('calcAmountInput'),
+      calcFactorInput: document.getElementById('calcFactorInput'),
+      calcTermInput: document.getElementById('calcTermInput'),
+      termLengthMonthsInput: document.getElementById('termLengthMonthsInput'),
+      originationSlider: document.getElementById('originationSlider'),
+      originationInput: document.getElementById('originationInput'),
+
+      toggleDaily: document.getElementById('toggleDaily'),
+      toggleWeekly: document.getElementById('toggleWeekly'),
+      toggleMonthly: document.getElementById('toggleMonthly'),
+
+      themeSelector: document.getElementById('themeSelector'),
+      accentSelector: document.getElementById('accentSelector'),
+      repSettingsToggle: document.getElementById('repSettingsToggle'),
+      themePanelToggle: document.getElementById('themePanelToggle'),
+      repSettingsPanel: document.getElementById('repSettingsPanel'),
+
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+
+      repNameInput: document.getElementById('repNameInput'),
+      repEmailInput: document.getElementById('repEmailInput'),
+      repPhoneInput: document.getElementById('repPhoneInput'),
+      repContactBlock: document.getElementById('repContactBlock'),
+      repNameDisplay: document.getElementById('repNameDisplay'),
+      repEmailDisplay: document.getElementById('repEmailDisplay'),
+      repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+
+      summaryAmountOut: document.getElementById('summaryAmountOut'),
+      summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+      summaryFactorOut: document.getElementById('summaryFactorOut'),
+      summaryTermOut: document.getElementById('summaryTermOut'),
+      summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+      summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      summaryTermLengthOut: document.getElementById('summaryTermLengthOut'),
+      summaryOriginationPercentOut: document.getElementById('summaryOriginationPercentOut'),
+      summaryOriginationAmountOut: document.getElementById('summaryOriginationAmountOut'),
+
+      addOfferButton: document.getElementById('addOfferButton'),
+      savedOffersSection: document.getElementById('savedOffersSection'),
+      savedOffersContainer: document.getElementById('savedOffersContainer'),
+
+      calculatorInputs: document.getElementById('calculatorInputs'),
+      buttonContainer: document.getElementById('buttonContainer'),
+      themeControls: document.getElementById('themeControls'),
+    };
+
+    let paymentFrequency = 'daily';
+    let currentTheme = 'theme-light';
+    let currentAccent = 'accent-blue';
+    let amountSliderMax = 1000000;
+    const MAX_ADDITIONAL_OFFERS = 2;
+    let savedOffers = [];
+    let isApprovalView = false;
+    let termLengthManualDirty = false;
+
+    // Load saved theme/accent if present
+    try {
+      const storedTheme = localStorage.getItem('generic_offer_calc_theme');
+      const storedAccent = localStorage.getItem('generic_offer_calc_accent');
+      if (storedTheme) currentTheme = storedTheme;
+      if (storedAccent) currentAccent = storedAccent;
+    } catch (_) {}
+
+    function formatCurrency(num) {
+      const numericValue = Number(num);
+      if (isNaN(numericValue)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(numericValue);
+    }
+
+    function parseFormattedNumber(val) {
+      if (typeof val !== 'string' || !val) return 0;
+      return parseFloat(val.replace(/[\$,]/g, '')) || 0;
+    }
+
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
+
+    // Offer math
+    function computeOffer(amount, factor, termPayments, frequency) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+
+      const paymentsCount = termPayments > 0 ? termPayments : 1;
+      const paymentAmount = totalPayback / paymentsCount;
+
+      let rawMonths;
+      if (frequency === 'weekly') {
+        // 52 weeks = 12 months
+        rawMonths = termPayments * (12 / 52);
+      } else if (frequency === 'monthly') {
+        rawMonths = termPayments;
+      } else {
+        // 250 daily payments = ~12 months
+        rawMonths = termPayments * (12 / 250);
+      }
+      const termLengthMonths = Math.round(rawMonths * 2) / 2;
+
+      let paymentLabel = 'Est. Daily Payment';
+      if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
+      if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
+
+      return {
+        amount,
+        factor,
+        termMonths: termPayments,
+        termLengthMonths,
+        totalPayback,
+        totalCost,
+        payment: paymentAmount,
+        paymentLabel,
+        frequency,
+      };
+    }
+
+    function getCurrentOffer() {
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
+      const termPayments = parseInt(elements.calcTermInput.value) || 1;
+      return computeOffer(amount, factor, termPayments, paymentFrequency);
+    }
+
+    function renderSavedOffers() {
+      if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+
+      if (!savedOffers.length) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
+        return;
+      }
+
+      elements.savedOffersSection.classList.remove('hidden');
+
+      const html = savedOffers.map((offer, index) => {
+        const labelIndex = index + 2;
+        return `
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+            </div>
+            <div class="text-center mt-2">
+              <span class="text-[11px] font-semibold text-muted block">You Get</span>
+              <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Factor</span>
+                <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Payments</span>
+                <span class="text-sm font-semibold text-primary block">${offer.termMonths}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">Payback</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-muted block">${offer.paymentLabel}</span>
+                <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      elements.savedOffersContainer.innerHTML = html;
+    }
+
+    function updateAddOfferButtonState() {
+      if (!elements.addOfferButton) return;
+      elements.addOfferButton.disabled = savedOffers.length >= MAX_ADDITIONAL_OFFERS;
+    }
+
+    function handleAddOffer() {
+      if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
+      savedOffers.push(getCurrentOffer());
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const initialValue = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        if (!isNaN(val) && val > max) {
+          val = max;
+          slider.value = val;
+        }
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        callback();
+      });
+
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (!isNaN(val) && val >= min && val <= max) {
+          slider.value = val;
+          callback();
+        } else if (input.value === '') {
+          callback();
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (isNaN(val) || val < min) val = min;
+        if (val > max) val = max;
+        slider.value = val;
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        callback();
+      });
+    }
+
+    function applyTheme() {
+      document.documentElement.className = `${currentTheme} ${currentAccent}`;
+      try {
+        localStorage.setItem('generic_offer_calc_theme', currentTheme);
+        localStorage.setItem('generic_offer_calc_accent', currentAccent);
+      } catch (_) {}
+    }
+
+    function updateRepDisplay() {
+      if (!elements.repContactBlock) return;
+
+      const name = elements.repNameInput?.value.trim() || '';
+      const email = elements.repEmailInput?.value.trim() || '';
+      const phone = elements.repPhoneInput?.value.trim() || '';
+
+      const hasAny = name || email || phone;
+
+      elements.repContactBlock.classList.toggle('hidden', !hasAny);
+      if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+      if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+      if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
+    }
+
+    function updatePaymentToggleUI() {
+      const btns = [
+        { el: elements.toggleDaily, freq: 'daily' },
+        { el: elements.toggleWeekly, freq: 'weekly' },
+        { el: elements.toggleMonthly, freq: 'monthly' },
+      ];
+      btns.forEach(({ el, freq }) => {
+        if (!el) return;
+        el.classList.remove('toggle-active', 'toggle-inactive');
+        el.classList.add(paymentFrequency === freq ? 'toggle-active' : 'toggle-inactive');
+      });
+    }
+
+    function initializeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+
+      const amountParam = params.get('amount');
+      const amount = amountParam ? parseFloat(amountParam) : 50000;
+      const factor = params.get('factor') || 1.25;
+      const term = params.get('term') || 6;
+      const freq = params.get('freq');
+      const paramTheme = params.get('theme');
+      const paramAccent = params.get('accent');
+      const offersParam = params.get('offers');
+      const businessNameParam = params.get('businessName') || '';
+      const repNameParam = params.get('repName') || '';
+      const repEmailParam = params.get('repEmail') || '';
+      const repPhoneParam = params.get('repPhone') || '';
+      const viewMode = params.get('view');
+
+      isApprovalView = viewMode === 'approval';
+
+      if (paramTheme) currentTheme = paramTheme;
+      if (paramAccent) currentAccent = paramAccent;
+
+      if (isApprovalView) {
+        setAmountSliderMax(amount);
+      } else {
+        setAmountSliderMax(1000000);
+      }
+
+      elements.calcAmountInput.value = formatCurrency(amount);
+      elements.calcAmountSlider.value = amount;
+      elements.calcFactorSlider.value = factor;
+      elements.calcTermSlider.value = term;
+
+      if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+      if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+      if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+      if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
+
+      paymentFrequency = freq || 'daily';
+
+      // parse saved offers
+      savedOffers = [];
+      if (offersParam) {
+        try {
+          const raw = JSON.parse(offersParam);
+          if (Array.isArray(raw)) {
+            savedOffers = raw.map(o =>
+              computeOffer(
+                Number(o.a ?? o.amount ?? 0),
+                Number(o.f ?? o.factor ?? 1.1),
+                Number(o.t ?? o.term ?? 3),
+                o.q ?? o.frequency ?? 'daily'
+              )
+            );
+          }
+        } catch (e) {
+          console.error('Error parsing offers from URL', e);
+        }
+      }
+
+      // Simple approval view: hide inputs and buttons but leave offer card
+      if (isApprovalView) {
+        if (elements.calculatorInputs) elements.calculatorInputs.style.display = 'none';
+        if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
+        if (elements.themeControls) elements.themeControls.style.display = 'none';
+      }
+    }
+
+    function runCalculator() {
+      try {
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+        const termPayments = parseInt(elements.calcTermInput.value) || 1;
+
+        const offer = computeOffer(amount, factor, termPayments, paymentFrequency);
+
+        const businessName = elements.businessNameInput?.value.trim() || '';
+        if (elements.businessNameDisplay) {
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
+        }
+
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
+        elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
+        elements.summaryTermOut.textContent = `${offer.termMonths} payments`;
+        elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+        elements.summaryPaymentLabel.textContent = offer.paymentLabel;
+        elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+
+        const origPct = parseFloat(elements.originationInput.value) || 0;
+        const origFeeAmount = amount * (origPct / 100);
+        elements.summaryOriginationPercentOut.textContent = `${origPct.toFixed(2)}%`;
+        elements.summaryOriginationAmountOut.textContent = formatCurrency(origFeeAmount);
+
+        // Term length in months (with manual override)
+        let months = offer.termLengthMonths;
+        if (elements.termLengthMonthsInput) {
+          if (!termLengthManualDirty) {
+            const autoRounded = Math.round(months * 2) / 2;
+            elements.termLengthMonthsInput.value = Number.isInteger(autoRounded)
+              ? String(autoRounded)
+              : autoRounded.toFixed(1);
+          }
+          const manualVal = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(manualVal) && manualVal > 0) {
+            months = manualVal;
+          }
+        }
+
+        if (months && months > 0) {
+          const rounded = Math.round(months * 2) / 2;
+          const display = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+          elements.summaryTermLengthOut.textContent = `${display} months`;
+        } else {
+          elements.summaryTermLengthOut.textContent = '';
+        }
+
+        updateRepDisplay();
+      } catch (e) {
+        console.error('Calculator error:', e);
+      }
+    }
+
+    function initializeCalculator() {
+      initializeFromURL();
+      applyTheme();
+
+      if (elements.themeSelector) elements.themeSelector.value = currentTheme;
+      if (elements.accentSelector) elements.accentSelector.value = currentAccent;
+
+      if (elements.calcAmountSlider && elements.calcAmountInput) {
+        syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
+      }
+      if (elements.calcFactorSlider && elements.calcFactorInput) {
+        syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
+      }
+      if (elements.calcTermSlider && elements.calcTermInput) {
+        syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
+      }
+      if (elements.originationSlider && elements.originationInput) {
+        syncInputs(elements.originationSlider, elements.originationInput, false, 0, 10, runCalculator);
+      }
+
+      if (elements.toggleDaily) {
+        elements.toggleDaily.addEventListener('click', () => {
+          paymentFrequency = 'daily';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleWeekly) {
+        elements.toggleWeekly.addEventListener('click', () => {
+          paymentFrequency = 'weekly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleMonthly) {
+        elements.toggleMonthly.addEventListener('click', () => {
+          paymentFrequency = 'monthly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.termLengthMonthsInput) {
+        elements.termLengthMonthsInput.addEventListener('input', () => {
+          termLengthManualDirty = true;
+          runCalculator();
+        });
+        elements.termLengthMonthsInput.addEventListener('blur', () => {
+          const v = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(v) && v > 0) {
+            const rounded = Math.round(v * 2) / 2;
+            elements.termLengthMonthsInput.value = Number.isInteger(rounded)
+              ? String(rounded)
+              : rounded.toFixed(1);
+          }
+          runCalculator();
+        });
+      }
+
+      if (elements.repSettingsToggle && elements.repSettingsPanel) {
+        elements.repSettingsToggle.addEventListener('click', () => {
+          elements.repSettingsPanel.classList.toggle('hidden');
+        });
+      }
+
+      if (elements.themePanelToggle && elements.repSettingsPanel) {
+        elements.themePanelToggle.addEventListener('click', () => {
+          elements.repSettingsPanel.classList.remove('hidden');
+        });
+      }
+
+      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+
+      if (elements.themeSelector) {
+        elements.themeSelector.addEventListener('change', e => {
+          currentTheme = e.target.value;
+          applyTheme();
+        });
+      }
+
+      if (elements.accentSelector) {
+        elements.accentSelector.addEventListener('change', e => {
+          currentAccent = e.target.value;
+          applyTheme();
+        });
+      }
+
+      if (elements.addOfferButton) {
+        elements.addOfferButton.addEventListener('click', handleAddOffer);
+      }
+
+      if (elements.shareLinkButton) {
+        elements.shareLinkButton.addEventListener('click', () => {
+          const shareBtn = elements.shareLinkButton;
+          const originalText = shareBtn.innerText;
+
+          const amount = parseFormattedNumber(elements.calcAmountInput.value);
+          const factor = parseFloat(elements.calcFactorInput.value);
+          const term = parseInt(elements.calcTermInput.value) || 1;
+          const freq = paymentFrequency;
+          const theme = currentTheme;
+          const accent = currentAccent;
+          const businessName = elements.businessNameInput?.value.trim() || '';
+          const repName = elements.repNameInput?.value.trim() || '';
+          const repEmail = elements.repEmailInput?.value.trim() || '';
+          const repPhone = elements.repPhoneInput?.value.trim() || '';
+
+          const offersForUrl = savedOffers.map(o => ({
+            a: o.amount,
+            f: o.factor,
+            t: o.termMonths,
+            q: o.frequency || freq,
+          }));
+
+          const url = new URL(window.location.href);
+          const params = new URLSearchParams({
+            amount,
+            factor,
+            term,
+            freq,
+            theme,
+            accent,
+            businessName,
+            repName,
+            repEmail,
+            repPhone,
+            offers: JSON.stringify(offersForUrl),
+            view: 'approval',
+          });
+          url.search = params.toString();
+
+          const ta = document.createElement('textarea');
+          ta.value = url.toString();
+          ta.style.position = 'fixed';
+          ta.style.top = '0';
+          ta.style.left = '0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+
+          try {
+            document.execCommand('copy');
+            shareBtn.innerText = 'Copied!';
+            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          } catch (e) {
+            console.error('Copy failed', e);
+            shareBtn.innerText = 'Error';
+            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          }
+          document.body.removeChild(ta);
+        });
+      }
+
+      updatePaymentToggleUI();
+      runCalculator();
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    function applyThemeAndInit() {
+      applyTheme();
+      initializeCalculator();
+    }
+
+    // Initial theme apply before layout flash
+    applyTheme();
+    initializeCalculator();
+  </script>
+</body>
+</html>
