@@ -23,16 +23,16 @@
 
     /* Base themes */
     html.theme-light {
-      --bg-body: #f4f7fb;
+      --bg-body: #eef2f7;
       --bg-card: #ffffff;
       --bg-card-inner: #f9fbff;
-      --bg-slider-track: #dbe3f0;
+      --bg-slider-track: #e2e8f0;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
-      --border-primary: #e2e8f0;
+      --border-primary: #cbd5e1;
       --text-primary: #0f172a;
-      --text-secondary: #1f2937;
-      --text-muted: #6b7280;
+      --text-secondary: #111827;
+      --text-muted: #4b5563;
     }
     html.theme-light body { background-color: var(--bg-body); }
 
@@ -40,13 +40,13 @@
       --bg-body: #020617;
       --bg-card: #020617;
       --bg-card-inner: #020617;
-      --bg-slider-track: #1e293b;
+      --bg-slider-track: #1f2937;
       --bg-input: #020617;
       --bg-toggle-inactive: #111827;
       --border-primary: #1f2937;
       --text-primary: #f9fafb;
       --text-secondary: #e5e7eb;
-      --text-muted: #9ca3af;
+      --text-muted: #d1d5db;
     }
     html.theme-dark body { background-color: var(--bg-body); }
 
@@ -58,7 +58,7 @@
       --bg-slider-track: #111111;
       --bg-input: #000000;
       --bg-toggle-inactive: #111111;
-      --border-primary: #111111;
+      --border-primary: #171717;
       --text-primary: #ffffff;
       --text-secondary: #e5e5e5;
       --text-muted: #9ca3af;
@@ -96,27 +96,27 @@
     }
     html.accent-blue,
     html.accent-primary {
-      --accent-color: #3b82f6;
-      --accent-color-light: #60a5fa;
+      --accent-color: #2563eb;
+      --accent-color-light: #3b82f6;
       --accent-color-dark: #1d4ed8;
-      --accent-shadow: 0 0 18px rgba(59, 130, 246, 0.55);
+      --accent-shadow: 0 0 18px rgba(37, 99, 235, 0.55);
     }
     html.accent-indigo {
-      --accent-color: #6366f1;
-      --accent-color-light: #818cf8;
-      --accent-color-dark: #4338ca;
-      --accent-shadow: 0 0 18px rgba(99, 102, 241, 0.55);
+      --accent-color: #4f46e5;
+      --accent-color-light: #6366f1;
+      --accent-color-dark: #3730a3;
+      --accent-shadow: 0 0 18px rgba(79, 70, 229, 0.55);
     }
     html.accent-violet {
-      --accent-color: #a855f7;
-      --accent-color-light: #c084fc;
-      --accent-color-dark: #7e22ce;
-      --accent-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
+      --accent-color: #8b5cf6;
+      --accent-color-light: #a855f7;
+      --accent-color-dark: #6d28d9;
+      --accent-shadow: 0 0 18px rgba(139, 92, 246, 0.55);
     }
     /* Extra accents */
     html.accent-teal {
       --accent-color: #14b8a6;
-      --accent-color-light: #5eead4;
+      --accent-color-light: #2dd4bf;
       --accent-color-dark: #0f766e;
       --accent-shadow: 0 0 18px rgba(20, 184, 166, 0.55);
     }
@@ -134,7 +134,7 @@
     }
     html.accent-lime {
       --accent-color: #84cc16;
-      --accent-color-light: #bef264;
+      --accent-color-light: #a3e635;
       --accent-color-dark: #4d7c0f;
       --accent-shadow: 0 0 18px rgba(132, 204, 22, 0.55);
     }
@@ -209,13 +209,13 @@
       color: var(--text-secondary);
     }
     .toggle-active {
-      background-color: var(--accent-color-light);
-      color: #0f172a;
+      background-color: var(--accent-color);
+      color: var(--text-primary);
     }
 
     .button-primary {
-      background-color: var(--accent-color-light);
-      color: #0f172a;
+      background-color: var(--accent-color);
+      color: var(--text-primary);
       font-weight: 600;
       border-radius: 0.75rem;
       padding: 0.6rem 1.75rem;
@@ -613,6 +613,12 @@
       calculatorInputs: document.getElementById('calculatorInputs'),
       buttonContainer: document.getElementById('buttonContainer'),
       themeControls: document.getElementById('themeControls'),
+      businessNameContainer: document.getElementById('businessNameContainer'),
+      factorContainer: document.getElementById('factorContainer'),
+      termContainer: document.getElementById('termContainer'),
+      originationContainer: document.getElementById('originationContainer'),
+      termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
+      toggleContainer: document.getElementById('toggleContainer'),
     };
 
     let paymentFrequency = 'daily';
@@ -888,9 +894,16 @@
         }
       }
 
-      // Simple approval view: hide inputs and buttons but leave offer card
       if (isApprovalView) {
-        if (elements.calculatorInputs) elements.calculatorInputs.style.display = 'none';
+        // Client-facing view: only amount slider visible (capped), hide all other controls
+        if (elements.factorContainer) elements.factorContainer.style.display = 'none';
+        if (elements.termContainer) elements.termContainer.style.display = 'none';
+        if (elements.originationContainer) elements.originationContainer.style.display = 'none';
+        if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
+        if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+
+        if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
         if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
         if (elements.themeControls) elements.themeControls.style.display = 'none';
       }
