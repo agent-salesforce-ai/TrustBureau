@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reliable Capital – Prepayment Savings Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rcNavy: '#0B1F3B',        // Deep navy for text/backgrounds
+            rcNavyDark: '#030B1D',    // Darker navy for hovers
+            rcAccent: '#2165AE',      // Brand blue 1
+            rcGold: '#37ACD1',        // Brand blue 2 (used as second gradient stop)
+            rcAccentSoft: '#E3F4FB',  // Soft blue background
+            rcBg: '#F4F8FC',          // Light blue-tinted background
+            rcGray: '#6B7280'
+          },
+          boxShadow: {
+            'rc-soft': '0 18px 45px rgba(15, 23, 42, 0.18)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+        'Segoe UI', sans-serif;
+    }
+
+    input[type="range"].rc-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to right, #2165AE, #37ACD1);
+      outline: none;
+    }
+
+    input[type="range"].rc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid #2165AE;
+      box-shadow: 0 0 0 2px rgba(33, 101, 174, 0.15);
+      cursor: pointer;
+    }
+
+    input[type="range"].rc-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid #2165AE;
+      box-shadow: 0 0 0 2px rgba(33, 101, 174, 0.15);
+      cursor: pointer;
+    }
+
+    input[type="range"].rc-slider::-moz-range-track {
+      background: linear-gradient(to right, #2165AE, #37ACD1);
+      height: 6px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="bg-rcBg text-slate-900">
+
+  <!-- NAVBAR -->
+  <header class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="#" class="flex items-center">
+        <img
+          src="https://cdn.prod.website-files.com/669b6ddd79f070f89cc22ce8/669b73663e0c22d92fe6eedc_Reliable%20Capital%20Logo_Horiz_Blue%20Gradient%20%26%20Black%201.svg"
+          alt="Reliable Capital"
+          class="h-8 sm:h-9 w-auto"
+        />
+      </a>
+
+      <!-- Nav (placeholder links) -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-rcGray">
+        <a href="#prepay-calculator" class="hover:text-rcNavy">Calculator</a>
+        <a href="#how-it-works" class="hover:text-rcNavy">How it works</a>
+      </nav>
+
+      <!-- CTAs -->
+      <div class="flex items-center gap-3">
+        <a
+          href="#contact"
+          class="inline-flex px-4 py-2 text-sm font-semibold rounded-full bg-gradient-to-r from-rcAccent to-rcGold text-white shadow-sm hover:opacity-90 transition"
+        >
+          Apply Now
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-b from-white to-rcBg">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <div>
+        <span class="inline-flex items-center gap-2 rounded-full bg-rcAccentSoft px-3 py-1 text-xs font-medium text-rcNavy mb-4">
+          <span class="w-2 h-2 rounded-full bg-rcAccent"></span>
+          Prepayment savings for existing structures
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-bold text-rcNavy tracking-tight">
+          Show clients how much they
+          <span class="block text-rcAccent">save by prepaying early.</span>
+        </h1>
+        <p class="mt-4 text-sm sm:text-base text-rcGray max-w-xl">
+          Plug in the funded amount, factor rate, term, and prepay discount. This tool compares the
+          full-term payback against an early payoff and highlights the client&apos;s estimated savings.
+        </p>
+      </div>
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-rc-soft p-5 sm:p-6 lg:p-7 text-sm text-rcGray">
+        <p class="text-xs uppercase tracking-[0.18em] text-rcAccent mb-2">How this tool fits</p>
+        <p>
+          Use this calculator alongside your existing approval snapshots. Once a structure is agreed,
+          you can share a locked scenario link with the client or partner so everyone can see the
+          same prepayment math.
+        </p>
+        <ul class="mt-4 space-y-1.5 text-xs">
+          <li>• Align expectations around prepay discounts and savings.</li>
+          <li>• Support renewal and refinance conversations with transparent math.</li>
+          <li>• Keep the look and feel consistent with Reliable Capital&apos;s brand.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREPAYMENT CALCULATOR -->
+  <section id="prepay-calculator" class="py-10 lg:py-16 bg-white border-t border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- HEADER ROW -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div class="text-left">
+          <h2 class="text-xl sm:text-2xl font-semibold text-rcNavy">Prepayment Savings Calculator</h2>
+          <p class="mt-1 text-xs sm:text-sm text-rcGray max-w-xl">
+            Estimate how much a client saves by prepaying on a specific day of the term at a given discount.
+          </p>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+          <button
+            id="shareScenarioButton"
+            type="button"
+            class="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-semibold rounded-full bg-gradient-to-r from-rcAccent to-rcGold text-white shadow-sm hover:opacity-90 transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3.5 w-3.5 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"
+              />
+            </svg>
+            Copy sharable scenario link
+          </button>
+          <p class="text-[11px] text-rcGray max-w-xs text-right">
+            Share a locked structure with clients so they can see approximate savings if they prepay.
+          </p>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="grid lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+
+        <!-- LEFT: INPUTS -->
+        <div class="bg-rcBg rounded-3xl border border-slate-200 p-5 sm:p-6 lg:p-7 space-y-6">
+          <h3 class="text-sm font-semibold text-rcNavy">Set up the base offer</h3>
+
+          <!-- Business name -->
+          <div class="space-y-1.5 text-xs sm:text-sm">
+            <label for="businessNameInput" class="font-medium text-rcNavy">Business name</label>
+            <input
+              id="businessNameInput"
+              type="text"
+              class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+              placeholder="Client business name"
+            />
+          </div>
+
+          <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 space-y-4">
+          <div class="grid sm:grid-cols-2 gap-4 lg:gap-5">
+            <!-- Funding Amount -->
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex items-center justify-between">
+                <label for="amountSlider" class="font-medium text-rcNavy">Funding amount</label>
+              </div>
+              <div class="grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)] gap-3 items-center">
+                <div>
+                  <input
+                    id="amountSlider"
+                    type="range"
+                    min="5000"
+                    max="500000"
+                    step="1000"
+                    value="50000"
+                    class="w-full rc-slider"
+                  />
+                  <div class="flex justify-between text-[11px] text-rcGray mt-1">
+                    <span>$5k</span>
+                    <span>$500k+</span>
+                  </div>
+                </div>
+                <div class="relative mt-1 sm:mt-0">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-rcGray text-sm">$</span>
+                  <input
+                    id="amountInput"
+                    inputmode="numeric"
+                    class="w-full rounded-2xl border border-slate-300 bg-white pl-7 pr-3 py-2 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Factor Rate -->
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex items-center justify-between">
+                <label for="factorSlider" class="font-medium text-rcNavy">Factor rate</label>
+              </div>
+              <div class="grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)] gap-3 items-center">
+                <div>
+                  <input
+                    id="factorSlider"
+                    type="range"
+                    min="1.10"
+                    max="1.50"
+                    step="0.01"
+                    value="1.25"
+                    class="w-full rc-slider"
+                  />
+                </div>
+                <div class="mt-1 sm:mt-0">
+                  <input
+                    id="factorInput"
+                    type="number"
+                    step="0.01"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Term -->
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex items-center justify-between">
+                <label for="termSlider" class="font-medium text-rcNavy">Term (months)</label>
+              </div>
+              <div class="grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)] gap-3 items-center">
+                <div>
+                  <input
+                    id="termSlider"
+                    type="range"
+                    min="3"
+                    max="18"
+                    step="1"
+                    value="9"
+                    class="w-full rc-slider"
+                  />
+                  <p class="mt-1 text-[11px] text-rcGray" id="businessDaysInfo"></p>
+                </div>
+                <div class="mt-1 sm:mt-0">
+                  <input
+                    id="termInput"
+                    type="number"
+                    step="1"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Prepay Discount -->
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex items-center justify-between">
+                <label for="discountSlider" class="font-medium text-rcNavy">Prepay discount (% of remaining balance)</label>
+              </div>
+              <div class="grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)] gap-3 items-center">
+                <div>
+                  <input
+                    id="discountSlider"
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="1"
+                    value="10"
+                    class="w-full rc-slider"
+                  />
+                </div>
+                <div class="flex items-center gap-2 mt-1 sm:mt-0">
+                  <input
+                    id="discountInput"
+                    type="number"
+                    min="0"
+                    max="50"
+                    step="1"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+                  />
+                  <span class="text-xs text-rcGray">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment frequency -->
+          <div class="space-y-2 text-[11px] sm:text-xs mt-4">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-rcNavy tracking-[0.16em] uppercase">Payment frequency</span>
+              <div class="inline-flex items-center gap-1 rounded-full bg-white border border-slate-200 px-1 py-0.5 text-[11px]">
+                <button id="payDaily" type="button" class="px-2 py-0.5 rounded-full font-semibold bg-rcAccent text-white">Daily</button>
+                <button id="payWeekly" type="button" class="px-2 py-0.5 rounded-full font-medium text-rcGray">Weekly</button>
+                <button id="payMonthly" type="button" class="px-2 py-0.5 rounded-full font-medium text-rcGray">Monthly</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <hr class="border-slate-200" />
+
+          <!-- Prepay day -->
+          <h3 class="text-sm font-semibold text-rcNavy">Prepayment timing</h3>
+          <div class="space-y-2 text-xs sm:text-sm">
+            <div class="flex items-center justify-between">
+              <label for="daySlider" class="font-medium text-rcNavy">Prepay on day of term</label>
+              <span id="dayOfTermLabel" class="font-semibold text-rcNavy text-xs"></span>
+            </div>
+            <input
+              id="daySlider"
+              type="range"
+              min="0"
+              max="198"
+              step="1"
+              value="66"
+              class="w-full rc-slider"
+            />
+            <p class="text-[11px] text-rcGray" id="elapsedInfo"></p>
+          </div>
+
+          <!-- Dates -->
+          <div class="grid sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="space-y-1.5">
+              <label for="fundingDate" class="font-medium text-rcNavy">Funding date</label>
+              <input
+                id="fundingDate"
+                type="date"
+                class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+              />
+            </div>
+            <div class="space-y-1.5">
+              <label for="prepayDate" class="font-medium text-rcNavy">Approx. prepay date</label>
+              <input
+                id="prepayDate"
+                type="date"
+                class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-rcNavy placeholder:text-rcGray focus:outline-none focus:ring-2 focus:ring-rcAccent focus:border-rcAccent"
+              />
+              <p id="prepayDateInfo" class="text-[11px] text-rcGray"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: OUTPUTS -->
+        <div class="bg-gradient-to-br from-rcNavy via-rcAccent to-rcGold text-white rounded-3xl p-5 sm:p-6 lg:p-7 shadow-rc-soft space-y-5">
+
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-rcAccentSoft">Prepayment snapshot</p>
+              <h3 class="mt-1 text-xl font-semibold">Savings if the client prepays early</h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-100">
+                We compare paying full term versus prepaying on the selected day with the chosen discount.
+              </p>
+            </div>
+          </div>
+
+          <!-- Original offer summary -->
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div class="rounded-2xl bg-white border border-slate-200 p-4 text-rcNavy text-center">
+              <p class="text-[11px] uppercase tracking-wide text-rcGray">Funding amount</p>
+              <p id="origAmount" class="mt-2 text-xl font-semibold"></p>
+              <p class="mt-1 text-[11px] text-rcGray" id="origFactor"></p>
+            </div>
+            <div class="rounded-2xl bg-white border border-slate-200 p-4 text-rcNavy text-center">
+              <p class="text-[11px] uppercase tracking-wide text-rcGray">Term & payment</p>
+              <p id="origTerm" class="mt-2 text-sm font-semibold"></p>
+              <p id="origPaymentLabel" class="mt-1 text-[11px] text-rcGray"></p>
+              <p id="origDaily" class="text-sm font-semibold"></p>
+            </div>
+          </div>
+
+          <!-- Prepay scenario details -->
+          <div class="rounded-2xl bg-white/10 border border-white/30 p-4 space-y-3 text-sm">
+            <div class="text-xs flex flex-col items-center gap-1 text-center">
+              <div class="text-slate-100 flex flex-col gap-0.5">
+                <span id="scenarioDayLabel" class="font-medium"></span>
+                <span id="businessNameDisplay" class="text-[11px] text-slate-200"></span>
+              </div>
+              <div class="text-[11px] text-slate-200">
+                <span>Total payback if client completes full term vs prepays on this day.</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm text-center">
+              <div>
+                <p class="text-[11px] uppercase tracking-wide text-slate-200">Paid to date</p>
+                <p id="paidToDate" class="mt-1 text-sm font-semibold"></p>
+              </div>
+              <div>
+                <p class="text-[11px] uppercase tracking-wide text-slate-200">Remaining balance</p>
+                <p id="remainingBalance" class="mt-1 text-sm font-semibold"></p>
+              </div>
+              <div>
+                <p class="text-[11px] uppercase tracking-wide text-slate-200">Prepay discount</p>
+                <p id="discountAmount" class="mt-1 text-sm font-semibold"></p>
+              </div>
+              <div>
+                <p class="text-[11px] uppercase tracking-wide text-slate-200">Discounted payoff</p>
+                <p id="discountedPayoff" class="mt-1 text-sm font-semibold"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Savings comparison -->
+          <div class="rounded-2xl bg-white border border-slate-200 p-4 space-y-4 text-rcNavy">
+            <div class="flex flex-col items-center gap-2 text-sm text-center">
+              <div>
+                <p class="text-[11px] uppercase tracking-wide text-rcGray">If client pays full term</p>
+                <p id="totalFullTerm" class="mt-1 text-sm font-semibold"></p>
+              </div>
+              <div>
+                <p class="text-[11px] uppercase tracking-wide text-rcGray">If client prepays on selected day</p>
+                <p id="totalIfPrepay" class="mt-1 text-sm font-semibold"></p>
+              </div>
+            </div>
+            <div class="rounded-2xl bg-rcAccentSoft px-4 py-4 text-center">
+              <p class="text-[11px] font-semibold tracking-[0.18em] text-rcNavy uppercase">Estimated savings</p>
+              <p class="text-[11px] text-rcGray mb-1">vs. completing the full term</p>
+              <p id="savingsAmount" class="text-2xl font-semibold text-rcNavy"></p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SIMPLE FOOTER -->
+  <footer id="contact" class="bg-rcNavy text-rcGray text-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-white text-sm">Reliable Capital</span>
+        <span class="text-slate-400">© 2024 All Rights Reserved</span>
+      </div>
+      <div class="flex flex-wrap gap-4">
+        <a href="#" class="hover:text-white">Privacy Policy</a>
+        <a href="#" class="hover:text-white">Terms of Use</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const elements = {
+      amountSlider: document.getElementById('amountSlider'),
+      amountInput: document.getElementById('amountInput'),
+      factorSlider: document.getElementById('factorSlider'),
+      factorInput: document.getElementById('factorInput'),
+      termSlider: document.getElementById('termSlider'),
+      termInput: document.getElementById('termInput'),
+      discountSlider: document.getElementById('discountSlider'),
+      discountInput: document.getElementById('discountInput'),
+      daySlider: document.getElementById('daySlider'),
+      dayOfTermLabel: document.getElementById('dayOfTermLabel'),
+      businessDaysInfo: document.getElementById('businessDaysInfo'),
+      elapsedInfo: document.getElementById('elapsedInfo'),
+      scenarioDayLabel: document.getElementById('scenarioDayLabel'),
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      amountDisplay: document.getElementById('amountDisplay'),
+      factorDisplay: document.getElementById('factorDisplay'),
+      termDisplay: document.getElementById('termDisplay'),
+      discountDisplay: document.getElementById('discountDisplay'),
+      origAmount: document.getElementById('origAmount'),
+      origFactor: document.getElementById('origFactor'),
+      origTerm: document.getElementById('origTerm'),
+      origPayback: document.getElementById('origPayback'),
+      origPaymentLabel: document.getElementById('origPaymentLabel'),
+      origDaily: document.getElementById('origDaily'),
+      paidToDate: document.getElementById('paidToDate'),
+      remainingBalance: document.getElementById('remainingBalance'),
+      discountAmount: document.getElementById('discountAmount'),
+      discountedPayoff: document.getElementById('discountedPayoff'),
+      totalFullTerm: document.getElementById('totalFullTerm'),
+      totalIfPrepay: document.getElementById('totalIfPrepay'),
+      savingsAmount: document.getElementById('savingsAmount'),
+      fundingDate: document.getElementById('fundingDate'),
+      prepayDate: document.getElementById('prepayDate'),
+      prepayDateInfo: document.getElementById('prepayDateInfo'),
+      shareScenarioButton: document.getElementById('shareScenarioButton'),
+      payDaily: document.getElementById('payDaily'),
+      payWeekly: document.getElementById('payWeekly'),
+      payMonthly: document.getElementById('payMonthly'),
+    };
+
+    let totalBusinessDays = 0;
+    let isApprovalView = false;
+    let paymentMode = 'daily';
+    let originalSharedAmount = null;
+
+    function formatCurrency(num) {
+      const n = Number(num);
+      if (isNaN(n)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(n);
+    }
+
+    function parseFormattedNumber(val) {
+      if (!val || typeof val !== 'string') return 0;
+      return parseFloat(val.replace(/[$,]/g, '')) || 0;
+    }
+
+    function syncInputs(slider, input, isCurrency, min, max, onChange) {
+      const initial = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initial) : String(initial);
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        if (isNaN(val)) val = min;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        onChange();
+      });
+
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (isNaN(val)) return;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        onChange();
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (isNaN(val) || val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        onChange();
+      });
+    }
+
+    function computeBaseOffer() {
+      const amount = parseFormattedNumber(elements.amountInput.value);
+      const factor = parseFloat(elements.factorInput.value) || 1.25;
+      const termMonths = parseInt(elements.termInput.value, 10) || 9;
+
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+      totalBusinessDays = Math.max(1, termMonths * 22);
+      const dailyPayment = totalPayback / totalBusinessDays;
+      const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
+      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
+
+      return {
+        amount,
+        factor,
+        termMonths,
+        totalPayback,
+        totalCost,
+        dailyPayment,
+        weeklyPayment,
+        monthlyPayment,
+      };
+    }
+
+    function updateDaySliderRange() {
+      elements.daySlider.max = String(totalBusinessDays);
+      let current = parseInt(elements.daySlider.value, 10);
+      if (isNaN(current) || current > totalBusinessDays) {
+        current = Math.floor(totalBusinessDays / 3);
+        elements.daySlider.value = String(current);
+      }
+    }
+
+    function updateDayFromDates() {
+      if (!elements.fundingDate || !elements.prepayDate) return;
+      const startVal = elements.fundingDate.value;
+      const prepayVal = elements.prepayDate.value;
+      if (!startVal || !prepayVal) {
+        elements.prepayDateInfo.textContent = '';
+        return;
+      }
+      const start = new Date(startVal + 'T00:00:00');
+      const pre = new Date(prepayVal + 'T00:00:00');
+      let diffDays = Math.round((pre - start) / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) diffDays = 0;
+      const approxBiz = Math.round(diffDays * 5 / 7);
+      const clamped = Math.max(0, Math.min(totalBusinessDays, approxBiz));
+      elements.daySlider.value = String(clamped);
+      elements.prepayDateInfo.textContent = totalBusinessDays
+        ? `≈ day ${clamped} of ${totalBusinessDays} (about ${diffDays} calendar days from funding)`
+        : '';
+    }
+
+    function updatePaymentModeButtons() {
+      if (!elements.payDaily || !elements.payWeekly || !elements.payMonthly) return;
+      const map = {
+        daily: elements.payDaily,
+        weekly: elements.payWeekly,
+        monthly: elements.payMonthly,
+      };
+      Object.values(map).forEach((btn) => {
+        btn.classList.remove('bg-rcAccent', 'text-white', 'font-semibold');
+        btn.classList.remove('text-rcGray', 'font-medium');
+      });
+      Object.entries(map).forEach(([mode, btn]) => {
+        if (mode === paymentMode) {
+          btn.classList.add('bg-rcAccent', 'text-white', 'font-semibold');
+        } else {
+          btn.classList.add('text-rcGray', 'font-medium');
+        }
+      });
+    }
+
+    function runCalculator() {
+      const base = computeBaseOffer();
+      const discountPct = Math.max(0, Math.min(50, parseFloat(elements.discountInput.value) || 0)) / 100;
+      const day = Math.max(0, Math.min(totalBusinessDays, parseInt(elements.daySlider.value, 10) || 0));
+
+      if (elements.amountDisplay) {
+        elements.amountDisplay.textContent = formatCurrency(parseFormattedNumber(elements.amountInput.value));
+      }
+      if (elements.factorDisplay) {
+        elements.factorDisplay.textContent = `${parseFloat(elements.factorInput.value || '1.25').toFixed(2)}x`;
+      }
+      if (elements.termDisplay) {
+        elements.termDisplay.textContent = `${elements.termInput.value || elements.termSlider.value} months`;
+      }
+      if (elements.discountDisplay) {
+        elements.discountDisplay.textContent = `${elements.discountInput.value || elements.discountSlider.value}%`;
+      }
+
+
+      elements.businessDaysInfo.textContent = `${base.termMonths} months ≈ ${totalBusinessDays} business days`;
+      const pctOfTerm = totalBusinessDays > 0 ? (day / totalBusinessDays) * 100 : 0;
+      elements.dayOfTermLabel.textContent = `Day ${day} of ${totalBusinessDays}`;
+      elements.elapsedInfo.textContent = `~${pctOfTerm.toFixed(1)}% through the term`;
+      elements.scenarioDayLabel.textContent = `Prepay on day ${day} (${pctOfTerm.toFixed(1)}% into term)`;
+
+      const name = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+      elements.businessNameDisplay.textContent = name ? `Business: ${name}` : '';
+
+      elements.origAmount.textContent = formatCurrency(base.amount);
+      elements.origFactor.textContent = `${base.factor.toFixed(2)}x total payback`;
+      elements.origTerm.textContent = `${base.termMonths} month term`;
+
+      let payLabel = 'Estimated daily payment';
+      let payValue = base.dailyPayment;
+      if (paymentMode === 'weekly') {
+        payLabel = 'Estimated weekly payment';
+        payValue = base.weeklyPayment;
+      } else if (paymentMode === 'monthly') {
+        payLabel = 'Estimated monthly payment';
+        payValue = base.monthlyPayment;
+      }
+      elements.origPaymentLabel.textContent = payLabel;
+      elements.origDaily.textContent = formatCurrency(payValue);
+
+      const paidToDate = base.dailyPayment * day;
+      const remainingBalanceNoDisc = Math.max(0, base.totalPayback - paidToDate);
+      const discountAmount = remainingBalanceNoDisc * discountPct;
+      const discountedPayoff = remainingBalanceNoDisc - discountAmount;
+
+      const totalFullTerm = base.totalPayback;
+      const totalIfPrepay = paidToDate + discountedPayoff;
+      const savings = Math.max(0, totalFullTerm - totalIfPrepay);
+
+      elements.paidToDate.textContent = formatCurrency(paidToDate);
+      elements.remainingBalance.textContent = formatCurrency(remainingBalanceNoDisc);
+      elements.discountAmount.textContent = formatCurrency(discountAmount);
+      elements.discountedPayoff.textContent = formatCurrency(discountedPayoff);
+      elements.totalFullTerm.textContent = formatCurrency(totalFullTerm);
+      elements.totalIfPrepay.textContent = formatCurrency(totalIfPrepay);
+      elements.savingsAmount.textContent = formatCurrency(savings);
+    }
+
+    function initializeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+
+      const amountParam = params.get('amount');
+      if (amountParam !== null) {
+        const a = parseFloat(amountParam);
+        if (!isNaN(a)) {
+          elements.amountSlider.value = String(a);
+          elements.amountInput.value = formatCurrency(a);
+          originalSharedAmount = a;
+        }
+      }
+
+      const factorParam = params.get('factor');
+      if (factorParam !== null) {
+        const f = parseFloat(factorParam);
+        if (!isNaN(f)) {
+          elements.factorSlider.value = String(f);
+          elements.factorInput.value = f.toFixed(2);
+        }
+      }
+
+      const termParam = params.get('term');
+      if (termParam !== null) {
+        const t = parseInt(termParam, 10);
+        if (!isNaN(t)) {
+          elements.termSlider.value = String(t);
+          elements.termInput.value = String(t);
+        }
+      }
+
+      const discountParam = params.get('discount');
+      if (discountParam !== null) {
+        const d = parseFloat(discountParam);
+        if (!isNaN(d)) {
+          elements.discountSlider.value = String(d);
+          elements.discountInput.value = String(d);
+        }
+      }
+
+      const dayParam = params.get('day');
+      if (dayParam !== null) {
+        const dd = parseInt(dayParam, 10);
+        if (!isNaN(dd)) {
+          elements.daySlider.value = String(dd);
+        }
+      }
+
+      const businessNameParam = params.get('businessName');
+      if (businessNameParam && elements.businessNameInput) {
+        elements.businessNameInput.value = businessNameParam;
+      }
+
+      const modeParam = params.get('mode');
+      if (modeParam === 'daily' || modeParam === 'weekly' || modeParam === 'monthly') {
+        paymentMode = modeParam;
+      }
+
+      const view = params.get('view');
+      if (view === 'approval') {
+        isApprovalView = true;
+
+        const lockedEls = [
+          elements.businessNameInput,
+          elements.factorSlider,
+          elements.factorInput,
+          elements.termSlider,
+          elements.termInput,
+          elements.discountSlider,
+          elements.discountInput,
+          elements.payDaily,
+          elements.payWeekly,
+          elements.payMonthly,
+        ];
+        lockedEls.forEach((el) => {
+          if (el) {
+            el.disabled = true;
+            el.classList.add('cursor-default', 'opacity-70');
+          }
+        });
+
+        if (elements.shareScenarioButton) {
+          elements.shareScenarioButton.disabled = true;
+          elements.shareScenarioButton.classList.add('opacity-60', 'cursor-default');
+          elements.shareScenarioButton.textContent = 'Shared scenario link';
+        }
+      }
+    }
+
+    function shareScenario() {
+      const amount = parseFormattedNumber(elements.amountInput.value);
+      const factor = parseFloat(elements.factorInput.value) || 1.25;
+      const term = parseInt(elements.termInput.value, 10) || 9;
+      const discount = parseFloat(elements.discountInput.value) || 0;
+      const day = parseInt(elements.daySlider.value, 10) || 0;
+      const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+
+      const url = new URL(window.location.href);
+      const params = new URLSearchParams({
+        amount,
+        factor,
+        term,
+        discount,
+        day,
+        mode: paymentMode,
+        businessName,
+        view: 'approval',
+      });
+      url.search = params.toString();
+
+      const textArea = document.createElement('textarea');
+      textArea.value = url.toString();
+      textArea.style.position = 'fixed';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        const original = elements.shareScenarioButton.textContent;
+        elements.shareScenarioButton.textContent = 'Link copied';
+        setTimeout(() => {
+          elements.shareScenarioButton.textContent = original;
+        }, 2000);
+      } catch (err) {
+        console.error('Copy failed', err);
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    function init() {
+      elements.amountInput.value = formatCurrency(parseFloat(elements.amountSlider.value));
+      elements.factorInput.value = parseFloat(elements.factorSlider.value).toFixed(2);
+      elements.termInput.value = elements.termSlider.value;
+      elements.discountInput.value = elements.discountSlider.value;
+
+      if (elements.fundingDate && !elements.fundingDate.value) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        elements.fundingDate.value = `${yyyy}-${mm}-${dd}`;
+      }
+
+      initializeFromURL();
+
+      const maxAmount = (isApprovalView && originalSharedAmount) ? originalSharedAmount : 500000;
+      syncInputs(elements.amountSlider, elements.amountInput, true, 5000, maxAmount, runCalculator);
+      syncInputs(elements.factorSlider, elements.factorInput, false, 1.1, 1.5, runCalculator);
+      syncInputs(elements.termSlider, elements.termInput, false, 3, 18, () => {
+        computeBaseOffer();
+        updateDaySliderRange();
+        updateDayFromDates();
+        runCalculator();
+      });
+      syncInputs(elements.discountSlider, elements.discountInput, false, 0, 50, runCalculator);
+
+      elements.daySlider.addEventListener('input', runCalculator);
+
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.fundingDate) {
+        elements.fundingDate.addEventListener('change', () => {
+          computeBaseOffer();
+          updateDaySliderRange();
+          updateDayFromDates();
+          runCalculator();
+        });
+      }
+
+      if (elements.prepayDate) {
+        elements.prepayDate.addEventListener('change', () => {
+          computeBaseOffer();
+          updateDaySliderRange();
+          updateDayFromDates();
+          runCalculator();
+        });
+      }
+
+      if (elements.shareScenarioButton && !isApprovalView) {
+        elements.shareScenarioButton.addEventListener('click', shareScenario);
+      }
+
+      if (elements.payDaily && elements.payWeekly && elements.payMonthly) {
+        elements.payDaily.addEventListener('click', () => {
+          paymentMode = 'daily';
+          updatePaymentModeButtons();
+          runCalculator();
+        });
+        elements.payWeekly.addEventListener('click', () => {
+          paymentMode = 'weekly';
+          updatePaymentModeButtons();
+          runCalculator();
+        });
+        elements.payMonthly.addEventListener('click', () => {
+          paymentMode = 'monthly';
+          updatePaymentModeButtons();
+          runCalculator();
+        });
+      }
+
+      updatePaymentModeButtons();
+      computeBaseOffer();
+      updateDaySliderRange();
+      updateDayFromDates();
+      runCalculator();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
+
