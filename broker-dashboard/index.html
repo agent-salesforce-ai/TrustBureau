@@ -185,27 +185,69 @@
 
     /* Logo preview */
     .logo-preview-box {
-      width: 56px;
-      height: 56px;
+      width: 100%;
+      height: 160px;
       border-radius: 12px;
-      background: #e5e7eb;
+      background: #f9fafb;
+      border: 2px dashed #d1d5db;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       margin-top: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .logo-preview-box:hover {
+      border-color: var(--accent-color);
+      background: #f0fdf4;
+    }
+
+    .logo-preview-box.dragging {
+      border-color: var(--accent-color);
+      background: #f0fdf4;
+      transform: scale(1.02);
     }
 
     .logo-preview-box img {
-      width: 100%;
-      height: 100%;
+      max-width: 85%;
+      max-height: 85%;
       object-fit: contain;
+    }
+
+    .logo-placeholder {
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .logo-placeholder svg {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 8px;
+      opacity: 0.5;
+    }
+
+    .logo-placeholder .main-text {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .logo-placeholder .sub-text {
+      font-size: 12px;
+      color: #9ca3af;
     }
 
     .pill-small {
       font-size: 11px;
       color: #9ca3af;
       margin-top: 4px;
+    }
+
+    #logoInput {
+      display: none;
     }
 
     /* widen Outseta profile content */
@@ -264,11 +306,16 @@
         <div class="field">
           <label for="logoInput">Portal logo</label>
           <input id="logoInput" type="file" accept="image/*" />
-          <div class="pill-small">Stored in this browser for now.</div>
-
           <div class="logo-preview-box" id="logoPreviewBox">
-            <span style="font-size:11px;color:#6b7280;">Logo</span>
+            <div class="logo-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <div class="main-text">Click to upload or drag and drop</div>
+              <div class="sub-text">PNG, JPG, SVG up to 10MB</div>
+            </div>
           </div>
+          <div class="pill-small">Stored in this browser for now.</div>
         </div>
 
         <div class="field">
@@ -317,7 +364,7 @@
         img.src = dataUrl;
         logoBox.appendChild(img);
       } else {
-        logoBox.innerHTML = '<span style="font-size:11px;color:#6b7280;">Logo</span>';
+        logoBox.innerHTML = '<div class="logo-placeholder"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><div class="main-text">Click to upload or drag and drop</div><div class="sub-text">PNG, JPG, SVG up to 10MB</div></div>';
       }
     }
 
@@ -327,18 +374,49 @@
       if (saved) setLogo(saved);
     }
 
-    colorInput.addEventListener('input', e => setAccentColor(e.target.value));
-
-    logoInput.addEventListener('change', function(e) {
-      var file = e.target.files && e.target.files[0];
-      if (!file) return;
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
       var reader = new FileReader();
-      reader.onload = ev => {
+      reader.onload = function(ev) {
         var dataUrl = ev.target.result;
         setLogo(dataUrl);
         try { localStorage.setItem(STORAGE_LOGO_KEY, dataUrl); } catch (err) {}
       };
       reader.readAsDataURL(file);
+    }
+
+    colorInput.addEventListener('input', e => setAccentColor(e.target.value));
+
+    // Click to upload
+    logoBox.addEventListener('click', function() {
+      logoInput.click();
+    });
+
+    logoInput.addEventListener('change', function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    // Drag and drop
+    logoBox.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      logoBox.classList.add('dragging');
+    });
+
+    logoBox.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      logoBox.classList.remove('dragging');
+    });
+
+    logoBox.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      logoBox.classList.remove('dragging');
+      
+      var file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) handleFile(file);
     });
 
     loadAccentColor();
