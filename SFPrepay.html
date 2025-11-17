@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth theme-slate accent-sutton">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sutton Funding | Prepayment Savings Calculator</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      transition: background-color 0.2s;
+      background:
+        radial-gradient(circle at top left, rgba(15, 23, 42, 0.85), transparent 55%),
+        linear-gradient(to bottom, #020617, #020617);
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    .input-icon {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Base themes (dark + light) */
+    html.theme-slate {
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    html.theme-slate body {
+      background:
+        radial-gradient(circle at top left, rgba(15, 23, 42, 0.85), transparent 55%),
+        linear-gradient(to bottom, #020617, #020617);
+    }
+
+    /* Light corporate theme tuned for Sutton Funding */
+    html.theme-corporate {
+      --bg-body: #f5f3ff;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+      --bg-slider-track: #e5e7eb;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #e5e7eb;
+      --text-primary: #020617;
+      --text-secondary: #111827;
+      --text-muted: #6b7280;
+    }
+    html.theme-corporate body {
+      background-color: var(--bg-body);
+    }
+
+    /* Sutton Funding accent (navy + gold) */
+    html.accent-sutton {
+      --accent-color: #fbbf24;        /* primary gold */
+      --accent-color-light: #facc6b;  /* lighter gold */
+      --accent-color-dark: #b45309;   /* deeper amber */
+      --accent-alt: #fbbf24;          /* slider handles / detail */
+      --accent-text-inverted: #020617;
+      --accent-shadow: 0 0 18px rgba(251, 191, 36, 0.65);
+    }
+
+    .card-bg {
+      background-color: var(--bg-card);
+      border-color: var(--border-primary);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.35),
+        0 20px 45px rgba(0, 0, 0, 0.75);
+    }
+    .card-inner-bg {
+      background-color: var(--bg-card-inner);
+      border: 1px solid var(--border-primary);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.45);
+    }
+
+    .text-primary {
+      color: var(--text-primary);
+    }
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+    .text-muted {
+      color: var(--text-muted);
+    }
+    .border-primary {
+      border-color: var(--border-primary);
+    }
+
+    .slider-track {
+      background-color: var(--bg-slider-track);
+    }
+    .slider-thumb {
+      accent-color: var(--accent-alt);
+    }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-radius: 0.75rem;
+      border: 1px solid #4b5563;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.45);
+      background-color: var(--bg-input);
+      outline: none;
+    }
+
+    .text-hero {
+      color: var(--accent-color);
+      text-shadow: var(--accent-shadow);
+    }
+
+    .button-primary {
+      background-color: var(--accent-color-light);
+      color: #111827;
+      font-weight: 600;
+      border-radius: 999px;
+      padding: 0.6rem 1.8rem;
+      border: 1px solid rgba(251, 191, 36, 0.85);
+      font-size: 0.85rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      transition:
+        background-color 0.15s ease-out,
+        box-shadow 0.15s ease-out,
+        transform 0.15s ease-out;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-dark);
+      color: #fefce8;
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 0 1px rgba(251, 191, 36, 0.9),
+        0 18px 40px rgba(0, 0, 0, 0.8);
+    }
+    .button-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+    }
+    .button-primary:disabled {
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .theme-toggle-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.7rem;
+      padding: 0.25rem 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      background-color: rgba(15, 23, 42, 0.02);
+      color: var(--text-muted);
+      transition:
+        background-color 0.15s ease-out,
+        color 0.15s ease-out,
+        border-color 0.15s ease-out;
+    }
+    .theme-toggle-btn:hover {
+      background-color: rgba(15, 23, 42, 0.18);
+      color: var(--text-primary);
+      border-color: rgba(148, 163, 184, 0.9);
+    }
+
+    .shell {
+      position: relative;
+      border-radius: 1.5rem;
+      background: var(--bg-card);
+      border: 2px solid rgba(251, 191, 36, 0.9);
+      box-shadow:
+        0 0 0 3px rgba(251, 191, 36, 0.85),
+        0 0 35px rgba(251, 191, 36, 0.8),
+        0 0 75px rgba(15, 23, 42, 0.9),
+        0 35px 90px rgba(0, 0, 0, 0.95);
+    }
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      border-radius: inherit;
+      background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.18), transparent 55%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .brand-logo {
+      filter: drop-shadow(0 0 22px rgba(251, 191, 36, 0.85));
+    }
+
+    .detail-label {
+      color: var(--accent-color-light);
+    }
+
+    .savings-card {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-width: 1px;
+      border-color: #6ee7b7;
+      box-shadow:
+        0 0 0 1px rgba(16, 185, 129, 0.35),
+        0 10px 25px rgba(16, 185, 129, 0.25);
+    }
+
+    html.theme-slate .savings-card {
+      background:
+        radial-gradient(circle at top, rgba(16, 185, 129, 0.35), transparent 60%),
+        #022c22;
+      border-color: #34d399;
+      box-shadow:
+        0 0 0 1px rgba(16, 185, 129, 0.5),
+        0 15px 40px rgba(6, 95, 70, 0.7);
+    }
+
+    html.theme-slate .savings-card p {
+      color: #bbf7d0;
+    }
+
+    html.theme-slate #savingsAmount {
+      color: #6ee7b7;
+    }
+
+    .savings-amount {
+      font-size: 1.75rem;
+      letter-spacing: 0.04em;
+    }
+
+    .freq-toggle-active {
+      background-color: var(--accent-color); /* Sutton gold */
+      color: var(--accent-text-inverted);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.55);
+    }
+    .freq-toggle-inactive {
+      background-color: transparent;
+      color: var(--text-muted);
+    }
+    .freq-toggle-shell {
+      background-color: #f9fafb; /* light pill in light mode */
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    html.theme-slate .freq-toggle-shell {
+      background-color: #020617; /* dark pill in dark mode */
+      border-color: rgba(148, 163, 184, 0.7);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
+
+  <div class="w-full max-w-4xl card-bg shell text-primary rounded-2xl p-6 md:p-8 space-y-6 border">
+
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-primary pb-4">
+      <div class="flex items-center gap-4">
+        <img src="https://i.imgur.com/MXMqYLc.png"
+             alt="Sutton Funding Logo" class="brand-logo h-14 w-auto" />
+        <div class="space-y-1">
+          <p class="text-xs uppercase tracking-[0.25em] text-muted">Sutton Funding</p>
+          <h1 class="text-lg md:text-xl font-semibold text-primary">Prepayment Savings Calculator</h1>
+          <p class="text-xs text-muted">Estimate savings when a client prepays early.</p>
+        </div>
+      </div>
+      <div class="text-right space-y-2">
+        <button
+          id="themeToggle"
+          type="button"
+          class="theme-toggle-btn inline-flex items-center gap-1"
+        >
+          Light mode
+        </button>
+        <button
+          id="shareScenarioButton"
+          class="button-primary inline-flex items-center gap-1"
+          type="button"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-3 w-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"
+            />
+          </svg>
+          Share Scenario
+        </button>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 md:gap-8">
+      <!-- INPUTS COLUMN -->
+      <div class="space-y-4">
+        <!-- Base Offer -->
+        <div class="card-inner-bg rounded-xl p-4 space-y-3">
+          <h2 class="text-sm font-semibold text-secondary mb-1">Base Offer</h2>
+
+          <div class="space-y-1">
+            <label for="businessNameInput" class="block text-xs font-semibold text-muted">Business Name</label>
+            <input
+              id="businessNameInput"
+              type="text"
+              class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+              placeholder="Client business name"
+            />
+          </div>
+
+          <div class="space-y-1">
+            <label for="amountSlider" class="block text-xs font-semibold text-muted">Funding Amount ($)</label>
+            <input
+              id="amountSlider"
+              type="range"
+              min="5000"
+              max="500000"
+              step="1000"
+              value="50000"
+              class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2"
+            />
+            <div class="relative">
+              <span class="absolute left-3 input-icon text-muted text-sm">$</span>
+              <input
+                id="amountInput"
+                inputmode="numeric"
+                class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <label for="factorSlider" class="block text-xs font-semibold text-muted detail-label">Factor Rate</label>
+            <input
+              id="factorSlider"
+              type="range"
+              min="1.10"
+              max="1.50"
+              step="0.01"
+              value="1.25"
+              class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb"
+            />
+            <div class="relative">
+              <input
+                id="factorInput"
+                type="number"
+                step="0.01"
+                class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <label for="termSlider" class="block text-xs font-semibold text-muted detail-label">Term (Months)</label>
+            <input
+              id="termSlider"
+              type="range"
+              min="3"
+              max="18"
+              step="1"
+              value="9"
+              class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb"
+            />
+            <div class="relative">
+              <input
+                id="termInput"
+                type="number"
+                step="1"
+                class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+              />
+            </div>
+            <p class="text-[11px] text-muted mt-1" id="businessDaysInfo"></p>
+          </div>
+
+          <div class="space-y-1 pt-2">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-muted font-semibold uppercase tracking-[0.16em]">Payment Frequency</span>
+              <div class="inline-flex rounded-full freq-toggle-shell p-0.5">
+                <button id="payDaily" type="button" class="px-2 py-0.5 rounded-full text-[11px] font-semibold freq-toggle-active">Daily</button>
+                <button id="payWeekly" type="button" class="px-2 py-0.5 rounded-full text-[11px] font-semibold freq-toggle-inactive">Weekly</button>
+                <button id="payMonthly" type="button" class="px-2 py-0.5 rounded-full text-[11px] font-semibold freq-toggle-inactive">Monthly</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prepay Settings -->
+        <div class="card-inner-bg rounded-xl p-4 space-y-3">
+          <h2 class="text-sm font-semibold text-secondary mb-1">Prepayment Settings</h2>
+
+          <div class="space-y-1">
+            <label for="discountSlider" class="block text-xs font-semibold text-muted detail-label">Prepay Discount (% of remaining balance)</label>
+            <input
+              id="discountSlider"
+              type="range"
+              min="0"
+              max="50"
+              step="1"
+              value="10"
+              class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb"
+            />
+            <div class="relative flex items-center gap-2">
+              <input
+                id="discountInput"
+                type="number"
+                min="0"
+                max="50"
+                step="1"
+                class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+              />
+              <span class="text-xs text-muted">%</span>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex items-center justify-between">
+              <label for="daySlider" class="block text-xs font-semibold text-muted detail-label">Prepay on Day</label>
+              <span class="text-[11px] text-muted" id="dayOfTermLabel"></span>
+            </div>
+            <input
+              id="daySlider"
+              type="range"
+              min="0"
+              max="198"
+              step="1"
+              value="66"
+              class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb"
+            />
+            <p class="text-[11px] text-muted" id="elapsedInfo"></p>
+          </div>
+
+          <div class="space-y-1">
+            <label for="fundingDate" class="block text-xs font-semibold text-muted detail-label">Funding Date</label>
+            <input
+              id="fundingDate"
+              type="date"
+              class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+            />
+          </div>
+
+          <div class="space-y-1">
+            <label for="prepayDate" class="block text-xs font-semibold text-muted detail-label">Prepay Date (approximate)</label>
+            <input
+              id="prepayDate"
+              type="date"
+              class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+            />
+            <p id="prepayDateInfo" class="text-[11px] text-muted"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTPUTS COLUMN -->
+      <div class="space-y-6">
+        <!-- Original Offer Summary -->
+        <div class="card-inner-bg rounded-2xl p-5 space-y-4">
+          <h2 class="text-sm font-semibold text-secondary text-center">Original Offer</h2>
+          <div class="mt-2 text-center space-y-1">
+            <p class="text-xs font-semibold text-muted">Funding Amount</p>
+            <p id="origAmount" class="text-2xl font-semibold text-hero"></p>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mt-4 text-center">
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Factor Rate</p>
+              <p id="origFactor" class="text-sm font-semibold text-primary"></p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Term</p>
+              <p id="origTerm" class="text-sm font-semibold text-primary"></p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Total Payback</p>
+              <p id="origPayback" class="text-sm font-semibold text-primary"></p>
+            </div>
+            <div class="space-y-1">
+              <p id="origPaymentLabel" class="text-[11px] font-semibold text-muted detail-label">Est. Daily Payment</p>
+              <p id="origDaily" class="text-sm font-semibold text-primary"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prepayment Scenario -->
+        <div class="card-inner-bg rounded-2xl p-5 space-y-5">
+          <div class="text-center space-y-1">
+            <h2 class="text-sm font-semibold text-secondary">Prepay Scenario</h2>
+            <p class="text-[11px] text-muted" id="scenarioDayLabel"></p>
+            <p id="businessNameDisplay" class="text-[11px] text-muted"></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6 text-sm mt-4 text-center">
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Paid to Date</p>
+              <p id="paidToDate" class="text-sm font-semibold text-primary"></p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Remaining Balance</p>
+              <p id="remainingBalance" class="text-sm font-semibold text-primary"></p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Prepay Discount</p>
+              <p id="discountAmount" class="text-sm font-semibold text-primary"></p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold text-muted detail-label">Discounted Payoff</p>
+              <p id="discountedPayoff" class="text-sm font-semibold text-primary"></p>
+            </div>
+          </div>
+
+          <div class="mt-8 border-t border-primary pt-6 space-y-5">
+            <div class="flex flex-col gap-3 md:flex-row md:items-baseline md:justify-between text-center">
+              <div class="space-y-1">
+                <p class="text-[11px] font-semibold text-muted detail-label">Total if Paid Full Term</p>
+                <p id="totalFullTerm" class="text-sm font-semibold text-primary"></p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[11px] font-semibold text-muted detail-label">Total if Prepaid on This Day</p>
+                <p id="totalIfPrepay" class="text-sm font-semibold text-primary"></p>
+              </div>
+            </div>
+            <div class="savings-card p-7 rounded-2xl w-full min-h-[240px] flex flex-col items-center justify-center gap-4 text-center mt-5">
+              <div>
+                <p class="text-[11px] font-semibold text-emerald-700 uppercase tracking-[0.18em]">Estimated Savings</p>
+                <p class="text-[11px] text-emerald-700">vs paying full term</p>
+              </div>
+              <p id="savingsAmount" class="savings-amount font-semibold text-emerald-800"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const elements = {
+      amountSlider: document.getElementById('amountSlider'),
+      amountInput: document.getElementById('amountInput'),
+      factorSlider: document.getElementById('factorSlider'),
+      factorInput: document.getElementById('factorInput'),
+      termSlider: document.getElementById('termSlider'),
+      termInput: document.getElementById('termInput'),
+      discountSlider: document.getElementById('discountSlider'),
+      discountInput: document.getElementById('discountInput'),
+      daySlider: document.getElementById('daySlider'),
+      dayOfTermLabel: document.getElementById('dayOfTermLabel'),
+      businessDaysInfo: document.getElementById('businessDaysInfo'),
+      elapsedInfo: document.getElementById('elapsedInfo'),
+      scenarioDayLabel: document.getElementById('scenarioDayLabel'),
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      origAmount: document.getElementById('origAmount'),
+      origFactor: document.getElementById('origFactor'),
+      origTerm: document.getElementById('origTerm'),
+      origPayback: document.getElementById('origPayback'),
+      origPaymentLabel: document.getElementById('origPaymentLabel'),
+      origDaily: document.getElementById('origDaily'),
+      paidToDate: document.getElementById('paidToDate'),
+      remainingBalance: document.getElementById('remainingBalance'),
+      discountAmount: document.getElementById('discountAmount'),
+      discountedPayoff: document.getElementById('discountedPayoff'),
+      totalFullTerm: document.getElementById('totalFullTerm'),
+      totalIfPrepay: document.getElementById('totalIfPrepay'),
+      savingsAmount: document.getElementById('savingsAmount'),
+      fundingDate: document.getElementById('fundingDate'),
+      prepayDate: document.getElementById('prepayDate'),
+      prepayDateInfo: document.getElementById('prepayDateInfo'),
+      shareScenarioButton: document.getElementById('shareScenarioButton'),
+      themeToggle: document.getElementById('themeToggle'),
+      payDaily: document.getElementById('payDaily'),
+      payWeekly: document.getElementById('payWeekly'),
+      payMonthly: document.getElementById('payMonthly'),
+    };
+
+    let totalBusinessDays = 0;
+    let isApprovalView = false; // declared once
+    let paymentMode = 'daily';
+    let originalSharedAmount = null; // max amount allowed in client view
+
+    function formatCurrency(num) {
+      const n = Number(num);
+      if (isNaN(n)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(n);
+    }
+
+    function parseFormattedNumber(val) {
+      if (!val || typeof val !== 'string') return 0;
+      return parseFloat(val.replace(/[$,]/g, '')) || 0;
+    }
+
+    function syncInputs(slider, input, isCurrency, min, max, onChange) {
+      const initial = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initial) : String(initial);
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        if (isNaN(val)) val = min;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        onChange();
+      });
+
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (isNaN(val)) return;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        onChange();
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (isNaN(val) || val < min) val = min;
+        if (val > max) val = max;
+        slider.value = String(val);
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        onChange();
+      });
+    }
+
+    function computeBaseOffer() {
+      const amount = parseFormattedNumber(elements.amountInput.value);
+      const factor = parseFloat(elements.factorInput.value) || 1.25;
+      const termMonths = parseInt(elements.termInput.value, 10) || 9;
+
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+      totalBusinessDays = Math.max(1, termMonths * 22);
+      const dailyPayment = totalPayback / totalBusinessDays;
+      const weeklyPayment = termMonths > 0 ? totalPayback / (termMonths * 4.3333) : 0;
+      const monthlyPayment = termMonths > 0 ? totalPayback / termMonths : 0;
+
+      return {
+        amount,
+        factor,
+        termMonths,
+        totalPayback,
+        totalCost,
+        dailyPayment,
+        weeklyPayment,
+        monthlyPayment,
+      };
+    }
+
+    function updateDaySliderRange() {
+      elements.daySlider.max = String(totalBusinessDays);
+      let current = parseInt(elements.daySlider.value, 10);
+      if (isNaN(current) || current > totalBusinessDays) {
+        current = Math.floor(totalBusinessDays / 3);
+        elements.daySlider.value = String(current);
+      }
+    }
+
+    function updateDayFromDates() {
+      if (!elements.fundingDate || !elements.prepayDate) return;
+      const startVal = elements.fundingDate.value;
+      const prepayVal = elements.prepayDate.value;
+      if (!startVal || !prepayVal) {
+        elements.prepayDateInfo.textContent = '';
+        return;
+      }
+      const start = new Date(startVal + 'T00:00:00');
+      const pre = new Date(prepayVal + 'T00:00:00');
+      let diffDays = Math.round((pre - start) / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) diffDays = 0;
+      const approxBiz = Math.round(diffDays * 5 / 7);
+      const clamped = Math.max(0, Math.min(totalBusinessDays, approxBiz));
+      elements.daySlider.value = String(clamped);
+      elements.prepayDateInfo.textContent = totalBusinessDays
+        ? `≈ day ${clamped} of ${totalBusinessDays} (about ${diffDays} calendar days from funding)`
+        : '';
+    }
+
+    function updatePaymentModeButtons() {
+      if (!elements.payDaily || !elements.payWeekly || !elements.payMonthly) return;
+      const map = {
+        daily: elements.payDaily,
+        weekly: elements.payWeekly,
+        monthly: elements.payMonthly,
+      };
+      Object.values(map).forEach((btn) => {
+        btn.classList.remove('freq-toggle-active', 'freq-toggle-inactive');
+      });
+      Object.entries(map).forEach(([mode, btn]) => {
+        if (mode === paymentMode) {
+          btn.classList.add('freq-toggle-active');
+        } else {
+          btn.classList.add('freq-toggle-inactive');
+        }
+      });
+    }
+
+    function runCalculator() {
+      const base = computeBaseOffer();
+      const discountPct = Math.max(0, Math.min(50, parseFloat(elements.discountInput.value) || 0)) / 100;
+      const day = Math.max(0, Math.min(totalBusinessDays, parseInt(elements.daySlider.value, 10) || 0));
+
+      // Update helper labels
+      elements.businessDaysInfo.textContent = `${base.termMonths} months ≈ ${totalBusinessDays} business days`;
+      const pctOfTerm = totalBusinessDays > 0 ? (day / totalBusinessDays) * 100 : 0;
+      elements.dayOfTermLabel.textContent = `Day ${day} of ${totalBusinessDays}`;
+      elements.elapsedInfo.textContent = `~${pctOfTerm.toFixed(1)}% through the term`;
+      elements.scenarioDayLabel.textContent = `Prepay on day ${day} (${pctOfTerm.toFixed(1)}% into term)`;
+
+      const name = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+      elements.businessNameDisplay.textContent = name ? `Business: ${name}` : '';
+
+      // Original offer outputs
+      elements.origAmount.textContent = formatCurrency(base.amount);
+      elements.origFactor.textContent = `${base.factor.toFixed(2)}x`;
+      elements.origTerm.textContent = `${base.termMonths} months`;
+      elements.origPayback.textContent = formatCurrency(base.totalPayback);
+
+      let payLabel = 'Est. Daily Payment';
+      let payValue = base.dailyPayment;
+      if (paymentMode === 'weekly') {
+        payLabel = 'Est. Weekly Payment';
+        payValue = base.weeklyPayment;
+      } else if (paymentMode === 'monthly') {
+        payLabel = 'Est. Monthly Payment';
+        payValue = base.monthlyPayment;
+      }
+      elements.origPaymentLabel.textContent = payLabel;
+      elements.origDaily.textContent = formatCurrency(payValue);
+
+      // Prepay math
+      const paidToDate = base.dailyPayment * day;
+      const remainingBalanceNoDisc = Math.max(0, base.totalPayback - paidToDate);
+      const discountAmount = remainingBalanceNoDisc * discountPct;
+      const discountedPayoff = remainingBalanceNoDisc - discountAmount;
+
+      const totalFullTerm = base.totalPayback;
+      const totalIfPrepay = paidToDate + discountedPayoff;
+      const savings = Math.max(0, totalFullTerm - totalIfPrepay);
+
+      // Outputs
+      elements.paidToDate.textContent = formatCurrency(paidToDate);
+      elements.remainingBalance.textContent = formatCurrency(remainingBalanceNoDisc);
+      elements.discountAmount.textContent = formatCurrency(discountAmount);
+      elements.discountedPayoff.textContent = formatCurrency(discountedPayoff);
+      elements.totalFullTerm.textContent = formatCurrency(totalFullTerm);
+      elements.totalIfPrepay.textContent = formatCurrency(totalIfPrepay);
+      elements.savingsAmount.textContent = formatCurrency(savings);
+    }
+
+    function initializeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+
+      const amountParam = params.get('amount');
+      if (amountParam !== null) {
+        const a = parseFloat(amountParam);
+        if (!isNaN(a)) {
+          elements.amountSlider.value = String(a);
+          elements.amountInput.value = formatCurrency(a);
+          originalSharedAmount = a;
+        }
+      }
+
+      const factorParam = params.get('factor');
+      if (factorParam !== null) {
+        const f = parseFloat(factorParam);
+        if (!isNaN(f)) {
+          elements.factorSlider.value = String(f);
+          elements.factorInput.value = f.toFixed(2);
+        }
+      }
+
+      const termParam = params.get('term');
+      if (termParam !== null) {
+        const t = parseInt(termParam, 10);
+        if (!isNaN(t)) {
+          elements.termSlider.value = String(t);
+          elements.termInput.value = String(t);
+        }
+      }
+
+      const discountParam = params.get('discount');
+      if (discountParam !== null) {
+        const d = parseFloat(discountParam);
+        if (!isNaN(d)) {
+          elements.discountSlider.value = String(d);
+          elements.discountInput.value = String(d);
+        }
+      }
+
+      const dayParam = params.get('day');
+      if (dayParam !== null) {
+        const dd = parseInt(dayParam, 10);
+        if (!isNaN(dd)) {
+          elements.daySlider.value = String(dd);
+        }
+      }
+
+      const businessNameParam = params.get('businessName');
+      if (businessNameParam && elements.businessNameInput) {
+        elements.businessNameInput.value = businessNameParam;
+      }
+
+      const modeParam = params.get('mode');
+      if (modeParam === 'daily' || modeParam === 'weekly' || modeParam === 'monthly') {
+        paymentMode = modeParam;
+      }
+
+      const view = params.get('view');
+      if (view === 'approval') {
+        // Shared scenario: lock structure-level settings, let client tweak amount/discount/day/dates.
+        isApprovalView = true;
+
+        const lockedEls = [
+          elements.businessNameInput,
+          elements.factorSlider,
+          elements.factorInput,
+          elements.termSlider,
+          elements.termInput,
+          elements.payDaily,
+          elements.payWeekly,
+          elements.payMonthly,
+        ];
+        lockedEls.forEach((el) => {
+          if (el) {
+            el.disabled = true;
+            el.classList.add('cursor-default', 'opacity-70');
+          }
+        });
+
+        if (elements.shareScenarioButton) {
+          elements.shareScenarioButton.disabled = true;
+          elements.shareScenarioButton.classList.add('opacity-60', 'cursor-default');
+          elements.shareScenarioButton.textContent = 'Shared Scenario';
+        }
+      }
+    }
+
+    function shareScenario() {
+      const amount = parseFormattedNumber(elements.amountInput.value);
+      const factor = parseFloat(elements.factorInput.value) || 1.25;
+      const term = parseInt(elements.termInput.value, 10) || 9;
+      const discount = parseFloat(elements.discountInput.value) || 0;
+      const day = parseInt(elements.daySlider.value, 10) || 0;
+      const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+
+      const url = new URL(window.location.href);
+      const params = new URLSearchParams({
+        amount,
+        factor,
+        term,
+        discount,
+        day,
+        mode: paymentMode,
+        businessName,
+        view: 'approval',
+      });
+      url.search = params.toString();
+
+      const textArea = document.createElement('textarea');
+      textArea.value = url.toString();
+      textArea.style.position = 'fixed';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        const original = elements.shareScenarioButton.textContent;
+        elements.shareScenarioButton.textContent = 'Copied!';
+        setTimeout(() => {
+          elements.shareScenarioButton.textContent = original;
+        }, 2000);
+      } catch (err) {
+        console.error('Copy failed', err);
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    function init() {
+      const root = document.documentElement;
+      if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', () => {
+          const isDark = root.classList.contains('theme-slate');
+          root.classList.remove(isDark ? 'theme-slate' : 'theme-corporate');
+          root.classList.add(isDark ? 'theme-corporate' : 'theme-slate');
+          elements.themeToggle.textContent = isDark ? 'Dark mode' : 'Light mode';
+        });
+      }
+
+      // Seed from sliders
+      elements.amountInput.value = formatCurrency(parseFloat(elements.amountSlider.value));
+      elements.factorInput.value = parseFloat(elements.factorSlider.value).toFixed(2);
+      elements.termInput.value = elements.termSlider.value;
+      elements.discountInput.value = elements.discountSlider.value;
+
+      // Default funding date = today
+      if (elements.fundingDate && !elements.fundingDate.value) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        elements.fundingDate.value = `${yyyy}-${mm}-${dd}`;
+      }
+
+      // URL overrides / approval mode
+      initializeFromURL();
+
+      // Sync controls
+      const maxAmount = (isApprovalView && originalSharedAmount) ? originalSharedAmount : 500000;
+      syncInputs(elements.amountSlider, elements.amountInput, true, 5000, maxAmount, runCalculator);
+      syncInputs(elements.factorSlider, elements.factorInput, false, 1.1, 1.5, runCalculator);
+      syncInputs(elements.termSlider, elements.termInput, false, 3, 18, () => {
+        computeBaseOffer();
+        updateDaySliderRange();
+        updateDayFromDates();
+        runCalculator();
+      });
+      syncInputs(elements.discountSlider, elements.discountInput, false, 0, 50, runCalculator);
+
+      elements.daySlider.addEventListener('input', runCalculator);
+
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.fundingDate) {
+        elements.fundingDate.addEventListener('change', () => {
+          computeBaseOffer();
+          updateDaySliderRange();
+          updateDayFromDates();
+          runCalculator();
+        });
+      }
+
+      if (elements.prepayDate) {
+        elements.prepayDate.addEventListener('change', () => {
+          computeBaseOffer();
+          updateDaySliderRange();
+          updateDayFromDates();
+          runCalculator();
+        });
+      }
+
+      if (elements.shareScenarioButton && !isApprovalView) {
+        elements.shareScenarioButton.addEventListener('click', shareScenario);
+      }
+
+      if (elements.payDaily && elements.payWeekly && elements.payMonthly) {
+        elements.payDaily.addEventListener('click', () => {
+          paymentMode = 'daily';
+          updatePaymentModeButtons();
+          runCalculator();
+        });
+        elements.payWeekly.addEventListener('click', () => {
+          paymentMode = 'weekly';
+          updatePaymentModeButtons();
+          runCalculator();
+        });
+        elements.payMonthly.addEventListener('click', () => {
+          paymentMode = 'monthly';
+          updatePaymentModeButtons();
+          runCalculator();
+        });
+      }
+
+      updatePaymentModeButtons();
+      computeBaseOffer();
+      updateDaySliderRange();
+      updateDayFromDates();
+      runCalculator();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
