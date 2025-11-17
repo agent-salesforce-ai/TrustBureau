@@ -28,18 +28,8 @@
       --bg-card-inner: #020617;
       --bg-slider-track: #1e293b;
       --bg-input: #020617;
-      --bg-tag: rgba(30, 64, 175, 0.22);
-      --bg-tag-soft: rgba(30, 64, 175, 0.35);
-      --bg-tag-soft-2: rgba(37, 99, 235, 0.25);
-      --bg-toggle-active: rgba(37, 99, 235, 0.9);
-      --bg-toggle-inactive: rgba(15, 23, 42, 1);
-      --bg-hero-badge: rgba(30, 64, 175, 0.25);
-      --gradient-hero:
-        radial-gradient(circle at top left, rgba(59, 130, 246, 0.45), transparent 50%),
-        radial-gradient(circle at top right, rgba(14, 165, 233, 0.2), transparent 55%),
-        radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.16), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.55), transparent 50%);
-      --card-glow: 0 0 0 1px rgba(56, 189, 248, 0.2), 0 0 40px rgba(59, 130, 246, 0.4);
+      --bg-toggle-active: rgba(37, 99, 235, 0.95);
+      --bg-toggle-inactive: #020617;
       --text-primary: #e5e7eb;
       --text-secondary: #9ca3af;
       --text-muted: #6b7280;
@@ -47,22 +37,23 @@
       --border-primary: rgba(148, 163, 184, 0.35);
       --border-subtle: rgba(148, 163, 184, 0.25);
       --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.7);
-      --shadow-tag: 0 0 30px rgba(59, 130, 246, 0.55);
       --accent-capfront: #06b6d4;
-      --accent-soft: rgba(6, 182, 212, 0.35);
-      --accent-strong: #22d3ee;
     }
 
     .bg-body { background-color: var(--bg-body); }
     .card-bg { background-color: var(--bg-card); }
     .card-inner-bg { background-color: var(--bg-card-inner); }
-    .card-glow { box-shadow: var(--card-glow); }
+    .card-glow { box-shadow: 0 0 0 1px rgba(56,189,248,0.25),0 0 40px rgba(37,99,235,0.6); }
     .input-bg { background-color: var(--bg-input); }
+
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
+    .text-hero { color: var(--text-hero); }
+
     .border-primary { border-color: var(--border-primary); }
     .border-subtle { border-color: var(--border-subtle); }
+
     .shadow-soft { box-shadow: var(--shadow-soft); }
 
     .toggle-active {
@@ -99,17 +90,12 @@
       position: relative;
       z-index: 10;
     }
-    .slider-thumb::-webkit-slider-runnable-track {
-      height: 6px;
-      border-radius: 999px;
-      background: linear-gradient(to right, rgba(56, 189, 248, 0.9), rgba(37, 99, 235, 0.95));
-      box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.9);
-    }
+    .slider-thumb::-webkit-slider-runnable-track,
     .slider-thumb::-moz-range-track {
       height: 6px;
       border-radius: 999px;
-      background: linear-gradient(to right, rgba(56, 189, 248, 0.9), rgba(37, 99, 235, 0.95));
-      box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.9);
+      background: linear-gradient(to right, rgba(56,189,248,0.9), rgba(37,99,235,0.95));
+      box-shadow: inset 0 1px 4px rgba(15,23,42,0.9);
     }
 
     ::placeholder { color: rgba(148, 163, 184, 0.6); }
@@ -191,7 +177,7 @@
                   <input
                     id="repNameInput"
                     type="text"
-                    class="rep-input w-full rounded-xl px-3 py-2 text-xs focus:outline-none input-bg border border-subtle text-primary"
+                    class="w-full rounded-xl px-3 py-2 text-xs focus:outline-none input-bg border border-subtle text-primary"
                     placeholder="Jordan at CapFront"
                   />
                 </div>
@@ -202,7 +188,7 @@
                   <input
                     id="repEmailInput"
                     type="email"
-                    class="rep-input w-full rounded-xl px-3 py-2 text-xs focus:outline-none input-bg border border-subtle text-primary"
+                    class="w-full rounded-xl px-3 py-2 text-xs focus:outline-none input-bg border border-subtle text-primary"
                     placeholder="jordan@capfront.net"
                   />
                 </div>
@@ -213,7 +199,7 @@
                   <input
                     id="repPhoneInput"
                     type="tel"
-                    class="rep-input w-full rounded-xl px-3 py-2 text-xs focus:outline-none input-bg border border-subtle text-primary"
+                    class="w-full rounded-xl px-3 py-2 text-xs focus:outline-none input-bg border border-subtle text-primary"
                     placeholder="(555) 123-4567"
                   />
                 </div>
@@ -662,16 +648,18 @@
     return parseFloat(val.replace(/[\$,]/g, '')) || 0;
   }
 
-  // payments -> months (nearest 0.5)
+  // payments -> months (nearest 0.5) using:
+  // weekly: 52 payments = 12 months
+  // daily: 250 payments = 12 months
   function calculateApproxMonths(termPayments, frequency) {
     if (!termPayments || termPayments <= 0) return 0;
     let months;
     if (frequency === 'weekly') {
-      months = termPayments / 4.3333;
+      months = termPayments * (12 / 52);
     } else if (frequency === 'monthly') {
       months = termPayments;
     } else {
-      months = termPayments / 22;
+      months = termPayments * (12 / 250);
     }
     return Math.round(months * 2) / 2;
   }
