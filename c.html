@@ -210,12 +210,12 @@
     }
     .toggle-active {
       background-color: var(--accent-color-light);
-      color: #f9fafb; /* LIGHT TEXT ON ACCENT */
+      color: #f9fafb; /* light text on accent */
     }
 
     .button-primary {
       background-color: var(--accent-color-light);
-      color: #f9fafb; /* LIGHT TEXT ON ACCENT */
+      color: #f9fafb; /* light text on accent */
       font-weight: 600;
       border-radius: 0.75rem;
       padding: 0.6rem 1.75rem;
@@ -630,7 +630,6 @@
     let isApprovalView = false;
     let termLengthManualDirty = false;
 
-    // Load saved theme/accent if present
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
@@ -661,7 +660,6 @@
       }
     }
 
-    // Offer math
     function computeOffer(amount, factor, termPayments, frequency) {
       const totalPayback = amount * factor;
       const totalCost = totalPayback - amount;
@@ -671,12 +669,10 @@
 
       let rawMonths;
       if (frequency === 'weekly') {
-        // 52 weeks = 12 months
         rawMonths = termPayments * (12 / 52);
       } else if (frequency === 'monthly') {
         rawMonths = termPayments;
       } else {
-        // 250 daily payments = ~12 months
         rawMonths = termPayments * (12 / 250);
       }
       const termLengthMonths = Math.round(rawMonths * 2) / 2;
@@ -895,7 +891,6 @@
       }
 
       if (isApprovalView) {
-        // Client-facing view: only amount slider visible (capped), hide all other controls
         if (elements.factorContainer) elements.factorContainer.style.display = 'none';
         if (elements.termContainer) elements.termContainer.style.display = 'none';
         if (elements.originationContainer) elements.originationContainer.style.display = 'none';
@@ -941,7 +936,6 @@
         elements.summaryOriginationPercentOut.textContent = `${origPct.toFixed(2)}%`;
         elements.summaryOriginationAmountOut.textContent = formatCurrency(origFeeAmount);
 
-        // Term length in months (with manual override)
         let months = offer.termLengthMonths;
         if (elements.termLengthMonthsInput) {
           if (!termLengthManualDirty) {
@@ -1067,14 +1061,12 @@
         elements.addOfferButton.addEventListener('click', handleAddOffer);
       }
 
+      // SHARE BUTTON – SIMPLE, RELIABLE PROMPT (NO CLIPBOARD)
       if (!isApprovalView && elements.shareLinkButton) {
-        elements.shareLinkButton.addEventListener('click', async () => {
-          const shareBtn = elements.shareLinkButton;
-          const originalText = shareBtn.innerText;
-
+        elements.shareLinkButton.addEventListener('click', () => {
           const amount = parseFormattedNumber(elements.calcAmountInput.value);
-          const factor = parseFloat(elements.calcFactorInput.value);
-          const term = parseInt(elements.calcTermInput.value) || 1;
+          const factor = parseFloat(elements.calcFactorInput.value) || 1.25;
+          const term = parseInt(elements.calcTermInput.value) || 6;
           const freq = paymentFrequency;
           const theme = currentTheme;
           const accent = currentAccent;
@@ -1108,43 +1100,8 @@
           url.search = params.toString();
           const shareUrl = url.toString();
 
-          const setStatus = msg => {
-            shareBtn.innerText = msg;
-            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
-          };
-
-          try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              await navigator.clipboard.writeText(shareUrl);
-              setStatus('Copied!');
-            } else {
-              throw new Error('Clipboard API not available');
-            }
-          } catch (err) {
-            console.warn('Clipboard API failed, falling back:', err);
-            try {
-              const ta = document.createElement('textarea');
-              ta.value = shareUrl;
-              ta.style.position = 'fixed';
-              ta.style.top = '0';
-              ta.style.left = '0';
-              ta.style.opacity = '0';
-              document.body.appendChild(ta);
-              ta.focus();
-              ta.select();
-              const ok = document.execCommand('copy');
-              document.body.removeChild(ta);
-              if (ok) {
-                setStatus('Copied!');
-              } else {
-                throw new Error('execCommand copy failed');
-              }
-            } catch (fallbackErr) {
-              console.error('All copy methods failed, showing prompt:', fallbackErr);
-              window.prompt('Copy this approval link:', shareUrl);
-              setStatus('Link shown');
-            }
-          }
+          // No clipboard drama: just show a prompt every time.
+          window.prompt('Copy this approval link:', shareUrl);
         });
       }
 
