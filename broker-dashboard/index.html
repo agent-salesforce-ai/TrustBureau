@@ -22,16 +22,12 @@
 
   <style>
     :root {
-      --accent-color: #10b981; /* default green, overridden by saved value */
-    }
-
-    * {
-      box-sizing: border-box;
+      --accent-color: #10b981;
     }
 
     body {
       margin: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #f3f4f6;
       color: #111827;
     }
@@ -42,11 +38,12 @@
       padding: 24px 16px 40px;
     }
 
+    /* Top bar */
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      padding: 18px 0;
     }
 
     .brand-left {
@@ -64,15 +61,46 @@
       font-size: 18px;
     }
 
-    .badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(16, 185, 129, 0.08);
-      color: #047857;
-      font-size: 12px;
-      font-weight: 500;
+    /* Top right buttons */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
+    .primary-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      color: white;
+      background: var(--accent-color);
+    }
+
+    .primary-btn:hover {
+      opacity: 0.9;
+    }
+
+    .logout-link {
+      font-size: 14px;
+      text-decoration: none;
+      color: #6b7280;
+    }
+
+    .logout-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Page title */
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 10px 0 24px;
+      padding-bottom: 6px;
+    }
+
+    /* Card layout */
     .grid {
       display: grid;
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
@@ -81,13 +109,13 @@
 
     @media (max-width: 860px) {
       .grid {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: 1fr;
       }
 
-      .top-bar {
+      .nav-actions {
         flex-direction: column;
-        align-items: flex-start;
         gap: 8px;
+        align-items: flex-end;
       }
     }
 
@@ -102,20 +130,14 @@
       border-bottom: 1px solid #e5e7eb;
     }
 
-    .card-body {
-      padding: 14px 18px 16px;
-    }
-
     .card-header h2 {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
     }
 
-    .card-body p {
-      margin: 0 0 16px;
-      font-size: 14px;
-      color: #6b7280;
+    .card-body {
+      padding: 14px 18px 16px;
     }
 
     label {
@@ -126,14 +148,11 @@
       color: #374151;
     }
 
-    input[type="file"] {
-      font-size: 13px;
-    }
-
     .field {
       margin-bottom: 14px;
     }
 
+    /* Color input */
     .color-row {
       display: flex;
       align-items: center;
@@ -145,9 +164,7 @@
       height: 32px;
       border-radius: 6px;
       border: 1px solid #d1d5db;
-      padding: 0;
       cursor: pointer;
-      background: transparent;
     }
 
     .color-hex {
@@ -157,13 +174,9 @@
       border-radius: 8px;
       border: 1px solid #e5e7eb;
       background: #f9fafb;
-      color: #111827;
     }
 
-    .logo-preview-wrapper {
-      margin-top: 10px;
-    }
-
+    /* Logo preview */
     .logo-preview-box {
       width: 56px;
       height: 56px;
@@ -173,6 +186,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      margin-top: 8px;
     }
 
     .logo-preview-box img {
@@ -181,89 +195,71 @@
       object-fit: contain;
     }
 
-    .logo-preview-label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 6px;
-    }
-
     .pill-small {
       font-size: 11px;
       color: #9ca3af;
       margin-top: 4px;
     }
 
-    .primary-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 18px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      color: #ffffff;
-      background: var(--accent-color);
-      border: none;
+    /* Fix Outseta embed width */
+    .o-profile-left {
+      width: 180px !important;
     }
-
-    .primary-link:hover {
-      opacity: 0.9;
-    }
-
-    .profile-embed {
-      min-height: 280px;
+    .o-profile-right {
+      width: calc(100% - 180px) !important;
     }
   </style>
 </head>
+
 <body>
 
 <div class="page">
+
+  <!-- NAV BAR -->
   <header class="top-bar">
     <div class="brand-left">
       <img src="../tb-logo.png" alt="TrustBureau logo" />
-      <span>Broker Dashboard</span>
+      <span>TrustBureau.ai</span>
     </div>
-    <div class="badge">Secure portal</div>
+
+    <div class="nav-actions">
+      <a class="primary-btn" href="https://trustbureau.ai/broker-toolbox">My Broker Box</a>
+      <a class="logout-link" href="javascript:OutsetaAuth.logout()">Log out</a>
+    </div>
   </header>
 
+  <!-- PAGE TITLE -->
+  <div class="page-title">Broker Dashboard</div>
+
   <div class="grid">
-    <!-- Account & Billing / Outseta Profile Embed (LEFT) -->
+
+    <!-- LEFT: Account & Billing -->
     <section class="card">
       <div class="card-header">
         <h2>Account &amp; billing</h2>
       </div>
-      <div class="card-body profile-embed">
-        <p>
-          Manage your profile, billing details, and subscription directly from your TrustBureau account.
-        </p>
+      <div class="card-body">
+        <p>Manage your profile, billing details, and subscription directly from your TrustBureau account.</p>
 
-        <!-- Outseta profile/billing embed -->
         <div data-o-profile="1" data-mode="embed"></div>
       </div>
     </section>
 
-    <!-- Branding / Theme Settings (RIGHT) -->
+    <!-- RIGHT: Brand your toolbox -->
     <section class="card">
       <div class="card-header">
         <h2>Brand your toolbox</h2>
       </div>
       <div class="card-body">
-        <p>
-          Upload your logo and choose an accent color. We’ll use these to theme your Broker Box tools.
-        </p>
+        <p>Upload your logo and choose an accent color. These personalize your Broker Box tools.</p>
 
         <div class="field">
           <label for="logoInput">Portal logo</label>
           <input id="logoInput" type="file" accept="image/*" />
-          <div class="pill-small">Stored in this browser for now. We’ll hook this into your account later.</div>
+          <div class="pill-small">Stored in this browser for now.</div>
 
-          <div class="logo-preview-wrapper">
-            <div class="logo-preview-box" id="logoPreviewBox">
-              <span style="font-size:11px;color:#6b7280;">Logo</span>
-            </div>
-            <div class="logo-preview-label">Logo preview</div>
+          <div class="logo-preview-box" id="logoPreviewBox">
+            <span style="font-size:11px;color:#6b7280;">Logo</span>
           </div>
         </div>
 
@@ -275,17 +271,14 @@
           </div>
         </div>
 
-        <!-- Broker toolbox link -->
-        <a href="https://trustbureau.ai/broker-toolbox" class="primary-link">
-          Broker Box
-        </a>
       </div>
     </section>
+
   </div>
 </div>
 
 <script>
-  // Simple client-side storage for accent color & logo
+  // Simple client-side storage
   (function() {
     var colorInput = document.getElementById('accentColor');
     var colorHex   = document.getElementById('accentHex');
@@ -300,16 +293,12 @@
       document.documentElement.style.setProperty('--accent-color', color);
       colorInput.value = color;
       colorHex.value = color.toUpperCase();
-      try {
-        localStorage.setItem(STORAGE_COLOR_KEY, color);
-      } catch (e) {}
+      try { localStorage.setItem(STORAGE_COLOR_KEY, color); } catch (e) {}
     }
 
     function loadAccentColor() {
       var saved = null;
-      try {
-        saved = localStorage.getItem(STORAGE_COLOR_KEY);
-      } catch (e) {}
+      try { saved = localStorage.getItem(STORAGE_COLOR_KEY); } catch (e) {}
       setAccentColor(saved || '#10b981');
     }
 
@@ -326,31 +315,24 @@
 
     function loadLogo() {
       var saved = null;
-      try {
-        saved = localStorage.getItem(STORAGE_LOGO_KEY);
-      } catch (e) {}
+      try { saved = localStorage.getItem(STORAGE_LOGO_KEY); } catch (e) {}
       if (saved) setLogo(saved);
     }
 
-    colorInput.addEventListener('input', function(e) {
-      setAccentColor(e.target.value);
-    });
+    colorInput.addEventListener('input', e => setAccentColor(e.target.value));
 
     logoInput.addEventListener('change', function(e) {
       var file = e.target.files && e.target.files[0];
       if (!file) return;
       var reader = new FileReader();
-      reader.onload = function(ev) {
+      reader.onload = ev => {
         var dataUrl = ev.target.result;
         setLogo(dataUrl);
-        try {
-          localStorage.setItem(STORAGE_LOGO_KEY, dataUrl);
-        } catch (err) {}
+        try { localStorage.setItem(STORAGE_LOGO_KEY, dataUrl); } catch (err) {}
       };
       reader.readAsDataURL(file);
     });
 
-    // Init on load
     loadAccentColor();
     loadLogo();
   })();
