@@ -1,1 +1,362 @@
-placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrustBureau — Broker Dashboard</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../favicon.png" />
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Outseta Quickstart script (from your embeds screen) -->
+  <script>
+    var o_options = {
+      domain: 'trustbureauai.outseta.com',
+      load: 'auth,customForm,emailList,leadCapture,nocode,profile,support'
+    };
+  </script>
+  <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+
+  <style>
+    :root {
+      --accent-color: #10b981; /* default green, will be overridden by saved value */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-left img {
+      height: 32px;
+    }
+
+    .brand-left span {
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      color: #047857;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 20px 18px 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .card p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+
+    input[type="file"] {
+      font-size: 13px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-row input[type="color"] {
+      width: 40px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      padding: 0;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .color-hex {
+      flex: 1;
+      font-size: 13px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    .preview-card {
+      margin-top: 16px;
+      padding: 14px 14px 12px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .preview-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .preview-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .preview-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .preview-pill {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #ffffff;
+      background: var(--accent-color);
+    }
+
+    .preview-button {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 12px;
+      font-weight: 500;
+      color: #ffffff;
+      background: var(--accent-color);
+      cursor: default;
+    }
+
+    .outseta-wrapper {
+      margin-top: 4px;
+    }
+
+    .pill-small {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <header class="top-bar">
+    <div class="brand-left">
+      <img src="../tb-logo.png" alt="TrustBureau logo" />
+      <span>Broker Dashboard</span>
+    </div>
+    <div class="badge">Secure portal</div>
+  </header>
+
+  <div class="grid">
+    <!-- Branding / Theme Settings -->
+    <section class="card">
+      <h2>Brand settings</h2>
+      <p>Upload your logo and choose an accent color. We’ll use these to theme your TrustBureau experience.</p>
+
+      <div class="field">
+        <label for="logoInput">Portal logo</label>
+        <input id="logoInput" type="file" accept="image/*" />
+        <div class="pill-small">Stored in this browser for now. We’ll hook this into your account later.</div>
+      </div>
+
+      <div class="field">
+        <label for="accentColor">Accent color</label>
+        <div class="color-row">
+          <input id="accentColor" type="color" />
+          <input id="accentHex" class="color-hex" type="text" readonly />
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <div class="preview-header">
+          <div class="preview-logo" id="logoPreviewBox">
+            <span style="font-size: 11px; color:#6b7280;">Logo</span>
+          </div>
+          <div>
+            <div class="preview-title">Sample merchant view</div>
+            <div class="preview-pill">Protected package</div>
+          </div>
+        </div>
+        <button class="preview-button">View package</button>
+      </div>
+    </section>
+
+    <!-- Outseta Profile / Billing -->
+    <section class="card">
+      <h2>Account &amp; billing</h2>
+      <p>Manage your profile, billing details, and subscription directly from your TrustBureau account.</p>
+
+      <div class="outseta-wrapper">
+        <div
+          data-o-profile="1"
+          data-mode="embed">
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  // Simple client-side storage for accent color & logo
+  (function() {
+    var colorInput = document.getElementById('accentColor');
+    var colorHex   = document.getElementById('accentHex');
+    var logoInput  = document.getElementById('logoInput');
+    var logoBox    = document.getElementById('logoPreviewBox');
+
+    var STORAGE_COLOR_KEY = 'tbAccentColor';
+    var STORAGE_LOGO_KEY  = 'tbLogoDataUrl';
+
+    function setAccentColor(color) {
+      if (!color) return;
+      document.documentElement.style.setProperty('--accent-color', color);
+      colorInput.value = color;
+      colorHex.value = color.toUpperCase();
+      try {
+        localStorage.setItem(STORAGE_COLOR_KEY, color);
+      } catch (e) {}
+    }
+
+    function loadAccentColor() {
+      var saved = null;
+      try {
+        saved = localStorage.getItem(STORAGE_COLOR_KEY);
+      } catch (e) {}
+      setAccentColor(saved || '#10b981');
+    }
+
+    function setLogo(dataUrl) {
+      logoBox.innerHTML = '';
+      if (dataUrl) {
+        var img = document.createElement('img');
+        img.src = dataUrl;
+        logoBox.appendChild(img);
+      } else {
+        logoBox.innerHTML = '<span style="font-size:11px;color:#6b7280;">Logo</span>';
+      }
+    }
+
+    function loadLogo() {
+      var saved = null;
+      try {
+        saved = localStorage.getItem(STORAGE_LOGO_KEY);
+      } catch (e) {}
+      if (saved) setLogo(saved);
+    }
+
+    colorInput.addEventListener('input', function(e) {
+      setAccentColor(e.target.value);
+    });
+
+    logoInput.addEventListener('change', function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var dataUrl = ev.target.result;
+        setLogo(dataUrl);
+        try {
+          localStorage.setItem(STORAGE_LOGO_KEY, dataUrl);
+        } catch (err) {}
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Init on load
+    loadAccentColor();
+    loadLogo();
+  })();
+</script>
+
+</body>
+</html>
