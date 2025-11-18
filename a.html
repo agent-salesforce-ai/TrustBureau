@@ -11,10 +11,12 @@
 
   <style>
     :root {
-      /* Defaults – overridden by theme/accent classes */
+      /* Accent defaults; many components now use --accent-gradient with fallback */
       --accent-color: #f59e0b;
       --accent-color-light: #fbbf24;
       --accent-color-dark: #92400e;
+      --accent-gradient: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
+      --accent-thumb: var(--accent-color);
       --accent-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
 
       --bg-body: #f1f5f9;
@@ -41,19 +43,14 @@
 
     /* Remove number spinners */
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
 
     .input-icon { top: 50%; transform: translateY(-50%); }
 
-    /* --------------------------------
+    /* ----------------------------
      * BASE THEMES
-     * -------------------------------- */
-
-    /* Light */
+     * ---------------------------- */
     html.theme-light {
       color-scheme: light;
       --bg-body: #eef2f7;
@@ -68,11 +65,8 @@
       --text-muted: #4b5563;
       --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.12);
     }
-    html.theme-light body {
-      background-color: var(--bg-body);
-    }
+    html.theme-light body { background-color: var(--bg-body); }
 
-    /* Dark */
     html.theme-dark {
       color-scheme: dark;
       --bg-body: #020617;
@@ -84,14 +78,11 @@
       --border-primary: #1f2937;
       --text-primary: #f9fafb;
       --text-secondary: #e5e7eb;
-      --text-muted: #cbd5f5;
+      --text-muted: #9ca3af;
       --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.7);
     }
-    html.theme-dark body {
-      background-color: var(--bg-body);
-    }
+    html.theme-dark body { background-color: var(--bg-body); }
 
-    /* AMOLED Black */
     html.theme-black {
       color-scheme: dark;
       --bg-body: #000000;
@@ -101,24 +92,22 @@
       --bg-input: #000000;
       --bg-toggle-inactive: #111111;
       --border-primary: #171717;
-      --text-primary: #f9fafb;
+      --text-primary: #ffffff;
       --text-secondary: #e5e5e5;
-      --text-muted: #d1d5db;
+      --text-muted: #9ca3af;
       --accent-color: #ffffff;
       --accent-color-light: #e5e5e5;
       --accent-color-dark: #ffffff;
+      --accent-gradient: linear-gradient(135deg, #e5e5e5, #ffffff);
+      --accent-thumb: #ffffff;
       --accent-shadow: 0 0 18px rgba(255, 255, 255, 0.6);
       --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.9);
     }
-    html.theme-black body {
-      background-color: var(--bg-body);
-    }
+    html.theme-black body { background-color: var(--bg-body); }
 
-    /* --------------------------------
+    /* ----------------------------
      * FUN THEMES
-     * -------------------------------- */
-
-    /* Ocean */
+     * ---------------------------- */
     html.theme-ocean {
       color-scheme: dark;
       --bg-body: #020617;
@@ -134,6 +123,8 @@
       --accent-color: #0ea5e9;
       --accent-color-light: #38bdf8;
       --accent-color-dark: #0369a1;
+      --accent-gradient: linear-gradient(135deg, #38bdf8, #0ea5e9);
+      --accent-thumb: #0ea5e9;
       --accent-shadow: 0 0 22px rgba(56, 189, 248, 0.7);
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
     }
@@ -143,7 +134,6 @@
         radial-gradient(circle at 100% 100%, rgba(8, 47, 73, 0.8), #020617);
     }
 
-    /* Forest */
     html.theme-forest {
       color-scheme: dark;
       --bg-body: #021210;
@@ -159,15 +149,15 @@
       --accent-color: #22c55e;
       --accent-color-light: #4ade80;
       --accent-color-dark: #15803d;
+      --accent-gradient: linear-gradient(135deg, #4ade80, #22c55e);
+      --accent-thumb: #22c55e;
       --accent-shadow: 0 0 22px rgba(34, 197, 94, 0.7);
       --shadow-soft: 0 18px 45px rgba(6, 95, 70, 0.8);
     }
     html.theme-forest body {
-      background:
-        radial-gradient(circle at 50% 120%, rgba(34, 197, 94, 0.4), #021210 70%);
+      background: radial-gradient(circle at 50% 120%, rgba(34, 197, 94, 0.4), #021210 70%);
     }
 
-    /* Sunset */
     html.theme-sunset {
       color-scheme: dark;
       --bg-body: #111827;
@@ -183,6 +173,8 @@
       --accent-color: #fb923c;
       --accent-color-light: #fdba74;
       --accent-color-dark: #c2410c;
+      --accent-gradient: linear-gradient(135deg, #fdba74, #fb923c);
+      --accent-thumb: #fb923c;
       --accent-shadow: 0 0 24px rgba(248, 113, 113, 0.7);
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
     }
@@ -192,7 +184,6 @@
         radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.45), #111827);
     }
 
-    /* Sky Day */
     html.theme-sky {
       color-scheme: light;
       --bg-body: #e0f2fe;
@@ -208,6 +199,8 @@
       --accent-color: #0ea5e9;
       --accent-color-light: #38bdf8;
       --accent-color-dark: #0369a1;
+      --accent-gradient: linear-gradient(135deg, #38bdf8, #0ea5e9);
+      --accent-thumb: #0ea5e9;
       --accent-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
       --shadow-soft: 0 10px 28px rgba(30, 64, 175, 0.23);
     }
@@ -217,7 +210,6 @@
         linear-gradient(to bottom, #eff6ff, #e0f2fe);
     }
 
-    /* Latte Desk */
     html.theme-latte {
       color-scheme: light;
       --bg-body: #f5f5f4;
@@ -233,6 +225,8 @@
       --accent-color: #d97706;
       --accent-color-light: #fbbf24;
       --accent-color-dark: #92400e;
+      --accent-gradient: linear-gradient(135deg, #fbbf24, #d97706);
+      --accent-thumb: #d97706;
       --accent-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
       --shadow-soft: 0 10px 26px rgba(148, 120, 86, 0.35);
     }
@@ -242,11 +236,9 @@
         linear-gradient(to bottom, #fafaf9, #f5f5f4);
     }
 
-    /* --------------------------------
+    /* ----------------------------
      * REALLY FUN THEMES
-     * -------------------------------- */
-
-    /* Neon Grid */
+     * ---------------------------- */
     html.theme-neon {
       color-scheme: dark;
       --bg-body: #020617;
@@ -262,6 +254,8 @@
       --accent-color: #22d3ee;
       --accent-color-light: #38bdf8;
       --accent-color-dark: #06b6d4;
+      --accent-gradient: linear-gradient(135deg, #38bdf8, #22d3ee);
+      --accent-thumb: #22d3ee;
       --accent-shadow: 0 0 18px rgba(56, 189, 248, 0.9);
       --shadow-soft: 0 20px 55px rgba(15, 23, 42, 0.95);
     }
@@ -271,7 +265,6 @@
         radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.5), #020617);
     }
 
-    /* Unicorn Dream */
     html.theme-unicorn {
       color-scheme: light;
       --bg-body: #fdf2ff;
@@ -287,6 +280,8 @@
       --accent-color: #ec4899;
       --accent-color-light: #f9a8d4;
       --accent-color-dark: #be185d;
+      --accent-gradient: linear-gradient(135deg, #f9a8d4, #ec4899);
+      --accent-thumb: #ec4899;
       --accent-shadow: 0 0 26px rgba(236, 72, 153, 0.6);
       --shadow-soft: 0 10px 30px rgba(190, 24, 93, 0.3);
     }
@@ -296,7 +291,6 @@
         radial-gradient(circle at 100% 100%, #bfdbfe, #fdf2ff 60%);
     }
 
-    /* Terminal Green */
     html.theme-terminal {
       color-scheme: dark;
       --bg-body: #020617;
@@ -308,10 +302,12 @@
       --border-primary: #22c55e;
       --text-primary: #d1fae5;
       --text-secondary: #4ade80;
-      --text-muted: #86efac;
+      --text-muted: #22c55e;
       --accent-color: #22c55e;
       --accent-color-light: #4ade80;
       --accent-color-dark: #15803d;
+      --accent-gradient: linear-gradient(135deg, #4ade80, #22c55e);
+      --accent-thumb: #22c55e;
       --accent-shadow: 0 0 22px rgba(34, 197, 94, 0.75);
       --shadow-soft: 0 20px 55px rgba(0, 0, 0, 0.9);
     }
@@ -321,7 +317,6 @@
         #020617;
     }
 
-    /* Synthwave */
     html.theme-synthwave {
       color-scheme: dark;
       --bg-body: #020617;
@@ -337,6 +332,8 @@
       --accent-color: #fb7185;
       --accent-color-light: #f9a8d4;
       --accent-color-dark: #be185d;
+      --accent-gradient: linear-gradient(135deg, #f9a8d4, #fb7185);
+      --accent-thumb: #fb7185;
       --accent-shadow: 0 0 24px rgba(236, 72, 153, 0.9);
       --shadow-soft: 0 22px 60px rgba(15, 23, 42, 0.95);
     }
@@ -346,11 +343,9 @@
         radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.5), #020617);
     }
 
-    /* --------------------------------
+    /* ----------------------------
      * TOO MUCH FUN THEMES
-     * -------------------------------- */
-
-    /* Laser Mode */
+     * ---------------------------- */
     html.theme-laser {
       color-scheme: dark;
       --bg-body: #000000;
@@ -366,6 +361,8 @@
       --accent-color: #22c55e;
       --accent-color-light: #4ade80;
       --accent-color-dark: #15803d;
+      --accent-gradient: linear-gradient(135deg, #4ade80, #22c55e);
+      --accent-thumb: #22c55e;
       --accent-shadow: 0 0 32px rgba(34, 197, 94, 0.9);
       --shadow-soft: 0 24px 70px rgba(0, 0, 0, 1);
     }
@@ -375,7 +372,6 @@
         radial-gradient(circle at 100% 100%, rgba(34, 197, 94, 0.8), #000000);
     }
 
-    /* Fiesta */
     html.theme-fiesta {
       color-scheme: dark;
       --bg-body: #111827;
@@ -391,15 +387,15 @@
       --accent-color: #f97316;
       --accent-color-light: #fb923c;
       --accent-color-dark: #c2410c;
+      --accent-gradient: linear-gradient(135deg, #fb923c, #f97316);
+      --accent-thumb: #f97316;
       --accent-shadow: 0 0 30px rgba(249, 115, 22, 0.9);
       --shadow-soft: 0 24px 60px rgba(127, 29, 29, 0.9);
     }
     html.theme-fiesta body {
-      background:
-        conic-gradient(from 200deg at 0 0, #f97316, #ec4899, #facc15, #f97316);
+      background: conic-gradient(from 200deg at 0 0, #f97316, #ec4899, #facc15, #f97316);
     }
 
-    /* Slime Pop */
     html.theme-slime {
       color-scheme: dark;
       --bg-body: #022c22;
@@ -415,6 +411,8 @@
       --accent-color: #a3e635;
       --accent-color-light: #bef264;
       --accent-color-dark: #4d7c0f;
+      --accent-gradient: linear-gradient(135deg, #bef264, #a3e635);
+      --accent-thumb: #a3e635;
       --accent-shadow: 0 0 30px rgba(190, 242, 100, 0.9);
       --shadow-soft: 0 24px 60px rgba(4, 120, 87, 0.9);
     }
@@ -424,157 +422,84 @@
         radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.5), #022c22);
     }
 
-    /* --------------------------------
-     * ACCENT PALETTES
-     * -------------------------------- */
-
-    html.accent-red {
-      --accent-color: #ef4444;
-      --accent-color-light: #f97373;
-      --accent-color-dark: #b91c1c;
-      --accent-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
-    }
-    html.accent-orange {
-      --accent-color: #f97316;
-      --accent-color-light: #fdba74;
-      --accent-color-dark: #c2410c;
-      --accent-shadow: 0 0 18px rgba(249, 115, 22, 0.55);
-    }
-    html.accent-yellow {
-      --accent-color: #eab308;
-      --accent-color-light: #fde047;
-      --accent-color-dark: #a16207;
-      --accent-shadow: 0 0 18px rgba(234, 179, 8, 0.55);
-    }
-    html.accent-gold {
-      --accent-color: #f59e0b;
-      --accent-color-light: #fbbf24;
-      --accent-color-dark: #92400e;
-      --accent-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
-    }
-    html.accent-green {
-      --accent-color: #22c55e;
-      --accent-color-light: #4ade80;
-      --accent-color-dark: #15803d;
-      --accent-shadow: 0 0 18px rgba(34, 197, 94, 0.55);
-    }
-    html.accent-blue,
-    html.accent-primary {
-      --accent-color: #2563eb;
-      --accent-color-light: #3b82f6;
-      --accent-color-dark: #1d4ed8;
-      --accent-shadow: 0 0 18px rgba(37, 99, 235, 0.55);
-    }
-    html.accent-indigo {
-      --accent-color: #4f46e5;
-      --accent-color-light: #6366f1;
-      --accent-color-dark: #3730a3;
-      --accent-shadow: 0 0 18px rgba(79, 70, 229, 0.55);
-    }
-    html.accent-violet {
-      --accent-color: #8b5cf6;
-      --accent-color-light: #a855f7;
-      --accent-color-dark: #6d28d9;
-      --accent-shadow: 0 0 18px rgba(139, 92, 246, 0.55);
-    }
-    html.accent-teal {
-      --accent-color: #14b8a6;
-      --accent-color-light: #2dd4bf;
-      --accent-color-dark: #0f766e;
-      --accent-shadow: 0 0 18px rgba(20, 184, 166, 0.55);
-    }
-    html.accent-cyan {
-      --accent-color: #06b6d4;
-      --accent-color-light: #22d3ee;
-      --accent-color-dark: #0e7490;
-      --accent-shadow: 0 0 18px rgba(6, 182, 212, 0.55);
-    }
-    html.accent-sky {
-      --accent-color: #0ea5e9;
-      --accent-color-light: #38bdf8;
-      --accent-color-dark: #0369a1;
-      --accent-shadow: 0 0 18px rgba(14, 165, 233, 0.55);
-    }
-    html.accent-lime {
-      --accent-color: #84cc16;
-      --accent-color-light: #a3e635;
-      --accent-color-dark: #4d7c0f;
-      --accent-shadow: 0 0 18px rgba(132, 204, 22, 0.55);
-    }
-    html.accent-emerald {
-      --accent-color: #10b981;
-      --accent-color-light: #34d399;
-      --accent-color-dark: #047857;
-      --accent-shadow: 0 0 18px rgba(16, 185, 129, 0.55);
-    }
-    html.accent-rose {
-      --accent-color: #f43f5e;
-      --accent-color-light: #fb7185;
-      --accent-color-dark: #be123c;
-      --accent-shadow: 0 0 18px rgba(244, 63, 94, 0.55);
-    }
-    html.accent-pink {
-      --accent-color: #ec4899;
-      --accent-color-light: #f472b6;
-      --accent-color-dark: #be185d;
-      --accent-shadow: 0 0 18px rgba(236, 72, 153, 0.55);
-    }
-    html.accent-slate {
-      --accent-color: #64748b;
-      --accent-color-light: #94a3b8;
-      --accent-color-dark: #475569;
-      --accent-shadow: 0 0 18px rgba(100, 116, 139, 0.55);
-    }
-    html.accent-gray {
-      --accent-color: #6b7280;
-      --accent-color-light: #9ca3af;
-      --accent-color-dark: #374151;
-      --accent-shadow: 0 0 18px rgba(107, 114, 128, 0.55);
-    }
-    html.accent-brown {
-      --accent-color: #92400e;
-      --accent-color-light: #fbbf24;
-      --accent-color-dark: #451a03;
-      --accent-shadow: 0 0 18px rgba(146, 64, 14, 0.55);
-    }
-
-    /* Fun extra accents */
+    /* ----------------------------
+     * NEW ACCENT PALETTES (fun)
+     * ---------------------------- */
     html.accent-rainbow {
-      --accent-color: #ec4899;
-      --accent-color-light: #f97316;
-      --accent-color-dark: #4f46e5;
-      --accent-shadow: 0 0 24px rgba(236, 72, 153, 0.7);
+      --accent-color: #ff006e;            /* fallback for thumb */
+      --accent-color-light: #ffbe0b;
+      --accent-color-dark: #8338ec;
+      --accent-gradient: linear-gradient(90deg,#ff006e,#ffbe0b,#3a86ff,#8338ec,#ff006e);
+      --accent-thumb: linear-gradient(45deg,#ff006e,#ffbe0b);
+      --accent-shadow: 0 0 28px rgba(255, 0, 110, 0.65);
     }
     html.accent-disco {
-      --accent-color: #a855f7;
-      --accent-color-light: #22d3ee;
-      --accent-color-dark: #be123c;
-      --accent-shadow: 0 0 24px rgba(168, 85, 247, 0.7);
+      --accent-color: #f472b6;
+      --accent-color-light: #a78bfa;
+      --accent-color-dark: #22d3ee;
+      --accent-gradient: linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6,#22d3ee);
+      --accent-thumb: linear-gradient(45deg,#22d3ee,#f472b6);
+      --accent-shadow: 0 0 26px rgba(167,139,250,0.7);
     }
     html.accent-metallic {
-      --accent-color: #9ca3af;
-      --accent-color-light: #e5e7eb;
-      --accent-color-dark: #4b5563;
-      --accent-shadow: 0 0 22px rgba(148, 163, 184, 0.7);
+      --accent-color: #94a3b8;
+      --accent-color-light: #e2e8f0;
+      --accent-color-dark: #475569;
+      --accent-gradient: linear-gradient(135deg,#f8fafc,#cbd5e1,#64748b);
+      --accent-thumb: linear-gradient(135deg,#e2e8f0,#94a3b8);
+      --accent-shadow: 0 0 20px rgba(148,163,184,0.45);
+    }
+    html.accent-aurora {
+      --accent-color: #22c55e;
+      --accent-color-light: #06b6d4;
+      --accent-color-dark: #8b5cf6;
+      --accent-gradient: linear-gradient(135deg,#06b6d4,#22c55e,#8b5cf6);
+      --accent-thumb: linear-gradient(135deg,#06b6d4,#22c55e);
+      --accent-shadow: 0 0 26px rgba(34,197,94,0.6);
+    }
+    html.accent-fire {
+      --accent-color: #ef4444;
+      --accent-color-light: #f59e0b;
+      --accent-color-dark: #b91c1c;
+      --accent-gradient: linear-gradient(135deg,#f59e0b,#ef4444,#b91c1c);
+      --accent-thumb: linear-gradient(135deg,#f59e0b,#ef4444);
+      --accent-shadow: 0 0 26px rgba(239,68,68,0.65);
     }
 
-    /* --------------------------------
-     * SHARED UI
-     * -------------------------------- */
+    /* Existing accents kept for completeness */
+    html.accent-red { --accent-color:#ef4444; --accent-color-light:#f97373; --accent-color-dark:#b91c1c; --accent-gradient: linear-gradient(135deg,#f97373,#ef4444); --accent-thumb:#ef4444; --accent-shadow:0 0 18px rgba(239,68,68,.55);}
+    html.accent-orange { --accent-color:#f97316; --accent-color-light:#fdba74; --accent-color-dark:#c2410c; --accent-gradient: linear-gradient(135deg,#fdba74,#f97316); --accent-thumb:#f97316; --accent-shadow:0 0 18px rgba(249,115,22,.55);}
+    html.accent-yellow { --accent-color:#eab308; --accent-color-light:#fde047; --accent-color-dark:#a16207; --accent-gradient: linear-gradient(135deg,#fde047,#eab308); --accent-thumb:#eab308; --accent-shadow:0 0 18px rgba(234,179,8,.55);}
+    html.accent-gold { --accent-color:#f59e0b; --accent-color-light:#fbbf24; --accent-color-dark:#92400e; --accent-gradient: linear-gradient(135deg,#fbbf24,#f59e0b); --accent-thumb:#f59e0b; --accent-shadow:0 0 26px rgba(245,158,11,.75);}
+    html.accent-green { --accent-color:#22c55e; --accent-color-light:#4ade80; --accent-color-dark:#15803d; --accent-gradient: linear-gradient(135deg,#4ade80,#22c55e); --accent-thumb:#22c55e; --accent-shadow:0 0 18px rgba(34,197,94,.55);}
+    html.accent-blue, html.accent-primary { --accent-color:#2563eb; --accent-color-light:#3b82f6; --accent-color-dark:#1d4ed8; --accent-gradient: linear-gradient(135deg,#3b82f6,#2563eb); --accent-thumb:#2563eb; --accent-shadow:0 0 18px rgba(37,99,235,.55);}
+    html.accent-indigo { --accent-color:#4f46e5; --accent-color-light:#6366f1; --accent-color-dark:#3730a3; --accent-gradient: linear-gradient(135deg,#6366f1,#4f46e5); --accent-thumb:#4f46e5; --accent-shadow:0 0 18px rgba(79,70,229,.55);}
+    html.accent-violet { --accent-color:#8b5cf6; --accent-color-light:#a855f7; --accent-color-dark:#6d28d9; --accent-gradient: linear-gradient(135deg,#a855f7,#8b5cf6); --accent-thumb:#8b5cf6; --accent-shadow:0 0 18px rgba(139,92,246,.55);}
+    html.accent-teal { --accent-color:#14b8a6; --accent-color-light:#2dd4bf; --accent-color-dark:#0f766e; --accent-gradient: linear-gradient(135deg,#2dd4bf,#14b8a6); --accent-thumb:#14b8a6; --accent-shadow:0 0 18px rgba(20,184,166,.55);}
+    html.accent-cyan { --accent-color:#06b6d4; --accent-color-light:#22d3ee; --accent-color-dark:#0e7490; --accent-gradient: linear-gradient(135deg,#22d3ee,#06b6d4); --accent-thumb:#06b6d4; --accent-shadow:0 0 18px rgba(6,182,212,.55);}
+    html.accent-sky { --accent-color:#0ea5e9; --accent-color-light:#38bdf8; --accent-color-dark:#0369a1; --accent-gradient: linear-gradient(135deg,#38bdf8,#0ea5e9); --accent-thumb:#0ea5e9; --accent-shadow:0 0 18px rgba(14,165,233,.55);}
+    html.accent-lime { --accent-color:#84cc16; --accent-color-light:#a3e635; --accent-color-dark:#4d7c0f; --accent-gradient: linear-gradient(135deg,#a3e635,#84cc16); --accent-thumb:#84cc16; --accent-shadow:0 0 18px rgba(132,204,22,.55);}
+    html.accent-emerald { --accent-color:#10b981; --accent-color-light:#34d399; --accent-color-dark:#047857; --accent-gradient: linear-gradient(135deg,#34d399,#10b981); --accent-thumb:#10b981; --accent-shadow:0 0 18px rgba(16,185,129,.55);}
+    html.accent-rose { --accent-color:#f43f5e; --accent-color-light:#fb7185; --accent-color-dark:#be123c; --accent-gradient: linear-gradient(135deg,#fb7185,#f43f5e); --accent-thumb:#f43f5e; --accent-shadow:0 0 18px rgba(244,63,94,.55);}
+    html.accent-pink { --accent-color:#ec4899; --accent-color-light:#f472b6; --accent-color-dark:#be185d; --accent-gradient: linear-gradient(135deg,#f472b6,#ec4899); --accent-thumb:#ec4899; --accent-shadow:0 0 18px rgba(236,72,153,.55);}
+    html.accent-slate { --accent-color:#64748b; --accent-color-light:#94a3b8; --accent-color-dark:#475569; --accent-gradient: linear-gradient(135deg,#94a3b8,#64748b); --accent-thumb:#64748b; --accent-shadow:0 0 18px rgba(100,116,139,.55);}
+    html.accent-gray { --accent-color:#6b7280; --accent-color-light:#9ca3af; --accent-color-dark:#374151; --accent-gradient: linear-gradient(135deg,#9ca3af,#6b7280); --accent-thumb:#6b7280; --accent-shadow:0 0 18px rgba(107,114,128,.55);}
+    html.accent-brown { --accent-color:#92400e; --accent-color-light:#fbbf24; --accent-color-dark:#451a03; --accent-gradient: linear-gradient(135deg,#fbbf24,#92400e); --accent-thumb:#92400e; --accent-shadow:0 0 18px rgba(146,64,14,.55);}
 
+    /* ----------------------------
+     * SHARED UI
+     * ---------------------------- */
     .card-bg {
       background-color: var(--bg-card);
       border: 1px solid var(--border-primary);
       border-radius: 0.75rem;
       box-shadow: var(--shadow-soft);
     }
-
     .card-inner-bg {
       background-color: var(--bg-card-inner);
       border: 1px solid var(--border-primary);
       border-radius: 0.75rem;
     }
-
     .shell {
       border-radius: 1rem;
       border: 1px solid var(--border-primary);
@@ -601,10 +526,9 @@
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
     .border-primary { border-color: var(--border-primary); }
+    .text-hero { color: var(--accent-color); }
 
-    .text-hero {
-      color: var(--accent-color);
-    }
+    /* Only glow on dark-ish themes */
     html.theme-dark .text-hero,
     html.theme-black .text-hero,
     html.theme-ocean .text-hero,
@@ -615,72 +539,38 @@
     html.theme-synthwave .text-hero,
     html.theme-laser .text-hero,
     html.theme-fiesta .text-hero,
-    html.theme-slime .text-hero {
-      text-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
-    }
+    html.theme-slime .text-hero { text-shadow: 0 0 18px rgba(0, 0, 0, 0.6); }
 
-    .slider-track {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 0.3rem;
-      border-radius: 9999px;
-      background-color: var(--bg-slider-track);
-    }
-    .slider-track::-webkit-slider-runnable-track {
-      height: 0.3rem;
-      border-radius: 9999px;
-      background-color: var(--bg-slider-track);
-    }
-    .slider-track::-moz-range-track {
-      height: 0.3rem;
-      border-radius: 9999px;
-      background-color: var(--bg-slider-track);
-    }
+    /* Sliders */
+    .slider-track { -webkit-appearance: none; appearance: none; width: 100%; height: 0.3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
+    .slider-track::-webkit-slider-runnable-track { height: 0.3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
+    .slider-track::-moz-range-track { height: 0.3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
     .slider-thumb { accent-color: var(--accent-color); }
     .slider-track::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 9999px;
-      margin-top: -6px;
-      background: var(--accent-color);
-      border: 2px solid var(--bg-card);
-      cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px; border-radius: 9999px; margin-top: -6px;
+      background: var(--accent-thumb);
+      border: 2px solid var(--bg-card); cursor: pointer;
     }
     .slider-track::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 9999px;
-      background: var(--accent-color);
-      border: 2px solid var(--bg-card);
-      cursor: pointer;
+      width: 16px; height: 16px; border-radius: 9999px;
+      background: var(--accent-thumb); border: 2px solid var(--bg-card); cursor: pointer;
     }
 
+    /* Inputs */
     .input-field {
       background-color: var(--bg-input);
       border-color: var(--border-primary);
       color: var(--text-primary);
       border-radius: 0.75rem;
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease,
-        background-color 0.15s ease,
-        color 0.15s ease;
+      transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
     }
-    .input-field::placeholder {
-      color: var(--text-muted);
-      opacity: 0.75;
-    }
+    .input-field::placeholder { color: var(--text-muted); opacity: .75; }
     .input-field:focus,
     .input-field:focus-visible,
-    .input-field:focus-within {
-      border-color: var(--accent-color-light);
-      box-shadow: 0 0 0 2px var(--accent-color-light);
-      outline: none;
-    }
+    .input-field:focus-within { border-color: var(--accent-color-light); box-shadow: 0 0 0 2px var(--accent-color-light); outline: none; }
 
+    /* Frequency toggle */
     #toggleContainer {
       background-color: var(--bg-card-inner);
       border-radius: 9999px;
@@ -688,78 +578,39 @@
       padding: 0.15rem;
       gap: 0.15rem;
     }
-    #toggleContainer button {
-      flex: 1 1 0;
-      border-radius: 9999px;
-      border: none;
-      font-size: 0.8rem;
-      line-height: 1.25rem;
-    }
-    .toggle-inactive {
-      background-color: transparent;
-      color: var(--text-muted);
-    }
+    #toggleContainer button { flex: 1 1 0; border-radius: 9999px; border: none; font-size: .8rem; line-height: 1.25rem; }
+    .toggle-inactive { background-color: transparent; color: var(--text-muted); }
     .toggle-active {
-      background-image: linear-gradient(
-        135deg,
-        var(--accent-color-light),
-        var(--accent-color)
-      );
+      background-image: var(--accent-gradient);
       color: #020617;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
       transform: translateY(-0.5px);
     }
 
+    /* Buttons */
     .button-primary {
-      background-image: linear-gradient(
-        135deg,
-        var(--accent-color-light),
-        var(--accent-color)
-      );
+      background-image: var(--accent-gradient);
       color: #020617;
       font-weight: 600;
       border-radius: 9999px;
       padding: 0.6rem 1.75rem;
       border: 1px solid var(--accent-color-dark);
       box-shadow: 0 12px 30px rgba(15, 23, 42, 0.4);
-      transition:
-        background-color 0.2s ease,
-        box-shadow 0.2s ease,
-        filter 0.2s ease,
-        transform 0.15s ease;
+      transition: background-color .2s ease, box-shadow .2s ease, filter .2s ease, transform .15s ease;
     }
-    .button-primary:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
-      filter: brightness(1.03);
-    }
-    .button-primary:active:not(:disabled) {
-      transform: translateY(0);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.45);
-      filter: brightness(0.98);
-    }
+    .button-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55); filter: brightness(1.03); }
+    .button-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 10px 24px rgba(15, 23, 42, 0.45); filter: brightness(0.98); }
     .button-primary:disabled {
-      background-image: none;
-      background-color: var(--bg-slider-track);
-      color: var(--text-muted);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-      border-color: var(--border-primary);
+      background-image: none; background-color: var(--bg-slider-track); color: var(--text-muted);
+      cursor: not-allowed; transform: none; box-shadow: none; border-color: var(--border-primary);
     }
 
-    #headerContainer {
-      border-bottom-color: var(--border-primary);
-    }
+    #headerContainer { border-bottom-color: var(--border-primary); }
     #themeControls button {
       border-radius: 9999px;
       background-color: rgba(148, 163, 184, 0.08);
       border-color: rgba(148, 163, 184, 0.45);
-      transition:
-        background-color 0.15s ease,
-        box-shadow 0.15s ease,
-        transform 0.15s ease,
-        border-color 0.15s ease;
+      transition: background-color .15s ease, box-shadow .15s ease, transform .15s ease, border-color .15s ease;
     }
     #themeControls button:hover {
       background-color: rgba(148, 163, 184, 0.16);
@@ -767,68 +618,49 @@
       box-shadow: 0 6px 14px rgba(15, 23, 42, 0.24);
       transform: translateY(-0.5px);
     }
+    #themeSelector, #accentSelector, #backgroundSelector { background-color: var(--bg-input); }
 
-    #themeSelector,
-    #accentSelector,
-    #backgroundSelector {
-      background-color: var(--bg-input);
-    }
+    button:focus-visible, select:focus-visible { outline: 2px solid var(--accent-color-light); outline-offset: 2px; }
 
-    button:focus-visible,
-    select:focus-visible {
-      outline: 2px solid var(--accent-color-light);
-      outline-offset: 2px;
-    }
-
-    /* --------------------------------
+    /* ----------------------------
      * BACKGROUND VARIANTS
-     * -------------------------------- */
-
-    html.bg-default body {
-      /* use theme background */
-    }
-
-    html.bg-plain body {
-      background: var(--bg-body);
-    }
-
+     * ---------------------------- */
+    html.bg-default body { /* theme background as defined above */ }
+    html.bg-plain body { background: var(--bg-body); }
     html.bg-soft body {
       background:
         radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.28), transparent 55%),
         radial-gradient(circle at 100% 100%, rgba(148, 163, 184, 0.2), var(--bg-body));
     }
-
     html.bg-loud body {
       background:
         radial-gradient(circle at 0 0, rgba(248, 113, 113, 0.55), transparent 50%),
         radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.55), var(--bg-body));
     }
-
     html.bg-grid body {
       background-color: var(--bg-body);
       background-image:
-        linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px);
-      background-size: 32px 32px;
+        linear-gradient(rgba(148,163,184,0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148,163,184,0.18) 1px, transparent 1px);
+      background-size: 24px 24px, 24px 24px;
+      background-position: center center;
     }
-
+    html.bg-dots body {
+      background-color: var(--bg-body);
+      background-image: radial-gradient(rgba(148,163,184,0.25) 1px, transparent 1px);
+      background-size: 14px 14px;
+      background-position: center center;
+    }
     html.bg-diagonal body {
       background:
-        linear-gradient(
-          135deg,
-          rgba(59, 130, 246, 0.22),
-          rgba(236, 72, 153, 0.22)
-        ),
+        repeating-linear-gradient(45deg, rgba(148,163,184,0.12) 0 2px, transparent 2px 12px),
         var(--bg-body);
     }
-
-    html.bg-spotlight body {
+    html.bg-aurora body {
       background:
-        radial-gradient(
-          circle at 50% 0,
-          rgba(250, 204, 21, 0.45),
-          transparent 65%
-        ),
+        radial-gradient(1000px 400px at 10% 10%, rgba(99,102,241,0.20), transparent 60%),
+        radial-gradient(800px 300px at 90% 20%, rgba(16,185,129,0.18), transparent 60%),
+        radial-gradient(900px 350px at 30% 90%, rgba(56,189,248,0.18), transparent 60%),
         var(--bg-body);
     }
   </style>
@@ -837,33 +669,32 @@
 
   <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
 
-    <!-- HEADER -->
-    <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
-      <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
+    <!-- HEADER (centered logo, company name, tagline) -->
+    <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center justify-center gap-2">
         <div class="flex items-center justify-center">
-          <img id="customLogoImg" class="h-7 w-auto hidden" alt="Logo" />
+          <img id="customLogoImg" class="h-10 w-auto hidden" alt="Logo" />
           <!-- Default logo -->
-          <svg id="defaultLogoSvg" class="h-7 w-7 text-hero" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg id="defaultLogoSvg" class="h-10 w-10 text-hero" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M16 3L7 6.5V15.5C7 21 10.8 25.9 16 27l9-3.5V6.5L16 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
             <path d="M12 11H17.5C19.985 11 22 13.015 22 15.5C22 17.985 19.985 20 17.5 20H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
             <path d="M12 11V21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="flex flex-col items-center leading-tight mt-1">
-          <span id="companyNameDisplay" class="text-[11px] font-semibold tracking-wide text-secondary"></span>
-          <span id="platformBrandDisplay" class="text-[10px] font-medium text-muted"></span>
+        <div id="brandStack" class="flex flex-col items-center leading-tight">
+          <span id="brandNameDisplay" class="text-sm font-semibold tracking-wide text-secondary">TrustBureau.ai</span>
+          <span id="poweredByLine" class="text-[11px] font-medium text-muted hidden">powered by TrustBureau.ai</span>
         </div>
-        <span class="text-xs font-semibold text-muted uppercase tracking-[0.18em] mt-1">
-          APPROVAL CALCULATOR
-        </span>
+        <span class="text-xs font-semibold text-muted uppercase tracking-[0.18em]">APPROVAL CALCULATOR</span>
       </div>
-      <div id="themeControls" class="flex items-center justify-center gap-2">
+
+      <!-- Top-right controls -->
+      <div id="themeControls" class="flex items-center justify-center gap-2 mt-2">
         <button id="repSettingsToggle" type="button"
                 class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-               stroke-width="1.8" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z"/>
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.31.876 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.876 3.31-2.42 2.42a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.31-.876-2.42-2.42a1.724 1.724 0 0 0-1.065-2.572c-1.756.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.876-3.31 2.42-2.42.996.574 2.272.115 2.573-1.065Z"/>
             <path stroke-linecap="round" stroke-linejoin="round"
                   d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
           </svg>
@@ -871,8 +702,7 @@
         </button>
         <button id="themePanelToggle" type="button"
                 class="px-2 py-1 text-[11px] rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-               stroke-width="1.8" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round"
                   d="M12 3c2.755 0 5 2.245 5 5 0 4-5 9-5 9s-5-5-5-9c0-2.755 2.245-5 5-5zm0 3a2 2 0 100 4 2 2 0 000-4z" />
           </svg>
@@ -881,20 +711,13 @@
       </div>
     </div>
 
-    <!-- REP SETTINGS PANEL (rep info + logo + company name) -->
-    <div id="repSettingsPanel"
-         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+    <!-- REP SETTINGS (rep info + company name + logo) -->
+    <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold text-secondary">Rep Settings</span>
+        <span class="text-xs font-semibold text-secondary">Rep & Brand Settings</span>
         <span class="text-[11px] text-muted">Shown on client approval view</span>
       </div>
       <div class="grid grid-cols-1 gap-2 text-xs">
-        <div>
-          <label for="companyNameInput" class="block font-semibold text-muted">Company Name</label>
-          <input id="companyNameInput" type="text"
-                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
-                 placeholder="Your Company" />
-        </div>
         <div>
           <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
           <input id="repNameInput" type="text"
@@ -913,20 +736,31 @@
                  class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
                  placeholder="(555) 123-4567" />
         </div>
-        <div>
-          <label for="logoInput" class="block font-semibold text-muted">Logo</label>
-          <input id="logoInput" type="file" accept="image/*"
-                 class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5" />
-          <p class="mt-1 text-[11px] text-muted">
-            Optional. Shown in the header and included in the shared approval link.
-          </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label for="companyNameInput" class="block font-semibold text-muted">Company Name</label>
+            <input id="companyNameInput" type="text"
+                   class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                   placeholder="Your Company, Inc." />
+            <p class="mt-1 text-[11px] text-muted">
+              Appears under the centered logo. If set, shows “powered by TrustBureau.ai”.
+            </p>
+          </div>
+          <div>
+            <label for="logoInput" class="block font-semibold text-muted">Logo</label>
+            <input id="logoInput" type="file" accept="image/*"
+                   class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5" />
+            <p class="mt-1 text-[11px] text-muted">
+              Optional. Included in the shared approval link (auto‑compressed).
+            </p>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- THEME PANEL (theme + accent + background) -->
-    <div id="themePanel"
-         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+    <div id="themePanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary">Theme Settings</span>
         <span class="text-[11px] text-muted">Affects your view & client view</span>
@@ -935,8 +769,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
             <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
-            <select id="themeSelector"
-                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+            <select id="themeSelector" class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
               <optgroup label="Clean">
                 <option value="theme-light">Light</option>
                 <option value="theme-dark">Dark</option>
@@ -965,8 +798,7 @@
           </div>
           <div>
             <label for="accentSelector" class="block font-semibold text-muted">Accent</label>
-            <select id="accentSelector"
-                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+            <select id="accentSelector" class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
               <option value="accent-gold">Gold (Default)</option>
               <option value="accent-red">Red</option>
               <option value="accent-orange">Orange</option>
@@ -985,22 +817,25 @@
               <option value="accent-slate">Slate</option>
               <option value="accent-gray">Gray</option>
               <option value="accent-brown">Brown</option>
+              <!-- New fun accents -->
               <option value="accent-rainbow">Rainbow</option>
               <option value="accent-disco">Disco</option>
               <option value="accent-metallic">Metallic</option>
+              <option value="accent-aurora">Aurora</option>
+              <option value="accent-fire">Fire</option>
             </select>
           </div>
           <div>
             <label for="backgroundSelector" class="block font-semibold text-muted">Background</label>
-            <select id="backgroundSelector"
-                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+            <select id="backgroundSelector" class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
               <option value="bg-default">Theme Default</option>
               <option value="bg-plain">Plain</option>
               <option value="bg-soft">Soft Gradient</option>
               <option value="bg-loud">Loud Gradient</option>
               <option value="bg-grid">Grid</option>
+              <option value="bg-dots">Dots</option>
               <option value="bg-diagonal">Diagonal</option>
-              <option value="bg-spotlight">Spotlight</option>
+              <option value="bg-aurora">Aurora Layers</option>
             </select>
           </div>
         </div>
@@ -1010,9 +845,7 @@
     <!-- CALCULATOR -->
     <div id="calculatorInputs" class="space-y-4 pt-2">
       <div id="businessNameContainer" class="px-1 mt-2">
-        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
-          Business Name
-        </label>
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">Business Name</label>
         <input id="businessNameInput" type="text"
                class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
                placeholder="e.g., Acme Holdings LLC" />
@@ -1021,11 +854,8 @@
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
         <!-- Amount -->
         <div id="amountContainer" class="space-y-1">
-          <label class="block text-xs font-semibold text-muted">
-            Amount You Get ($)
-          </label>
-          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000"
-                 value="50000"
+          <label class="block text-xs font-semibold text-muted">Amount You Get ($)</label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
             <span class="absolute left-3 input-icon text-muted text-sm">$</span>
@@ -1040,11 +870,8 @@
           <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-4 w-4 absolute left-3 input-icon text-muted"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M6 18 18 6M6 6l12 12" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
             <input id="calcFactorInput" type="number" step="0.01"
                    class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
@@ -1053,17 +880,12 @@
 
         <!-- Number of Payments -->
         <div id="termContainer" class="space-y-1">
-          <label class="block text-xs font-semibold text-muted">
-            Number of Payments
-          </label>
+          <label class="block text-xs font-semibold text-muted">Number of Payments</label>
           <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="6"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-4 w-4 absolute left-3 input-icon text-muted"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
             </svg>
             <input id="calcTermInput" type="number" step="1"
                    class="w-full p-1.5 pl-9 text-sm border rounded-lg shadow-sm input-field" />
@@ -1072,9 +894,7 @@
 
         <!-- Origination Fee -->
         <div id="originationContainer" class="space-y-1">
-          <label class="block text-xs font-semibold text-muted">
-            Origination Fee (%)
-          </label>
+          <label class="block text-xs font-semibold text-muted">Origination Fee (%)</label>
           <input id="originationSlider" type="range" min="0" max="10" step="0.1" value="0"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
@@ -1086,9 +906,7 @@
 
         <!-- Manual Term Length (Months - Display Only) -->
         <div id="termLengthMonthsContainer" class="space-y-1">
-          <label class="block text-xs font-semibold text-muted">
-            Term Length (Months - Display Only)
-          </label>
+          <label class="block text-xs font-semibold text-muted">Term Length (Months - Display Only)</label>
           <div class="relative group">
             <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
                    class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
@@ -1099,15 +917,9 @@
 
       <!-- Frequency toggle -->
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
-        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
-          Daily
-        </button>
-        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
-          Weekly
-        </button>
-        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
-          Monthly
-        </button>
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Daily</button>
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Weekly</button>
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Monthly</button>
       </div>
     </div>
 
@@ -1117,11 +929,9 @@
         <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
       </div>
       <div class="text-center py-6">
-        <span id="businessNameDisplay"
-              class="text-sm font-semibold text-primary block mb-1 hidden"></span>
+        <span id="businessNameDisplay" class="text-sm font-semibold text-primary block mb-1 hidden"></span>
         <span class="text-sm font-semibold text-muted block">You Get</span>
-        <span id="summaryAmountOut"
-              class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
+        <span id="summaryAmountOut" class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
         <span class="text-base font-medium text-secondary block">
           Total Payback:
           <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
@@ -1132,53 +942,40 @@
       </div>
       <div class="pt-6">
         <div class="grid grid-cols-2 gap-4 justify-items-center">
-          <!-- Term Length highlight row -->
           <div class="text-center col-span-2">
             <span class="text-[11px] font-semibold text-muted uppercase tracking-wide block">Term Length</span>
-            <span id="summaryTermLengthOut"
-                  class="text-2xl font-semibold text-primary block"></span>
+            <span id="summaryTermLengthOut" class="text-2xl font-semibold text-primary block"></span>
           </div>
 
-          <!-- Factor & Payments -->
           <div class="text-center">
             <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Factor Rate</span>
-            <span id="summaryFactorOut"
-                  class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryFactorOut" class="text-lg font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
             <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Payments</span>
-            <span id="summaryTermOut"
-                  class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryTermOut" class="text-lg font-semibold text-primary block"></span>
           </div>
 
-          <!-- Cost & Payment -->
           <div class="text-center">
             <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Total Cost of Funds</span>
-            <span id="summaryCostOut"
-                  class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryCostOut" class="text-lg font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
-            <span id="summaryPaymentLabel"
-                  class="text-[11px] font-medium text-muted uppercase tracking-wide block">Est. Daily Payment</span>
-            <span id="summaryPaymentValue"
-                  class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryPaymentLabel" class="text-[11px] font-medium text-muted uppercase tracking-wide block">Est. Daily Payment</span>
+            <span id="summaryPaymentValue" class="text-lg font-semibold text-primary block"></span>
           </div>
 
-          <!-- Origination -->
           <div class="text-center">
             <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Origination Fee (%)</span>
-            <span id="summaryOriginationPercentOut"
-                  class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryOriginationPercentOut" class="text-lg font-semibold text-primary block"></span>
           </div>
           <div class="text-center">
             <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Origination Fee ($)</span>
-            <span id="summaryOriginationAmountOut"
-                  class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryOriginationAmountOut" class="text-lg font-semibold text-primary block"></span>
           </div>
         </div>
       </div>
-      <div id="repContactBlock"
-           class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
+      <div id="repContactBlock" class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
         <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
         <div id="repNameDisplay" class="font-medium"></div>
         <div id="repEmailDisplay"></div>
@@ -1187,42 +984,33 @@
     </div>
 
     <!-- ADDITIONAL OFFERS -->
-    <div id="savedOffersSection"
-         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+    <div id="savedOffersSection" class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
       <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
         <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
       </div>
-      <div id="savedOffersContainer"
-           class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <div id="savedOffersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
     <!-- BUTTONS -->
     <div id="buttonContainer" class="pt-4 border-t border-primary mt-4">
       <div class="relative flex justify-center gap-3 flex-wrap">
         <button id="addOfferButton" class="button-primary flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 4v16m8-8H4" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
           </svg>
           Add Offer
         </button>
         <button id="shareLinkButton" class="button-primary flex items-center gap-2" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
           </svg>
           Share Approval Link
         </button>
       </div>
       <div id="shareLinkContainer" class="mt-3 hidden">
         <label class="block text-xs font-semibold text-muted mb-1">Shareable Approval Link</label>
-        <input id="shareLinkOutput" type="text" readonly
-               class="w-full text-xs input-field border border-primary rounded-lg px-2 py-1" />
-        <p class="mt-1 text-[11px] text-muted">
-          Link copied to clipboard (when possible). If not, copy from here.
-        </p>
+        <input id="shareLinkOutput" type="text" readonly class="w-full text-xs input-field border border-primary rounded-lg px-2 py-1" />
+        <p class="mt-1 text-[11px] text-muted">Link copied to clipboard (when possible). If not, copy from here.</p>
       </div>
     </div>
 
@@ -1255,10 +1043,6 @@
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
 
-      companyNameInput: document.getElementById('companyNameInput'),
-      companyNameDisplay: document.getElementById('companyNameDisplay'),
-      platformBrandDisplay: document.getElementById('platformBrandDisplay'),
-
       repNameInput: document.getElementById('repNameInput'),
       repEmailInput: document.getElementById('repEmailInput'),
       repPhoneInput: document.getElementById('repPhoneInput'),
@@ -1270,6 +1054,10 @@
       logoInput: document.getElementById('logoInput'),
       customLogoImg: document.getElementById('customLogoImg'),
       defaultLogoSvg: document.getElementById('defaultLogoSvg'),
+
+      companyNameInput: document.getElementById('companyNameInput'),
+      brandNameDisplay: document.getElementById('brandNameDisplay'),
+      poweredByLine: document.getElementById('poweredByLine'),
 
       summaryAmountOut: document.getElementById('summaryAmountOut'),
       summaryPaybackOut: document.getElementById('summaryPaybackOut'),
@@ -1306,14 +1094,14 @@
     let currentAccent = 'accent-gold';
     let currentBackground = 'bg-default';
     let currentLogoDataUrl = '';
-    let companyName = '';
+    let currentCompanyName = '';
     let amountSliderMax = 1000000;
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
     let termLengthManualDirty = false;
 
-    // Load saved theme/accent/background/logo/company, fallback to system dark if no theme
+    /* ---------- persistence ---------- */
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
@@ -1329,37 +1117,29 @@
       if (storedAccent) currentAccent = storedAccent;
       if (storedBackground) currentBackground = storedBackground;
       if (storedLogo) currentLogoDataUrl = storedLogo;
-      if (storedCompany) companyName = storedCompany;
+      if (storedCompany) currentCompanyName = storedCompany;
     } catch (_) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         currentTheme = 'theme-dark';
       }
     }
 
+    /* ---------- utils ---------- */
     function formatCurrency(num) {
       const numericValue = Number(num);
       if (isNaN(numericValue)) return '$0';
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(numericValue);
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(numericValue);
     }
-
     function parseFormattedNumber(val) {
       if (typeof val !== 'string' || !val) return 0;
       return parseFloat(val.replace(/[\$,]/g, '')) || 0;
     }
-
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
-      if (elements.calcAmountSlider) {
-        elements.calcAmountSlider.max = String(cap);
-      }
+      if (elements.calcAmountSlider) elements.calcAmountSlider.max = String(cap);
     }
 
-    // Encode/decode config to keep URLs short
+    // Short link encoding
     function encodeConfig(config) {
       try {
         const json = JSON.stringify(config);
@@ -1369,7 +1149,6 @@
         return '';
       }
     }
-
     function decodeConfig(encoded) {
       try {
         const json = decodeURIComponent(escape(atob(encoded)));
@@ -1380,40 +1159,57 @@
       }
     }
 
+    // Logo compression to keep URLs reasonable
+    function compressLogo(file, maxW = 280, maxH = 80, quality = 0.9) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('read_fail'));
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+            const w = Math.max(1, Math.round(img.width * scale));
+            const h = Math.max(1, Math.round(img.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            let dataUrl;
+            try {
+              dataUrl = canvas.toDataURL('image/webp', quality);
+            } catch {
+              try { dataUrl = canvas.toDataURL('image/jpeg', quality); }
+              catch { dataUrl = canvas.toDataURL('image/png'); }
+            }
+            resolve(dataUrl);
+          };
+          img.onerror = () => reject(new Error('img_fail'));
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    /* ---------- core ---------- */
     function computeOffer(amount, factor, termPayments, frequency) {
       const totalPayback = amount * factor;
       const totalCost = totalPayback - amount;
-
       const paymentsCount = termPayments > 0 ? termPayments : 1;
       const paymentAmount = totalPayback / paymentsCount;
 
       let rawMonths;
-      if (frequency === 'weekly') {
-        rawMonths = termPayments * (12 / 52);
-      } else if (frequency === 'monthly') {
-        rawMonths = termPayments;
-      } else {
-        rawMonths = termPayments * (12 / 250);
-      }
+      if (frequency === 'weekly') rawMonths = termPayments * (12 / 52);
+      else if (frequency === 'monthly') rawMonths = termPayments;
+      else rawMonths = termPayments * (12 / 250);
       const termLengthMonths = Math.round(rawMonths * 2) / 2;
 
       let paymentLabel = 'Est. Daily Payment';
       if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
       if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
 
-      return {
-        amount,
-        factor,
-        termMonths: termPayments,
-        termLengthMonths,
-        totalPayback,
-        totalCost,
-        payment: paymentAmount,
-        paymentLabel,
-        frequency,
-      };
+      return { amount, factor, termMonths: termPayments, termLengthMonths, totalPayback, totalCost, payment: paymentAmount, paymentLabel, frequency };
     }
-
     function getCurrentOffer() {
       const amount = parseFormattedNumber(elements.calcAmountInput.value);
       const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
@@ -1423,13 +1219,11 @@
 
     function renderSavedOffers() {
       if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
-
       if (!savedOffers.length) {
         elements.savedOffersSection.classList.add('hidden');
         elements.savedOffersContainer.innerHTML = '';
         return;
       }
-
       elements.savedOffersSection.classList.remove('hidden');
 
       const html = savedOffers.map((offer, index) => {
@@ -1461,18 +1255,15 @@
                 <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span>
               </div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
 
       elements.savedOffersContainer.innerHTML = html;
     }
-
     function updateAddOfferButtonState() {
       if (!elements.addOfferButton) return;
       elements.addOfferButton.disabled = savedOffers.length >= MAX_ADDITIONAL_OFFERS;
     }
-
     function handleAddOffer() {
       if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
       savedOffers.push(getCurrentOffer());
@@ -1482,14 +1273,11 @@
 
     function syncInputs(slider, input, isCurrency, min, max, callback) {
       const initialValue = parseFloat(slider.value);
-      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+      input.value = isCurrency ? formatCurrency(initialValue) : String(initialValue);
 
       slider.addEventListener('input', () => {
         let val = parseFloat(slider.value);
-        if (!isNaN(val) && val > max) {
-          val = max;
-          slider.value = val;
-        }
+        if (!isNaN(val) && val > max) { val = max; slider.value = val; }
         input.value = isCurrency ? formatCurrency(val) : String(val);
         callback();
       });
@@ -1516,17 +1304,12 @@
 
     function applyTheme() {
       let themeClass = currentTheme;
-
       if (currentTheme === 'theme-auto') {
-        const prefersDark =
-          window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         themeClass = prefersDark ? 'theme-dark' : 'theme-light';
       }
-
       document.documentElement.className = `${themeClass} ${currentAccent} ${currentBackground}`;
       document.documentElement.dataset.effectiveTheme = themeClass;
-
       try {
         localStorage.setItem('generic_offer_calc_theme', currentTheme);
         localStorage.setItem('generic_offer_calc_accent', currentAccent);
@@ -1536,7 +1319,6 @@
 
     function applyLogoFromDataUrl(dataUrl) {
       if (!elements.customLogoImg || !elements.defaultLogoSvg) return;
-
       if (dataUrl && typeof dataUrl === 'string') {
         elements.customLogoImg.src = dataUrl;
         elements.customLogoImg.classList.remove('hidden');
@@ -1546,53 +1328,37 @@
         elements.customLogoImg.classList.add('hidden');
         elements.defaultLogoSvg.classList.remove('hidden');
       }
-
       try {
-        if (dataUrl) {
-          localStorage.setItem('generic_offer_calc_logo', dataUrl);
-        } else {
-          localStorage.removeItem('generic_offer_calc_logo');
-        }
+        if (dataUrl) localStorage.setItem('generic_offer_calc_logo', dataUrl);
+        else localStorage.removeItem('generic_offer_calc_logo');
       } catch (_) {}
     }
 
     function updateBrandDisplay() {
-      const brandEl = elements.companyNameDisplay;
-      const poweredEl = elements.platformBrandDisplay;
+      const name = elements.companyNameInput?.value.trim() || currentCompanyName || '';
+      currentCompanyName = name;
 
-      const inputVal = elements.companyNameInput
-        ? elements.companyNameInput.value.trim()
-        : '';
-      const name = inputVal || companyName || '';
+      // Main brand line
+      if (elements.brandNameDisplay) {
+        elements.brandNameDisplay.textContent = name || 'TrustBureau.ai';
+      }
 
-      companyName = name;
-
-      if (brandEl && poweredEl) {
-        if (name) {
-          brandEl.textContent = name;
-          poweredEl.textContent = 'powered by TrustBureau.ai';
-        } else {
-          brandEl.textContent = 'TrustBureau.ai';
-          poweredEl.textContent = '';
-        }
+      // Tagline: powered by TrustBureau.ai (only if custom company set)
+      if (elements.poweredByLine) {
+        elements.poweredByLine.classList.toggle('hidden', !name);
       }
 
       try {
-        if (companyName) {
-          localStorage.setItem('generic_offer_calc_company', companyName);
-        } else {
-          localStorage.removeItem('generic_offer_calc_company');
-        }
+        if (name) localStorage.setItem('generic_offer_calc_company', name);
+        else localStorage.removeItem('generic_offer_calc_company');
       } catch (_) {}
     }
 
     function updateRepDisplay() {
       if (!elements.repContactBlock) return;
-
       const name = elements.repNameInput?.value.trim() || '';
       const email = elements.repEmailInput?.value.trim() || '';
       const phone = elements.repPhoneInput?.value.trim() || '';
-
       const hasAny = name || email || phone;
 
       elements.repContactBlock.classList.toggle('hidden', !hasAny);
@@ -1614,22 +1380,17 @@
       });
     }
 
+    /* ---------- init from URL ---------- */
     function initializeFromURL() {
       const params = new URLSearchParams(window.location.search);
       const configParam = params.get('c');
       const viewMode = params.get('view');
       isApprovalView = viewMode === 'approval';
 
-      let amount = 50000;
-      let factor = 1.25;
-      let term = 6;
-      let freq = 'daily';
-      let businessNameParam = '';
-      let repNameParam = '';
-      let repEmailParam = '';
-      let repPhoneParam = '';
-      let companyNameParam = '';
-      let offersRaw = null;
+      let amount = 50000, factor = 1.25, term = 6, freq = 'daily';
+      let businessNameParam = '', repNameParam = '', repEmailParam = '', repPhoneParam = '';
+      let offersRaw = null, themeParam = null, accentParam = null, bgParam = null;
+      let logoParam = null, companyParam = null;
 
       if (configParam) {
         const cfg = decodeConfig(configParam);
@@ -1639,73 +1400,48 @@
           if (typeof cfg.t === 'number') term = cfg.t;
           if (typeof cfg.q === 'string') freq = cfg.q;
 
-          if (typeof cfg.th === 'string') currentTheme = cfg.th;
-          if (typeof cfg.ac === 'string') currentAccent = cfg.ac;
-          if (typeof cfg.bg === 'string') currentBackground = cfg.bg;
+          if (typeof cfg.th === 'string') themeParam = cfg.th;
+          if (typeof cfg.ac === 'string') accentParam = cfg.ac;
+          if (typeof cfg.bg === 'string') bgParam = cfg.bg;
 
           if (typeof cfg.b === 'string') businessNameParam = cfg.b;
           if (typeof cfg.rn === 'string') repNameParam = cfg.rn;
           if (typeof cfg.re === 'string') repEmailParam = cfg.re;
           if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
-          if (typeof cfg.cn === 'string') companyNameParam = cfg.cn;
 
-          if (typeof cfg.lg === 'string') currentLogoDataUrl = cfg.lg;
+          if (typeof cfg.lg === 'string') logoParam = cfg.lg;
+          if (typeof cfg.cn === 'string') companyParam = cfg.cn;
 
           if (Array.isArray(cfg.o)) offersRaw = cfg.o;
         }
       } else {
-        const amountParam = params.get('amount');
-        if (amountParam) {
-          const parsedAmount = parseFloat(amountParam);
-          if (!isNaN(parsedAmount)) amount = parsedAmount;
-        }
-        const factorParam = params.get('factor');
-        if (factorParam) {
-          const parsedFactor = parseFloat(factorParam);
-          if (!isNaN(parsedFactor)) factor = parsedFactor;
-        }
-        const termParam = params.get('term');
-        if (termParam) {
-          const parsedTerm = parseInt(termParam, 10);
-          if (!isNaN(parsedTerm)) term = parsedTerm;
-        }
-        const freqParam = params.get('freq');
-        if (freqParam) freq = freqParam;
+        // Backward compatible verbose params
+        const amountParam = params.get('amount'); if (amountParam) { const v = parseFloat(amountParam); if (!isNaN(v)) amount = v; }
+        const factorParam = params.get('factor'); if (factorParam) { const v = parseFloat(factorParam); if (!isNaN(v)) factor = v; }
+        const termParam = params.get('term'); if (termParam) { const v = parseInt(termParam, 10); if (!isNaN(v)) term = v; }
+        const freqParam = params.get('freq'); if (freqParam) freq = freqParam;
 
-        const themeParam = params.get('theme');
-        const accentParam = params.get('accent');
-        const bgParam = params.get('bg');
-
-        if (themeParam) currentTheme = themeParam;
-        if (accentParam) currentAccent = accentParam;
-        if (bgParam) currentBackground = bgParam;
-
+        themeParam = params.get('theme'); accentParam = params.get('accent'); bgParam = params.get('bg');
         businessNameParam = params.get('businessName') || '';
         repNameParam = params.get('repName') || '';
         repEmailParam = params.get('repEmail') || '';
         repPhoneParam = params.get('repPhone') || '';
-        companyNameParam = params.get('companyNameHeader') || '';
+        companyParam = params.get('company') || '';
 
         const offersParam = params.get('offers');
         if (offersParam) {
-          try {
-            const parsed = JSON.parse(offersParam);
-            if (Array.isArray(parsed)) offersRaw = parsed;
-          } catch (e) {
-            console.error('Error parsing offers from URL', e);
-          }
+          try { const parsed = JSON.parse(offersParam); if (Array.isArray(parsed)) offersRaw = parsed; }
+          catch (e) { console.error('Error parsing offers from URL', e); }
         }
       }
 
-      if (companyNameParam) {
-        companyName = companyNameParam;
-      }
+      if (themeParam) currentTheme = themeParam;
+      if (accentParam) currentAccent = accentParam;
+      if (bgParam) currentBackground = bgParam;
+      if (logoParam) currentLogoDataUrl = logoParam;
+      if (typeof companyParam === 'string') currentCompanyName = companyParam;
 
-      if (isApprovalView) {
-        setAmountSliderMax(amount);
-      } else {
-        setAmountSliderMax(1000000);
-      }
+      if (isApprovalView) setAmountSliderMax(amount); else setAmountSliderMax(1000000);
 
       elements.calcAmountInput.value = formatCurrency(amount);
       elements.calcAmountSlider.value = amount;
@@ -1716,25 +1452,16 @@
       if (elements.repNameInput) elements.repNameInput.value = repNameParam;
       if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
       if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
-      if (elements.companyNameInput) {
-        elements.companyNameInput.value = companyName || '';
-      }
+      if (elements.companyNameInput) elements.companyNameInput.value = currentCompanyName || '';
 
       paymentFrequency = freq || 'daily';
 
       savedOffers = [];
       if (Array.isArray(offersRaw)) {
         savedOffers = offersRaw.map(o =>
-          computeOffer(
-            Number(o.a ?? o.amount ?? 0),
-            Number(o.f ?? o.factor ?? 1.1),
-            Number(o.t ?? o.term ?? 3),
-            o.q ?? o.frequency ?? 'daily'
-          )
+          computeOffer(Number(o.a ?? o.amount ?? 0), Number(o.f ?? o.factor ?? 1.1), Number(o.t ?? o.term ?? 3), o.q ?? o.frequency ?? 'daily')
         );
       }
-
-      updateBrandDisplay();
 
       if (isApprovalView) {
         if (elements.factorContainer) elements.factorContainer.style.display = 'none';
@@ -1743,7 +1470,6 @@
         if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
         if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
         if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
-
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
         if (elements.themePanel) elements.themePanel.style.display = 'none';
         if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
@@ -1751,6 +1477,7 @@
       }
     }
 
+    /* ---------- calc ---------- */
     function runCalculator() {
       try {
         const amount = parseFormattedNumber(elements.calcAmountInput.value);
@@ -1787,20 +1514,14 @@
         if (elements.termLengthMonthsInput) {
           if (!termLengthManualDirty) {
             const autoRounded = Math.round(months * 2) / 2;
-            elements.termLengthMonthsInput.value = Number.isInteger(autoRounded)
-              ? String(autoRounded)
-              : autoRounded.toFixed(1);
+            elements.termLengthMonthsInput.value = Number.isInteger(autoRounded) ? String(autoRounded) : autoRounded.toFixed(1);
           }
           const manualVal = parseFloat(elements.termLengthMonthsInput.value);
-          if (!isNaN(manualVal) && manualVal > 0) {
-            months = manualVal;
-          }
+          if (!isNaN(manualVal) && manualVal > 0) months = manualVal;
         }
-
         if (months && months > 0) {
           const rounded = Math.round(months * 2) / 2;
-          const display = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
-          elements.summaryTermLengthOut.textContent = `${display} months`;
+          elements.summaryTermLengthOut.textContent = `${Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)} months`;
         } else {
           elements.summaryTermLengthOut.textContent = '';
         }
@@ -1811,22 +1532,19 @@
       }
     }
 
+    /* ---------- init ---------- */
     function initializeCalculator() {
       initializeFromURL();
       applyTheme();
       applyLogoFromDataUrl(currentLogoDataUrl);
+      updateBrandDisplay();
 
-      // React to system theme changes when on Auto
+      // Respond to system theme changes while in "Auto"
       if (window.matchMedia) {
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleSystemThemeChange = () => {
-          if (currentTheme === 'theme-auto') applyTheme();
-        };
-        if (mq.addEventListener) {
-          mq.addEventListener('change', handleSystemThemeChange);
-        } else if (mq.addListener) {
-          mq.addListener(handleSystemThemeChange);
-        }
+        const handleSystemThemeChange = () => { if (currentTheme === 'theme-auto') applyTheme(); };
+        if (mq.addEventListener) mq.addEventListener('change', handleSystemThemeChange);
+        else if (mq.addListener) mq.addListener(handleSystemThemeChange);
       }
 
       if (elements.themeSelector) elements.themeSelector.value = currentTheme;
@@ -1846,50 +1564,25 @@
         syncInputs(elements.originationSlider, elements.originationInput, false, 0, 10, runCalculator);
       }
 
-      if (!isApprovalView && elements.toggleDaily) {
-        elements.toggleDaily.addEventListener('click', () => {
-          paymentFrequency = 'daily';
-          updatePaymentToggleUI();
-          runCalculator();
-        });
-      }
-      if (!isApprovalView && elements.toggleWeekly) {
-        elements.toggleWeekly.addEventListener('click', () => {
-          paymentFrequency = 'weekly';
-          updatePaymentToggleUI();
-          runCalculator();
-        });
-      }
-      if (!isApprovalView && elements.toggleMonthly) {
-        elements.toggleMonthly.addEventListener('click', () => {
-          paymentFrequency = 'monthly';
-          updatePaymentToggleUI();
-          runCalculator();
-        });
-      }
+      if (!isApprovalView && elements.toggleDaily) elements.toggleDaily.addEventListener('click', () => { paymentFrequency = 'daily'; updatePaymentToggleUI(); runCalculator(); });
+      if (!isApprovalView && elements.toggleWeekly) elements.toggleWeekly.addEventListener('click', () => { paymentFrequency = 'weekly'; updatePaymentToggleUI(); runCalculator(); });
+      if (!isApprovalView && elements.toggleMonthly) elements.toggleMonthly.addEventListener('click', () => { paymentFrequency = 'monthly'; updatePaymentToggleUI(); runCalculator(); });
 
-      if (!isApprovalView && elements.businessNameInput) {
-        elements.businessNameInput.addEventListener('input', runCalculator);
-      }
+      if (!isApprovalView && elements.businessNameInput) elements.businessNameInput.addEventListener('input', runCalculator);
 
       if (!isApprovalView && elements.termLengthMonthsInput) {
-        elements.termLengthMonthsInput.addEventListener('input', () => {
-          termLengthManualDirty = true;
-          runCalculator();
-        });
+        elements.termLengthMonthsInput.addEventListener('input', () => { termLengthManualDirty = true; runCalculator(); });
         elements.termLengthMonthsInput.addEventListener('blur', () => {
           const v = parseFloat(elements.termLengthMonthsInput.value);
           if (!isNaN(v) && v > 0) {
             const rounded = Math.round(v * 2) / 2;
-            elements.termLengthMonthsInput.value = Number.isInteger(rounded)
-              ? String(rounded)
-              : rounded.toFixed(1);
+            elements.termLengthMonthsInput.value = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
           }
           runCalculator();
         });
       }
 
-      // Settings vs Theme panels
+      // Separate toggles; close other panel when opening one
       if (!isApprovalView) {
         if (elements.repSettingsToggle && elements.repSettingsPanel) {
           elements.repSettingsToggle.addEventListener('click', () => {
@@ -1910,47 +1603,43 @@
       if (!isApprovalView && elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
       if (!isApprovalView && elements.companyNameInput) {
-        elements.companyNameInput.addEventListener('input', updateBrandDisplay);
+        elements.companyNameInput.addEventListener('input', () => {
+          currentCompanyName = elements.companyNameInput.value.trim();
+          updateBrandDisplay();
+        });
       }
 
       if (!isApprovalView && elements.logoInput) {
-        elements.logoInput.addEventListener('change', () => {
+        elements.logoInput.addEventListener('change', async () => {
           const file = elements.logoInput.files && elements.logoInput.files[0];
           if (!file) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const result = e.target?.result;
-            if (typeof result === 'string') {
-              currentLogoDataUrl = result;
+          try {
+            const dataUrl = await compressLogo(file);
+            currentLogoDataUrl = dataUrl;
+            applyLogoFromDataUrl(currentLogoDataUrl);
+          } catch (e) {
+            console.warn('Logo processing failed; using raw image.', e);
+            const reader = new FileReader();
+            reader.onload = ev => {
+              currentLogoDataUrl = typeof ev.target?.result === 'string' ? ev.target.result : '';
               applyLogoFromDataUrl(currentLogoDataUrl);
-            }
-          };
-          reader.readAsDataURL(file);
+            };
+            reader.readAsDataURL(file);
+          }
         });
       }
 
       if (!isApprovalView && elements.themeSelector) {
-        elements.themeSelector.addEventListener('change', e => {
-          currentTheme = e.target.value;
-          applyTheme();
-        });
+        elements.themeSelector.addEventListener('change', e => { currentTheme = e.target.value; applyTheme(); });
       }
       if (!isApprovalView && elements.accentSelector) {
-        elements.accentSelector.addEventListener('change', e => {
-          currentAccent = e.target.value;
-          applyTheme();
-        });
+        elements.accentSelector.addEventListener('change', e => { currentAccent = e.target.value; applyTheme(); });
       }
       if (!isApprovalView && elements.backgroundSelector) {
-        elements.backgroundSelector.addEventListener('change', e => {
-          currentBackground = e.target.value;
-          applyTheme();
-        });
+        elements.backgroundSelector.addEventListener('change', e => { currentBackground = e.target.value; applyTheme(); });
       }
 
-      if (!isApprovalView && elements.addOfferButton) {
-        elements.addOfferButton.addEventListener('click', handleAddOffer);
-      }
+      if (!isApprovalView && elements.addOfferButton) elements.addOfferButton.addEventListener('click', handleAddOffer);
 
       if (!isApprovalView && elements.shareLinkButton) {
         elements.shareLinkButton.addEventListener('click', async () => {
@@ -1968,42 +1657,22 @@
           const repName = elements.repNameInput?.value.trim() || '';
           const repEmail = elements.repEmailInput?.value.trim() || '';
           const repPhone = elements.repPhoneInput?.value.trim() || '';
-          const companyNameVal = elements.companyNameInput?.value.trim() || '';
+          const companyName = elements.companyNameInput?.value.trim() || '';
 
-          companyName = companyNameVal;
-          updateBrandDisplay();
-
-          const offersForUrl = savedOffers.map(o => ({
-            a: o.amount,
-            f: o.factor,
-            t: o.termMonths,
-            q: o.frequency || freq,
-          }));
+          const offersForUrl = savedOffers.map(o => ({ a: o.amount, f: o.factor, t: o.termMonths, q: o.frequency || freq }));
 
           const payload = {
-            a: amount,
-            f: factor,
-            t: term,
-            q: freq,
-            th: theme,
-            ac: accent,
-            bg: background,
-            b: businessName,
-            rn: repName,
-            re: repEmail,
-            rp: repPhone,
-            cn: companyNameVal,
+            a: amount, f: factor, t: term, q: freq,
+            th: theme, ac: accent, bg: background,
+            b: businessName, rn: repName, re: repEmail, rp: repPhone,
+            cn: companyName,
             o: offersForUrl,
-            lg: currentLogoDataUrl || '',
+            lg: currentLogoDataUrl || ''
           };
 
           const encoded = encodeConfig(payload);
           const url = new URL(window.location.href);
-          const params = new URLSearchParams({
-            c: encoded,
-            view: 'approval',
-          });
-          url.search = params.toString();
+          url.search = new URLSearchParams({ c: encoded, view: 'approval' }).toString();
           const shareUrl = url.toString();
 
           if (elements.shareLinkOutput && elements.shareLinkContainer) {
@@ -2019,33 +1688,25 @@
           };
 
           try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
+            if (navigator.clipboard?.writeText) {
               await navigator.clipboard.writeText(shareUrl);
               setStatus('Copied!');
             } else {
               throw new Error('Clipboard API not available');
             }
-          } catch (err) {
-            console.warn('Clipboard API failed, falling back:', err);
+          } catch {
             try {
               const ta = document.createElement('textarea');
               ta.value = shareUrl;
               ta.style.position = 'fixed';
-              ta.style.top = '0';
-              ta.style.left = '0';
+              ta.style.top = '0'; ta.style.left = '0';
               ta.style.opacity = '0';
               document.body.appendChild(ta);
-              ta.focus();
-              ta.select();
+              ta.focus(); ta.select();
               const ok = document.execCommand('copy');
               document.body.removeChild(ta);
-              if (ok) {
-                setStatus('Copied!');
-              } else {
-                throw new Error('execCommand copy failed');
-              }
-            } catch (fallbackErr) {
-              console.error('All copy methods failed:', fallbackErr);
+              setStatus(ok ? 'Copied!' : 'Copy failed');
+            } catch {
               setStatus('Copy failed');
             }
           }
@@ -2056,7 +1717,6 @@
       runCalculator();
       renderSavedOffers();
       updateAddOfferButtonState();
-      updateBrandDisplay();
     }
 
     initializeCalculator();
