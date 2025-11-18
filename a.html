@@ -84,7 +84,7 @@
       --border-primary: #1f2937;
       --text-primary: #f9fafb;
       --text-secondary: #e5e7eb;
-      --text-muted: #9ca3af;
+      --text-muted: #cbd5f5;
       --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.7);
     }
     html.theme-dark body {
@@ -101,9 +101,9 @@
       --bg-input: #000000;
       --bg-toggle-inactive: #111111;
       --border-primary: #171717;
-      --text-primary: #ffffff;
+      --text-primary: #f9fafb;
       --text-secondary: #e5e5e5;
-      --text-muted: #9ca3af;
+      --text-muted: #d1d5db;
       --accent-color: #ffffff;
       --accent-color-light: #e5e5e5;
       --accent-color-dark: #ffffff;
@@ -308,7 +308,7 @@
       --border-primary: #22c55e;
       --text-primary: #d1fae5;
       --text-secondary: #4ade80;
-      --text-muted: #22c55e;
+      --text-muted: #86efac;
       --accent-color: #22c55e;
       --accent-color-light: #4ade80;
       --accent-color-dark: #15803d;
@@ -538,6 +538,26 @@
       --accent-shadow: 0 0 18px rgba(146, 64, 14, 0.55);
     }
 
+    /* Fun extra accents */
+    html.accent-rainbow {
+      --accent-color: #ec4899;
+      --accent-color-light: #f97316;
+      --accent-color-dark: #4f46e5;
+      --accent-shadow: 0 0 24px rgba(236, 72, 153, 0.7);
+    }
+    html.accent-disco {
+      --accent-color: #a855f7;
+      --accent-color-light: #22d3ee;
+      --accent-color-dark: #be123c;
+      --accent-shadow: 0 0 24px rgba(168, 85, 247, 0.7);
+    }
+    html.accent-metallic {
+      --accent-color: #9ca3af;
+      --accent-color-light: #e5e7eb;
+      --accent-color-dark: #4b5563;
+      --accent-shadow: 0 0 22px rgba(148, 163, 184, 0.7);
+    }
+
     /* --------------------------------
      * SHARED UI
      * -------------------------------- */
@@ -585,7 +605,6 @@
     .text-hero {
       color: var(--accent-color);
     }
-    /* No glow in light-ish themes */
     html.theme-dark .text-hero,
     html.theme-black .text-hero,
     html.theme-ocean .text-hero,
@@ -766,7 +785,7 @@
      * -------------------------------- */
 
     html.bg-default body {
-      /* Use theme's background; no override */
+      /* use theme background */
     }
 
     html.bg-plain body {
@@ -784,6 +803,34 @@
         radial-gradient(circle at 0 0, rgba(248, 113, 113, 0.55), transparent 50%),
         radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.55), var(--bg-body));
     }
+
+    html.bg-grid body {
+      background-color: var(--bg-body);
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    html.bg-diagonal body {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.22),
+          rgba(236, 72, 153, 0.22)
+        ),
+        var(--bg-body);
+    }
+
+    html.bg-spotlight body {
+      background:
+        radial-gradient(
+          circle at 50% 0,
+          rgba(250, 204, 21, 0.45),
+          transparent 65%
+        ),
+        var(--bg-body);
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
@@ -792,18 +839,21 @@
 
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
-      <div class="flex flex-col items-center justify-center flex-shrink-0 gap-2">
-        <div class="flex items-center gap-2">
-          <img id="customLogoImg" class="h-6 w-auto hidden" alt="Logo" />
+      <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
+        <div class="flex items-center justify-center">
+          <img id="customLogoImg" class="h-7 w-auto hidden" alt="Logo" />
           <!-- Default logo -->
-          <svg id="defaultLogoSvg" class="h-6 w-6 text-hero" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg id="defaultLogoSvg" class="h-7 w-7 text-hero" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M16 3L7 6.5V15.5C7 21 10.8 25.9 16 27l9-3.5V6.5L16 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
             <path d="M12 11H17.5C19.985 11 22 13.015 22 15.5C22 17.985 19.985 20 17.5 20H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
             <path d="M12 11V21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
-          <span class="text-[11px] font-semibold tracking-wide text-secondary">TrustBureau.ai</span>
         </div>
-        <span class="text-xs font-semibold text-muted uppercase tracking-[0.18em]">
+        <div class="flex flex-col items-center leading-tight mt-1">
+          <span id="companyNameDisplay" class="text-[11px] font-semibold tracking-wide text-secondary"></span>
+          <span id="platformBrandDisplay" class="text-[10px] font-medium text-muted"></span>
+        </div>
+        <span class="text-xs font-semibold text-muted uppercase tracking-[0.18em] mt-1">
           APPROVAL CALCULATOR
         </span>
       </div>
@@ -831,7 +881,7 @@
       </div>
     </div>
 
-    <!-- REP SETTINGS PANEL (rep info + logo) -->
+    <!-- REP SETTINGS PANEL (rep info + logo + company name) -->
     <div id="repSettingsPanel"
          class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
@@ -839,6 +889,12 @@
         <span class="text-[11px] text-muted">Shown on client approval view</span>
       </div>
       <div class="grid grid-cols-1 gap-2 text-xs">
+        <div>
+          <label for="companyNameInput" class="block font-semibold text-muted">Company Name</label>
+          <input id="companyNameInput" type="text"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Your Company" />
+        </div>
         <div>
           <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
           <input id="repNameInput" type="text"
@@ -929,6 +985,9 @@
               <option value="accent-slate">Slate</option>
               <option value="accent-gray">Gray</option>
               <option value="accent-brown">Brown</option>
+              <option value="accent-rainbow">Rainbow</option>
+              <option value="accent-disco">Disco</option>
+              <option value="accent-metallic">Metallic</option>
             </select>
           </div>
           <div>
@@ -939,6 +998,9 @@
               <option value="bg-plain">Plain</option>
               <option value="bg-soft">Soft Gradient</option>
               <option value="bg-loud">Loud Gradient</option>
+              <option value="bg-grid">Grid</option>
+              <option value="bg-diagonal">Diagonal</option>
+              <option value="bg-spotlight">Spotlight</option>
             </select>
           </div>
         </div>
@@ -1193,6 +1255,10 @@
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
 
+      companyNameInput: document.getElementById('companyNameInput'),
+      companyNameDisplay: document.getElementById('companyNameDisplay'),
+      platformBrandDisplay: document.getElementById('platformBrandDisplay'),
+
       repNameInput: document.getElementById('repNameInput'),
       repEmailInput: document.getElementById('repEmailInput'),
       repPhoneInput: document.getElementById('repPhoneInput'),
@@ -1240,18 +1306,20 @@
     let currentAccent = 'accent-gold';
     let currentBackground = 'bg-default';
     let currentLogoDataUrl = '';
+    let companyName = '';
     let amountSliderMax = 1000000;
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
     let termLengthManualDirty = false;
 
-    // Load saved theme/accent/background/logo, fallback to system dark if no theme
+    // Load saved theme/accent/background/logo/company, fallback to system dark if no theme
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
       const storedBackground = localStorage.getItem('generic_offer_calc_bg');
       const storedLogo = localStorage.getItem('generic_offer_calc_logo');
+      const storedCompany = localStorage.getItem('generic_offer_calc_company');
 
       if (storedTheme) {
         currentTheme = storedTheme;
@@ -1261,6 +1329,7 @@
       if (storedAccent) currentAccent = storedAccent;
       if (storedBackground) currentBackground = storedBackground;
       if (storedLogo) currentLogoDataUrl = storedLogo;
+      if (storedCompany) companyName = storedCompany;
     } catch (_) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         currentTheme = 'theme-dark';
@@ -1487,6 +1556,36 @@
       } catch (_) {}
     }
 
+    function updateBrandDisplay() {
+      const brandEl = elements.companyNameDisplay;
+      const poweredEl = elements.platformBrandDisplay;
+
+      const inputVal = elements.companyNameInput
+        ? elements.companyNameInput.value.trim()
+        : '';
+      const name = inputVal || companyName || '';
+
+      companyName = name;
+
+      if (brandEl && poweredEl) {
+        if (name) {
+          brandEl.textContent = name;
+          poweredEl.textContent = 'powered by TrustBureau.ai';
+        } else {
+          brandEl.textContent = 'TrustBureau.ai';
+          poweredEl.textContent = '';
+        }
+      }
+
+      try {
+        if (companyName) {
+          localStorage.setItem('generic_offer_calc_company', companyName);
+        } else {
+          localStorage.removeItem('generic_offer_calc_company');
+        }
+      } catch (_) {}
+    }
+
     function updateRepDisplay() {
       if (!elements.repContactBlock) return;
 
@@ -1529,6 +1628,7 @@
       let repNameParam = '';
       let repEmailParam = '';
       let repPhoneParam = '';
+      let companyNameParam = '';
       let offersRaw = null;
 
       if (configParam) {
@@ -1547,13 +1647,13 @@
           if (typeof cfg.rn === 'string') repNameParam = cfg.rn;
           if (typeof cfg.re === 'string') repEmailParam = cfg.re;
           if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
+          if (typeof cfg.cn === 'string') companyNameParam = cfg.cn;
 
           if (typeof cfg.lg === 'string') currentLogoDataUrl = cfg.lg;
 
           if (Array.isArray(cfg.o)) offersRaw = cfg.o;
         }
       } else {
-        // Backwards compatible verbose params
         const amountParam = params.get('amount');
         if (amountParam) {
           const parsedAmount = parseFloat(amountParam);
@@ -1584,6 +1684,7 @@
         repNameParam = params.get('repName') || '';
         repEmailParam = params.get('repEmail') || '';
         repPhoneParam = params.get('repPhone') || '';
+        companyNameParam = params.get('companyNameHeader') || '';
 
         const offersParam = params.get('offers');
         if (offersParam) {
@@ -1594,6 +1695,10 @@
             console.error('Error parsing offers from URL', e);
           }
         }
+      }
+
+      if (companyNameParam) {
+        companyName = companyNameParam;
       }
 
       if (isApprovalView) {
@@ -1611,6 +1716,9 @@
       if (elements.repNameInput) elements.repNameInput.value = repNameParam;
       if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
       if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
+      if (elements.companyNameInput) {
+        elements.companyNameInput.value = companyName || '';
+      }
 
       paymentFrequency = freq || 'daily';
 
@@ -1625,6 +1733,8 @@
           )
         );
       }
+
+      updateBrandDisplay();
 
       if (isApprovalView) {
         if (elements.factorContainer) elements.factorContainer.style.display = 'none';
@@ -1779,7 +1889,7 @@
         });
       }
 
-      // Separate toggles for Settings vs Theme; closing the other when one opens
+      // Settings vs Theme panels
       if (!isApprovalView) {
         if (elements.repSettingsToggle && elements.repSettingsPanel) {
           elements.repSettingsToggle.addEventListener('click', () => {
@@ -1798,6 +1908,10 @@
       if (!isApprovalView && elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
       if (!isApprovalView && elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
       if (!isApprovalView && elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+
+      if (!isApprovalView && elements.companyNameInput) {
+        elements.companyNameInput.addEventListener('input', updateBrandDisplay);
+      }
 
       if (!isApprovalView && elements.logoInput) {
         elements.logoInput.addEventListener('change', () => {
@@ -1854,6 +1968,10 @@
           const repName = elements.repNameInput?.value.trim() || '';
           const repEmail = elements.repEmailInput?.value.trim() || '';
           const repPhone = elements.repPhoneInput?.value.trim() || '';
+          const companyNameVal = elements.companyNameInput?.value.trim() || '';
+
+          companyName = companyNameVal;
+          updateBrandDisplay();
 
           const offersForUrl = savedOffers.map(o => ({
             a: o.amount,
@@ -1874,6 +1992,7 @@
             rn: repName,
             re: repEmail,
             rp: repPhone,
+            cn: companyNameVal,
             o: offersForUrl,
             lg: currentLogoDataUrl || '',
           };
@@ -1937,6 +2056,7 @@
       runCalculator();
       renderSavedOffers();
       updateAddOfferButtonState();
+      updateBrandDisplay();
     }
 
     initializeCalculator();
