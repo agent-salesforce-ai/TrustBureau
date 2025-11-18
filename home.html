@@ -44,7 +44,6 @@
       --tb-green:  #16A34A;
     }
 
-    /* THEME SURFACES */
     body[data-theme="light"] {
       --tb-bg:          #F8FAFC;
       --tb-card:        #FFFFFF;
@@ -54,7 +53,10 @@
       --tb-muted:       #CBD5E1;
       --tb-chart-bg:    #FFFFFF;
       --tb-chart-axis:  #E2E8F0;
+      --tb-logo-shield: #FACC15;
+      --tb-logo-check:  #FFFFFF; /* white check in light mode */
     }
+
     body[data-theme="dark"] {
       --tb-bg:          #020617;
       --tb-card:        #020617;
@@ -64,6 +66,8 @@
       --tb-muted:       #475569;
       --tb-chart-bg:    #020617;
       --tb-chart-axis:  #334155;
+      --tb-logo-shield: #FACC15;
+      --tb-logo-check:  #000000; /* black check in dark mode */
     }
 
     .bg-brand-bg { background-color: var(--tb-bg) !important; }
@@ -72,23 +76,28 @@
     .text-brand-gray { color: var(--tb-gray) !important; }
     .border-brand-border { border-color: var(--tb-border) !important; }
 
+    .tb-logo-shield { fill: var(--tb-logo-shield); }
+    .tb-logo-check  { fill: var(--tb-logo-check); }
+
     body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
     .cta-button { transition: all .3s ease; }
-    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(15,23,42,.18); }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(15,23,42,.15); }
     .cta-button:active { transform: translateY(0); }
 
-    button,a { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+    button, a { -webkit-tap-highlight-color: transparent; cursor: pointer; }
 
     /* SCORE GAUGE */
     .score-circle {
       width: 120px; height: 120px; border-radius: 9999px;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 2.5rem;
-      border: 8px solid var(--tb-border); background-color: var(--tb-card); color: var(--tb-text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 2.5rem;
+      border: 8px solid var(--tb-border);
+      background-color: var(--tb-card); color: var(--tb-text);
     }
     .score-red    { border-color:#FCA5A5; color:#B91C1C; background-color:#FEF2F2; }
     .score-yellow { border-color:#FACC15; color:#92400E; background-color:#FEF9C3; }
@@ -102,54 +111,191 @@
     .chart-visual {
       border-left:1px solid var(--tb-chart-axis);
       border-bottom:1px solid var(--tb-chart-axis);
-      height:150px; display:flex; justify-content:space-around; align-items:flex-end;
-      padding:10px 12px 6px 12px; gap:8px; background-color:var(--tb-chart-bg);
+      height:150px;
+      display:flex;
+      justify-content:space-around;
+      align-items:flex-end;
+      padding:10px 12px 6px 12px;
+      gap:8px;
+      background-color:var(--tb-chart-bg);
     }
-    .chart-empty { font-size:.875rem; color:var(--tb-gray); padding:16px 4px 8px; text-align:center; width:100%; }
-    .bar-wrapper { flex:1; max-width:90px; height:100%; display:flex; flex-direction:column-reverse; align-items:center; position:relative; }
-    .bar { width:90%; max-width:40px; background-color:var(--tb-yellow); position:relative; min-height:2px; border-radius:4px 4px 0 0; transition:height .5s ease-out; }
+    .chart-empty {
+      font-size:.875rem;
+      color:var(--tb-gray);
+      padding:16px 4px 8px;
+      text-align:center;
+      width:100%;
+    }
+    .bar-wrapper {
+      flex:1;
+      max-width:90px;
+      height:100%;
+      display:flex;
+      flex-direction:column-reverse;
+      align-items:center;
+      position:relative;
+    }
+    .bar {
+      width:90%;
+      max-width:40px;
+      background-color:var(--tb-yellow);
+      position:relative;
+      min-height:2px;
+      border-radius:4px 4px 0 0;
+      transition:height .5s ease-out;
+    }
     .bar-green  { background-color:var(--tb-green); }
     .bar-grey   { background-color:var(--tb-muted); }
-    .bar-yellow { background-color:var(--tb-yellow); }
+    .bar-yellow { background-color:#EAB308; }
     .bar-red    { background-color:#DC2626; }
-    .bar-label  { font-size:.75rem; color:var(--tb-gray); padding-top:4px; text-align:center; font-weight:500; }
-    .bar-value  { position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:.75rem; color:var(--tb-text); font-weight:600; white-space:nowrap; }
+
+    .bar-label {
+      font-size:.75rem;
+      color:var(--tb-gray);
+      padding-top:4px;
+      text-align:center;
+      font-weight:500;
+    }
+    .bar-value {
+      position:absolute;
+      top:-20px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:.75rem;
+      color:var(--tb-text);
+      font-weight:600;
+      white-space:nowrap;
+    }
 
     /* TABLE */
-    .data-table { border-collapse:collapse; width:100%; font-size:.875rem; overflow-x:auto; display:block; }
-    .data-table th,.data-table td { padding:10px 12px; border-bottom:1px solid var(--tb-border); text-align:left; white-space:nowrap; }
-    .data-table th { background-color:rgba(148,163,184,.12); font-weight:600; color:var(--tb-gray); font-size:.75rem; text-transform:uppercase; }
+    .data-table {
+      border-collapse:collapse;
+      width:100%;
+      min-width:100%;
+      font-size:.875rem;
+      table-layout:auto;
+      display:table;
+    }
+    .data-table th,
+    .data-table td {
+      padding:10px 12px;
+      border-bottom:1px solid var(--tb-border);
+      text-align:left;
+      white-space:nowrap;
+    }
+    .data-table th {
+      background-color:rgba(148,163,184,.12);
+      font-weight:600;
+      color:var(--tb-gray);
+      font-size:.75rem;
+      text-transform:uppercase;
+    }
     .data-table tr:last-child td { border-bottom:none; }
-    .data-table .monthly-avg { font-weight:600; background-color:rgba(148,163,184,.12); color:var(--tb-text); border-top:1px solid var(--tb-border); }
-    .text-red-table{ color:#EF4444; } .text-green-table{ color:var(--tb-green); }
+    .data-table .monthly-avg {
+      font-weight:600;
+      background-color:rgba(148,163,184,.12);
+      color:var(--tb-text);
+      border-top:1px solid var(--tb-border);
+    }
+    .text-red-table{ color:#EF4444; }
+    .text-green-table{ color:var(--tb-green); }
 
     /* RISK CHECKLIST */
-    .risk-checklist-item{ display:flex; align-items:flex-start; gap:12px; font-size:.875rem; margin-bottom:.75rem; line-height:1.4; }
+    .risk-checklist-item{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      font-size:.875rem;
+      margin-bottom:.75rem;
+      line-height:1.4;
+    }
     .risk-checklist-item:last-child{ margin-bottom:0; }
     .risk-label{ flex:0 0 160px; color:var(--tb-text); font-weight:500; }
     .risk-status{ flex:1; font-weight:600; text-align:left; }
-    .risk-green{ color:var(--tb-green); } .risk-red{ color:#F87171; } .risk-yellow{ color:#EAB308; } .risk-grey{ color:var(--tb-gray); }
+    .risk-green{ color:var(--tb-green); }
+    .risk-red{ color:#F87171; }
+    .risk-yellow{ color:#EAB308; }
+    .risk-grey{ color:var(--tb-gray); }
 
-    /* HERO MOCK */
-    .hero-visual{ background-color:var(--tb-card); border:1px solid var(--tb-border); border-radius:.5rem; box-shadow:0 10px 20px rgba(15,23,42,.12); overflow:hidden; }
-    .hero-visual-header{ display:flex; align-items:center; padding:.75rem 1rem; background-color:rgba(148,163,184,.12); border-bottom:1px solid var(--tb-border); }
-    .hero-visual-header .dot{ height:.75rem; width:.75rem; border-radius:9999px; background-color:var(--tb-muted); margin-right:.5rem; }
-    .hero-visual-body{ padding:1.5rem; background-color:var(--tb-card); }
+    /* HERO VISUAL */
+    .hero-visual {
+      background-color:var(--tb-card);
+      border:1px solid var(--tb-border);
+      border-radius:.5rem;
+      box-shadow:0 10px 20px rgba(15,23,42,.12);
+      overflow:hidden;
+    }
+    .hero-visual-header {
+      display:flex;
+      align-items:center;
+      padding:.75rem 1rem;
+      background-color:rgba(148,163,184,.12);
+      border-bottom:1px solid var(--tb-border);
+    }
+    .hero-visual-header .dot {
+      height:.75rem;
+      width:.75rem;
+      border-radius:9999px;
+      background-color:var(--tb-muted);
+      margin-right:.5rem;
+    }
+    .hero-visual-body { padding:1.5rem; }
 
     /* HEADER SURFACE */
     .theme-header{ background-color:rgba(248,250,252,.9); }
     body[data-theme="dark"] .theme-header{ background-color:rgba(15,23,42,.9); }
 
     /* LOADER */
-    .report-loader{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding-top:3.5rem; padding-bottom:3.5rem; }
-    .loader-ring{ width:64px; height:64px; border-radius:9999px; border:4px solid var(--tb-border); border-top-color:var(--tb-yellow); animation:loader-spin 1s linear infinite; position:relative; }
-    .loader-dot{ position:absolute; width:12px; height:12px; border-radius:9999px; background-color:var(--tb-green); top:4px; right:4px; }
-    @keyframes loader-spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+    .report-loader{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding-top:3.5rem;
+      padding-bottom:3.5rem;
+    }
+    .loader-ring{
+      width:64px;
+      height:64px;
+      border-radius:9999px;
+      border:4px solid var(--tb-border);
+      border-top-color:var(--tb-yellow);
+      animation:loader-spin 1s linear infinite;
+      position:relative;
+    }
+    .loader-dot{
+      position:absolute;
+      width:12px;
+      height:12px;
+      border-radius:9999px;
+      background-color:var(--tb-green);
+      top:4px;
+      right:4px;
+    }
+    @keyframes loader-spin {
+      from { transform:rotate(0); }
+      to   { transform:rotate(360deg); }
+    }
     .loader-steps{ font-size:.875rem; }
-    .loader-step{ display:flex; align-items:center; padding:.4rem .75rem; border-radius:.75rem; color:var(--tb-gray); }
+    .loader-step{
+      display:flex;
+      align-items:center;
+      padding:.4rem .75rem;
+      border-radius:.75rem;
+      color:var(--tb-gray);
+    }
     .loader-step + .loader-step{ margin-top:.25rem; }
-    .loader-step-dot{ width:8px; height:8px; border-radius:9999px; margin-right:.5rem; background-color:#E5E7EB; }
-    .loader-step.active{ background-color:rgba(250,204,21,.08); color:#92400E; }
+    .loader-step-dot{
+      width:8px;
+      height:8px;
+      border-radius:9999px;
+      margin-right:.5rem;
+      background-color:#E5E7EB;
+    }
+    .loader-step.active{
+      background-color:rgba(250,204,21,.08);
+      color:#92400E;
+    }
     .loader-step.active .loader-step-dot{ background-color:var(--tb-yellow); }
     .loader-step.completed{ color:var(--tb-green); }
     .loader-step.completed .loader-step-dot{ background-color:var(--tb-green); }
@@ -168,10 +314,10 @@
     <div class="container mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
         <a href="#" class="flex items-center space-x-2" aria-label="TrustBureau.ai home">
-          <!-- Shield logo (brand yellow) -->
+          <!-- Shield logo with theme-aware check -->
           <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 2.25L4.5 5.25v6.75c0 4.17 3.01 7.98 7.5 9.75 4.49-1.77 7.5-5.58 7.5-9.75V5.25L12 2.25Z" fill="#FACC15"/>
-            <path d="M10.3 13.95 8 11.65l-1.2 1.2 3.5 3.5 6.9-6.9-1.2-1.2-5.7 5.7Z" fill="#000000"/>
+            <path class="tb-logo-shield" d="M12 2.25L4.5 5.25v6.75c0 4.17 3.01 7.98 7.5 9.75 4.49-1.77 7.5-5.58 7.5-9.75V5.25L12 2.25Z"/>
+            <path class="tb-logo-check" d="M10.3 13.95 8 11.65l-1.2 1.2 3.5 3.5 6.9-6.9-1.2-1.2-5.7 5.7Z"/>
           </svg>
           <span class="font-heading font-bold text-xl text-brand-dark">TrustBureau.ai</span>
         </a>
@@ -210,7 +356,9 @@
         <!-- Mobile menu button -->
         <div class="md:hidden">
           <button id="mobile-menu-btn" class="text-brand-dark p-2" aria-label="Toggle navigation menu" aria-expanded="false">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+            </svg>
           </button>
         </div>
       </div>
@@ -243,7 +391,9 @@
             <span id="theme-toggle-label-mobile">Light</span>
           </button>
 
-          <a href="#demo" class="mobile-nav-link cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 text-center">Search</a>
+          <a href="#demo" class="mobile-nav-link cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 text-center">
+            Search
+          </a>
         </nav>
       </div>
     </div>
@@ -263,8 +413,12 @@
               TrustBureau provides the world's most comprehensive AI-powered business verification and underwriting reports, enabling you to make decisions in seconds, not days.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300">Search</a>
-              <a href="#platform" class="cta-button bg-brand-card text-brand-dark font-bold py-4 px-8 rounded-lg text-lg border border-brand-border hover:border-brand-gray">Learn More</a>
+              <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300">
+                Search
+              </a>
+              <a href="#platform" class="cta-button bg-brand-card text-brand-dark font-bold py-4 px-8 rounded-lg text-lg border border-brand-border hover:border-brand-gray">
+                Learn More
+              </a>
             </div>
           </div>
 
@@ -276,12 +430,12 @@
             <div class="hero-visual-body" style="min-height: 400px;">
               <div class="space-y-4">
                 <div class="flex items-center space-x-4">
-                  <div class="score-circle score-green" style="width: 80px; height: 80px; font-size: 1.75rem; border-width: 6px;">
+                  <div class="score-circle score-green" style="width:80px;height:80px;font-size:1.75rem;border-width:6px;">
                     <span>780</span>
                   </div>
                   <div class="flex-1 space-y-2">
-                    <div class="h-6 bg-slate-200 rounded-md w-3/4"></div>
-                    <div class="h-4 bg-slate-100 rounded-md w-1/2"></div>
+                    <div class="h-6 rounded-md w-3/4 bg-slate-200"></div>
+                    <div class="h-4 rounded-md w-1/2 bg-slate-100"></div>
                   </div>
                 </div>
 
@@ -294,20 +448,36 @@
                   <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
                   <ul class="space-y-1.5">
                     <li class="flex items-start">
-                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
                       <span class="text-sm text-brand-dark">Active corporate filings</span>
                     </li>
                     <li class="flex items-start">
-                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
                       <span class="text-sm text-brand-dark">Positive cash flow</span>
                     </li>
                   </ul>
                 </div>
 
-                <div class="chart-visual" style="height: 100px; padding: 10px 12px 0 12px;">
-                  <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height: 60%;"></div><div class="bar-label" style="padding-top: 2px;">Sep</div></div>
-                  <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height: 80%;"></div><div class="bar-label" style="padding-top: 2px;">Oct</div></div>
-                  <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height: 75%;"></div><div class="bar-label" style="padding-top: 2px;">Nov</div></div>
+                <div class="chart-visual" style="height:100px;padding:10px 12px 0 12px;">
+                  <div class="bar-wrapper" title="Sep '24: $90.1B">
+                    <div class="bar-value">$90.1B</div>
+                    <div class="bar bar-green" style="height:60%;"></div>
+                    <div class="bar-label" style="padding-top:2px;">Sep</div>
+                  </div>
+                  <div class="bar-wrapper" title="Oct '24: $92.5B">
+                    <div class="bar-value">$92.5B</div>
+                    <div class="bar bar-green" style="height:80%;"></div>
+                    <div class="bar-label" style="padding-top:2px;">Oct</div>
+                  </div>
+                  <div class="bar-wrapper" title="Nov '24: $95.0B">
+                    <div class="bar-value">$95.0B</div>
+                    <div class="bar bar-green" style="height:75%;"></div>
+                    <div class="bar-label" style="padding-top:2px;">Nov</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -323,50 +493,58 @@
         <div id="main-widget-container" class="max-w-7xl mx-auto w-full transition-all duration-300 ease-in-out">
           <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-6 flex flex-col relative">
 
-            <!-- Search header (hidden by default, shown when clicking "Search") -->
-            <div id="report-search-header" class="max-w-xl mx-auto w-full" style="display: none;">
+            <!-- Search header (shown when clicking Search) -->
+            <div id="report-search-header" class="max-w-xl mx-auto w-full" style="display:none;">
               <h2 class="font-heading font-bold text-4xl text-brand-dark text-center">Try the Demo</h2>
-              <p class="text-lg text-brand-gray text-center mt-3 mb-8">Enter any business name to generate a live, comprehensive report in seconds.</p>
+              <p class="text-lg text-brand-gray text-center mt-3 mb-8">
+                Enter any business name to generate a live, comprehensive report in seconds.
+              </p>
               <div class="space-y-4">
                 <div>
                   <label for="business-name" class="block text-sm font-medium text-brand-dark text-center">Enter any Business Name</label>
                   <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-yellow focus:border-brand-yellow sm:text-sm bg-brand-card text-brand-dark" placeholder="e.g., Tesla, Inc. or Apex Innovations">
                 </div>
                 <button id="generate-report-btn" class="group relative w-full flex justify-center cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-wait">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-1" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
+                  </svg>
                   <span>Generate Report</span>
                 </button>
               </div>
             </div>
 
             <!-- Results container -->
-            <div id="report-results-ui" class="w-full" style="display: block;">
+            <div id="report-results-ui" class="w-full" style="display:block;">
 
               <!-- Loader -->
-              <div id="report-loader" style="display: none;" class="report-loader results-box">
+              <div id="report-loader" style="display:none;" class="report-loader results-box">
                 <div class="flex flex-col items-center">
-                  <div class="loader-ring relative"><div class="loader-dot"></div></div>
+                  <div class="loader-ring relative">
+                    <div class="loader-dot"></div>
+                  </div>
                   <p class="mt-4 text-base font-medium text-brand-dark">Building comprehensive report…</p>
                   <p id="loader-subtext" class="mt-1 text-sm text-brand-gray">Step 1 of 4 · Searching corporate filings</p>
                   <div class="loader-steps mt-6 w-full max-w-md">
-                    <div class="loader-step" data-step="0"><div class="loader-step-dot"></div><span>Corporate filings &amp; business registration</span></div>
-                    <div class="loader-step" data-step="1"><div class="loader-step-dot"></div><span>Financials, banking data &amp; debt obligations</span></div>
-                    <div class="loader-step" data-step="2"><div class="loader-step-dot"></div><span>News, reviews &amp; public sentiment</span></div>
+                    <div class="loader-step" data-step="0"><div class="loader-step-dot"></div><span>Corporate filings &amp; registration</span></div>
+                    <div class="loader-step" data-step="1"><div class="loader-step-dot"></div><span>Financials, banking &amp; debt</span></div>
+                    <div class="loader-step" data-step="2"><div class="loader-step-dot"></div><span>News, reviews &amp; sentiment</span></div>
                     <div class="loader-step" data-step="3"><div class="loader-step-dot"></div><span>Scoring risk &amp; assembling report</span></div>
                   </div>
                 </div>
               </div>
 
               <!-- Error -->
-              <div id="report-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
+              <div id="report-error-container" style="display:none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
                 <p class="text-sm font-bold text-red-700">An Error Occurred</p>
                 <p class="text-sm text-red-600 mt-1 text-center" id="report-error-message"></p>
               </div>
 
-              <h3 id="report-static-header" class="text-2xl font-heading font-bold text-brand-dark mb-4 text-center">Live AI Comprehensive Business Report</h3>
+              <h3 id="report-static-header" class="text-2xl font-heading font-bold text-brand-dark mb-4 text-center">
+                Live AI Comprehensive Business Report
+              </h3>
 
               <!-- Report content -->
-              <div id="report-content" class="w-full" style="display: block; margin-top: 1.5rem; border-top: 1px solid var(--tb-border); padding-top: 1.5rem;">
+              <div id="report-content" class="w-full" style="display:block;margin-top:1.5rem;border-top:1px solid var(--tb-border);padding-top:1.5rem;">
 
                 <div class="mb-6 pb-4 border-b border-brand-border">
                   <h2 id="report-company-name-header" class="text-3xl font-heading font-bold text-brand-dark text-center">Apple Inc. (Sample)</h2>
@@ -376,21 +554,43 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
                   <!-- Sidebar -->
                   <div class="lg:col-span-2 space-y-6">
+
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
-                        <div id="report-score-circle" class="score-circle mb-4 score-green"><span id="report-score-digit">810</span></div>
-                        <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic">Excellent financial health, strong brand, and consistent market leadership.</p>
+                        <div id="report-score-circle" class="score-circle mb-4 score-green">
+                          <span id="report-score-digit">810</span>
+                        </div>
+                        <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic">
+                          Excellent financial health, strong brand, and consistent market leadership.
+                        </p>
+
                         <div class="w-full text-left">
                           <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
                           <ul id="report-score-positives" class="space-y-1.5 mb-3">
-                            <li class="flex items-start"><svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-sm text-brand-dark">Massive cash reserves</span></li>
-                            <li class="flex items-start"><svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-sm text-brand-dark">High profitability</span></li>
+                            <li class="flex items-start">
+                              <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                              </svg>
+                              <span class="text-sm text-brand-dark">Massive cash reserves</span>
+                            </li>
+                            <li class="flex items-start">
+                              <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                              </svg>
+                              <span class="text-sm text-brand-dark">High profitability</span>
+                            </li>
                           </ul>
                           <ul id="report-score-negatives" class="space-y-1.5">
-                            <li class="flex items-start"><svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span class="text-sm text-brand-dark">Regulatory scrutiny</span></li>
+                            <li class="flex items-start">
+                              <svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                              </svg>
+                              <span class="text-sm text-brand-dark">Regulatory scrutiny</span>
+                            </li>
                           </ul>
                         </div>
                       </div>
@@ -474,15 +674,19 @@
                         </div>
                       </div>
                     </div>
+
                   </div>
 
-                  <!-- Main column -->
+                  <!-- Main Column -->
                   <div class="lg:col-span-3 space-y-6">
+
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Underwriting Recommendation</h4>
                       <div id="report-recommendation-box" class="p-4 border-l-4 rounded-r-lg bg-yellow-50 border-yellow-500 text-yellow-900">
                         <h5 id="report-recommendation-decision" class="font-heading font-bold text-2xl text-yellow-700">Approve</h5>
-                        <p id="report-recommendation-justification" class="text-sm mt-1">Recommendation is 'Approve' based on overwhelming financial strength, market dominance, and positive cash flow. Risk is negligible relative to operating income.</p>
+                        <p id="report-recommendation-justification" class="text-sm mt-1">
+                          Recommendation is 'Approve' based on overwhelming financial strength, market dominance, and positive cash flow. Risk is negligible relative to operating income.
+                        </p>
                       </div>
                     </div>
 
@@ -490,13 +694,18 @@
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Key Information</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul class="space-y-2 text-sm text-brand-gray">
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Website:</strong><span id="report-key-website" class="font-medium text-brand-dark sm:text-right break-all"><a href="//apple.com" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">apple.com</a></span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Industry:</strong><span id="report-key-industry" class="font-medium text-brand-dark sm:text-right break-words">Technology, Consumer Electronics</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>CEO:</strong><span id="report-key-ceo" class="font-medium text-brand-dark sm:text-right break-words">Tim Cook</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Founded:</strong><span id="report-key-founded" class="font-medium text-brand-dark sm:text-right break-words">1976</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Employees:</strong><span id="report-key-employees" class="font-medium text-brand-dark sm:text-right break-words">161,000+</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Phone:</strong><span id="report-key-phone" class="font-medium text-brand-dark sm:text-right break-words">(800) 275-2273</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Address:</strong><span id="report-key-address" class="font-medium text-brand-dark sm:text-right text-left break-words">One Apple Park Way, Cupertino, CA 95014</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between">
+                            <strong>Website:</strong>
+                            <span id="report-key-website" class="font-medium text-brand-dark sm:text-right break-all">
+                              <a href="//apple.com" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">apple.com</a>
+                            </span>
+                          </li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Industry:</strong> <span id="report-key-industry" class="font-medium text-brand-dark sm:text-right break-words">Technology, Consumer Electronics</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>CEO:</strong> <span id="report-key-ceo" class="font-medium text-brand-dark sm:text-right break-words">Tim Cook</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Founded:</strong> <span id="report-key-founded" class="font-medium text-brand-dark sm:text-right break-words">1976</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Employees:</strong> <span id="report-key-employees" class="font-medium text-brand-dark sm:text-right break-words">161,000+</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Phone:</strong> <span id="report-key-phone" class="font-medium text-brand-dark sm:text-right break-words">(800) 275-2273</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Address:</strong> <span id="report-key-address" class="font-medium text-brand-dark sm:text-right text-left break-words">One Apple Park Way, Cupertino, CA 95014</span></li>
                         </ul>
                       </div>
                     </div>
@@ -513,12 +722,12 @@
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul class="space-y-2 text-sm text-brand-gray">
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Name:</strong><span id="report-sos-name" class="font-medium text-brand-dark sm:text-right break-words">APPLE INC.</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Type:</strong><span id="report-sos-entity" class="font-medium text-brand-dark sm:text-right break-words">Corporation</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Status:</strong><span id="report-sos-status" class="font-medium text-brand-dark sm:text-right break-words text-brand-green">Active</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Jurisdiction:</strong><span id="report-sos-jurisdiction" class="font-medium text-brand-dark sm:text-right break-words">California</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Formation Date:</strong><span id="report-sos-date" class="font-medium text-brand-dark sm:text-right break-words">01/03/1977</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Registered Agent:</strong><span id="report-sos-agent" class="font-medium text-brand-dark sm:text-right break-words">CORPORATION SERVICE COMPANY</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark sm:text-right break-words">APPLE INC.</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark sm:text-right break-words">Corporation</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark sm:text-right break-words text-brand-green">Active</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark sm:text-right break-words">California</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark sm:text-right break-words">01/03/1977</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark sm:text-right break-words">CORPORATION SERVICE COMPANY</span></li>
                         </ul>
                       </div>
                     </div>
@@ -592,36 +801,38 @@
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Summary</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
-                        <div id="report-fin-public" style="display: block;">
+                        <div id="report-fin-public" style="display:block;">
                           <ul class="space-y-2 text-sm text-brand-gray">
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong><span class="font-medium text-brand-dark sm:text-right break-words">Public Company</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Ticker:</strong><span id="report-fin-ticker" class="font-medium text-brand-dark sm:text-right break-words">AAPL</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Market Cap:</strong><span id="report-fin-marketcap" class="font-medium text-brand-dark sm:text-right break-words">$2.85 Trillion</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Latest Revenue:</strong><span id="report-fin-revenue" class="font-medium text-brand-dark sm:text-right break-words">$383.29 Billion (TTM)</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Net Income:</strong><span id="report-fin-netincome" class="font-medium text-brand-dark sm:text-right break-words">$96.99 Billion (TTM)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Public Company</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Ticker:</strong> <span id="report-fin-ticker" class="font-medium text-brand-dark sm:text-right break-words">AAPL</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Market Cap:</strong> <span id="report-fin-marketcap" class="font-medium text-brand-dark sm:text-right break-words">$2.85 Trillion</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Latest Revenue:</strong> <span id="report-fin-revenue" class="font-medium text-brand-dark sm:text-right break-words">$383.29 Billion (TTM)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Net Income:</strong> <span id="report-fin-netincome" class="font-medium text-brand-dark sm:text-right break-words">$96.99 Billion (TTM)</span></li>
                           </ul>
                         </div>
-                        <div id="report-fin-private" style="display: none;">
+                        <div id="report-fin-private" style="display:none;">
                           <ul class="space-y-2 text-sm text-brand-gray">
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong><span class="font-medium text-brand-dark sm:text-right break-words">Private Company</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Annual Revenue:</strong><span id="report-fin-est-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Profit Margin:</strong><span id="report-fin-est-margin" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Cash on Hand:</strong><span id="report-fin-est-cash" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Private Company</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Annual Revenue:</strong> <span id="report-fin-est-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Profit Margin:</strong> <span id="report-fin-est-margin" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Cash on Hand:</strong> <span id="report-fin-est-cash" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
                           </ul>
                         </div>
 
-                        <div id="report-fin-credit" class="mt-4 pt-4 border-t border-brand-border">
+                        <div id="report-fin-credit" class="mt-4 pt-4 border-top border-brand-border">
                           <h5 class="text-sm font-semibold uppercase text-brand-gray mb-3">Credit Snapshot</h5>
                           <ul class="space-y-2 text-sm text-brand-gray">
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Decision:</strong><span id="report-fin-credit-decision" class="font-medium text-brand-dark sm:text-right break-words">Approve</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>FICO Score:</strong><span id="report-fin-credit-score" class="font-medium text-brand-dark sm:text-right break-words">810 (Est.)</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Total Debt (Credit):</strong><span id="report-fin-credit-total-debt" class="font-medium text-brand-dark sm:text-right break-words">$120.0B</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Revolving Debt:</strong><span id="report-fin-credit-revolving-debt" class="font-medium text-brand-dark sm:text-right break-words">$0 (N/A)</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Avg Monthly Revenue (Bank):</strong><span id="report-fin-credit-avg-revenue" class="font-medium text-brand-dark sm:text-right break-words">$31.9B</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Decision:</strong> <span id="report-fin-credit-decision" class="font-medium text-brand-dark sm:text-right break-words">Approve</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>FICO Score:</strong> <span id="report-fin-credit-score" class="font-medium text-brand-dark sm:text-right break-words">810 (Est.)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Total Debt (Credit):</strong> <span id="report-fin-credit-total-debt" class="font-medium text-brand-dark sm:text-right break-words">$120.0B</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Revolving Debt:</strong> <span id="report-fin-credit-revolving-debt" class="font-medium text-brand-dark sm:text-right break-words">$0 (N/A)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Avg Monthly Revenue (Bank):</strong> <span id="report-fin-credit-avg-revenue" class="font-medium text-brand-dark sm:text-right break-words">$31.9B</span></li>
                           </ul>
                         </div>
 
-                        <p id="report-fin-note" class="text-xs italic text-brand-gray mt-3 pt-3 border-t border-brand-border">Data sourced from public filings.</p>
+                        <p id="report-fin-note" class="text-xs italic text-brand-gray mt-3 pt-3 border-t border-brand-border">
+                          Data sourced from public filings.
+                        </p>
                       </div>
                     </div>
 
@@ -629,8 +840,16 @@
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Recent News</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-news-list" class="space-y-3">
-                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Apple unveils new M4 chips and AI-focused Macs</strong><p class="text-sm text-brand-gray mt-1 mb-2">Apple announced its next generation of chips, focusing heavily on on-device AI capabilities.</p><span class="text-xs text-brand-gray font-medium">Bloomberg</span></li>
-                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">DOJ Antitrust Trial Begins</strong><p class="text-sm text-brand-gray mt-1 mb-2">The Department of Justice has started its antitrust case against Apple, targeting App Store policies.</p><span class="text-xs text-brand-gray font-medium">Reuters</span></li>
+                          <li class="report-list-item">
+                            <strong class="text-sm font-medium text-brand-dark">Apple unveils new M4 chips and AI-focused Macs</strong>
+                            <p class="text-sm text-brand-gray mt-1 mb-2">Apple announced its next generation of chips, focusing heavily on on-device AI capabilities.</p>
+                            <span class="text-xs text-brand-gray font-medium">Bloomberg</span>
+                          </li>
+                          <li class="report-list-item">
+                            <strong class="text-sm font-medium text-brand-dark">DOJ Antitrust Trial Begins</strong>
+                            <p class="text-sm text-brand-gray mt-1 mb-2">The Department of Justice has started its antitrust case against Apple, targeting App Store policies.</p>
+                            <span class="text-xs text-brand-gray font-medium">Reuters</span>
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -640,11 +859,17 @@
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-reviews-list" class="space-y-4">
                           <blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item">
-                            <div class="flex justify-between items-center mb-1"><span class="text-sm font-medium text-brand-dark">Trustpilot</span><span class="text-sm font-bold text-brand-green">4.5/5</span></div>
+                            <div class="flex justify-between items-center mb-1">
+                              <span class="text-sm font-medium text-brand-dark">Trustpilot</span>
+                              <span class="text-sm font-bold text-brand-green">4.5/5</span>
+                            </div>
                             <p class="text-sm italic text-brand-gray">"Incredible products, but the customer service for repairs can be slow."</p>
                           </blockquote>
                           <blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item">
-                            <div class="flex justify-between items-center mb-1"><span class="text-sm font-medium text-brand-dark">ConsumerAffairs</span><span class="text-sm font-bold text-brand-green">4.2/5</span></div>
+                            <div class="flex justify-between items-center mb-1">
+                              <span class="text-sm font-medium text-brand-dark">ConsumerAffairs</span>
+                              <span class="text-sm font-bold text-brand-green">4.2/5</span>
+                            </div>
                             <p class="text-sm italic text-brand-gray">"The ecosystem is seamless, but I'm worried about being locked in."</p>
                           </blockquote>
                         </ul>
@@ -655,14 +880,24 @@
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Competitive Landscape</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-competitors-list" class="space-y-3">
-                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Samsung Electronics</strong><p class="text-sm text-brand-gray mt-1">Direct competitor in smartphones, tablets, and wearables. Strong global presence.</p></li>
-                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Microsoft</strong><p class="text-sm text-brand-gray mt-1">Competes in personal computing (Surface) and operating systems (Windows).</p></li>
-                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Google (Alphabet)</strong><p class="text-sm text-brand-gray mt-1">Competes in operating systems (Android), smartphones (Pixel), and cloud services.</p></li>
+                          <li class="report-list-item">
+                            <strong class="text-sm font-medium text-brand-dark">Samsung Electronics</strong>
+                            <p class="text-sm text-brand-gray mt-1">Direct competitor in smartphones, tablets, and wearables. Strong global presence.</p>
+                          </li>
+                          <li class="report-list-item">
+                            <strong class="text-sm font-medium text-brand-dark">Microsoft</strong>
+                            <p class="text-sm text-brand-gray mt-1">Competes in personal computing (Surface) and operating systems (Windows).</p>
+                          </li>
+                          <li class="report-list-item">
+                            <strong class="text-sm font-medium text-brand-dark">Google (Alphabet)</strong>
+                            <p class="text-sm text-brand-gray mt-1">Competes in operating systems (Android), smartphones (Pixel), and cloud services.</p>
+                          </li>
                         </ul>
                       </div>
                     </div>
 
                   </div>
+
                 </div>
 
                 <!-- Banking Snapshot -->
@@ -673,40 +908,40 @@
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-2">True Revenue (Last 3 Months)</h5>
                         <div id="banking-chart-revenue" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height:94.8421%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height:97.3684%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height:100%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height:94.8421%;"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height:97.3684%;"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height:100%;"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-2">Average Daily Balance</h5>
                         <div id="banking-chart-avg-balance" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $45.2B"><div class="bar-value">$45.2B</div><div class="bar bar-grey" style="height:100%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $42.1B"><div class="bar-value">$42.1B</div><div class="bar bar-grey" style="height:93.1415%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $44.8B"><div class="bar-value">$44.8B</div><div class="bar bar-grey" style="height:99.115%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $45.2B"><div class="bar-value">$45.2B</div><div class="bar bar-grey" style="height:100%;"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $42.1B"><div class="bar-value">$42.1B</div><div class="bar bar-grey" style="height:93.1415%;"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $44.8B"><div class="bar-value">$44.8B</div><div class="bar bar-grey" style="height:99.115%;"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-3">Ending Balance</h5>
                         <div id="banking-chart-end-balance" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $62.1B"><div class="bar-value">$62.1B</div><div class="bar bar-yellow" style="height:100%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $61.5B"><div class="bar-value">$61.5B</div><div class="bar bar-yellow" style="height:99.0338%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $61.9B"><div class="bar-value">$61.9B</div><div class="bar bar-yellow" style="height:99.6779%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $62.1B"><div class="bar-value">$62.1B</div><div class="bar bar-yellow" style="height:100%;"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $61.5B"><div class="bar-value">$61.5B</div><div class="bar bar-yellow" style="height:99.0338%;"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $61.9B"><div class="bar-value">$61.9B</div><div class="bar bar-yellow" style="height:99.6779%;"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-2">Debt Service (Monthly Payments)</h5>
                         <div id="banking-chart-debt" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height:100%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $1.1B"><div class="bar-value">$1.1B</div><div class="bar bar-red" style="height:91.6667%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height:100%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height:100%;"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $1.1B"><div class="bar-value">$1.1B</div><div class="bar bar-red" style="height:91.6667%;"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height:100%;"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Monthly Breakdown full-width -->
+                <!-- Monthly Breakdown (full width) -->
                 <div class="mt-6">
                   <h4 class="font-heading font-semibold text-brand-dark mb-3">Monthly Financial Breakdown (Fictional)</h4>
                   <div class="p-4 border border-brand-border rounded-lg bg-brand-card w-full">
@@ -772,7 +1007,7 @@
                 </div>
 
                 <!-- Sources -->
-                <div id="report-sources-container" class="mt-8 border-t border-brand-border pt-6" style="display: block;">
+                <div id="report-sources-container" class="mt-8 border-t border-brand-border pt-6" style="display:block;">
                   <h5 class="text-sm font-semibold text-brand-gray uppercase mb-3">Data Sources</h5>
                   <ul id="report-sources" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 list-disc list-inside">
                     <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">Apple Inc. (AAPL) SEC Filings</a></li>
@@ -801,12 +1036,131 @@
               Our platform provides a complete, end-to-end solution for AI governance, risk, and compliance (GRC).
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Model Auditing</h3><p class="mt-2 text-brand-gray">Generate independent audit reports for performance, safety, and security.</p></div>
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Bias &amp; Fairness</h3><p class="mt-2 text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p></div>
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Security &amp; Robustness</h3><p class="mt-2 text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p></div>
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Explainable AI (XAI)</h3><p class="mt-2 text-brand-gray">Generate human-readable explanations for complex model decisions.</p></div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                <h3 class="font-semibold text-lg text-brand-dark">Model Auditing</h3>
+                <p class="mt-2 text-brand-gray">Generate independent audit reports for performance, safety, and security.</p>
+              </div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                <h3 class="font-semibold text-lg text-brand-dark">Bias &amp; Fairness</h3>
+                <p class="mt-2 text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p>
+              </div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                <h3 class="font-semibold text-lg text-brand-dark">Security &amp; Robustness</h3>
+                <p class="mt-2 text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p>
+              </div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
+                <h3 class="font-semibold text-lg text-brand-dark">Explainable AI (XAI)</h3>
+                <p class="mt-2 text-brand-gray">Generate human-readable explanations for complex model decisions.</p>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it Works -->
+    <section id="how-it-works" class="py-24 bg-brand-bg">
+      <div class="container mx-auto px-6">
+        <h2 class="text-xs text-brand-yellow font-semibold text-center uppercase tracking-wider">How it Works</h2>
+        <h3 class="font-heading font-bold text-4xl text-brand-dark text-center mt-3">From Search to Decision in Seconds</h3>
+        <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">
+          Our powerful AI engine rapidly aggregates and analyzes vast amounts of data to deliver actionable insights.
+        </p>
+
+        <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div class="flex items-start mb-6">
+              <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
+                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h4 class="text-xl font-semibold text-brand-dark">Search &amp; Initiate</h4>
+                <p class="mt-1 text-brand-gray">Simply enter a business name to begin the AI underwriting process.</p>
+              </div>
+            </div>
+            <div class="flex items-start mb-6">
+              <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
+                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-4m0 0h4m-4 0l-4 4m4-4l4 4m6-6v4m0 0h-4m4 0l4-4m-4 4l-4-4m-6 0H6m0 0v-4m0 4l-4-4m4 4l-4 4m6-6v4"/>
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h4 class="text-xl font-semibold text-brand-dark">AI-Powered Data Aggregation</h4>
+                <p class="mt-1 text-brand-gray">Our engine gathers and synthesizes data from thousands of sources in real-time.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
+                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h4 class="text-xl font-semibold text-brand-dark">Instant, Actionable Reports</h4>
+                <p class="mt-1 text-brand-gray">Receive a comprehensive, easy-to-understand report for immediate decision-making.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual mt-12 lg:mt-0" aria-hidden="true">
+            <div class="hero-visual-header">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <div class="hero-visual-body">
+              <div class="space-y-4">
+                <div class="flex items-center space-x-4">
+                  <div class="score-circle score-red" style="width:80px;height:80px;font-size:1.75rem;border-width:6px;">
+                    <span>420</span>
+                  </div>
+                  <div class="flex-1 space-y-2">
+                    <div class="h-6 bg-slate-200 rounded-md w-3/4"></div>
+                    <div class="h-4 bg-slate-100 rounded-md w-1/2"></div>
+                  </div>
+                </div>
+
+                <div class="p-3 border-l-4 rounded-r-lg bg-red-50 border-red-500 text-red-800">
+                  <h5 class="font-heading font-bold text-lg text-red-700">Decline</h5>
+                  <p class="text-sm mt-1">Multiple active tax liens and no web presence.</p>
+                </div>
+
+                <div>
+                  <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
+                  <ul class="space-y-1.5">
+                    <li class="flex items-start">
+                      <svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                      </svg>
+                      <span class="text-sm text-brand-dark">Active State Tax Lien</span>
+                    </li>
+                    <li class="flex items-start">
+                      <svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                      </svg>
+                      <span class="text-sm text-brand-dark">No verifiable web presence</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="chart-visual" style="height:100px;padding:10px 12px 0 12px;">
+                  <div class="bar-wrapper">
+                    <div class="bar bar-red" style="height:60%;"></div>
+                    <div class="bar-label" style="padding-top:2px;">Sep</div>
+                  </div>
+                  <div class="bar-wrapper">
+                    <div class="bar bar-red" style="height:40%;"></div>
+                    <div class="bar-label" style="padding-top:2px;">Oct</div>
+                  </div>
+                  <div class="bar-wrapper">
+                    <div class="bar bar-red" style="height:35%;"></div>
+                    <div class="bar-label" style="padding-top:2px;">Nov</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -816,45 +1170,116 @@
       <div class="container mx-auto px-6">
         <h2 class="text-xs text-brand-yellow font-semibold text-center uppercase tracking-wider">Pricing</h2>
         <h3 class="font-heading font-bold text-4xl text-brand-dark text-center mt-3">Simple, Transparent Pricing</h3>
-        <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">Choose the plan that's right for your business. No hidden fees, no long-term contracts.</p>
+        <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">
+          Choose the plan that's right for your business. No hidden fees, no long-term contracts.
+        </p>
         <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-8 flex flex-col">
             <h4 class="font-heading font-bold text-2xl text-brand-dark">Standard</h4>
             <p class="mt-2 text-brand-gray">For individuals and small teams.</p>
-            <div class="mt-6"><span class="font-heading font-extrabold text-5xl text-brand-dark">$10</span><span class="text-lg text-brand-gray">/ report</span></div>
+            <div class="mt-6">
+              <span class="font-heading font-extrabold text-5xl text-brand-dark">$10</span>
+              <span class="text-lg text-brand-gray">/ report</span>
+            </div>
             <ul class="mt-8 space-y-4 text-brand-gray">
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Comprehensive AI Report</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Public Records Check</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Basic Risk Score</li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Comprehensive AI Report
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Public Records Check
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Basic Risk Score
+              </li>
             </ul>
-            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">Get Started</a>
+            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">
+              Get Started
+            </a>
           </div>
 
           <div class="bg-brand-card border-2 border-brand-yellow rounded-lg shadow-2xl p-8 flex flex-col relative overflow-hidden">
             <span class="absolute top-0 right-0 bg-brand-yellow text-black text-xs font-bold px-4 py-1 rounded-bl-lg">Most Popular</span>
             <h4 class="font-heading font-bold text-2xl text-brand-dark">Pro</h4>
             <p class="mt-2 text-brand-gray">For growing businesses and lenders.</p>
-            <div class="mt-6"><span class="font-heading font-extrabold text-5xl text-brand-dark">$500</span><span class="text-lg text-brand-gray">/ mo</span></div>
+            <div class="mt-6">
+              <span class="font-heading font-extrabold text-5xl text-brand-dark">$500</span>
+              <span class="text-lg text-brand-gray">/ mo</span>
+            </div>
             <ul class="mt-8 space-y-4 text-brand-gray">
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>100 Reports / month</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Bank Data Analysis</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Advanced Risk Score</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Sentiment Analysis</li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                100 Reports / month
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Bank Data Analysis
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Advanced Risk Score
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Sentiment Analysis
+              </li>
             </ul>
-            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 mt-8">Get Started</a>
+            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 mt-8">
+              Get Started
+            </a>
           </div>
 
           <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-8 flex flex-col">
             <h4 class="font-heading font-bold text-2xl text-brand-dark">Enterprise</h4>
             <p class="mt-2 text-brand-gray">For large-scale operations.</p>
-            <div class="mt-6"><span class="font-heading font-extrabold text-4xl text-brand-dark">Custom</span></div>
+            <div class="mt-6">
+              <span class="font-heading font-extrabold text-4xl text-brand-dark">Custom</span>
+            </div>
             <ul class="mt-8 space-y-4 text-brand-gray">
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Unlimited Reports</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Full API Access</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>AI Governance Suite</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Dedicated Support</li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Unlimited Reports
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Full API Access
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                AI Governance Suite
+              </li>
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Dedicated Support
+              </li>
             </ul>
-            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">Contact Sales</a>
+            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">
+              Contact Sales
+            </a>
           </div>
         </div>
       </div>
@@ -866,9 +1291,9 @@
     <div class="container mx-auto px-6 py-12">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="flex items-center space-x-2">
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2.5 7.5V17C2.5 19.5 6.6 22 12 22C17.4 22 21.5 19.5 21.5 17V7.5L12 2Z" fill="#FACC15"/>
-            <path d="M10.5 15.1999L17.5 8.19995L16.1 6.79995L10.5 12.3999L7.7 9.59995L6.3 10.9999L10.5 15.1999Z" fill="#000000"/>
+          <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path class="tb-logo-shield" d="M12 2.25L4.5 5.25v6.75c0 4.17 3.01 7.98 7.5 9.75 4.49-1.77 7.5-5.58 7.5-9.75V5.25L12 2.25Z"/>
+            <path class="tb-logo-check" d="M10.5 15.1999L17.5 8.19995L16.1 6.79995L10.5 12.3999L7.7 9.59995L6.3 10.9999L10.5 15.1999Z"/>
           </svg>
           <span class="font-heading font-bold text-xl text-brand-dark">TrustBureau.ai</span>
         </div>
@@ -878,7 +1303,9 @@
           <a href="#demo" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Demo</a>
         </nav>
       </div>
-      <div class="mt-8 text-center text-brand-gray text-sm">&copy; 2025 TrustBureau.ai. All rights reserved.</div>
+      <div class="mt-8 text-center text-brand-gray text-sm">
+        &copy; 2025 TrustBureau.ai. All rights reserved.
+      </div>
     </div>
   </footer>
 
@@ -907,548 +1334,709 @@
 
 <!-- Script -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    /*** GET REFS ***/
-    const bankingChartAvgBalance = document.getElementById('banking-chart-avg-balance');
-    const bankingChartDebt = document.getElementById('banking-chart-debt');
-    const bankingChartEndBalance = document.getElementById('banking-chart-end-balance');
-    const bankingChartRevenue = document.getElementById('banking-chart-revenue');
-    const businessNameInput = document.getElementById('business-name');
-    const companyNameHeader = document.getElementById('report-company-name-header');
-    const competitorsList = document.getElementById('report-competitors-list');
-    const contentContainer = document.getElementById('report-content');
-    const debtObligationsList = document.getElementById('report-debt-obligations-list');
-    const errorContainer = document.getElementById('report-error-container');
-    const errorMessage = document.getElementById('report-error-message');
-    const finCreditAvgRevenue = document.getElementById('report-fin-credit-avg-revenue');
-    const finCreditDecision = document.getElementById('report-fin-credit-decision');
-    const finCreditRevolvingDebt = document.getElementById('report-fin-credit-revolving-debt');
-    const finCreditScore = document.getElementById('report-fin-credit-score');
-    const finCreditTotalDebt = document.getElementById('report-fin-credit-total-debt');
-    const finEstCash = document.getElementById('report-fin-est-cash');
-    const finEstMargin = document.getElementById('report-fin-est-margin');
-    const finEstRevenue = document.getElementById('report-fin-est-revenue');
-    const finMarketCap = document.getElementById('report-fin-marketcap');
-    const finNetIncome = document.getElementById('report-fin-netincome');
-    const finNote = document.getElementById('report-fin-note');
-    const finPrivateDiv = document.getElementById('report-fin-private');
-    const finPublicDiv = document.getElementById('report-fin-public');
-    const finRevenue = document.getElementById('report-fin-revenue');
-    const finTicker = document.getElementById('report-fin-ticker');
-    const generateReportBtn = document.getElementById('generate-report-btn');
-    const keyAddress = document.getElementById('report-key-address');
-    const keyCeo = document.getElementById('report-key-ceo');
-    const keyEmployees = document.getElementById('report-key-employees');
-    const keyFounded = document.getElementById('report-key-founded');
-    const keyIndustry = document.getElementById('report-key-industry');
-    const keyPhone = document.getElementById('report-key-phone');
-    const keyWebsite = document.getElementById('report-key-website');
-    const legalList = document.getElementById('report-legal-list');
-    const loader = document.getElementById('report-loader');
-    const loaderSubtext = document.getElementById('loader-subtext');
-    const loaderStepEls = document.querySelectorAll('.loader-step');
-    const mainWidgetContainer = document.getElementById('main-widget-container');
-    const mapFallback = document.getElementById('report-map-fallback');
-    const mapIframe = document.getElementById('report-map-iframe');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const monthlyBreakdownBody = document.getElementById('report-monthly-breakdown-body');
-    const newsList = document.getElementById('report-news-list');
-    const positiveList = document.getElementById('report-score-positives');
-    const recommendationBox = document.getElementById('report-recommendation-box');
-    const recommendationDecision = document.getElementById('report-recommendation-decision');
-    const recommendationJustification = document.getElementById('report-recommendation-justification');
-    const recordsList = document.getElementById('report-records-list');
-    const reportSearchHeader = document.getElementById('report-search-header');
-    const reportStaticHeader = document.getElementById('report-static-header');
-    const resultsUi = document.getElementById('report-results-ui');
-    const reviewsList = document.getElementById('report-reviews-list');
-    const riskChecklist = document.getElementById('report-risk-checklist');
-    const scoreCircle = document.getElementById('report-score-circle');
-    const scoreDigit = document.getElementById('report-score-digit');
-    const scoreJustification = document.getElementById('report-score-justification');
-    const counterpartiesList = document.getElementById('report-counterparties-list');
-    const negativeList = document.getElementById('report-score-negatives');
-    const sentimentJustification = document.getElementById('report-sentiment-justification');
-    const sentimentRating = document.getElementById('report-sentiment-rating');
-    const sosAgent = document.getElementById('report-sos-agent');
-    const sosDate = document.getElementById('report-sos-date');
-    const sosEntity = document.getElementById('report-sos-entity');
-    const sosJurisdiction = document.getElementById('report-sos-jurisdiction');
-    const sosName = document.getElementById('report-sos-name');
-    const sosStatus = document.getElementById('report-sos-status');
-    const sourcesContainer = document.getElementById('report-sources-container');
-    const sourcesList = document.getElementById('report-sources');
-    const summaryHeader = document.getElementById('report-summary-header');
-    const swotOpportunities = document.getElementById('report-swot-opportunities');
-    const swotStrengths = document.getElementById('report-swot-strengths');
-    const swotThreats = document.getElementById('report-swot-threats');
-    const swotWeaknesses = document.getElementById('report-swot-weaknesses');
+  document.addEventListener('DOMContentLoaded', function () {
+    /* THEME TOGGLE */
+    var themeToggleBtn = document.getElementById('theme-toggle-btn');
+    var themeIconSun = document.getElementById('theme-icon-sun');
+    var themeIconMoon = document.getElementById('theme-icon-moon');
+    var themeLabel = document.getElementById('theme-toggle-label');
 
-    /* THEME TOGGLE (persisted) */
-    const themeToggleBtn = document.getElementById('theme-toggle-btn');
-    const themeIconSun = document.getElementById('theme-icon-sun');
-    const themeIconMoon = document.getElementById('theme-icon-moon');
-    const themeLabel = document.getElementById('theme-toggle-label');
-    const themeToggleBtnMobile = document.getElementById('theme-toggle-btn-mobile');
-    const themeIconSunMobile = document.getElementById('theme-icon-sun-mobile');
-    const themeIconMoonMobile = document.getElementById('theme-icon-moon-mobile');
-    const themeLabelMobile = document.getElementById('theme-toggle-label-mobile');
+    var themeToggleBtnMobile = document.getElementById('theme-toggle-btn-mobile');
+    var themeIconSunMobile = document.getElementById('theme-icon-sun-mobile');
+    var themeIconMoonMobile = document.getElementById('theme-icon-moon-mobile');
+    var themeLabelMobile = document.getElementById('theme-toggle-label-mobile');
 
     function updateThemeVisual(theme) {
-      const isDark = theme === 'dark';
+      var isDark = theme === 'dark';
+
       if (themeIconSun) themeIconSun.classList.toggle('hidden', isDark);
       if (themeIconMoon) themeIconMoon.classList.toggle('hidden', !isDark);
       if (themeLabel) themeLabel.textContent = isDark ? 'Dark' : 'Light';
+
       if (themeIconSunMobile) themeIconSunMobile.classList.toggle('hidden', isDark);
       if (themeIconMoonMobile) themeIconMoonMobile.classList.toggle('hidden', !isDark);
       if (themeLabelMobile) themeLabelMobile.textContent = isDark ? 'Dark' : 'Light';
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+      var metaTheme = document.querySelector('meta[name="theme-color"]');
       if (metaTheme) metaTheme.setAttribute('content', isDark ? '#020617' : '#F8FAFC');
     }
+
     function applyTheme(theme) {
-      const finalTheme = theme === 'dark' ? 'dark' : 'light';
+      var finalTheme = theme === 'dark' ? 'dark' : 'light';
       document.body.setAttribute('data-theme', finalTheme);
-      localStorage.setItem('tb-theme', finalTheme);
+      try { localStorage.setItem('tb-theme', finalTheme); } catch (e) {}
       updateThemeVisual(finalTheme);
     }
-    applyTheme(localStorage.getItem('tb-theme') || 'light');
-    if (themeToggleBtn) themeToggleBtn.addEventListener('click', () => applyTheme((document.body.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light'));
-    if (themeToggleBtnMobile) themeToggleBtnMobile.addEventListener('click', () => applyTheme((document.body.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light'));
+
+    var savedTheme = null;
+    try { savedTheme = localStorage.getItem('tb-theme'); } catch (e) {}
+    applyTheme(savedTheme || 'light');
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', function () {
+        var current = document.body.getAttribute('data-theme') || 'light';
+        applyTheme(current === 'light' ? 'dark' : 'light');
+      });
+    }
+    if (themeToggleBtnMobile) {
+      themeToggleBtnMobile.addEventListener('click', function () {
+        var current = document.body.getAttribute('data-theme') || 'light';
+        applyTheme(current === 'light' ? 'dark' : 'light');
+      });
+    }
 
     /* SETTINGS MODAL */
-    const settingsModal = document.getElementById('settings-modal');
-    const settingsBtn = document.getElementById('settings-btn');
-    const settingsBtnMobile = document.getElementById('settings-btn-mobile');
-    const settingsSaveBtn = document.getElementById('settings-save-btn');
-    const settingsCancelBtn = document.getElementById('settings-cancel-btn');
-    const settingsCloseBtn = document.getElementById('settings-close-btn');
-    const settingsApiInput = document.getElementById('settings-api-key-input');
+    var settingsModal = document.getElementById('settings-modal');
+    var settingsBtn = document.getElementById('settings-btn');
+    var settingsBtnMobile = document.getElementById('settings-btn-mobile');
+    var settingsSaveBtn = document.getElementById('settings-save-btn');
+    var settingsCancelBtn = document.getElementById('settings-cancel-btn');
+    var settingsCloseBtn = document.getElementById('settings-close-btn');
+    var settingsApiInput = document.getElementById('settings-api-key-input');
 
     function openSettingsModal() {
-      settingsModal.classList.remove('hidden'); settingsModal.classList.add('flex');
-      const existingKey = localStorage.getItem('tb-gemini-key') || '';
-      settingsApiInput.value = existingKey;
-      setTimeout(() => settingsApiInput.focus(), 50);
+      if (!settingsModal) return;
+      settingsModal.classList.remove('hidden');
+      settingsModal.classList.add('flex');
+      var existingKey = '';
+      try { existingKey = localStorage.getItem('tb-gemini-key') || ''; } catch (e) {}
+      if (settingsApiInput) settingsApiInput.value = existingKey;
+      setTimeout(function () { if (settingsApiInput) settingsApiInput.focus(); }, 50);
     }
-    function closeSettingsModal() { settingsModal.classList.add('hidden'); settingsModal.classList.remove('flex'); }
+
+    function closeSettingsModal() {
+      if (!settingsModal) return;
+      settingsModal.classList.add('hidden');
+      settingsModal.classList.remove('flex');
+    }
 
     if (settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
     if (settingsBtnMobile) settingsBtnMobile.addEventListener('click', openSettingsModal);
     if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeSettingsModal);
     if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettingsModal);
-    if (settingsModal) settingsModal.addEventListener('click', (e)=>{ if(e.target===settingsModal) closeSettingsModal(); });
-    if (settingsSaveBtn) settingsSaveBtn.addEventListener('click', () => {
-      const key = (settingsApiInput.value || '').trim();
-      if (key) localStorage.setItem('tb-gemini-key', key); else localStorage.removeItem('tb-gemini-key');
-      closeSettingsModal();
+    if (settingsModal) {
+      settingsModal.addEventListener('click', function (e) {
+        if (e.target === settingsModal) closeSettingsModal();
+      });
+    }
+    if (settingsSaveBtn) {
+      settingsSaveBtn.addEventListener('click', function () {
+        var key = settingsApiInput ? settingsApiInput.value.trim() : '';
+        try {
+          if (key) localStorage.setItem('tb-gemini-key', key);
+          else localStorage.removeItem('tb-gemini-key');
+        } catch (e) {}
+        closeSettingsModal();
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && settingsModal && !settingsModal.classList.contains('hidden')) {
+        closeSettingsModal();
+      }
     });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !settingsModal.classList.contains('hidden')) closeSettingsModal(); });
 
-    /* LOADER STEPS */
-    let loaderIntervalId = null;
-    let loaderStepIndex = 0;
-    const loaderStepMessages = [
+    /* EXISTING REPORT SCRIPT (adapted for settings + loader steps) */
+
+    var bankingChartAvgBalance = document.getElementById('banking-chart-avg-balance');
+    var bankingChartDebt = document.getElementById('banking-chart-debt');
+    var bankingChartEndBalance = document.getElementById('banking-chart-end-balance');
+    var bankingChartRevenue = document.getElementById('banking-chart-revenue');
+    var businessNameInput = document.getElementById('business-name');
+    var companyNameHeader = document.getElementById('report-company-name-header');
+    var competitorsList = document.getElementById('report-competitors-list');
+    var contentContainer = document.getElementById('report-content');
+    var debtObligationsList = document.getElementById('report-debt-obligations-list');
+    var errorContainer = document.getElementById('report-error-container');
+    var errorMessage = document.getElementById('report-error-message');
+    var finCreditAvgRevenue = document.getElementById('report-fin-credit-avg-revenue');
+    var finCreditDecision = document.getElementById('report-fin-credit-decision');
+    var finCreditRevolvingDebt = document.getElementById('report-fin-credit-revolving-debt');
+    var finCreditScore = document.getElementById('report-fin-credit-score');
+    var finCreditTotalDebt = document.getElementById('report-fin-credit-total-debt');
+    var finEstCash = document.getElementById('report-fin-est-cash');
+    var finEstMargin = document.getElementById('report-fin-est-margin');
+    var finEstRevenue = document.getElementById('report-fin-est-revenue');
+    var finMarketCap = document.getElementById('report-fin-marketcap');
+    var finNetIncome = document.getElementById('report-fin-netincome');
+    var finNote = document.getElementById('report-fin-note');
+    var finPrivateDiv = document.getElementById('report-fin-private');
+    var finPublicDiv = document.getElementById('report-fin-public');
+    var finRevenue = document.getElementById('report-fin-revenue');
+    var finTicker = document.getElementById('report-fin-ticker');
+    var generateReportBtn = document.getElementById('generate-report-btn');
+    var keyAddress = document.getElementById('report-key-address');
+    var keyCeo = document.getElementById('report-key-ceo');
+    var keyEmployees = document.getElementById('report-key-employees');
+    var keyFounded = document.getElementById('report-key-founded');
+    var keyIndustry = document.getElementById('report-key-industry');
+    var keyPhone = document.getElementById('report-key-phone');
+    var keyWebsite = document.getElementById('report-key-website');
+    var legalList = document.getElementById('report-legal-list');
+    var loader = document.getElementById('report-loader');
+    var loaderSubtext = document.getElementById('loader-subtext');
+    var loaderStepEls = document.querySelectorAll('.loader-step');
+    var mainWidgetContainer = document.getElementById('main-widget-container');
+    var mapFallback = document.getElementById('report-map-fallback');
+    var mapIframe = document.getElementById('report-map-iframe');
+    var mobileMenu = document.getElementById('mobile-menu');
+    var mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    var monthlyBreakdownBody = document.getElementById('report-monthly-breakdown-body');
+    var newsList = document.getElementById('report-news-list');
+    var positiveList = document.getElementById('report-score-positives');
+    var recommendationBox = document.getElementById('report-recommendation-box');
+    var recommendationDecision = document.getElementById('report-recommendation-decision');
+    var recommendationJustification = document.getElementById('report-recommendation-justification');
+    var recordsList = document.getElementById('report-records-list');
+    var reportSearchHeader = document.getElementById('report-search-header');
+    var reportStaticHeader = document.getElementById('report-static-header');
+    var resultsUi = document.getElementById('report-results-ui');
+    var reviewsList = document.getElementById('report-reviews-list');
+    var riskChecklist = document.getElementById('report-risk-checklist');
+    var scoreCircle = document.getElementById('report-score-circle');
+    var scoreDigit = document.getElementById('report-score-digit');
+    var scoreJustification = document.getElementById('report-score-justification');
+    var counterpartiesList = document.getElementById('report-counterparties-list');
+    var negativeList = document.getElementById('report-score-negatives');
+    var sentimentJustification = document.getElementById('report-sentiment-justification');
+    var sentimentRating = document.getElementById('report-sentiment-rating');
+    var sosAgent = document.getElementById('report-sos-agent');
+    var sosDate = document.getElementById('report-sos-date');
+    var sosEntity = document.getElementById('report-sos-entity');
+    var sosJurisdiction = document.getElementById('report-sos-jurisdiction');
+    var sosName = document.getElementById('report-sos-name');
+    var sosStatus = document.getElementById('report-sos-status');
+    var sourcesContainer = document.getElementById('report-sources-container');
+    var sourcesList = document.getElementById('report-sources');
+    var summaryHeader = document.getElementById('report-summary-header');
+    var swotOpportunities = document.getElementById('report-swot-opportunities');
+    var swotStrengths = document.getElementById('report-swot-strengths');
+    var swotThreats = document.getElementById('report-swot-threats');
+    var swotWeaknesses = document.getElementById('report-swot-weaknesses');
+
+    /* Loader step animation */
+    var loaderIntervalId = null;
+    var loaderStepIndex = 0;
+    var loaderStepMessages = [
       'Step 1 of 4 · Searching corporate filings',
       'Step 2 of 4 · Aggregating financial & banking data',
       'Step 3 of 4 · Analyzing news, reviews & sentiment',
       'Step 4 of 4 · Scoring risk & assembling report'
     ];
+
     function updateLoaderStep() {
-      document.querySelectorAll('.loader-step').forEach((el, idx) => {
-        el.classList.remove('active','completed');
+      loaderStepEls.forEach(function (el, idx) {
+        el.classList.remove('active', 'completed');
         if (idx < loaderStepIndex) el.classList.add('completed');
         else if (idx === loaderStepIndex) el.classList.add('active');
       });
       if (loaderSubtext) loaderSubtext.textContent = loaderStepMessages[loaderStepIndex] || '';
     }
     function startLoaderAnimation() {
-      loaderStepIndex = 0; updateLoaderStep();
+      loaderStepIndex = 0;
+      updateLoaderStep();
       if (loaderIntervalId) clearInterval(loaderIntervalId);
-      loaderIntervalId = setInterval(() => { loaderStepIndex = (loaderStepIndex + 1) % loaderStepMessages.length; updateLoaderStep(); }, 2200);
+      loaderIntervalId = setInterval(function () {
+        loaderStepIndex = (loaderStepIndex + 1) % loaderStepMessages.length;
+        updateLoaderStep();
+      }, 2200);
     }
-    function stopLoaderAnimation() { if (loaderIntervalId) { clearInterval(loaderIntervalId); loaderIntervalId = null; } }
-
-    /* UI STATE */
-    function showReportState(state, message='') {
-      if (reportStaticHeader) reportStaticHeader.style.display = 'none';
-      if (state === 'loading') {
-        loader.style.display = 'flex'; errorContainer.style.display = 'none'; contentContainer.style.display = 'none'; startLoaderAnimation();
-      } else if (state === 'error') {
-        loader.style.display = 'none'; stopLoaderAnimation(); errorContainer.style.display = 'flex'; contentContainer.style.display = 'none'; errorMessage.innerHTML = message;
-      } else {
-        loader.style.display = 'none'; stopLoaderAnimation(); errorContainer.style.display = 'none'; contentContainer.style.display = 'block';
-        mainWidgetContainer.classList.add('max-w-7xl'); mainWidgetContainer.classList.remove('max-w-xl');
+    function stopLoaderAnimation() {
+      if (loaderIntervalId) {
+        clearInterval(loaderIntervalId);
+        loaderIntervalId = null;
       }
     }
 
-    /* HELPERS */
-    function populateGenericList(el, items, formatter, placeholder='No information found.') {
-      if (!el) return;
-      el.innerHTML = '';
-      if (!items || items.length === 0) { el.innerHTML = `<li class="text-sm text-brand-gray italic">${placeholder}</li>`; return; }
-      const pieces = [];
-      items.forEach(item => { const html = formatter(item); if (html && html.trim()) pieces.push(html); });
-      el.innerHTML = pieces.length ? pieces.join('') : `<li class="text-sm text-brand-gray italic">${placeholder}</li>`;
-    }
-    const formatFinding = f => {
-      const type=(f.type||'Finding'), details=(f.details||'No details'); let color='text-brand-gray';
-      const t = type.toLowerCase(); if (t.includes('no records')||t.includes('clear')) color='text-brand-green'; else if (t.includes('lien')||t.includes('judgment')||t.includes('lawsuit')) color='text-red-500';
-      return `<li class="${color}"><strong>${type}:</strong> <span class="text-brand-gray">${details}</span></li>`;
-    };
-    const formatSwotItem = i => `<li class="text-sm text-brand-gray">${i}</li>`;
-    const formatNewsItem = n => {
-      const title=n.title||'', summary=n.summary||'', source=n.source||'';
-      if (!title && !summary && !source) return '';
-      return `<li class="report-list-item">${title?`<strong class="text-sm font-medium text-brand-dark">${title}</strong>`:''}${summary?`<p class="text-sm text-brand-gray mt-1 mb-2">${summary}</p>`:''}${source?`<span class="text-xs text-brand-gray font-medium">${source}</span>`:''}</li>`;
-    };
-    const formatReviewItem = r => {
-      const source=r.source||'', rating=r.rating||'', snippet=r.snippet||'';
-      if (!source && !rating && !snippet) return '';
-      return `<blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item"><div class="flex justify-between items-center mb-1"><span class="text-sm font-medium text-brand-dark">${source||'Customer review'}</span>${rating?`<span class="text-sm font-bold text-brand-green">${rating}</span>`:''}</div>${snippet?`<p class="text-sm italic text-brand-gray">"${snippet}"</p>`:''}</blockquote>`;
-    };
-    const formatCompetitorItem = c => {
-      const name=c.name||'', summary=c.summary||''; if (!name && !summary) return '';
-      return `<li class="report-list-item">${name?`<strong class="text-sm font-medium text-brand-dark">${name}</strong>`:''}${summary?`<p class="text-sm text-brand-gray mt-1">${summary}</p>`:''}</li>`;
-    };
-    const formatDebtItem = d => `<li class="report-list-item"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1"><strong class="text-sm font-medium text-brand-dark">${d.type||'Unknown Debt'}</strong><span class="text-sm font-bold text-red-500 sm:text-right">${d.monthlyPayment||'N/A'} / mo</span></div><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray"><span>Lender: <strong>${d.lender||'Unknown'}</strong></span><span class="sm:text-right">Est. Balance: <strong>${d.estimatedBalance||'N/A'}</strong></span></div></li>`;
-    };
-    const formatCounterpartyItem = cp => {
-      const flowColor = (cp.flow||'outflow').toLowerCase()==='inflow' ? 'text-brand-green' : 'text-red-500';
-      return `<li class="report-list-item"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1"><strong class="text-sm font-medium text-brand-dark">${cp.name||'Unknown Counterparty'}</strong><span class="text-sm font-bold ${flowColor} sm:text-right">${cp.avgAmount||'N/A'} / mo</span></div><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray"><span>Type: ${cp.type||'N/A'}</span><span class="sm:text-right">Relationship: ${cp.relationship||'External'}</span></div></li>`;
-    };
+    function showReportState(state, message) {
+      if (!loader || !errorContainer || !contentContainer || !resultsUi || !mainWidgetContainer) return;
+      resultsUi.style.display = 'block';
+      if (reportStaticHeader) reportStaticHeader.style.display = 'none';
 
-    function populateBankingCharts(element, data, barClass) {
+      if (state === 'loading') {
+        loader.style.display = 'flex';
+        errorContainer.style.display = 'none';
+        contentContainer.style.display = 'none';
+        startLoaderAnimation();
+      } else if (state === 'error') {
+        loader.style.display = 'none';
+        stopLoaderAnimation();
+        errorContainer.style.display = 'flex';
+        contentContainer.style.display = 'none';
+        if (errorMessage) errorMessage.innerHTML = message || '';
+      } else if (state === 'content') {
+        loader.style.display = 'none';
+        stopLoaderAnimation();
+        errorContainer.style.display = 'none';
+        contentContainer.style.display = 'block';
+        mainWidgetContainer.classList.add('max-w-7xl');
+        mainWidgetContainer.classList.remove('max-w-xl');
+      }
+    }
+
+    function populateGenericList(element, items, formatter, placeholder) {
       if (!element) return;
       element.innerHTML = '';
-      if (!data || data.length === 0) { element.innerHTML = `<div class="chart-empty">No recent data available.</div>`; return; }
-      const maxAmount = Math.max(...data.map(d => d.amount || 0));
-      const scaleMax = maxAmount === 0 ? 1 : maxAmount * 1.1;
-      data.forEach(item => {
-        const h = (item.amount / scaleMax) * 100;
-        element.innerHTML += `<div class="bar-wrapper" title="${item.label}: ${item.value}"><div class="bar-value">${item.value||'N/A'}</div><div class="bar ${barClass||'bar-green'}" style="height:${h}%"></div><div class="bar-label">${item.label||'N/A'}</div></div>`;
-      });
-    }
-
-    function populateMonthlyTable(body, months, avg) {
-      if (!body) return;
-      body.innerHTML = '';
-      if (!months || months.length === 0) { body.innerHTML = `<tr><td colspan="8" class="text-center italic text-brand-gray">No monthly statement breakdown available.</td></tr>`; return; }
-      months.forEach(m => {
-        const netColor = (m.netCashflow||'').startsWith('-') ? 'text-red-table' : 'text-green-table';
-        body.innerHTML += `<tr><td class="font-medium text-brand-dark">${m.month||'N/A'}</td><td class="text-green-table">${m.credits||'$0.00'}</td><td class="text-red-table">${m.debits||'$0.00'}</td><td>${m.avgBalance||'$0.00'}</td><td>${m.minBalance||'$0.00'}</td><td class="${(m.daysNeg||0)>0?'text-red-table font-bold':''}">${m.daysNeg||0}</td><td class="${(m.nsfs||0)>0?'text-red-table font-bold':''}">${m.nsfs||0}</td><td class="font-medium ${netColor}">${m.netCashflow||'$0.00'}</td></tr>`;
-      });
-      if (avg) {
-        const avgColor = (avg.netCashflow||'').startsWith('-')?'text-red-table':'text-green-table';
-        body.innerHTML += `<tr class="monthly-avg"><td>Average</td><td>${avg.credits||'$0.00'}</td><td>${avg.debits||'$0.00'}</td><td>${avg.avgBalance||'$0.00'}</td><td>${avg.minBalance||'$0.00'}</td><td>${avg.daysNeg||0}</td><td>${avg.nsfs||0}</td><td class="${avgColor}">${avg.netCashflow||'$0.00'}</td></tr>`;
+      if (items && items.length > 0) {
+        items.forEach(function (item) { element.innerHTML += formatter(item); });
+      } else {
+        element.innerHTML = '<li class="text-sm text-brand-gray italic">' + (placeholder || 'No information found.') + '</li>';
       }
     }
 
-    function populateRiskChecklist(el, items) {
-      if (!el) return; el.innerHTML = '';
-      if (!items || items.length === 0) { el.innerHTML = `<li class="text-sm text-brand-gray italic">No checklist items available.</li>`; return; }
-      items.forEach(i => {
-        let color = 'risk-grey'; if (i.color==='green') color='risk-green'; else if (i.color==='red') color='risk-red'; else if (i.color==='yellow') color='risk-yellow';
-        el.innerHTML += `<li class="risk-checklist-item"><span class="risk-label">${i.label||'Unknown Check'}</span><span class="risk-status ${color}">${i.status||'Not assessed.'}</span></li>`;
+    function formatFinding(finding) {
+      var type = finding.type || 'Finding';
+      var details = finding.details || 'No details';
+      var t = type.toLowerCase();
+      var color = 'text-brand-gray';
+      if (t.indexOf('no records') !== -1 || t.indexOf('clear') !== -1) color = 'text-brand-green';
+      else if (t.indexOf('lien') !== -1 || t.indexOf('judgment') !== -1 || t.indexOf('lawsuit') !== -1) color = 'text-red-500';
+      return '<li class="' + color + '"><strong>' + type + ':</strong> <span class="text-brand-gray">' + details + '</span></li>';
+    }
+
+    function formatSwotItem(item) { return '<li class="text-sm text-brand-gray">' + item + '</li>'; }
+
+    function formatNewsItem(item) {
+      return '<li class="report-list-item">' +
+        '<strong class="text-sm font-medium text-brand-dark">' + (item.title || 'No Title') + '</strong>' +
+        '<p class="text-sm text-brand-gray mt-1 mb-2">' + (item.summary || 'No summary.') + '</p>' +
+        '<span class="text-xs text-brand-gray font-medium">' + (item.source || 'Unknown Source') + '</span>' +
+        '</li>';
+    }
+
+    function formatReviewItem(item) {
+      return '<blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item">' +
+        '<div class="flex justify-between items-center mb-1">' +
+        '<span class="text-sm font-medium text-brand-dark">' + (item.source || 'Unknown Source') + '</span>' +
+        '<span class="text-sm font-bold text-brand-green">' + (item.rating || '') + '</span>' +
+        '</div>' +
+        '<p class="text-sm italic text-brand-gray">"' + (item.snippet || 'No snippet provided.') + '"</p>' +
+        '</blockquote>';
+    }
+
+    function formatCompetitorItem(item) {
+      return '<li class="report-list-item">' +
+        '<strong class="text-sm font-medium text-brand-dark">' + (item.name || 'Unknown Competitor') + '</strong>' +
+        '<p class="text-sm text-brand-gray mt-1">' + (item.summary || 'No summary.') + '</p>' +
+        '</li>';
+    }
+
+    function formatDebtItem(item) {
+      return '<li class="report-list-item">' +
+        '<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">' +
+        '<strong class="text-sm font-medium text-brand-dark">' + (item.type || 'Unknown Debt') + '</strong>' +
+        '<span class="text-sm font-bold text-red-500 sm:text-right">' + (item.monthlyPayment || 'N/A') + ' / mo</span>' +
+        '</div>' +
+        '<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">' +
+        '<span>Lender: <strong>' + (item.lender || 'Unknown Lender') + '</strong></span>' +
+        '<span class="sm:text-right">Est. Balance: <strong>' + (item.estimatedBalance || 'N/A') + '</strong></span>' +
+        '</div>' +
+        '</li>';
+    }
+
+    function formatCounterpartyItem(item) {
+      var flowColor = (item.flow || 'outflow').toLowerCase() === 'inflow' ? 'text-brand-green' : 'text-red-500';
+      return '<li class="report-list-item">' +
+        '<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">' +
+        '<strong class="text-sm font-medium text-brand-dark">' + (item.name || 'Unknown Counterparty') + '</strong>' +
+        '<span class="text-sm font-bold ' + flowColor + ' sm:text-right">' + (item.avgAmount || 'N/A') + ' / mo</span>' +
+        '</div>' +
+        '<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">' +
+        '<span>Type: ' + (item.type || 'N/A') + '</span>' +
+        '<span class="sm:text-right">Relationship: ' + (item.relationship || 'External') + '</span>' +
+        '</div>' +
+        '</li>';
+    }
+
+    function populateBankingCharts(element, data, barColorClass) {
+      if (!element) return;
+      element.innerHTML = '';
+      if (!data || data.length === 0) {
+        element.innerHTML = '<div class="chart-empty">No recent data available.</div>';
+        return;
+      }
+      var maxAmount = Math.max.apply(null, data.map(function (d) { return d.amount || 0; }));
+      var scaleMax = maxAmount === 0 ? 1 : maxAmount * 1.1;
+      data.forEach(function (item) {
+        var barHeight = (item.amount / scaleMax) * 100;
+        element.innerHTML +=
+          '<div class="bar-wrapper" title="' + (item.label || 'N/A') + ': ' + (item.value || 'N/A') + '">' +
+          '<div class="bar-value">' + (item.value || 'N/A') + '</div>' +
+          '<div class="bar ' + (barColorClass || 'bar-green') + '" style="height:' + barHeight + '%"></div>' +
+          '<div class="bar-label">' + (item.label || 'N/A') + '</div>' +
+          '</div>';
+      });
+    }
+
+    function populateMonthlyTable(bodyElement, months, averages) {
+      if (!bodyElement) return;
+      bodyElement.innerHTML = '';
+      if (!months || months.length === 0) {
+        bodyElement.innerHTML = '<tr><td colspan="8" class="text-center italic text-brand-gray">No monthly statement breakdown available.</td></tr>';
+        return;
+      }
+      months.forEach(function (month) {
+        var netColor = (month.netCashflow || '').indexOf('-') === 0 ? 'text-red-table' : 'text-green-table';
+        bodyElement.innerHTML +=
+          '<tr>' +
+          '<td class="font-medium text-brand-dark">' + (month.month || 'N/A') + '</td>' +
+          '<td class="text-green-table">' + (month.credits || '$0.00') + '</td>' +
+          '<td class="text-red-table">' + (month.debits || '$0.00') + '</td>' +
+          '<td>' + (month.avgBalance || '$0.00') + '</td>' +
+          '<td>' + (month.minBalance || '$0.00') + '</td>' +
+          '<td class="' + ((month.daysNeg || 0) > 0 ? 'text-red-table font-bold' : '') + '">' + (month.daysNeg || 0) + '</td>' +
+          '<td class="' + ((month.nsfs || 0) > 0 ? 'text-red-table font-bold' : '') + '">' + (month.nsfs || 0) + '</td>' +
+          '<td class="font-medium ' + netColor + '">' + (month.netCashflow || '$0.00') + '</td>' +
+          '</tr>';
+      });
+      if (averages) {
+        var avgNetColor = (averages.netCashflow || '').indexOf('-') === 0 ? 'text-red-table' : 'text-green-table';
+        bodyElement.innerHTML +=
+          '<tr class="monthly-avg">' +
+          '<td>Average</td>' +
+          '<td>' + (averages.credits || '$0.00') + '</td>' +
+          '<td>' + (averages.debits || '$0.00') + '</td>' +
+          '<td>' + (averages.avgBalance || '$0.00') + '</td>' +
+          '<td>' + (averages.minBalance || '$0.00') + '</td>' +
+          '<td>' + (averages.daysNeg || 0) + '</td>' +
+          '<td>' + (averages.nsfs || 0) + '</td>' +
+          '<td class="' + avgNetColor + '">' + (averages.netCashflow || '$0.00') + '</td>' +
+          '</tr>';
+      }
+    }
+
+    function populateRiskChecklist(element, items) {
+      if (!element) return;
+      element.innerHTML = '';
+      if (!items || items.length === 0) {
+        element.innerHTML = '<li class="text-sm text-brand-gray italic">No checklist items available.</li>';
+        return;
+      }
+      items.forEach(function (item) {
+        var colorClass = 'risk-grey';
+        if (item.color === 'green') colorClass = 'risk-green';
+        else if (item.color === 'red') colorClass = 'risk-red';
+        else if (item.color === 'yellow') colorClass = 'risk-yellow';
+        element.innerHTML +=
+          '<li class="risk-checklist-item">' +
+          '<span class="risk-label">' + (item.label || 'Unknown Check') + '</span>' +
+          '<span class="risk-status ' + colorClass + '">' + (item.status || 'Not assessed.') + '</span>' +
+          '</li>';
       });
     }
 
     function populateSources(sources) {
       if (!sourcesList || !sourcesContainer) return;
       sourcesList.innerHTML = '';
-      if (sources && sources.length) {
-        sources.forEach(s => {
-          const li = document.createElement('li'); li.className = 'text-xs truncate';
-          li.innerHTML = `<a href="${s.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">${s.title || s.uri}</a>`;
+      if (sources && sources.length > 0) {
+        sources.forEach(function (source) {
+          var li = document.createElement('li');
+          li.className = 'text-xs truncate';
+          li.innerHTML = '<a href="' + source.uri + '" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">' + (source.title || source.uri) + '</a>';
           sourcesList.appendChild(li);
-        }); sourcesContainer.style.display = 'block';
-      } else { sourcesContainer.style.display = 'none'; }
+        });
+        sourcesContainer.style.display = 'block';
+      } else {
+        sourcesContainer.style.display = 'none';
+      }
     }
 
-    /* REPORT POPULATOR (drives all UI) */
     function populateReport(data) {
       if (!data) return;
 
-      companyNameHeader.innerText = data.keyInfo?.companyName || 'Business Report';
-      summaryHeader.innerText     = data.keyInfo?.summary || 'A comprehensive AI-generated report.';
+      if (companyNameHeader) companyNameHeader.innerText = data.keyInfo && data.keyInfo.companyName ? data.keyInfo.companyName : 'Business Report';
+      if (summaryHeader) summaryHeader.innerText = data.keyInfo && data.keyInfo.summary ? data.keyInfo.summary : 'A comprehensive AI-generated report.';
 
-      const decision = data.aiRecommendation?.decision || 'Manual Review';
-      recommendationDecision.innerText = decision;
-      recommendationJustification.innerText = data.aiRecommendation?.justification || 'AI justification not provided.';
-      recommendationBox.className = 'p-4 border-l-4 rounded-r-lg';
-      if (decision.toLowerCase()==='approve') { recommendationBox.classList.add('bg-yellow-50','border-yellow-500','text-yellow-900'); recommendationDecision.className='font-heading font-bold text-2xl text-yellow-700'; }
-      else if (decision.toLowerCase()==='decline') { recommendationBox.classList.add('bg-red-50','border-red-500','text-red-800'); recommendationDecision.className='font-heading font-bold text-2xl text-red-700'; }
-      else { recommendationBox.classList.add('bg-amber-50','border-amber-500','text-amber-900'); recommendationDecision.className='font-heading font-bold text-2xl text-amber-700'; }
-
-      const score = data.aiRiskScore?.score || 0;
-      scoreDigit.innerText = score;
-      scoreJustification.innerText = data.aiRiskScore?.justification || 'No justification provided.';
-      scoreCircle.className = 'score-circle mb-4'; if (score<550) scoreCircle.classList.add('score-red'); else if (score<700) scoreCircle.classList.add('score-yellow'); else scoreCircle.classList.add('score-green');
-
-      const checkIcon = '<svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
-      const xIcon    = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
-
-      populateGenericList(positiveList, data.aiRiskScore?.positiveFactors, i => `<li class="flex items-start">${checkIcon}<span class="text-sm text-brand-dark">${i}</span></li>`, 'No positive factors noted.');
-      populateGenericList(negativeList, data.aiRiskScore?.negativeFactors, i => `<li class="flex items-start">${xIcon}<span class="text-sm text-brand-dark">${i}</span></li>`, 'No negative factors noted.');
-
-      keyWebsite.innerHTML = data.keyInfo?.website ? `<a href="${data.keyInfo.website.startsWith('http')?'':'//'}${data.keyInfo.website}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">${data.keyInfo.website}</a>` : 'N/A';
-      keyIndustry.innerText = data.keyInfo?.industry || 'N/A';
-      keyCeo.innerText      = data.keyInfo?.ceoName || 'N/A';
-      keyFounded.innerText  = data.keyInfo?.yearFounded || 'N/A';
-      keyEmployees.innerText= data.keyInfo?.employeeCount || 'N/A';
-      keyPhone.innerText    = data.keyInfo?.phone || 'N/A';
-      keyAddress.innerText  = data.keyInfo?.fullAddress || 'N/A';
-
-      const address = data.keyInfo?.fullAddress;
-      if (address && address !== 'N/A') { const enc = encodeURIComponent(address); mapIframe.src = `https://maps.google.com/maps?q=${enc}&t=&z=13&ie=UTF8&iwloc=&output=embed`; mapIframe.style.display='block'; mapFallback.style.display='none'; }
-      else { mapIframe.style.display='none'; mapFallback.style.display='block'; }
-
-      // SOS
-      sosName.innerText = data.sos?.entityName || 'N/A';
-      sosStatus.innerText = data.sos?.status || 'N/A';
-      sosEntity.innerText = data.sos?.entityType || 'N/A';
-      sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
-      sosDate.innerText = data.sos?.formationDate || 'N/A';
-      sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
-      sosStatus.className = 'font-medium text-brand-dark sm:text-right break-words';
-      const st = (data.sos?.status || '').toLowerCase();
-      if (st.includes('active')) sosStatus.classList.add('text-brand-green'); else if (st) sosStatus.classList.add('text-red-500');
-
-      // Financials
-      const fin = data.financialSummary;
-      if (fin) {
-        if (fin.isPublic) {
-          finPublicDiv.style.display = 'block'; finPrivateDiv.style.display = 'none';
-          finTicker.innerText = fin.tickerSymbol || 'N/A';
-          finMarketCap.innerText = fin.marketCap || 'N/A';
-          finRevenue.innerText = fin.latestRevenue || 'N/A';
-          finNetIncome.innerText = fin.netIncome || 'N/A';
+      var decision = data.aiRecommendation && data.aiRecommendation.decision ? data.aiRecommendation.decision : 'Manual Review';
+      if (recommendationDecision) recommendationDecision.innerText = decision;
+      if (recommendationJustification) recommendationJustification.innerText = (data.aiRecommendation && data.aiRecommendation.justification) || 'AI justification not provided.';
+      if (recommendationBox) {
+        recommendationBox.className = 'p-4 border-l-4 rounded-r-lg';
+        if (decision.toLowerCase() === 'approve') {
+          recommendationBox.classList.add('bg-yellow-50', 'border-yellow-500', 'text-yellow-900');
+          recommendationDecision.className = 'font-heading font-bold text-2xl text-yellow-700';
+        } else if (decision.toLowerCase() === 'decline') {
+          recommendationBox.classList.add('bg-red-50', 'border-red-500', 'text-red-800');
+          recommendationDecision.className = 'font-heading font-bold text-2xl text-red-700';
         } else {
-          finPublicDiv.style.display = 'none'; finPrivateDiv.style.display = 'block';
-          finEstRevenue.innerText = fin.estAnnualRevenue || 'N/A';
-          finEstMargin.innerText  = fin.estProfitMargin || 'N/A';
-          finEstCash.innerText    = fin.cashOnHand || 'N/A';
+          recommendationBox.classList.add('bg-amber-50', 'border-amber-500', 'text-amber-900');
+          recommendationDecision.className = 'font-heading font-bold text-2xl text-amber-700';
         }
-        finCreditDecision.innerText = fin.creditDecision || 'N/A';
-        finCreditScore.innerText    = fin.ficoScore || 'N/A';
-        finCreditTotalDebt.innerText= fin.totalDebt || 'N/A';
-        finCreditRevolvingDebt.innerText = fin.revolvingDebt || 'N/A';
-        finCreditAvgRevenue.innerText    = fin.avgMonthlyRevenue || 'N/A';
+      }
+
+      var score = data.aiRiskScore && data.aiRiskScore.score ? data.aiRiskScore.score : 0;
+      if (scoreDigit) scoreDigit.innerText = score;
+      if (scoreJustification) scoreJustification.innerText = (data.aiRiskScore && data.aiRiskScore.justification) || 'No justification provided.';
+      if (scoreCircle) {
+        scoreCircle.className = 'score-circle mb-4';
+        if (score < 550) scoreCircle.classList.add('score-red');
+        else if (score < 700) scoreCircle.classList.add('score-yellow');
+        else scoreCircle.classList.add('score-green');
+      }
+
+      var checkIcon = '<svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+      var xIcon = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+
+      populateGenericList(positiveList, data.aiRiskScore && data.aiRiskScore.positiveFactors, function (item) {
+        return '<li class="flex items-start">' + checkIcon + '<span class="text-sm text-brand-dark">' + item + '</span></li>';
+      }, 'No positive factors noted.');
+
+      populateGenericList(negativeList, data.aiRiskScore && data.aiRiskScore.negativeFactors, function (item) {
+        return '<li class="flex items-start">' + xIcon + '<span class="text-sm text-brand-dark">' + item + '</span></li>';
+      }, 'No negative factors noted.');
+
+      if (keyWebsite) {
+        if (data.keyInfo && data.keyInfo.website) {
+          var website = data.keyInfo.website;
+          keyWebsite.innerHTML = '<a href="' + (website.indexOf('http') === 0 ? '' : '//') + website + '" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">' + website + '</a>';
+        } else {
+          keyWebsite.innerText = 'N/A';
+        }
+      }
+      if (keyIndustry) keyIndustry.innerText = (data.keyInfo && data.keyInfo.industry) || 'N/A';
+      if (keyCeo) keyCeo.innerText = (data.keyInfo && data.keyInfo.ceoName) || 'N/A';
+      if (keyFounded) keyFounded.innerText = (data.keyInfo && data.keyInfo.yearFounded) || 'N/A';
+      if (keyEmployees) keyEmployees.innerText = (data.keyInfo && data.keyInfo.employeeCount) || 'N/A';
+      if (keyPhone) keyPhone.innerText = (data.keyInfo && data.keyInfo.phone) || 'N/A';
+      if (keyAddress) keyAddress.innerText = (data.keyInfo && data.keyInfo.fullAddress) || 'N/A';
+
+      var address = data.keyInfo && data.keyInfo.fullAddress;
+      if (address && address !== 'N/A' && mapIframe && mapFallback) {
+        var encodedAddress = encodeURIComponent(address);
+        mapIframe.src = 'https://maps.google.com/maps?q=' + encodedAddress + '&t=&z=13&ie=UTF8&iwloc=&output=embed';
+        mapIframe.style.display = 'block';
+        mapFallback.style.display = 'none';
+      } else if (mapIframe && mapFallback) {
+        mapIframe.style.display = 'none';
+        mapFallback.style.display = 'block';
+      }
+
+      if (sosName) sosName.innerText = data.sos && data.sos.entityName || 'N/A';
+      if (sosStatus) sosStatus.innerText = data.sos && data.sos.status || 'N/A';
+      if (sosEntity) sosEntity.innerText = data.sos && data.sos.entityType || 'N/A';
+      if (sosJurisdiction) sosJurisdiction.innerText = data.sos && data.sos.jurisdiction || 'N/A';
+      if (sosDate) sosDate.innerText = data.sos && data.sos.formationDate || 'N/A';
+      if (sosAgent) sosAgent.innerText = data.sos && data.sos.registeredAgent || 'N/A';
+      if (sosStatus) {
+        sosStatus.className = 'font-medium text-brand-dark sm:text-right break-words';
+        if (data.sos && data.sos.status && data.sos.status.toLowerCase().indexOf('active') !== -1) {
+          sosStatus.classList.add('text-brand-green');
+        } else if (data.sos && data.sos.status && data.sos.status.toLowerCase().indexOf('n/a') === -1) {
+          sosStatus.classList.add('text-red-500');
+        }
+      }
+
+      var fin = data.financialSummary;
+      if (fin && finPublicDiv && finPrivateDiv && finNote) {
+        if (fin.isPublic) {
+          finPublicDiv.style.display = 'block';
+          finPrivateDiv.style.display = 'none';
+          if (finTicker) finTicker.innerText = fin.tickerSymbol || 'N/A';
+          if (finMarketCap) finMarketCap.innerText = fin.marketCap || 'N/A';
+          if (finRevenue) finRevenue.innerText = fin.latestRevenue || 'N/A';
+          if (finNetIncome) finNetIncome.innerText = fin.netIncome || 'N/A';
+        } else {
+          finPublicDiv.style.display = 'none';
+          finPrivateDiv.style.display = 'block';
+          if (finEstRevenue) finEstRevenue.innerText = fin.estAnnualRevenue || 'N/A';
+          if (finEstMargin) finEstMargin.innerText = fin.estProfitMargin || 'N/A';
+          if (finEstCash) finEstCash.innerText = fin.cashOnHand || 'N/A';
+        }
+        if (finCreditDecision) finCreditDecision.innerText = fin.creditDecision || 'N/A';
+        if (finCreditScore) finCreditScore.innerText = fin.ficoScore || 'N/A';
+        if (finCreditTotalDebt) finCreditTotalDebt.innerText = fin.totalDebt || 'N/A';
+        if (finCreditRevolvingDebt) finCreditRevolvingDebt.innerText = fin.revolvingDebt || 'N/A';
+        if (finCreditAvgRevenue) finCreditAvgRevenue.innerText = fin.avgMonthlyRevenue || 'N/A';
         finNote.innerText = fin.note || (fin.isPublic ? 'Data sourced from public filings.' : 'Fictional data generated by AI for demonstration.');
       }
 
-      populateGenericList(swotStrengths, data.swotAnalysis?.strengths, formatSwotItem, 'No strengths identified.');
-      populateGenericList(swotWeaknesses, data.swotAnalysis?.weaknesses, formatSwotItem, 'No weaknesses identified.');
-      populateGenericList(swotOpportunities, data.swotAnalysis?.opportunities, formatSwotItem, 'No opportunities identified.');
-      populateGenericList(swotThreats, data.swotAnalysis?.threats, formatSwotItem, 'No threats identified.');
+      populateGenericList(swotStrengths, data.swotAnalysis && data.swotAnalysis.strengths, formatSwotItem, 'No strengths identified.');
+      populateGenericList(swotWeaknesses, data.swotAnalysis && data.swotAnalysis.weaknesses, formatSwotItem, 'No weaknesses identified.');
+      populateGenericList(swotOpportunities, data.swotAnalysis && data.swotAnalysis.opportunities, formatSwotItem, 'No opportunities identified.');
+      populateGenericList(swotThreats, data.swotAnalysis && data.swotAnalysis.threats, formatSwotItem, 'No threats identified.');
 
-      sentimentRating.innerText = data.publicSentiment?.rating || 'Neutral';
-      sentimentJustification.innerText = data.publicSentiment?.justification || 'No sentiment analysis available.';
+      if (sentimentRating) sentimentRating.innerText = data.publicSentiment && data.publicSentiment.rating || 'Neutral';
+      if (sentimentJustification) sentimentJustification.innerText = data.publicSentiment && data.publicSentiment.justification || 'No sentiment analysis available.';
 
       populateGenericList(newsList, data.recentNews, formatNewsItem, 'No recent news found.');
       populateGenericList(reviewsList, data.customerReviews, formatReviewItem, 'No customer reviews found.');
       populateGenericList(competitorsList, data.competitors, formatCompetitorItem, 'No competitors identified.');
-      populateGenericList(recordsList, data.publicRecords?.findings, formatFinding, 'No public records found.');
-      populateGenericList(legalList, data.legalAndRegulatory?.findings, formatFinding, 'No legal or regulatory flags found.');
+      populateGenericList(recordsList, data.publicRecords && data.publicRecords.findings, formatFinding, 'No public records found.');
+      populateGenericList(legalList, data.legalAndRegulatory && data.legalAndRegulatory.findings, formatFinding, 'No legal or regulatory flags found.');
 
-      populateBankingCharts(bankingChartRevenue,     data.bankingSnapshot?.revenue,        'bar-green');
-      populateBankingCharts(bankingChartAvgBalance,  data.bankingSnapshot?.avgDailyBalance,'bar-grey');
-      populateBankingCharts(bankingChartEndBalance,  data.bankingSnapshot?.endingBalance,  'bar-yellow');
-      populateBankingCharts(bankingChartDebt,        data.bankingSnapshot?.debtService,    'bar-red');
+      populateBankingCharts(bankingChartRevenue, data.bankingSnapshot && data.bankingSnapshot.revenue, 'bar-green');
+      populateBankingCharts(bankingChartAvgBalance, data.bankingSnapshot && data.bankingSnapshot.avgDailyBalance, 'bar-grey');
+      populateBankingCharts(bankingChartEndBalance, data.bankingSnapshot && data.bankingSnapshot.endingBalance, 'bar-yellow');
+      populateBankingCharts(bankingChartDebt, data.bankingSnapshot && data.bankingSnapshot.debtService, 'bar-red');
 
-      populateMonthlyTable(monthlyBreakdownBody, data.monthlyBreakdown?.months, data.monthlyBreakdown?.averages);
+      populateMonthlyTable(monthlyBreakdownBody, data.monthlyBreakdown && data.monthlyBreakdown.months, data.monthlyBreakdown && data.monthlyBreakdown.averages);
       populateGenericList(debtObligationsList, data.debtObligations, formatDebtItem, 'No extrapolated debt obligations found.');
-      populateGenericList(counterpartiesList,  data.topCounterparties, formatCounterpartyItem, 'No counterparty data found.');
+      populateGenericList(counterpartiesList, data.topCounterparties, formatCounterpartyItem, 'No counterparty data found.');
       populateRiskChecklist(riskChecklist, data.aiRiskChecklist);
     }
 
-    /* NETWORKING */
-    async function fetchWithBackoff(url, options, retries=3, delay=1000) {
-      let lastError;
-      for (let i=0;i<retries;i++) {
+    async function fetchWithBackoff(url, options, retries, delay) {
+      retries = retries || 3;
+      delay = delay || 1000;
+      var lastError;
+      for (var i = 0; i < retries; i++) {
         try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body=null; try{ body=await res.json(); }catch{}
-            const msg = body?.error?.message || res.statusText;
-            lastError = new Error(`API Error: ${msg} (Status: ${res.status})`);
-            if ((res.status===429||res.status>=500) && i<retries-1) { await new Promise(r=>setTimeout(r, delay*Math.pow(2,i))); continue; }
-            throw lastError;
+          var response = await fetch(url, options);
+          if (!response.ok) {
+            var errorBody = null;
+            try { errorBody = await response.json(); } catch (e) { errorBody = null; }
+            var errorMessage = (errorBody && errorBody.error && errorBody.error.message) || response.statusText;
+            lastError = new Error('API Error: ' + errorMessage + ' (Status: ' + response.status + ')');
+            if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
+              await new Promise(function (resolve) { setTimeout(resolve, delay * Math.pow(2, i)); });
+              continue;
+            } else {
+              throw lastError;
+            }
           }
-          return await res.json();
-        } catch (err) {
-          lastError = err; if (i<retries-1) await new Promise(r=>setTimeout(r, delay*Math.pow(2,i)));
+          return await response.json();
+        } catch (error) {
+          lastError = error;
+          if (i < retries - 1) {
+            await new Promise(function (resolve) { setTimeout(resolve, delay * Math.pow(2, i)); });
+          }
         }
       }
       throw lastError || new Error('API request failed after all retries.');
     }
 
-    async function callReportAPI(systemPrompt, userQuery, logId='api') {
-      const apiKey = localStorage.getItem('tb-gemini-key') || '';
+    async function callReportAPI(systemPrompt, userQuery, logId) {
+      logId = logId || 'api';
+      var apiKey = '';
+      try { apiKey = localStorage.getItem('tb-gemini-key') || ''; } catch (e) {}
       if (!apiKey) throw new Error('Gemini API key is missing. Open Settings and add your key first.');
 
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const payload = {
+      var apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=' + encodeURIComponent(apiKey);
+      var payload = {
         contents: [{ parts: [{ text: userQuery }] }],
         tools: [{ google_search: {} }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
+        systemInstruction: { parts: [{ text: systemPrompt }] }
       };
 
-      const result = await fetchWithBackoff(apiUrl, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+      var result = await fetchWithBackoff(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-      const candidate = result.candidates?.[0];
-      const text = candidate?.content?.parts?.[0]?.text;
+      var candidate = result.candidates && result.candidates[0];
+      var text = candidate && candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text;
       if (!text) throw new Error('No content received from API.');
 
-      // Extract a single JSON object from the text
-      let json=null;
+      var json = null;
       try {
-        const s = text.indexOf('{'); const e = text.lastIndexOf('}');
-        if (s===-1 || e===-1 || e<s) throw new Error('Received non-JSON response from API.');
-        json = JSON.parse(text.substring(s, e+1).trim());
+        var startIndex = text.indexOf('{');
+        var endIndex = text.lastIndexOf('}');
+        if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) throw new Error('Received non-JSON response from API.');
+        var jsonString = text.substring(startIndex, endIndex + 1).trim();
+        json = JSON.parse(jsonString);
       } catch (e) {
-        console.error(`[${logId}] parse error`, e, '\nRaw:', text);
+        console.error('[' + logId + '] Failed to parse JSON response:', e);
+        console.error('Raw text was:', text);
+        if (e.message === 'Received non-JSON response from API.') throw e;
         throw new Error('Received an invalid JSON response from the API.');
       }
 
-      let sources = [];
-      const gm = candidate.groundingMetadata;
-      if (gm && gm.groundingAttributions) {
-        sources = gm.groundingAttributions.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri && s.title);
+      var sources = [];
+      var groundingMetadata = candidate.groundingMetadata;
+      if (groundingMetadata && groundingMetadata.groundingAttributions) {
+        sources = groundingMetadata.groundingAttributions
+          .map(function (attr) {
+            return { uri: attr.web && attr.web.uri, title: attr.web && attr.web.title };
+          })
+          .filter(function (s) { return s.uri && s.title; });
       }
-      return { json, sources };
+      return { json: json, sources: sources };
     }
 
     function getMasterPrompt() {
-      return `You are a world-class underwriting analyst and business intelligence expert.
-
-You are given a COMPANY NAME and must produce an insanely comprehensive business verification and underwriting report.
-
-TOOLS
-- You have access to the google_search tool.
-- You MUST use google_search aggressively. Run multiple searches for:
-  - corporate filings / secretary of state
-  - official website and contact information
-  - financials / investor pages / market cap (if public)
-  - public records: liens, judgments, UCC, bankruptcies
-  - lawsuits and regulatory actions
-  - news coverage
-  - customer reviews (Trustpilot, BBB, Google, etc.)
-  - competitors and market position
-
-HARD RULES
-- NO hallucinated facts when real data is available.
-- NEVER output placeholders like "No Title", "Unknown Source", "No summary".
-- If you truly cannot find a value after searching, set that specific field to "N/A" or omit the item entirely.
-- Prefer fewer high-quality, well-sourced items.
-
-OUTPUT SHAPE
-Return ONE JSON object only (no prose around it) with this exact shape:
-
-{
-  "keyInfo": {
-    "companyName": "string",
-    "summary": "1-2 sentence summary",
-    "website": "string",
-    "fullAddress": "string",
-    "phone": "string",
-    "yearFounded": "string",
-    "industry": "string",
-    "ceoName": "string",
-    "employeeCount": "string"
-  },
-  "financialSummary": {
-    "isPublic": true,
-    "tickerSymbol": "string (if public)",
-    "marketCap": "string (if public)",
-    "latestRevenue": "string (if public)",
-    "netIncome": "string (if public)",
-    "estAnnualRevenue": "string (if private)",
-    "estProfitMargin": "string (if private)",
-    "cashOnHand": "string (if private)",
-    "note": "Explain what is real vs fictional.",
-    "creditDecision": "Approve | Decline | Manual Review",
-    "ficoScore": "string",
-    "totalDebt": "string",
-    "revolvingDebt": "string",
-    "avgMonthlyRevenue": "string"
-  },
-  "bankingSnapshot": {
-    "revenue":        [{"label": "Sep '24", "value": "$X", "amount": 0}],
-    "avgDailyBalance":[{"label": "Sep '24", "value": "$X", "amount": 0}],
-    "endingBalance":  [{"label": "Sep '24", "value": "$X", "amount": 0}],
-    "debtService":    [{"label": "Sep '24", "value": "$X", "amount": 0}]
-  },
-  "monthlyBreakdown": {
-    "months": [
-      {"month":"Nov '24","credits":"string","debits":"string","avgBalance":"string","minBalance":"string","daysNeg":0,"nsfs":0,"netCashflow":"string"}
-    ],
-    "averages": {"credits":"string","debits":"string","avgBalance":"string","minBalance":"string","daysNeg":0,"nsfs":0,"netCashflow":"string"}
-  },
-  "debtObligations": [{"type":"string","lender":"string","estimatedBalance":"string","monthlyPayment":"string"}],
-  "topCounterparties":[{"name":"string","type":"Customer|Vendor","flow":"inflow|outflow","avgAmount":"string","relationship":"Internal|External"}],
-  "sos":{"entityName":"string","status":"string","entityType":"string","jurisdiction":"string","formationDate":"string","registeredAgent":"string"},
-  "publicRecords":{"findings":[{"type":"string","details":"string"}]},
-  "legalAndRegulatory":{"findings":[{"type":"string","details":"string","date":"string"}]},
-  "recentNews":[{"title":"Real headline","source":"Publisher","summary":"1-2 sentence summary"}],
-  "customerReviews":[{"snippet":"Quoted snippet","source":"Site","rating":"4.2/5"}],
-  "competitors":[{"name":"Competitor","summary":"1 sentence positioning"}],
-  "publicSentiment":{"rating":"Positive (8/10)","justification":"Short explanation"},
-  "swotAnalysis":{"strengths":["..."],"weaknesses":["..."],"opportunities":["..."],"threats":["..."]},
-  "aiRiskScore":{"score":300,"justification":"Explain score","positiveFactors":["..."],"negativeFactors":["..."]},
-  "aiRiskChecklist":[{"label":"Corporate filings","status":"Active & in good standing","color":"green"}],
-  "aiRecommendation":{"decision":"Approve|Decline|Manual Review","justification":"Underwriting rationale"}
-}
-
-Respond ONLY with that JSON (no Markdown, no commentary).`;
+      return "You are a world-class Tier-4 Senior Underwriting Analyst and business intelligence expert. A user is requesting an 'insanely comprehensive' master report on a company. You MUST use Google Search extensively to find as much real-world data as possible.\n1. Determine if the company is public or private.\n2. Use google_search to gather corporate filings, official website/contact info, financials, public records, lawsuits, news, reviews, competitors.\n3. Generate publicSentiment, swotAnalysis, aiRiskScore, aiRecommendation based on evidence.\n4. For financialSummary: if PUBLIC, use real ticker, marketCap, revenue, netIncome. If PRIVATE, generate realistic fictional values and clearly note this.\n5. Generate fictional but realistic bankingSnapshot (3 months for revenue, avgDailyBalance, endingBalance, debtService).\n6. Generate realistic monthlyBreakdown with 3 months + averages.\n7. Generate aiRiskChecklist with labels, status, and color (green/red/yellow/grey).\n8. Generate realistic debtObligations and topCounterparties.\n9. Respond ONLY with a single valid JSON object matching the schema provided, no extra text.";
     }
 
-    /* Generate report */
     if (generateReportBtn) {
-      generateReportBtn.addEventListener('click', async () => {
-        const businessName = (businessNameInput.value || '').trim();
-        if (!businessName) { resultsUi.style.display='block'; reportSearchHeader.style.display='none'; showReportState('error','Please enter a business name.'); return; }
-        resultsUi.style.display='block'; reportSearchHeader.style.display='none';
-        showReportState('loading'); generateReportBtn.disabled = true;
-
-        try {
-          const { json, sources } = await callReportAPI(getMasterPrompt(), `Generate a master comprehensive AI business report for: "${businessName}"`, 'full-report');
-          populateReport(json); populateSources(sources); showReportState('content');
-        } catch (err) {
-          console.error('Full Report Error:', err);
-          showReportState('error', `Failed to generate report: ${err.message}`);
-        } finally {
-          generateReportBtn.disabled = false;
+      generateReportBtn.addEventListener('click', function () {
+        var businessName = businessNameInput ? businessNameInput.value.trim() : '';
+        if (!businessName) {
+          if (resultsUi) resultsUi.style.display = 'block';
+          if (reportSearchHeader) reportSearchHeader.style.display = 'none';
+          showReportState('error', 'Please enter a business name.');
+          return;
         }
+
+        if (resultsUi) resultsUi.style.display = 'block';
+        if (reportSearchHeader) reportSearchHeader.style.display = 'none';
+
+        showReportState('loading');
+        generateReportBtn.disabled = true;
+
+        var systemPrompt = getMasterPrompt();
+        var userQuery = 'Generate a master comprehensive AI business report for: "' + businessName + '"';
+
+        callReportAPI(systemPrompt, userQuery, 'full-report')
+          .then(function (result) {
+            populateReport(result.json);
+            populateSources(result.sources);
+            showReportState('content');
+          })
+          .catch(function (error) {
+            console.error('Full Report Error:', error);
+            showReportState('error', 'Failed to generate report: ' + error.message + '.');
+          })
+          .finally(function () {
+            generateReportBtn.disabled = false;
+          });
       });
     }
 
-    /* Smooth scroll & menu */
-    document.querySelectorAll('a[href="#demo"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
-        reportSearchHeader.style.display='block'; resultsUi.style.display='none';
-        mainWidgetContainer.classList.add('max-w-xl'); mainWidgetContainer.classList.remove('max-w-7xl');
-        mobileMenu.classList.add('hidden'); mobileMenuBtn.setAttribute('aria-expanded','false');
+    var tryDemoBtns = document.querySelectorAll('a[href="#demo"]');
+    if (tryDemoBtns) {
+      tryDemoBtns.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          var demoSection = document.getElementById('demo');
+          if (demoSection) demoSection.scrollIntoView({ behavior: 'smooth' });
+          if (reportSearchHeader) reportSearchHeader.style.display = 'block';
+          if (resultsUi) resultsUi.style.display = 'none';
+          if (mainWidgetContainer) {
+            mainWidgetContainer.classList.add('max-w-xl');
+            mainWidgetContainer.classList.remove('max-w-7xl');
+          }
+          if (mobileMenu) mobileMenu.classList.add('hidden');
+          if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        });
       });
-    });
+    }
+
     if (mobileMenuBtn && mobileMenu) {
-      mobileMenuBtn.addEventListener('click', () => {
-        const isOpen = !mobileMenu.classList.contains('hidden');
-        mobileMenu.classList.toggle('hidden'); mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+      mobileMenuBtn.addEventListener('click', function () {
+        var isOpen = !mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
       });
     }
-    document.querySelectorAll('a[href="#platform"], a[href="#pricing"]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault(); const t = document.querySelector(link.getAttribute('href')); t?.scrollIntoView({ behavior:'smooth' });
-        mobileMenu.classList.add('hidden'); mobileMenuBtn.setAttribute('aria-expanded','false');
+
+    var navLinks = document.querySelectorAll('a[href="#platform"], a[href="#pricing"]');
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        var targetId = link.getAttribute('href');
+        var targetElement = document.querySelector(targetId);
+        if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
+        if (mobileMenu) mobileMenu.classList.add('hidden');
+        if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
       });
     });
 
-    // Default landing view shows results demo
-    reportSearchHeader.style.display='none'; resultsUi.style.display='block';
-    mainWidgetContainer.classList.add('max-w-7xl'); mainWidgetContainer.classList.remove('max-w-xl');
+    if (reportSearchHeader) reportSearchHeader.style.display = 'none';
+    if (resultsUi) resultsUi.style.display = 'block';
+    if (mainWidgetContainer) {
+      mainWidgetContainer.classList.add('max-w-7xl');
+      mainWidgetContainer.classList.remove('max-w-xl');
+    }
   });
 </script>
 </body>
