@@ -14,6 +14,28 @@
   </script>
   <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
 
+  <!-- Auth Protection -->
+  <script>
+    // Check if this is an approval view (public customer link)
+    const urlParams = new URLSearchParams(window.location.search);
+    const isApprovalView = urlParams.get('view') === 'approval';
+    
+    // Only require login for non-approval views (broker/rep view)
+    if (!isApprovalView) {
+      document.addEventListener('DOMContentLoaded', function() {
+        Outseta.getUser()
+          .then(user => {
+            if (!user) {
+              window.location.href = 'https://trustbureauai.outseta.com/auth';
+            }
+          })
+          .catch(() => {
+            window.location.href = 'https://trustbureauai.outseta.com/auth';
+          });
+      });
+    }
+  </script>
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
@@ -160,7 +182,7 @@
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
       <div class="flex flex-col items-center justify-center flex-shrink-0">
-        <img id="dynamicLogo" src="../../tb-logo.png"
+        <img id="dynamicLogo" src="../tb-logo.png"
              alt="Logo" class="brand-logo h-16 w-auto" />
         <span class="brand-georgia text-primary text-xl mt-2 tracking-wide"></span>
       </div>
@@ -186,14 +208,6 @@
         <span class="text-[11px] text-muted">Shown on client approval view</span>
       </div>
       <div class="grid grid-cols-1 gap-2 text-xs">
-        <div>
-          <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
-          <select id="themeSelector"
-                  class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
-            <option value="theme-corporate">Light Theme</option>
-            <option value="theme-slate">Dark Theme</option>
-          </select>
-        </div>
         <div>
           <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
           <input id="repNameInput" type="text"
@@ -435,7 +449,7 @@
     };
 
     let paymentFrequency = 'daily';
-    let currentTheme = 'theme-slate';
+    let currentTheme = 'theme-corporate'; // Always use light theme
     let currentAccent = 'accent-capfront';
     let amountSliderMax = 1000000;
     const MAX_ADDITIONAL_OFFERS = 2;
@@ -671,7 +685,7 @@
 
       isApprovalView = (viewMode === 'approval');
 
-      currentTheme = paramTheme || 'theme-slate';
+      currentTheme = 'theme-corporate'; // Always use light theme
       currentAccent = 'accent-capfront';
 
       if (isApprovalView) {
@@ -779,7 +793,6 @@
     function initializeCalculator() {
       initializeFromURL();
       applyTheme();
-      elements.themeSelector.value = currentTheme;
 
       syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
       syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
@@ -814,11 +827,6 @@
       if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
       if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
 
-      elements.themeSelector.addEventListener('change', (e) => {
-        currentTheme = e.target.value;
-        applyTheme();
-      });
-
       if (elements.addOfferButton) {
         elements.addOfferButton.addEventListener('click', handleAddOffer);
       }
@@ -850,7 +858,6 @@
           factor,
           term,
           freq,
-          theme,
           businessName,
           repName,
           repEmail,
