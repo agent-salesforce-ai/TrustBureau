@@ -341,10 +341,18 @@
     /* --------------------------------
      * ACCENT PALETTES
      * -------------------------------- */
+
+    /* Default accent = TrustBureau-ish emerald, but keep class name accent-gold for compatibility */
+    html.accent-gold {
+      --accent-color: #10b981;
+      --accent-color-light: #34d399;
+      --accent-color-dark: #047857;
+      --accent-shadow: 0 0 26px rgba(16, 185, 129, 0.75);
+    }
+
     html.accent-red      { --accent-color:#ef4444; --accent-color-light:#f97373; --accent-color-dark:#b91c1c; --accent-shadow:0 0 18px rgba(239,68,68,.55);}
     html.accent-orange   { --accent-color:#f97316; --accent-color-light:#fdba74; --accent-color-dark:#c2410c; --accent-shadow:0 0 18px rgba(249,115,22,.55);}
     html.accent-yellow   { --accent-color:#eab308; --accent-color-light:#fde047; --accent-color-dark:#a16207; --accent-shadow:0 0 18px rgba(234,179,8,.55);}
-    html.accent-gold     { --accent-color:#f59e0b; --accent-color-light:#fbbf24; --accent-color-dark:#92400e; --accent-shadow:0 0 26px rgba(245,158,11,.75);}
     html.accent-green    { --accent-color:#22c55e; --accent-color-light:#4ade80; --accent-color-dark:#15803d; --accent-shadow:0 0 18px rgba(34,197,94,.55);}
     html.accent-blue     { --accent-color:#2563eb; --accent-color-light:#3b82f6; --accent-color-dark:#1d4ed8; --accent-shadow:0 0 18px rgba(37,99,235,.55);}
     html.accent-indigo   { --accent-color:#4f46e5; --accent-color-light:#6366f1; --accent-color-dark:#3730a3; --accent-shadow:0 0 18px rgba(79,70,229,.55);}
@@ -382,11 +390,22 @@
       border-radius: 0.75rem;
     }
 
-    /* EXTRA DEPTH FOR MAIN OFFER CARD */
+    /* Extra depth baseline for main offer card */
     #offerCard {
-      /* A bit closer to the viewer than other cards */
       box-shadow: 0 14px 40px rgba(15, 23, 42, 0.22);
       border-radius: 0.9rem;
+    }
+
+    /* Glow ring for main offer card – only when:
+       - effective theme is light
+       - glow is enabled (offer-glow-on class on <html>)
+    */
+    html.theme-light.offer-glow-on #offerCard {
+      border-color: var(--accent-color-light);
+      box-shadow:
+        0 0 0 1px rgba(148, 163, 184, 0.35),
+        0 0 0 2px rgba(255, 255, 255, 0.9),
+        0 18px 45px var(--accent-shadow);
     }
 
     .shell {
@@ -405,7 +424,7 @@
     .border-primary { border-color: var(--border-primary); }
 
     .text-hero { color: var(--accent-color); }
-    /* No glow in light-ish themes */
+    /* No glow on the text itself in light-ish themes; only border-card glow */
     html.theme-dark .text-hero, html.theme-black .text-hero, html.theme-ocean .text-hero,
     html.theme-forest .text-hero, html.theme-sunset .text-hero, html.theme-neon .text-hero,
     html.theme-terminal .text-hero, html.theme-synthwave .text-hero, html.theme-laser .text-hero,
@@ -517,19 +536,17 @@
       <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
         <div class="flex items-center justify-center">
           <img id="customLogoImg" class="h-9 w-auto hidden" alt="Logo" />
-          <!-- TrustBureau shield with check -->
+          <!-- TrustBureau-style shield logo -->
           <svg
             id="defaultLogoSvg"
             class="h-9 w-9"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <!-- shield body -->
             <path
               d="M12 3L4.5 6V11.25C4.5 15.806 7.942 20.022 12 21C16.058 20.022 19.5 15.806 19.5 11.25V6L12 3Z"
               fill="#56BD9C"
             />
-            <!-- check -->
             <path
               d="M9 12.75L11.25 15L15 9.75"
               stroke="white"
@@ -540,7 +557,7 @@
           </svg>
         </div>
         <div class="flex flex-col items-center leading-tight mt-1">
-          <!-- Company name: now ~2x larger than before -->
+          <!-- Company name: 2x size -->
           <span id="companyNameDisplay" class="text-[22px] font-bold tracking-tight text-secondary"></span>
           <span id="platformBrandDisplay" class="text-[11px] font-medium text-muted"></span>
         </div>
@@ -604,15 +621,18 @@
                  placeholder="(555) 123-4567" />
         </div>
         <div>
-          <label for="logoInput" class="block font-semibold text-muted">Logo</label>
-          <input id="logoInput" type="file" accept="image/*"
-                 class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5" />
-          <p class="mt-1 text-[11px] text-muted">We compress to keep the link short (≈256px, WebP if possible).</p>
+          <label for="logoInput" class="block font-semibold text-muted">Logo URL</label>
+          <input id="logoInput" type="url"
+                 class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5"
+                 placeholder="https://yourdomain.com/logo.png" />
+          <p class="mt-1 text-[11px] text-muted">
+            Paste a public image URL; this logo is shown to clients and included in the approval link.
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- THEME PANEL (theme + accent + background) -->
+    <!-- THEME PANEL (theme + accent + background + glow toggle) -->
     <div id="themePanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary">Theme Settings</span>
@@ -652,7 +672,7 @@
           <div>
             <label for="accentSelector" class="block font-semibold text-muted">Accent</label>
             <select id="accentSelector" class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
-              <option value="accent-gold">Gold (Default)</option>
+              <option value="accent-gold">TrustBureau (Default)</option>
               <option value="accent-red">Red</option>
               <option value="accent-orange">Orange</option>
               <option value="accent-yellow">Yellow</option>
@@ -692,6 +712,15 @@
               <option value="bg-mesh">Mesh</option>
             </select>
           </div>
+        </div>
+
+        <!-- Glow toggle -->
+        <div class="mt-2 flex items-center justify-between">
+          <span class="text-[11px] font-semibold text-muted">Main Offer Glow</span>
+          <label class="inline-flex items-center gap-2 cursor-pointer text-[11px] text-muted">
+            <input id="offerGlowCheckbox" type="checkbox" class="rounded border-primary">
+            <span>Enable in light theme</span>
+          </label>
         </div>
       </div>
     </div>
@@ -891,6 +920,7 @@
       themeSelector: document.getElementById('themeSelector'),
       accentSelector: document.getElementById('accentSelector'),
       backgroundSelector: document.getElementById('backgroundSelector'),
+      offerGlowCheckbox: document.getElementById('offerGlowCheckbox'),
       repSettingsToggle: document.getElementById('repSettingsToggle'),
       themePanelToggle: document.getElementById('themePanelToggle'),
       repSettingsPanel: document.getElementById('repSettingsPanel'),
@@ -949,6 +979,7 @@
     let currentTheme = 'theme-light';
     let currentAccent = 'accent-gold';
     let currentBackground = 'bg-default';
+    let offerGlow = true; // default: glow ON
     let currentLogoDataUrl = '';
     let companyName = '';
     let amountSliderMax = 1000000;
@@ -957,13 +988,14 @@
     let isApprovalView = false;
     let termLengthManualDirty = false;
 
-    // Load saved theme/accent/background/logo/company, fallback to system dark if no theme
+    // Load saved theme/accent/background/logo/company/glow
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
       const storedBackground = localStorage.getItem('generic_offer_calc_bg');
       const storedLogo = localStorage.getItem('generic_offer_calc_logo');
       const storedCompany = localStorage.getItem('generic_offer_calc_company');
+      const storedGlow = localStorage.getItem('generic_offer_calc_glow');
 
       if (storedTheme) {
         currentTheme = storedTheme;
@@ -972,8 +1004,20 @@
       }
       if (storedAccent) currentAccent = storedAccent;
       if (storedBackground) currentBackground = storedBackground;
-      if (storedLogo) currentLogoDataUrl = storedLogo;
+
+      if (storedLogo) {
+        // guard in case someone somehow stored a massive data URL
+        if (storedLogo.length < 500) {
+          currentLogoDataUrl = storedLogo;
+        } else {
+          currentLogoDataUrl = '';
+          localStorage.removeItem('generic_offer_calc_logo');
+        }
+      }
+
       if (storedCompany) companyName = storedCompany;
+      if (storedGlow === '0') offerGlow = false;
+      else if (storedGlow === '1') offerGlow = true;
     } catch (_) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         currentTheme = 'theme-dark';
@@ -987,16 +1031,18 @@
         style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0,
       }).format(numericValue);
     }
+
     function parseFormattedNumber(val) {
       if (typeof val !== 'string' || !val) return 0;
       return parseFloat(val.replace(/[\$,]/g, '')) || 0;
     }
+
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
       if (elements.calcAmountSlider) elements.calcAmountSlider.max = String(cap);
     }
 
-    // Base64 helpers that support Unicode
+    // Base64 helpers for compact config
     function b64EncodeUnicode(str) {
       return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
     }
@@ -1006,7 +1052,6 @@
       ).join(''));
     }
 
-    // Encode/decode config (kept compact)
     function encodeConfig(config) {
       try { return b64EncodeUnicode(JSON.stringify(config)); } catch { return ''; }
     }
@@ -1014,7 +1059,6 @@
       try { return JSON.parse(b64DecodeUnicode(encoded)); } catch { return null; }
     }
 
-    // Read #hash param (preferred) or ?query param
     function getParam(name) {
       const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
       if (hash) {
@@ -1044,6 +1088,7 @@
 
       return { amount, factor, termMonths: termPayments, termLengthMonths, totalPayback, totalCost, payment: paymentAmount, paymentLabel, frequency };
     }
+
     function getCurrentOffer() {
       const amount = parseFormattedNumber(elements.calcAmountInput.value);
       const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
@@ -1053,7 +1098,11 @@
 
     function renderSavedOffers() {
       if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
-      if (!savedOffers.length) { elements.savedOffersSection.classList.add('hidden'); elements.savedOffersContainer.innerHTML = ''; return; }
+      if (!savedOffers.length) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
+        return;
+      }
       elements.savedOffersSection.classList.remove('hidden');
       const html = savedOffers.map((offer, index) => {
         const labelIndex = index + 2;
@@ -1086,6 +1135,7 @@
       if (!elements.addOfferButton) return;
       elements.addOfferButton.disabled = savedOffers.length >= MAX_ADDITIONAL_OFFERS;
     }
+
     function handleAddOffer() {
       if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
       savedOffers.push(getCurrentOffer());
@@ -1126,12 +1176,14 @@
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         themeClass = prefersDark ? 'theme-dark' : 'theme-light';
       }
-      document.documentElement.className = `${themeClass} ${currentAccent} ${currentBackground}`;
+      const glowClass = offerGlow ? 'offer-glow-on' : 'offer-glow-off';
+      document.documentElement.className = `${themeClass} ${currentAccent} ${currentBackground} ${glowClass}`;
       document.documentElement.dataset.effectiveTheme = themeClass;
       try {
         localStorage.setItem('generic_offer_calc_theme', currentTheme);
         localStorage.setItem('generic_offer_calc_accent', currentAccent);
         localStorage.setItem('generic_offer_calc_bg', currentBackground);
+        localStorage.setItem('generic_offer_calc_glow', offerGlow ? '1' : '0');
       } catch (_) {}
     }
 
@@ -1150,32 +1202,6 @@
         if (dataUrl) localStorage.setItem('generic_offer_calc_logo', dataUrl);
         else localStorage.removeItem('generic_offer_calc_logo');
       } catch (_) {}
-    }
-
-    // Resize/compress uploaded logo to keep links short
-    function processLogoFile(file, maxDim = 256) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          let dataUrl = '';
-          try {
-            dataUrl = canvas.toDataURL('image/webp', 0.8);
-            if (!dataUrl || dataUrl.length < 16) throw new Error('webp failed');
-          } catch { dataUrl = canvas.toDataURL('image/png'); }
-          currentLogoDataUrl = dataUrl;
-          applyLogoFromDataUrl(currentLogoDataUrl);
-        };
-        img.src = e.target?.result;
-      };
-      reader.readAsDataURL(file);
     }
 
     function updateBrandDisplay() {
@@ -1251,7 +1277,13 @@
           if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
           if (typeof cfg.cn === 'string') companyNameParam = cfg.cn;
 
-          if (typeof cfg.lg === 'string') currentLogoDataUrl = cfg.lg;
+          if (typeof cfg.lg === 'string') {
+            currentLogoDataUrl = cfg.lg.length < 500 ? cfg.lg : '';
+          }
+          if (typeof cfg.gl !== 'undefined') {
+            offerGlow = !!cfg.gl;
+          }
+
           if (Array.isArray(cfg.o)) offersRaw = cfg.o;
         }
       }
@@ -1313,8 +1345,13 @@
 
         const businessName = elements.businessNameInput?.value.trim() || '';
         if (elements.businessNameDisplay) {
-          if (businessName) { elements.businessNameDisplay.textContent = businessName; elements.businessNameDisplay.classList.remove('hidden'); }
-          else { elements.businessNameDisplay.textContent = ''; elements.businessNameDisplay.classList.add('hidden'); }
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
         }
 
         elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
@@ -1334,7 +1371,9 @@
         if (elements.termLengthMonthsInput) {
           if (!termLengthManualDirty) {
             const autoRounded = Math.round(months * 2) / 2;
-            elements.termLengthMonthsInput.value = Number.isInteger(autoRounded) ? String(autoRounded) : autoRounded.toFixed(1);
+            elements.termLengthMonthsInput.value = Number.isInteger(autoRounded)
+              ? String(autoRounded)
+              : autoRounded.toFixed(1);
           }
           const manualVal = parseFloat(elements.termLengthMonthsInput.value);
           if (!isNaN(manualVal) && manualVal > 0) months = manualVal;
@@ -1355,7 +1394,7 @@
       applyTheme();
       applyLogoFromDataUrl(currentLogoDataUrl);
 
-      // React to system theme changes when on Auto
+      // react to system theme changes when on Auto
       if (window.matchMedia) {
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
         const handleSystemThemeChange = () => { if (currentTheme === 'theme-auto') applyTheme(); };
@@ -1366,6 +1405,8 @@
       if (elements.themeSelector) elements.themeSelector.value = currentTheme;
       if (elements.accentSelector) elements.accentSelector.value = currentAccent;
       if (elements.backgroundSelector) elements.backgroundSelector.value = currentBackground;
+      if (elements.offerGlowCheckbox) elements.offerGlowCheckbox.checked = offerGlow;
+      if (elements.logoInput && currentLogoDataUrl) elements.logoInput.value = currentLogoDataUrl;
 
       if (elements.calcAmountSlider && elements.calcAmountInput) {
         syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
@@ -1403,7 +1444,7 @@
         });
       }
 
-      // Settings vs Theme panels (toggle open/close, close the other)
+      // Settings vs Theme panels
       if (!isApprovalView) {
         if (elements.repSettingsToggle && elements.repSettingsPanel) {
           elements.repSettingsToggle.addEventListener('click', () => {
@@ -1425,13 +1466,15 @@
 
       if (!isApprovalView && elements.companyNameInput) elements.companyNameInput.addEventListener('input', updateBrandDisplay);
 
+      // Logo URL input
       if (!isApprovalView && elements.logoInput) {
-        elements.logoInput.addEventListener('change', () => {
-          const file = elements.logoInput.files && elements.logoInput.files[0];
-          if (file) processLogoFile(file, 256);
+        elements.logoInput.addEventListener('input', () => {
+          currentLogoDataUrl = elements.logoInput.value.trim();
+          applyLogoFromDataUrl(currentLogoDataUrl);
         });
       }
 
+      // Theme selectors
       if (!isApprovalView && elements.themeSelector) {
         elements.themeSelector.addEventListener('change', e => { currentTheme = e.target.value; applyTheme(); });
       }
@@ -1440,6 +1483,12 @@
       }
       if (!isApprovalView && elements.backgroundSelector) {
         elements.backgroundSelector.addEventListener('change', e => { currentBackground = e.target.value; applyTheme(); });
+      }
+      if (!isApprovalView && elements.offerGlowCheckbox) {
+        elements.offerGlowCheckbox.addEventListener('change', () => {
+          offerGlow = !!elements.offerGlowCheckbox.checked;
+          applyTheme();
+        });
       }
 
       if (!isApprovalView && elements.addOfferButton) {
@@ -1467,7 +1516,12 @@
           companyName = companyNameVal;
           updateBrandDisplay();
 
-          const offersForUrl = savedOffers.map(o => ({ a: o.amount, f: o.factor, t: o.termMonths, q: o.frequency || freq }));
+          const offersForUrl = savedOffers.map(o => ({
+            a: o.amount,
+            f: o.factor,
+            t: o.termMonths,
+            q: o.frequency || freq
+          }));
 
           const payload = {
             a: amount, f: factor, t: term, q: freq,
@@ -1476,11 +1530,12 @@
             cn: companyNameVal,
             o: offersForUrl,
             lg: currentLogoDataUrl || '',
+            gl: offerGlow ? 1 : 0,
           };
 
           const encoded = encodeConfig(payload);
 
-          // Build share URL with hash to avoid server/proxy limits
+          // Share via URL hash to keep query string small
           const url = new URL(window.location.href);
           url.search = new URLSearchParams({ view: 'approval' }).toString();
           url.hash = 'c=' + encoded;
@@ -1493,7 +1548,10 @@
             elements.shareLinkOutput.select();
           }
 
-          const setStatus = (msg) => { shareBtn.innerText = msg; setTimeout(() => { shareBtn.innerText = originalText; }, 2000); };
+          const setStatus = (msg) => {
+            shareBtn.innerText = msg;
+            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          };
 
           try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1503,8 +1561,14 @@
           } catch (err) {
             try {
               const ta = document.createElement('textarea');
-              ta.value = shareUrl; ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
-              document.body.appendChild(ta); ta.focus(); ta.select();
+              ta.value = shareUrl;
+              ta.style.position = 'fixed';
+              ta.style.top = '0';
+              ta.style.left = '0';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
               const ok = document.execCommand('copy');
               document.body.removeChild(ta);
               if (ok) setStatus('Copied!'); else throw new Error('execCommand copy failed');
