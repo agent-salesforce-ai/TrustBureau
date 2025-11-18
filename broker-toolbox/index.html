@@ -20,6 +20,22 @@
   </script>
   <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
 
+  <!-- Auth Protection -->
+  <script>
+    // Redirect to login if not authenticated
+    document.addEventListener('DOMContentLoaded', function() {
+      Outseta.getUser()
+        .then(user => {
+          if (!user) {
+            window.location.href = 'https://trustbureauai.outseta.com/auth';
+          }
+        })
+        .catch(() => {
+          window.location.href = 'https://trustbureauai.outseta.com/auth';
+        });
+    });
+  </script>
+
   <style>
     :root {
       --accent-color: #10b981;
