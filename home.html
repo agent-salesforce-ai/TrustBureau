@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="TrustBureau.ai provides AI-powered business verification and underwriting reports so you can make lending and risk decisions in seconds, not days.">
-  <meta name="theme-color" content="#000000">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TrustBureau.ai provides AI-powered business verification and underwriting reports so you can make lending and risk decisions in seconds, not days." />
+  <meta name="theme-color" content="#F8FAFC" />
   <title>TrustBureau.ai - AI-Powered Business Verification & Underwriting</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Dark (AMOLED) Tailwind Configuration -->
+  <!-- Tailwind config -->
   <script>
     tailwind.config = {
       theme: {
@@ -25,281 +25,150 @@
             sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            'brand-yellow': '#FACC15', // primary accent & shield
-            'brand-green': '#16A34A',  // secondary accent (positives)
-            'brand-dark': '#F1F5F9',   // primary text
-            'brand-gray': '#94A3B8',   // secondary text
-            'brand-bg': '#000000',     // background
-            'brand-card': '#000000',   // card background
-            'brand-border': '#334155', // border
-          }
-        }
-      }
-    }
+            'brand-yellow': '#FACC15',
+            'brand-green': '#16A34A',
+            'brand-dark': '#0F172A',
+            'brand-gray': '#64748B',
+            'brand-bg': '#F8FAFC',
+            'brand-card': '#FFFFFF',
+            'brand-border': '#E2E8F0',
+          },
+        },
+      },
+    };
   </script>
 
   <style>
+    :root {
+      --tb-yellow: #FACC15;
+      --tb-green:  #16A34A;
+    }
+
+    /* THEME SURFACES */
+    body[data-theme="light"] {
+      --tb-bg:          #F8FAFC;
+      --tb-card:        #FFFFFF;
+      --tb-text:        #0F172A;
+      --tb-gray:        #64748B;
+      --tb-border:      #E2E8F0;
+      --tb-muted:       #CBD5E1;
+      --tb-chart-bg:    #FFFFFF;
+      --tb-chart-axis:  #E2E8F0;
+    }
+    body[data-theme="dark"] {
+      --tb-bg:          #020617;
+      --tb-card:        #020617;
+      --tb-text:        #F1F5F9;
+      --tb-gray:        #94A3B8;
+      --tb-border:      #334155;
+      --tb-muted:       #475569;
+      --tb-chart-bg:    #020617;
+      --tb-chart-axis:  #334155;
+    }
+
+    .bg-brand-bg { background-color: var(--tb-bg) !important; }
+    .bg-brand-card { background-color: var(--tb-card) !important; }
+    .text-brand-dark { color: var(--tb-text) !important; }
+    .text-brand-gray { color: var(--tb-gray) !important; }
+    .border-brand-border { border-color: var(--tb-border) !important; }
+
     body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    .cta-button {
-      transition: all 0.25s ease;
-    }
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(250, 204, 21, 0.14);
-    }
-    .cta-button:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-    button, a {
-      -webkit-tap-highlight-color: transparent;
-      cursor: pointer;
-    }
 
-    /* SCORE CIRCLE (dark + yellow / green) */
+    .cta-button { transition: all .3s ease; }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(15,23,42,.18); }
+    .cta-button:active { transform: translateY(0); }
+
+    button,a { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+
+    /* SCORE GAUGE */
     .score-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Plus Jakarta Sans', 'sans-serif';
-      font-weight: 800;
-      font-size: 2.5rem;
-      border: 8px solid;
+      width: 120px; height: 120px; border-radius: 9999px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 2.5rem;
+      border: 8px solid var(--tb-border); background-color: var(--tb-card); color: var(--tb-text);
     }
-    .score-red {
-      border-color: #7F1D1D;
-      color: #FCA5A5;
-      background-color: #111827;
-    }
-    .score-yellow {
-      border-color: #854D0E;
-      color: #FACC15;
-      background-color: #111827;
-    }
-    .score-green {
-      border-color: #166534;
-      color: #4ADE80;
-      background-color: #022C22;
-    }
+    .score-red    { border-color:#FCA5A5; color:#B91C1C; background-color:#FEF2F2; }
+    .score-yellow { border-color:#FACC15; color:#92400E; background-color:#FEF9C3; }
+    .score-green  { border-color:var(--tb-green); color:#166534; background-color:#DCFCE7; }
 
-    /* LIST ITEMS */
-    .report-list-item {
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid #334155;
-      margin-bottom: 0.75rem;
-    }
-    .report-list-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-      margin-bottom: 0;
-    }
+    /* LISTS */
+    .report-list-item { padding-bottom:.75rem; border-bottom:1px solid var(--tb-border); margin-bottom:.75rem; }
+    .report-list-item:last-child { border-bottom:none; padding-bottom:0; margin-bottom:0; }
 
-    /* BANKING CHARTS */
+    /* CHARTS */
     .chart-visual {
-      border-left: 1px solid #334155;
-      border-bottom: 1px solid #334155;
-      height: 150px;
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-end;
-      padding: 10px 12px 6px 12px;
-      gap: 8px;
+      border-left:1px solid var(--tb-chart-axis);
+      border-bottom:1px solid var(--tb-chart-axis);
+      height:150px; display:flex; justify-content:space-around; align-items:flex-end;
+      padding:10px 12px 6px 12px; gap:8px; background-color:var(--tb-chart-bg);
     }
-    .chart-empty {
-      font-size: 0.875rem;
-      color: #94A3B8;
-      padding: 16px 4px 8px 4px;
-      text-align: center;
-      width: 100%;
-    }
-    .bar-wrapper {
-      flex: 1;
-      max-width: 90px;
-      height: 100%;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-      position: relative;
-    }
-    .bar {
-      width: 90%;
-      max-width: 40px;
-      position: relative;
-      min-height: 2px;
-      border-radius: 4px 4px 0 0;
-      transition: height 0.5s ease-out;
-    }
-    .bar-green { background-color: #22C55E; } /* emerald-500 */
-    .bar-grey  { background-color: #64748B; } /* slate-500 */
-    .bar-yellow{ background-color: #EAB308; } /* yellow-600 */
-    .bar-red   { background-color: #DC2626; } /* red-600 */
+    .chart-empty { font-size:.875rem; color:var(--tb-gray); padding:16px 4px 8px; text-align:center; width:100%; }
+    .bar-wrapper { flex:1; max-width:90px; height:100%; display:flex; flex-direction:column-reverse; align-items:center; position:relative; }
+    .bar { width:90%; max-width:40px; background-color:var(--tb-yellow); position:relative; min-height:2px; border-radius:4px 4px 0 0; transition:height .5s ease-out; }
+    .bar-green  { background-color:var(--tb-green); }
+    .bar-grey   { background-color:var(--tb-muted); }
+    .bar-yellow { background-color:var(--tb-yellow); }
+    .bar-red    { background-color:#DC2626; }
+    .bar-label  { font-size:.75rem; color:var(--tb-gray); padding-top:4px; text-align:center; font-weight:500; }
+    .bar-value  { position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:.75rem; color:var(--tb-text); font-weight:600; white-space:nowrap; }
 
-    .bar-label {
-      font-size: 0.75rem;
-      color: #94A3B8;
-      padding-top: 4px;
-      text-align: center;
-      font-weight: 500;
-    }
-    .bar-value {
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.75rem;
-      color: #F1F5F9;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    /* DATA TABLE */
-    .data-table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.875rem;
-      overflow-x: auto;
-      display: block;
-    }
-    .data-table th,
-    .data-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #334155;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .data-table th {
-      background-color: #0f172a;
-      font-weight: 600;
-      color: #94A3B8;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-    }
-    .data-table tr:last-child td {
-      border-bottom: none;
-    }
-    .data-table .monthly-avg {
-      font-weight: 600;
-      background-color: #0f172a;
-      color: #F1F5F9;
-      border-top: 2px solid #334155;
-    }
-    .text-red-table { color: #F87171; }
-    .text-green-table { color: #16A34A; }
+    /* TABLE */
+    .data-table { border-collapse:collapse; width:100%; font-size:.875rem; overflow-x:auto; display:block; }
+    .data-table th,.data-table td { padding:10px 12px; border-bottom:1px solid var(--tb-border); text-align:left; white-space:nowrap; }
+    .data-table th { background-color:rgba(148,163,184,.12); font-weight:600; color:var(--tb-gray); font-size:.75rem; text-transform:uppercase; }
+    .data-table tr:last-child td { border-bottom:none; }
+    .data-table .monthly-avg { font-weight:600; background-color:rgba(148,163,184,.12); color:var(--tb-text); border-top:1px solid var(--tb-border); }
+    .text-red-table{ color:#EF4444; } .text-green-table{ color:var(--tb-green); }
 
     /* RISK CHECKLIST */
-    .risk-checklist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      font-size: 0.875rem;
-      margin-bottom: 0.75rem;
-      line-height: 1.4;
-    }
-    .risk-checklist-item:last-child { margin-bottom: 0; }
-    .risk-label {
-      flex: 0 0 160px;
-      color: #F1F5F9;
-      font-weight: 500;
-    }
-    .risk-status {
-      flex: 1;
-      font-weight: 600;
-      text-align: left;
-    }
-    .risk-green  { color: #16A34A; }
-    .risk-red    { color: #F87171; }
-    .risk-yellow { color: #FACC15; }
-    .risk-grey   { color: #94A3B8; }
+    .risk-checklist-item{ display:flex; align-items:flex-start; gap:12px; font-size:.875rem; margin-bottom:.75rem; line-height:1.4; }
+    .risk-checklist-item:last-child{ margin-bottom:0; }
+    .risk-label{ flex:0 0 160px; color:var(--tb-text); font-weight:500; }
+    .risk-status{ flex:1; font-weight:600; text-align:left; }
+    .risk-green{ color:var(--tb-green); } .risk-red{ color:#F87171; } .risk-yellow{ color:#EAB308; } .risk-grey{ color:var(--tb-gray); }
 
-    /* HERO VISUALS */
-    .hero-visual {
-      background-color: #000000;
-      border: 1px solid #334155;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-      overflow: hidden;
-    }
-    .hero-visual-header {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background-color: #0f172a;
-      border-bottom: 1px solid #334155;
-    }
-    .hero-visual-header .dot {
-      height: 0.75rem;
-      width: 0.75rem;
-      border-radius: 9999px;
-      background-color: #475569;
-      margin-right: 0.5rem;
-    }
-    .hero-visual-body {
-      padding: 1.5rem;
-    }
+    /* HERO MOCK */
+    .hero-visual{ background-color:var(--tb-card); border:1px solid var(--tb-border); border-radius:.5rem; box-shadow:0 10px 20px rgba(15,23,42,.12); overflow:hidden; }
+    .hero-visual-header{ display:flex; align-items:center; padding:.75rem 1rem; background-color:rgba(148,163,184,.12); border-bottom:1px solid var(--tb-border); }
+    .hero-visual-header .dot{ height:.75rem; width:.75rem; border-radius:9999px; background-color:var(--tb-muted); margin-right:.5rem; }
+    .hero-visual-body{ padding:1.5rem; background-color:var(--tb-card); }
 
-    /* LOADER PROGRESS */
-    .loader-progress-track {
-      width: 100%;
-      height: 0.6rem;
-      border-radius: 9999px;
-      background-color: #020617;
-      overflow: hidden;
-      border: 1px solid #1f2937;
-    }
-    .loader-progress-bar {
-      height: 100%;
-      width: 50%;
-      background: linear-gradient(90deg, #FACC15, #22C55E);
-      box-shadow: 0 0 16px rgba(250, 204, 21, 0.35);
-      animation: loader-indeterminate 1.2s infinite ease-out;
-    }
-    @keyframes loader-indeterminate {
-      0% { transform: translateX(-110%); }
-      100% { transform: translateX(250%); }
-    }
+    /* HEADER SURFACE */
+    .theme-header{ background-color:rgba(248,250,252,.9); }
+    body[data-theme="dark"] .theme-header{ background-color:rgba(15,23,42,.9); }
 
-    .loader-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 0.875rem;
-      color: #64748B;
-    }
-    .loader-step-dot {
-      width: 0.75rem;
-      height: 0.75rem;
-      border-radius: 9999px;
-      border: 2px solid #4B5563;
-      margin-top: 0.18rem;
-    }
-    .loader-step-active {
-      color: #E5E7EB;
-    }
-    .loader-step-active .loader-step-dot {
-      border-color: #FACC15;
-      background: radial-gradient(circle at center, #FACC15, #22C55E);
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.5);
-    }
+    /* LOADER */
+    .report-loader{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding-top:3.5rem; padding-bottom:3.5rem; }
+    .loader-ring{ width:64px; height:64px; border-radius:9999px; border:4px solid var(--tb-border); border-top-color:var(--tb-yellow); animation:loader-spin 1s linear infinite; position:relative; }
+    .loader-dot{ position:absolute; width:12px; height:12px; border-radius:9999px; background-color:var(--tb-green); top:4px; right:4px; }
+    @keyframes loader-spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+    .loader-steps{ font-size:.875rem; }
+    .loader-step{ display:flex; align-items:center; padding:.4rem .75rem; border-radius:.75rem; color:var(--tb-gray); }
+    .loader-step + .loader-step{ margin-top:.25rem; }
+    .loader-step-dot{ width:8px; height:8px; border-radius:9999px; margin-right:.5rem; background-color:#E5E7EB; }
+    .loader-step.active{ background-color:rgba(250,204,21,.08); color:#92400E; }
+    .loader-step.active .loader-step-dot{ background-color:var(--tb-yellow); }
+    .loader-step.completed{ color:var(--tb-green); }
+    .loader-step.completed .loader-step-dot{ background-color:var(--tb-green); }
 
+    /* SETTINGS MODAL */
+    .settings-overlay{ background-color:rgba(15,23,42,.6); }
+    body[data-theme="light"] .settings-overlay{ background-color:rgba(15,23,42,.35); }
   </style>
 </head>
 
-<body class="font-sans text-brand-dark bg-brand-bg">
-
+<body class="font-sans text-brand-dark bg-brand-bg" data-theme="light">
 <div id="main-app" class="relative min-h-screen">
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 bg-brand-bg/80 backdrop-blur-md border-b border-brand-border">
+  <header class="sticky top-0 z-40 theme-header backdrop-blur-md border-b border-brand-border">
     <div class="container mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
         <a href="#" class="flex items-center space-x-2" aria-label="TrustBureau.ai home">
-          <!-- Yellow shield logo -->
+          <!-- Shield logo (brand yellow) -->
           <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M12 2.25L4.5 5.25v6.75c0 4.17 3.01 7.98 7.5 9.75 4.49-1.77 7.5-5.58 7.5-9.75V5.25L12 2.25Z" fill="#FACC15"/>
             <path d="M10.3 13.95 8 11.65l-1.2 1.2 3.5 3.5 6.9-6.9-1.2-1.2-5.7 5.7Z" fill="#000000"/>
@@ -307,18 +176,30 @@
           <span class="font-heading font-bold text-xl text-brand-dark">TrustBureau.ai</span>
         </a>
 
-        <nav class="hidden md:flex items-center space-x-6" aria-label="Main navigation">
+        <nav class="hidden md:flex items-center space-x-4" aria-label="Main navigation">
           <a href="#demo" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Demo</a>
           <a href="#platform" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Platform</a>
           <a href="#pricing" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Pricing</a>
 
           <!-- Settings (desktop) -->
-          <button id="settings-btn" type="button" class="flex items-center text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors" aria-label="Open settings">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11.25 4.5h1.5l.4 2.03a5.52 5.52 0 0 1 1.54.89l1.96-.75 1.06 1.06-.74 1.96c.38.5.67 1.05.88 1.65l2.04.38v1.5l-2.04.38a5.52 5.52 0 0 1-.88 1.65l.74 1.96-1.06 1.06-1.96-.74a5.52 5.52 0 0 1-1.54.88L12.75 19.5h-1.5l-.4-2.03a5.52 5.52 0 0 1-1.54-.88l-1.96.74-1.06-1.06.74-1.96a5.52 5.52 0 0 1-.88-1.65L4.11 12v-1.5l2.04-.38c.21-.6.5-1.16.88-1.65l-.74-1.96 1.06-1.06 1.96.75c.46-.38.98-.68 1.54-.89L11.25 4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="12" cy="12" r="2.25" stroke="currentColor" stroke-width="1.5"/>
+          <button id="settings-btn" type="button" class="flex items-center text-sm font-medium text-brand-gray hover:text-brand-dark px-3 py-1 rounded-full border border-brand-border hover:bg-brand-card">
+            <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="none" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M10.25 3.5l.53 1.77a1 1 0 00.95.73h1.86a.75.75 0 01.53 1.28l-1.51 1.47a1 1 0 000 1.44l1.5 1.47a.75.75 0 01-.52 1.28h-1.86a1 1 0 00-.95.73l-.53 1.77a.75.75 0 01-1.44 0L8.28 15.7a1 1 0 00-.95-.73H5.47a.75.75 0 01-.53-1.28l1.51-1.47a1 1 0 000-1.44L4.94 7.28a.75.75 0 01.53-1.28h1.86a1 1 0 00.95-.73l.53-1.77a.75.75 0 011.44 0z"/>
+              <circle cx="10" cy="10" r="2.25" stroke-width="1.5"></circle>
             </svg>
-            <span class="ml-1.5">Settings</span>
+            Settings
+          </button>
+
+          <!-- Theme toggle (desktop) -->
+          <button id="theme-toggle-btn" type="button" class="flex items-center text-xs font-medium text-brand-gray border border-brand-border rounded-full px-3 py-1 hover:bg-brand-card hover:text-brand-dark">
+            <svg id="theme-icon-sun" class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <circle cx="10" cy="10" r="4"></circle>
+            </svg>
+            <svg id="theme-icon-moon" class="w-4 h-4 mr-1 hidden" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M14.53 11.94A5.5 5.5 0 0 1 8.06 5.47 4.5 4.5 0 1 0 14.53 11.94Z"></path>
+            </svg>
+            <span id="theme-toggle-label">Light</span>
           </button>
 
           <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-2 px-5 rounded-lg text-sm hover:bg-yellow-300" aria-label="Search businesses">
@@ -326,12 +207,10 @@
           </a>
         </nav>
 
-        <!-- Mobile Menu Button -->
+        <!-- Mobile menu button -->
         <div class="md:hidden">
           <button id="mobile-menu-btn" class="text-brand-dark p-2" aria-label="Toggle navigation menu" aria-expanded="false">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
           </button>
         </div>
       </div>
@@ -344,24 +223,33 @@
           <a href="#pricing" class="mobile-nav-link text-lg font-medium text-brand-gray hover:text-brand-dark transition-colors">Pricing</a>
 
           <!-- Settings (mobile) -->
-          <button id="settings-btn-mobile" type="button" class="mobile-nav-link flex items-center text-lg font-medium text-brand-gray hover:text-brand-dark transition-colors">
-            <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11.25 4.5h1.5l.4 2.03a5.52 5.52 0 0 1 1.54.89l1.96-.75 1.06 1.06-.74 1.96c.38.5.67 1.05.88 1.65l2.04.38v1.5l-2.04.38a5.52 5.52 0 0 1-.88 1.65l.74 1.96-1.06 1.06-1.96-.74a5.52 5.52 0 0 1-1.54.88L12.75 19.5h-1.5l-.4-2.03a5.52 5.52 0 0 1-1.54-.88l-1.96.74-1.06-1.06.74-1.96a5.52 5.52 0 0 1-.88-1.65L4.11 12v-1.5l2.04-.38c.21-.6.5-1.16.88-1.65l-.74-1.96 1.06-1.06 1.96.75c.46-.38.98-.68 1.54-.89L11.25 4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="12" cy="12" r="2.25" stroke="currentColor" stroke-width="1.5"/>
+          <button id="settings-btn-mobile" type="button" class="mobile-nav-link flex items-center justify-center text-sm font-medium text-brand-gray border border-brand-border rounded-full px-3 py-2 hover:bg-brand-card hover:text-brand-dark">
+            <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="none" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M10.25 3.5l.53 1.77a1 1 0 00.95.73h1.86a.75.75 0 01.53 1.28l-1.51 1.47a1 1 0 000 1.44l1.5 1.47a.75.75 0 01-.52 1.28h-1.86a1 1 0 00-.95.73l-.53 1.77a.75.75 0 01-1.44 0L8.28 15.7a1 1 0 00-.95-.73H5.47a.75.75 0 01-.53-1.28l1.51-1.47a1 1 0 000-1.44L4.94 7.28a.75.75 0 01.53-1.28h1.86a1 1 0 00.95-.73l.53-1.77a.75.75 0 011.44 0z"/>
+              <circle cx="10" cy="10" r="2.25" stroke-width="1.5"></circle>
             </svg>
-            <span>Settings</span>
+            Settings
           </button>
 
-          <a href="#demo" class="mobile-nav-link cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 text-center">
-            Search
-          </a>
+          <!-- Theme toggle (mobile) -->
+          <button id="theme-toggle-btn-mobile" type="button" class="mt-1 flex items-center justify-center text-sm font-medium text-brand-gray border border-brand-border rounded-full px-3 py-2 hover:bg-brand-card hover:text-brand-dark">
+            <svg id="theme-icon-sun-mobile" class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <circle cx="10" cy="10" r="4"></circle>
+            </svg>
+            <svg id="theme-icon-moon-mobile" class="w-4 h-4 mr-1 hidden" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M14.53 11.94A5.5 5.5 0 0 1 8.06 5.47 4.5 4.5 0 1 0 14.53 11.94Z"></path>
+            </svg>
+            <span id="theme-toggle-label-mobile">Light</span>
+          </button>
+
+          <a href="#demo" class="mobile-nav-link cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 text-center">Search</a>
         </nav>
       </div>
     </div>
   </header>
 
   <main id="main-page">
-
     <!-- Hero -->
     <section class="relative py-24 md:py-32 bg-brand-bg overflow-hidden">
       <div class="container mx-auto px-6 z-10">
@@ -372,15 +260,11 @@
               <span class="block text-brand-yellow">Instant. Accurate. Fair.</span>
             </h1>
             <p class="mt-6 text-xl text-brand-gray max-w-xl mx-auto lg:mx-0">
-              TrustBureau provides AI-powered business verification and underwriting reports so you can make decisions in seconds, not days.
+              TrustBureau provides the world's most comprehensive AI-powered business verification and underwriting reports, enabling you to make decisions in seconds, not days.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300">
-                Search
-              </a>
-              <a href="#platform" class="cta-button bg-brand-card text-brand-dark font-bold py-4 px-8 rounded-lg text-lg border border-brand-border hover:border-brand-gray">
-                Learn More
-              </a>
+              <a href="#demo" class="cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300">Search</a>
+              <a href="#platform" class="cta-button bg-brand-card text-brand-dark font-bold py-4 px-8 rounded-lg text-lg border border-brand-border hover:border-brand-gray">Learn More</a>
             </div>
           </div>
 
@@ -396,38 +280,34 @@
                     <span>780</span>
                   </div>
                   <div class="flex-1 space-y-2">
-                    <div class="h-6 bg-slate-700 rounded-md w-3/4"></div>
-                    <div class="h-4 bg-slate-800 rounded-md w-1/2"></div>
+                    <div class="h-6 bg-slate-200 rounded-md w-3/4"></div>
+                    <div class="h-4 bg-slate-100 rounded-md w-1/2"></div>
                   </div>
                 </div>
 
-                <div class="p-3 border-l-4 rounded-r-lg bg-emerald-900/20 border-emerald-500 text-emerald-200">
-                  <h5 class="font-heading font-bold text-lg text-emerald-400">Approve</h5>
-                  <p class="text-sm mt-1 text-brand-gray">Strong financials and positive sentiment.</p>
+                <div class="p-3 border-l-4 rounded-r-lg bg-yellow-50 border-yellow-500 text-yellow-900">
+                  <h5 class="font-heading font-bold text-lg text-yellow-700">Approve</h5>
+                  <p class="text-sm mt-1">Strong financials and positive sentiment.</p>
                 </div>
 
                 <div>
                   <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
                   <ul class="space-y-1.5">
                     <li class="flex items-start">
-                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                      </svg>
+                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                       <span class="text-sm text-brand-dark">Active corporate filings</span>
                     </li>
                     <li class="flex items-start">
-                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                      </svg>
+                      <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                       <span class="text-sm text-brand-dark">Positive cash flow</span>
                     </li>
                   </ul>
                 </div>
 
                 <div class="chart-visual" style="height: 100px; padding: 10px 12px 0 12px;">
-                  <div class="bar-wrapper"><div class="bar bar-green" style="height: 60%;"></div><div class="bar-label" style="padding-top: 2px;">Sep</div></div>
-                  <div class="bar-wrapper"><div class="bar bar-green" style="height: 80%;"></div><div class="bar-label" style="padding-top: 2px;">Oct</div></div>
-                  <div class="bar-wrapper"><div class="bar bar-green" style="height: 75%;"></div><div class="bar-label" style="padding-top: 2px;">Nov</div></div>
+                  <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height: 60%;"></div><div class="bar-label" style="padding-top: 2px;">Sep</div></div>
+                  <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height: 80%;"></div><div class="bar-label" style="padding-top: 2px;">Oct</div></div>
+                  <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height: 75%;"></div><div class="bar-label" style="padding-top: 2px;">Nov</div></div>
                 </div>
               </div>
             </div>
@@ -438,96 +318,55 @@
     </section>
 
     <!-- Report Generator -->
-    <section id="demo" class="py-24 bg-black">
+    <section id="demo" class="py-24 bg-brand-bg">
       <div class="container mx-auto px-6">
         <div id="main-widget-container" class="max-w-7xl mx-auto w-full transition-all duration-300 ease-in-out">
           <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-6 flex flex-col relative">
 
-            <!-- Search header (collapsed until "Try the demo") -->
+            <!-- Search header (hidden by default, shown when clicking "Search") -->
             <div id="report-search-header" class="max-w-xl mx-auto w-full" style="display: none;">
               <h2 class="font-heading font-bold text-4xl text-brand-dark text-center">Try the Demo</h2>
-              <p class="text-lg text-brand-gray text-center mt-3 mb-8">
-                Enter any business name to generate a live, comprehensive report.
-              </p>
+              <p class="text-lg text-brand-gray text-center mt-3 mb-8">Enter any business name to generate a live, comprehensive report in seconds.</p>
               <div class="space-y-4">
                 <div>
                   <label for="business-name" class="block text-sm font-medium text-brand-dark text-center">Enter any Business Name</label>
-                  <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-yellow focus:border-brand-yellow sm:text-sm bg-brand-card text-brand-dark" placeholder="e.g., 'Sutton Funding' or 'Apple Inc.'">
+                  <input type="text" id="business-name" class="mt-1 block w-full px-3 py-3 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-yellow focus:border-brand-yellow sm:text-sm bg-brand-card text-brand-dark" placeholder="e.g., Tesla, Inc. or Apex Innovations">
                 </div>
                 <button id="generate-report-btn" class="group relative w-full flex justify-center cta-button bg-brand-yellow text-black font-bold py-4 px-8 rounded-lg text-lg hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-wait">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-1" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/></svg>
                   <span>Generate Report</span>
                 </button>
               </div>
             </div>
 
-            <!-- Results Container -->
+            <!-- Results container -->
             <div id="report-results-ui" class="w-full" style="display: block;">
 
-              <!-- Enhanced Loader -->
-              <div id="report-loader" style="display: none;" class="results-box py-12 flex flex-col items-center">
-                <div class="flex items-center space-x-3">
-                  <span class="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-slate-800">
-                    <svg class="h-7 w-7 text-brand-yellow animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-                      <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V2C6.477 2 2 6.477 2 12h2z"></path>
-                    </svg>
-                  </span>
-                  <div>
-                    <p class="text-brand-dark font-semibold text-lg">Building your underwriting report…</p>
-                    <p class="text-brand-gray text-sm">Running web searches, pulling filings, and synthesizing everything.</p>
+              <!-- Loader -->
+              <div id="report-loader" style="display: none;" class="report-loader results-box">
+                <div class="flex flex-col items-center">
+                  <div class="loader-ring relative"><div class="loader-dot"></div></div>
+                  <p class="mt-4 text-base font-medium text-brand-dark">Building comprehensive report…</p>
+                  <p id="loader-subtext" class="mt-1 text-sm text-brand-gray">Step 1 of 4 · Searching corporate filings</p>
+                  <div class="loader-steps mt-6 w-full max-w-md">
+                    <div class="loader-step" data-step="0"><div class="loader-step-dot"></div><span>Corporate filings &amp; business registration</span></div>
+                    <div class="loader-step" data-step="1"><div class="loader-step-dot"></div><span>Financials, banking data &amp; debt obligations</span></div>
+                    <div class="loader-step" data-step="2"><div class="loader-step-dot"></div><span>News, reviews &amp; public sentiment</span></div>
+                    <div class="loader-step" data-step="3"><div class="loader-step-dot"></div><span>Scoring risk &amp; assembling report</span></div>
                   </div>
                 </div>
-
-                <div class="mt-6 w-full max-w-md">
-                  <div class="loader-progress-track">
-                    <div class="loader-progress-bar"></div>
-                  </div>
-                </div>
-
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl">
-                  <div class="loader-step">
-                    <div class="loader-step-dot"></div>
-                    <div>
-                      <p class="font-medium">Search &amp; ingest</p>
-                      <p class="text-xs text-brand-gray">Finding corporate filings, news, reviews, and web presence.</p>
-                    </div>
-                  </div>
-                  <div class="loader-step">
-                    <div class="loader-step-dot"></div>
-                    <div>
-                      <p class="font-medium">Analyze &amp; score</p>
-                      <p class="text-xs text-brand-gray">Building financial, banking, legal, and sentiment profiles.</p>
-                    </div>
-                  </div>
-                  <div class="loader-step">
-                    <div class="loader-step-dot"></div>
-                    <div>
-                      <p class="font-medium">Draft the report</p>
-                      <p class="text-xs text-brand-gray">Writing the narrative and recommendations for you.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <p class="mt-6 text-xs text-brand-gray">
-                  Tip: you can tweak the business name and re-run the report any time.
-                </p>
               </div>
 
               <!-- Error -->
-              <div id="report-error-container" style="display: none;" class="p-4 border border-red-900 rounded-lg bg-red-900/20 results-box flex flex-col items-center justify-center">
-                <p class="text-sm font-bold text-red-400">An Error Occurred</p>
-                <p class="text-sm text-red-500" id="report-error-message"></p>
+              <div id="report-error-container" style="display: none;" class="p-4 border border-red-200 rounded-lg bg-red-50 results-box flex flex-col items-center justify-center">
+                <p class="text-sm font-bold text-red-700">An Error Occurred</p>
+                <p class="text-sm text-red-600 mt-1 text-center" id="report-error-message"></p>
               </div>
 
-              <h3 id="report-static-header" class="text-2xl font-heading font-bold text-brand-dark mb-4 text-center">
-                Live AI Comprehensive Business Report
-              </h3>
+              <h3 id="report-static-header" class="text-2xl font-heading font-bold text-brand-dark mb-4 text-center">Live AI Comprehensive Business Report</h3>
 
-              <!-- Report Content -->
-              <div id="report-content" class="w-full" style="display: block; margin-top: 1.5rem; border-top: 1px solid #374151; padding-top: 1.5rem;">
+              <!-- Report content -->
+              <div id="report-content" class="w-full" style="display: block; margin-top: 1.5rem; border-top: 1px solid var(--tb-border); padding-top: 1.5rem;">
 
                 <div class="mb-6 pb-4 border-b border-brand-border">
                   <h2 id="report-company-name-header" class="text-3xl font-heading font-bold text-brand-dark text-center">Apple Inc. (Sample)</h2>
@@ -537,50 +376,26 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
                   <!-- Sidebar -->
                   <div class="lg:col-span-2 space-y-6">
-
-                    <!-- Risk score -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Score</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
-                        <div id="report-score-circle" class="score-circle mb-4 score-green">
-                          <span id="report-score-digit">810</span>
-                        </div>
-                        <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic">
-                          Excellent financial health, strong brand, and consistent market leadership.
-                        </p>
-
+                        <div id="report-score-circle" class="score-circle mb-4 score-green"><span id="report-score-digit">810</span></div>
+                        <p id="report-score-justification" class="text-center text-brand-gray text-sm mb-4 italic">Excellent financial health, strong brand, and consistent market leadership.</p>
                         <div class="w-full text-left">
                           <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
                           <ul id="report-score-positives" class="space-y-1.5 mb-3">
-                            <li class="flex items-start">
-                              <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                              </svg>
-                              <span class="text-sm text-brand-dark">Massive cash reserves</span>
-                            </li>
-                            <li class="flex items-start">
-                              <svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                              </svg>
-                              <span class="text-sm text-brand-dark">High profitability</span>
-                            </li>
+                            <li class="flex items-start"><svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-sm text-brand-dark">Massive cash reserves</span></li>
+                            <li class="flex items-start"><svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-sm text-brand-dark">High profitability</span></li>
                           </ul>
                           <ul id="report-score-negatives" class="space-y-1.5">
-                            <li class="flex items-start">
-                              <svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                              </svg>
-                              <span class="text-sm text-brand-dark">Regulatory scrutiny</span>
-                            </li>
+                            <li class="flex items-start"><svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span class="text-sm text-brand-dark">Regulatory scrutiny</span></li>
                           </ul>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Sentiment -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Sentiment</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
@@ -591,141 +406,123 @@
                       </div>
                     </div>
 
-                    <!-- Public Records -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Public Records</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
-                          <li class="text-brand-green">
-                            <strong>Clear:</strong> <span class="text-brand-gray">No liens, judgments, or bankruptcies found for Apple Inc.</span>
-                          </li>
+                          <li class="text-brand-green"><strong>Clear:</strong> <span class="text-brand-gray">No liens, judgments, or bankruptcies found for Apple Inc.</span></li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Legal & Regulatory -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Legal &amp; Regulatory</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-legal-list" class="space-y-2 list-disc list-inside text-sm text-brand-gray">
-                          <li class="text-red-400">
-                            <strong>Lawsuit:</strong> <span class="text-brand-gray">Ongoing antitrust lawsuit from the DOJ regarding App Store policies.</span>
-                          </li>
-                          <li class="text-red-400">
-                            <strong>Regulatory:</strong> <span class="text-brand-gray">Facing fines from the EU related to DMA compliance.</span>
-                          </li>
+                          <li class="text-red-500"><strong>Lawsuit:</strong> <span class="text-brand-gray">Ongoing antitrust lawsuit from the DOJ regarding App Store policies.</span></li>
+                          <li class="text-red-500"><strong>Regulatory:</strong> <span class="text-brand-gray">Facing fines from the EU related to DMA compliance.</span></li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Risk checklist -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Risk Checklist</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-risk-checklist" class="space-y-3">
-                          <li class="risk-checklist-item"><span class="risk-label">Corporate Filings</span><span class="risk-status risk-green">Active &amp; in good standing</span></li>
-                          <li class="risk-checklist-item"><span class="risk-label">Sanctions &amp; PEP</span><span class="risk-status risk-green">No hits found</span></li>
-                          <li class="risk-checklist-item"><span class="risk-label">Adverse Media</span><span class="risk-status risk-yellow">Minor hits (antitrust)</span></li>
+                          <li class="risk-checklist-item"><span class="risk-label">Corporate Filings</span><span class="risk-status risk-green">Active &amp; In Good Standing</span></li>
+                          <li class="risk-checklist-item"><span class="risk-label">Sanctions &amp; PEP</span><span class="risk-status risk-green">No Hits Found</span></li>
+                          <li class="risk-checklist-item"><span class="risk-label">Adverse Media</span><span class="risk-status risk-yellow">Minor Hits (Antitrust)</span></li>
                           <li class="risk-checklist-item"><span class="risk-label">Financial Health</span><span class="risk-status risk-green">Excellent</span></li>
                           <li class="risk-checklist-item"><span class="risk-label">Public Records</span><span class="risk-status risk-green">Clear</span></li>
-                          <li class="risk-checklist-item"><span class="risk-label">Web Presence</span><span class="risk-status risk-green">Verified &amp; authoritative</span></li>
+                          <li class="risk-checklist-item"><span class="risk-label">Web Presence</span><span class="risk-status risk-green">Verified &amp; Authoritative</span></li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- SWOT -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">SWOT Analysis</h4>
                       <div class="space-y-4">
-                        <div class="p-4 border border-emerald-800 rounded-lg bg-emerald-900/20">
-                          <h5 class="font-semibold text-emerald-400 mb-2">Strengths</h5>
+                        <div class="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                          <h5 class="font-semibold text-yellow-700 mb-2">Strengths</h5>
                           <ul id="report-swot-strengths" class="space-y-1 list-disc list-inside text-sm text-brand-gray">
-                            <li>Iconic brand and ecosystem</li><li>Exceptional profitability</li><li>Strong R&amp;D pipeline</li>
+                            <li>Iconic brand and ecosystem</li>
+                            <li>Exceptional profitability</li>
+                            <li>Strong R&amp;D pipeline</li>
                           </ul>
                         </div>
-                        <div class="p-4 border border-red-900 rounded-lg bg-red-900/20">
-                          <h5 class="font-semibold text-red-400 mb-2">Weaknesses</h5>
+                        <div class="p-4 border border-red-200 rounded-lg bg-red-50">
+                          <h5 class="font-semibold text-red-700 mb-2">Weaknesses</h5>
                           <ul id="report-swot-weaknesses" class="space-y-1 list-disc list-inside text-sm text-brand-gray">
-                            <li>High price point</li><li>Dependence on iPhone sales</li>
+                            <li>High price point</li>
+                            <li>Dependence on iPhone sales</li>
                           </ul>
                         </div>
-                        <div class="p-4 border border-slate-700 rounded-lg bg-slate-900/20">
-                          <h5 class="font-semibold text-slate-400 mb-2">Opportunities</h5>
+                        <div class="p-4 border border-slate-200 rounded-lg bg-slate-50">
+                          <h5 class="font-semibold text-slate-700 mb-2">Opportunities</h5>
                           <ul id="report-swot-opportunities" class="space-y-1 list-disc list-inside text-sm text-brand-gray">
-                            <li>Expansion in emerging markets</li><li>Growth in Services (App Store, TV+)</li>
+                            <li>Expansion in emerging markets</li>
+                            <li>Growth in Services (App Store, TV+)</li>
                           </ul>
                         </div>
-                        <div class="p-4 border border-amber-800 rounded-lg bg-amber-900/20">
-                          <h5 class="font-semibold text-amber-400 mb-2">Threats</h5>
+                        <div class="p-4 border border-amber-200 rounded-lg bg-amber-50">
+                          <h5 class="font-semibold text-amber-700 mb-2">Threats</h5>
                           <ul id="report-swot-threats" class="space-y-1 list-disc list-inside text-sm text-brand-gray">
-                            <li>Intense competition</li><li>Global supply chain vulnerabilities</li><li>Antitrust regulation</li>
+                            <li>Intense competition</li>
+                            <li>Global supply chain vulnerabilities</li>
+                            <li>Antitrust regulation</li>
                           </ul>
                         </div>
                       </div>
                     </div>
-
                   </div>
 
                   <!-- Main column -->
                   <div class="lg:col-span-3 space-y-6">
-
-                    <!-- Recommendation -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">AI Underwriting Recommendation</h4>
-                      <div id="report-recommendation-box" class="p-4 border-l-4 rounded-r-lg bg-emerald-900/20 border-emerald-500 text-emerald-200">
-                        <h5 id="report-recommendation-decision" class="font-heading font-bold text-2xl text-emerald-400">Approve</h5>
-                        <p id="report-recommendation-justification" class="text-sm mt-1">
-                          Recommendation is “Approve” based on overwhelming financial strength, market dominance, and positive cash flow.
-                        </p>
+                      <div id="report-recommendation-box" class="p-4 border-l-4 rounded-r-lg bg-yellow-50 border-yellow-500 text-yellow-900">
+                        <h5 id="report-recommendation-decision" class="font-heading font-bold text-2xl text-yellow-700">Approve</h5>
+                        <p id="report-recommendation-justification" class="text-sm mt-1">Recommendation is 'Approve' based on overwhelming financial strength, market dominance, and positive cash flow. Risk is negligible relative to operating income.</p>
                       </div>
                     </div>
 
-                    <!-- Key info -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Key Information</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul class="space-y-2 text-sm text-brand-gray">
-                          <li class="flex flex-col sm:flex-row sm:justify-between">
-                            <strong>Website:</strong>
-                            <span id="report-key-website" class="font-medium text-brand-dark sm:text-right break-all">
-                              <a href="//apple.com" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">apple.com</a>
-                            </span>
-                          </li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Industry:</strong> <span id="report-key-industry" class="font-medium text-brand-dark sm:text-right break-words">Technology, Consumer Electronics</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>CEO:</strong> <span id="report-key-ceo" class="font-medium text-brand-dark sm:text-right break-words">Tim Cook</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Founded:</strong> <span id="report-key-founded" class="font-medium text-brand-dark sm:text-right break-words">1976</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Employees:</strong> <span id="report-key-employees" class="font-medium text-brand-dark sm:text-right break-words">161,000+</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Phone:</strong> <span id="report-key-phone" class="font-medium text-brand-dark sm:text-right break-words">(800) 275-2273</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Address:</strong> <span id="report-key-address" class="font-medium text-brand-dark sm:text-right text-left break-words">One Apple Park Way, Cupertino, CA 95014</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Website:</strong><span id="report-key-website" class="font-medium text-brand-dark sm:text-right break-all"><a href="//apple.com" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">apple.com</a></span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Industry:</strong><span id="report-key-industry" class="font-medium text-brand-dark sm:text-right break-words">Technology, Consumer Electronics</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>CEO:</strong><span id="report-key-ceo" class="font-medium text-brand-dark sm:text-right break-words">Tim Cook</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Founded:</strong><span id="report-key-founded" class="font-medium text-brand-dark sm:text-right break-words">1976</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Employees:</strong><span id="report-key-employees" class="font-medium text-brand-dark sm:text-right break-words">161,000+</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Phone:</strong><span id="report-key-phone" class="font-medium text-brand-dark sm:text-right break-words">(800) 275-2273</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Address:</strong><span id="report-key-address" class="font-medium text-brand-dark sm:text-right text-left break-words">One Apple Park Way, Cupertino, CA 95014</span></li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Map -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Business Location</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
-                        <iframe id="report-map-iframe" width="100%" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=One%20Apple%20Park%20Way%2C%20Cupertino%2C%20CA%2095014&t=&z=13&ie=UTF8&iwloc=&output=embed" class="rounded-lg border border-brand-border filter invert-[90%] hue-rotate-[180deg]" aria-label="Business Location Map" style="display: block;"></iframe>
-                        <p id="report-map-fallback" class="text-sm text-brand-gray italic mt-2" style="display: none;">Map could not be loaded. Address may be missing or invalid.</p>
+                        <iframe id="report-map-iframe" width="100%" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=One%20Apple%20Park%20Way%2C%20Cupertino%2C%20CA%2095014&t=&z=13&ie=UTF8&iwloc=&output=embed" class="rounded-lg border border-brand-border" aria-label="Business Location Map" style="display:block;"></iframe>
+                        <p id="report-map-fallback" class="text-sm text-brand-gray italic mt-2" style="display:none;">Map could not be loaded. Address may be missing or invalid.</p>
                       </div>
                     </div>
 
-                    <!-- Corporate filings -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Corporate Filings</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul class="space-y-2 text-sm text-brand-gray">
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Name:</strong> <span id="report-sos-name" class="font-medium text-brand-dark sm:text-right break-words">APPLE INC.</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Type:</strong> <span id="report-sos-entity" class="font-medium text-brand-dark sm:text-right break-words">Corporation</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Status:</strong> <span id="report-sos-status" class="font-medium text-brand-dark sm:text-right break-words text-brand-green">Active</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Jurisdiction:</strong> <span id="report-sos-jurisdiction" class="font-medium text-brand-dark sm:text-right break-words">California</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Formation Date:</strong> <span id="report-sos-date" class="font-medium text-brand-dark sm:text-right break-words">01/03/1977</span></li>
-                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Registered Agent:</strong> <span id="report-sos-agent" class="font-medium text-brand-dark sm:text-right break-words">CORPORATION SERVICE COMPANY</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Name:</strong><span id="report-sos-name" class="font-medium text-brand-dark sm:text-right break-words">APPLE INC.</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Entity Type:</strong><span id="report-sos-entity" class="font-medium text-brand-dark sm:text-right break-words">Corporation</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Status:</strong><span id="report-sos-status" class="font-medium text-brand-dark sm:text-right break-words text-brand-green">Active</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Jurisdiction:</strong><span id="report-sos-jurisdiction" class="font-medium text-brand-dark sm:text-right break-words">California</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Formation Date:</strong><span id="report-sos-date" class="font-medium text-brand-dark sm:text-right break-words">01/03/1977</span></li>
+                          <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Registered Agent:</strong><span id="report-sos-agent" class="font-medium text-brand-dark sm:text-right break-words">CORPORATION SERVICE COMPANY</span></li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Counterparties -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Top Counterparties (Sample)</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
@@ -733,7 +530,7 @@
                           <li class="report-list-item">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
                               <strong class="text-sm font-medium text-brand-dark">App Store (Inflow)</strong>
-                              <span class="text-sm font-bold text-green-table sm:text-right">$1.2B / mo (Avg)</span>
+                              <span class="text-sm font-bold text-brand-green sm:text-right">$1.2B / mo (Avg)</span>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
                               <span>Type: Customer / Platform Fees</span>
@@ -743,10 +540,20 @@
                           <li class="report-list-item">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
                               <strong class="text-sm font-medium text-brand-dark">Foxconn (Outflow)</strong>
-                              <span class="text-sm font-bold text-red-table sm:text-right">$3.1B / mo (Avg)</span>
+                              <span class="text-sm font-bold text-red-500 sm:text-right">$3.1B / mo (Avg)</span>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
                               <span>Type: Vendor / Manufacturing</span>
+                              <span class="sm:text-right">Relationship: External</span>
+                            </div>
+                          </li>
+                          <li class="report-list-item">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                              <strong class="text-sm font-medium text-brand-dark">TSMC (Outflow)</strong>
+                              <span class="text-sm font-bold text-red-500 sm:text-right">$1.5B / mo (Avg)</span>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                              <span>Type: Vendor / Components</span>
                               <span class="sm:text-right">Relationship: External</span>
                             </div>
                           </li>
@@ -754,7 +561,6 @@
                       </div>
                     </div>
 
-                    <!-- Debt obligations -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Extrapolated Debt Obligations</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
@@ -762,104 +568,104 @@
                           <li class="report-list-item">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
                               <strong class="text-sm font-medium text-brand-dark">Corporate Bond (Unsecured)</strong>
-                              <span class="text-sm font-bold text-red-table sm:text-right">$920M / mo</span>
+                              <span class="text-sm font-bold text-red-500 sm:text-right">$920M / mo</span>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
                               <span>Lender: Various (Public Bondholders)</span>
                               <span class="sm:text-right">Est. Balance: $109.8B</span>
                             </div>
                           </li>
+                          <li class="report-list-item">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
+                              <strong class="text-sm font-medium text-brand-dark">Commercial Paper</strong>
+                              <span class="text-sm font-bold text-red-500 sm:text-right">$150M / mo</span>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
+                              <span>Lender: Various Money Market Funds</span>
+                              <span class="sm:text-right">Est. Balance: $10.2B</span>
+                            </div>
+                          </li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Financial summary -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Financial Summary</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <div id="report-fin-public" style="display: block;">
                           <ul class="space-y-2 text-sm text-brand-gray">
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Public Company</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Ticker:</strong> <span id="report-fin-ticker" class="font-medium text-brand-dark sm:text-right break-words">AAPL</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Market Cap:</strong> <span id="report-fin-marketcap" class="font-medium text-brand-dark sm:text-right break-words">$2.85 Trillion</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Latest Revenue:</strong> <span id="report-fin-revenue" class="font-medium text-brand-dark sm:text-right break-words">$383.29 Billion (TTM)</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Net Income:</strong> <span id="report-fin-netincome" class="font-medium text-brand-dark sm:text-right break-words">$96.99 Billion (TTM)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong><span class="font-medium text-brand-dark sm:text-right break-words">Public Company</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Ticker:</strong><span id="report-fin-ticker" class="font-medium text-brand-dark sm:text-right break-words">AAPL</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Market Cap:</strong><span id="report-fin-marketcap" class="font-medium text-brand-dark sm:text-right break-words">$2.85 Trillion</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Latest Revenue:</strong><span id="report-fin-revenue" class="font-medium text-brand-dark sm:text-right break-words">$383.29 Billion (TTM)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Net Income:</strong><span id="report-fin-netincome" class="font-medium text-brand-dark sm:text-right break-words">$96.99 Billion (TTM)</span></li>
                           </ul>
                         </div>
                         <div id="report-fin-private" style="display: none;">
                           <ul class="space-y-2 text-sm text-brand-gray">
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong> <span class="font-medium text-brand-dark sm:text-right break-words">Private Company</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Annual Revenue:</strong> <span id="report-fin-est-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Profit Margin:</strong> <span id="report-fin-est-margin" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Cash on Hand:</strong> <span id="report-fin-est-cash" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Type:</strong><span class="font-medium text-brand-dark sm:text-right break-words">Private Company</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Annual Revenue:</strong><span id="report-fin-est-revenue" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Profit Margin:</strong><span id="report-fin-est-margin" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Est. Cash on Hand:</strong><span id="report-fin-est-cash" class="font-medium text-brand-dark sm:text-right break-words"></span></li>
                           </ul>
                         </div>
 
                         <div id="report-fin-credit" class="mt-4 pt-4 border-t border-brand-border">
                           <h5 class="text-sm font-semibold uppercase text-brand-gray mb-3">Credit Snapshot</h5>
                           <ul class="space-y-2 text-sm text-brand-gray">
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Decision:</strong> <span id="report-fin-credit-decision" class="font-medium text-brand-dark sm:text-right break-words">Approve</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>FICO Score:</strong> <span id="report-fin-credit-score" class="font-medium text-brand-dark sm:text-right break-words">810 (Est.)</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Total Debt (Credit):</strong> <span id="report-fin-credit-total-debt" class="font-medium text-brand-dark sm:text-right break-words">$120.0B</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Revolving Debt:</strong> <span id="report-fin-credit-revolving-debt" class="font-medium text-brand-dark sm:text-right break-words">$0 (N/A)</span></li>
-                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Avg Monthly Revenue (Bank):</strong> <span id="report-fin-credit-avg-revenue" class="font-medium text-brand-dark sm:text-right break-words">$31.9B</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Decision:</strong><span id="report-fin-credit-decision" class="font-medium text-brand-dark sm:text-right break-words">Approve</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>FICO Score:</strong><span id="report-fin-credit-score" class="font-medium text-brand-dark sm:text-right break-words">810 (Est.)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Total Debt (Credit):</strong><span id="report-fin-credit-total-debt" class="font-medium text-brand-dark sm:text-right break-words">$120.0B</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Revolving Debt:</strong><span id="report-fin-credit-revolving-debt" class="font-medium text-brand-dark sm:text-right break-words">$0 (N/A)</span></li>
+                            <li class="flex flex-col sm:flex-row sm:justify-between"><strong>Avg Monthly Revenue (Bank):</strong><span id="report-fin-credit-avg-revenue" class="font-medium text-brand-dark sm:text-right break-words">$31.9B</span></li>
                           </ul>
                         </div>
 
-                        <p id="report-fin-note" class="text-xs italic text-brand-gray mt-3 pt-3 border-t border-brand-border">
-                          Data sourced from public filings.
-                        </p>
+                        <p id="report-fin-note" class="text-xs italic text-brand-gray mt-3 pt-3 border-t border-brand-border">Data sourced from public filings.</p>
                       </div>
                     </div>
 
-                    <!-- Recent news -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Recent News</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-news-list" class="space-y-3">
-                          <li class="report-list-item">
-                            <strong class="text-sm font-medium text-brand-dark">Apple unveils new M4 chips and AI-focused Macs</strong>
-                            <p class="text-sm text-brand-gray mt-1 mb-2">Apple announced its next generation of chips, focusing heavily on on-device AI capabilities.</p>
-                            <span class="text-xs text-brand-gray font-medium">Bloomberg</span>
-                          </li>
+                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Apple unveils new M4 chips and AI-focused Macs</strong><p class="text-sm text-brand-gray mt-1 mb-2">Apple announced its next generation of chips, focusing heavily on on-device AI capabilities.</p><span class="text-xs text-brand-gray font-medium">Bloomberg</span></li>
+                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">DOJ Antitrust Trial Begins</strong><p class="text-sm text-brand-gray mt-1 mb-2">The Department of Justice has started its antitrust case against Apple, targeting App Store policies.</p><span class="text-xs text-brand-gray font-medium">Reuters</span></li>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Customer reviews -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Customer Reviews</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-reviews-list" class="space-y-4">
-                          <blockquote class="p-4 border-l-4 border-brand-border bg-slate-900 report-list-item">
-                            <div class="flex justify-between items-center mb-1">
-                              <span class="text-sm font-medium text-brand-dark">Trustpilot</span>
-                              <span class="text-sm font-bold text-brand-yellow">4.5/5</span>
-                            </div>
+                          <blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item">
+                            <div class="flex justify-between items-center mb-1"><span class="text-sm font-medium text-brand-dark">Trustpilot</span><span class="text-sm font-bold text-brand-green">4.5/5</span></div>
                             <p class="text-sm italic text-brand-gray">"Incredible products, but the customer service for repairs can be slow."</p>
+                          </blockquote>
+                          <blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item">
+                            <div class="flex justify-between items-center mb-1"><span class="text-sm font-medium text-brand-dark">ConsumerAffairs</span><span class="text-sm font-bold text-brand-green">4.2/5</span></div>
+                            <p class="text-sm italic text-brand-gray">"The ecosystem is seamless, but I'm worried about being locked in."</p>
                           </blockquote>
                         </ul>
                       </div>
                     </div>
 
-                    <!-- Competitors -->
                     <div>
                       <h4 class="font-heading font-semibold text-brand-dark mb-3">Competitive Landscape</h4>
                       <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
                         <ul id="report-competitors-list" class="space-y-3">
-                          <li class="report-list-item">
-                            <strong class="text-sm font-medium text-brand-dark">Samsung Electronics</strong>
-                            <p class="text-sm text-brand-gray mt-1">Direct competitor in smartphones, tablets, and wearables. Strong global presence.</p>
-                          </li>
+                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Samsung Electronics</strong><p class="text-sm text-brand-gray mt-1">Direct competitor in smartphones, tablets, and wearables. Strong global presence.</p></li>
+                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Microsoft</strong><p class="text-sm text-brand-gray mt-1">Competes in personal computing (Surface) and operating systems (Windows).</p></li>
+                          <li class="report-list-item"><strong class="text-sm font-medium text-brand-dark">Google (Alphabet)</strong><p class="text-sm text-brand-gray mt-1">Competes in operating systems (Android), smartphones (Pixel), and cloud services.</p></li>
                         </ul>
                       </div>
                     </div>
 
                   </div>
-
                 </div>
 
-                <!-- Banking snapshot -->
+                <!-- Banking Snapshot -->
                 <div class="mt-6">
                   <h4 class="font-heading font-semibold text-brand-dark mb-3">Banking Snapshot &amp; Trends (Fictional)</h4>
                   <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
@@ -867,45 +673,45 @@
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-2">True Revenue (Last 3 Months)</h5>
                         <div id="banking-chart-revenue" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height: 94.8421%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height: 97.3684%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height: 100%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $90.1B"><div class="bar-value">$90.1B</div><div class="bar bar-green" style="height:94.8421%"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $92.5B"><div class="bar-value">$92.5B</div><div class="bar bar-green" style="height:97.3684%"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $95.0B"><div class="bar-value">$95.0B</div><div class="bar bar-green" style="height:100%"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-2">Average Daily Balance</h5>
                         <div id="banking-chart-avg-balance" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $45.2B"><div class="bar-value">$45.2B</div><div class="bar bar-grey" style="height: 100%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $42.1B"><div class="bar-value">$42.1B</div><div class="bar bar-grey" style="height: 93.1415%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $44.8B"><div class="bar-value">$44.8B</div><div class="bar bar-grey" style="height: 99.115%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $45.2B"><div class="bar-value">$45.2B</div><div class="bar bar-grey" style="height:100%"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $42.1B"><div class="bar-value">$42.1B</div><div class="bar bar-grey" style="height:93.1415%"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $44.8B"><div class="bar-value">$44.8B</div><div class="bar bar-grey" style="height:99.115%"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-3">Ending Balance</h5>
                         <div id="banking-chart-end-balance" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $62.1B"><div class="bar-value">$62.1B</div><div class="bar bar-yellow" style="height: 100%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $61.5B"><div class="bar-value">$61.5B</div><div class="bar bar-yellow" style="height: 99.0338%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $61.9B"><div class="bar-value">$61.9B</div><div class="bar bar-yellow" style="height: 99.6779%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $62.1B"><div class="bar-value">$62.1B</div><div class="bar bar-yellow" style="height:100%"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $61.5B"><div class="bar-value">$61.5B</div><div class="bar bar-yellow" style="height:99.0338%"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $61.9B"><div class="bar-value">$61.9B</div><div class="bar bar-yellow" style="height:99.6779%"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                       <div>
                         <h5 class="text-sm font-semibold text-brand-dark mb-2">Debt Service (Monthly Payments)</h5>
                         <div id="banking-chart-debt" class="chart-visual">
-                          <div class="bar-wrapper" title="Sep '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height: 100%"></div><div class="bar-label">Sep '24</div></div>
-                          <div class="bar-wrapper" title="Oct '24: $1.1B"><div class="bar-value">$1.1B</div><div class="bar bar-red" style="height: 91.6667%"></div><div class="bar-label">Oct '24</div></div>
-                          <div class="bar-wrapper" title="Nov '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height: 100%"></div><div class="bar-label">Nov '24</div></div>
+                          <div class="bar-wrapper" title="Sep '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height:100%"></div><div class="bar-label">Sep '24</div></div>
+                          <div class="bar-wrapper" title="Oct '24: $1.1B"><div class="bar-value">$1.1B</div><div class="bar bar-red" style="height:91.6667%"></div><div class="bar-label">Oct '24</div></div>
+                          <div class="bar-wrapper" title="Nov '24: $1.2B"><div class="bar-value">$1.2B</div><div class="bar bar-red" style="height:100%"></div><div class="bar-label">Nov '24</div></div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Monthly breakdown -->
+                <!-- Monthly Breakdown full-width -->
                 <div class="mt-6">
                   <h4 class="font-heading font-semibold text-brand-dark mb-3">Monthly Financial Breakdown (Fictional)</h4>
-                  <div class="p-4 border border-brand-border rounded-lg bg-brand-card">
-                    <div class="overflow-x-auto">
-                      <table class="data-table w-full">
+                  <div class="p-4 border border-brand-border rounded-lg bg-brand-card w-full">
+                    <div class="overflow-x-auto w-full">
+                      <table class="data-table w-full min-w-full">
                         <thead>
                           <tr>
                             <th>Month</th>
@@ -969,9 +775,10 @@
                 <div id="report-sources-container" class="mt-8 border-t border-brand-border pt-6" style="display: block;">
                   <h5 class="text-sm font-semibold text-brand-gray uppercase mb-3">Data Sources</h5>
                   <ul id="report-sources" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 list-disc list-inside">
-                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">Apple Inc. (AAPL) SEC Filings</a></li>
-                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">Bloomberg Terminal Data</a></li>
-                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">California Secretary of State</a></li>
+                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">Apple Inc. (AAPL) SEC Filings</a></li>
+                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">Bloomberg Terminal Data</a></li>
+                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">California Secretary of State</a></li>
+                    <li class="text-xs truncate"><a href="#" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">Reuters News Archive</a></li>
                   </ul>
                 </div>
 
@@ -994,113 +801,12 @@
               Our platform provides a complete, end-to-end solution for AI governance, risk, and compliance (GRC).
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
-                <h3 class="font-semibold text-lg text-brand-dark">Model Auditing</h3>
-                <p class="mt-2 text-brand-gray">Generate independent audit reports for performance, safety, and security.</p>
-              </div>
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
-                <h3 class="font-semibold text-lg text-brand-dark">Bias &amp; Fairness</h3>
-                <p class="mt-2 text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p>
-              </div>
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
-                <h3 class="font-semibold text-lg text-brand-dark">Security &amp; Robustness</h3>
-                <p class="mt-2 text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p>
-              </div>
-              <div class="bg-brand-card p-6 rounded-lg border border-brand-border">
-                <h3 class="font-semibold text-lg text-brand-dark">Explainable AI (XAI)</h3>
-                <p class="mt-2 text-brand-gray">Generate human-readable explanations for complex model decisions.</p>
-              </div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Model Auditing</h3><p class="mt-2 text-brand-gray">Generate independent audit reports for performance, safety, and security.</p></div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Bias &amp; Fairness</h3><p class="mt-2 text-brand-gray">Identify and mitigate algorithmic bias across all protected classes.</p></div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Security &amp; Robustness</h3><p class="mt-2 text-brand-gray">Test for adversarial attacks, data poisoning, and other vulnerabilities.</p></div>
+              <div class="bg-brand-card p-6 rounded-lg border border-brand-border"><h3 class="font-semibold text-lg text-brand-dark">Explainable AI (XAI)</h3><p class="mt-2 text-brand-gray">Generate human-readable explanations for complex model decisions.</p></div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- How it Works -->
-    <section id="how-it-works" class="py-24 bg-black">
-      <div class="container mx-auto px-6">
-        <h2 class="text-xs text-brand-yellow font-semibold text-center uppercase tracking-wider">How it Works</h2>
-        <h3 class="font-heading font-bold text-4xl text-brand-dark text-center mt-3">From Search to Decision in Seconds</h3>
-        <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">
-          Our AI engine searches the web, synthesizes the signals, and returns an underwriting-ready report.
-        </p>
-
-        <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div class="flex items-start mb-6">
-              <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
-                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-xl font-semibold text-brand-dark">Search &amp; Initiate</h4>
-                <p class="mt-1 text-brand-gray">Enter a business name to kick off the full-stack search, filings, and data pull.</p>
-              </div>
-            </div>
-            <div class="flex items-start mb-6">
-              <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
-                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-4m0 0h4m-4 0l-4 4m4-4l4 4m6-6v4m0 0h-4m4 0l4-4m-4 4l-4-4m-6 0H6m0 0v-4m0 4l-4-4m4 4l-4 4m6-6v4"></path></svg>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-xl font-semibold text-brand-dark">AI-Powered Aggregation</h4>
-                <p class="mt-1 text-brand-gray">Gemini searches filings, news, reviews, maps, and more to assemble the signal.</p>
-              </div>
-            </div>
-            <div class="flex items-start">
-              <div class="flex-shrink-0 p-3 bg-brand-yellow rounded-full">
-                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-xl font-semibold text-brand-dark">Actionable Report</h4>
-                <p class="mt-1 text-brand-gray">You get a fully populated report: risk score, recommendation, banking and counterparty views.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Negative example card -->
-          <div class="hero-visual mt-12 lg:mt-0" aria-hidden="true">
-            <div class="hero-visual-header">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            </div>
-            <div class="hero-visual-body">
-              <div class="space-y-4">
-                <div class="flex items-center space-x-4">
-                  <div class="score-circle score-red" style="width: 80px; height: 80px; font-size: 1.75rem; border-width: 6px;">
-                    <span>420</span>
-                  </div>
-                  <div class="flex-1 space-y-2">
-                    <div class="h-6 bg-slate-700 rounded-md w-3/4"></div>
-                    <div class="h-4 bg-slate-800 rounded-md w-1/2"></div>
-                  </div>
-                </div>
-
-                <div class="p-3 border-l-4 rounded-r-lg bg-red-900/20 border-red-500 text-red-200">
-                  <h5 class="font-heading font-bold text-lg text-red-400">Decline</h5>
-                  <p class="text-sm mt-1">Multiple active tax liens and no verifiable web presence.</p>
-                </div>
-
-                <div>
-                  <h5 class="text-sm font-semibold uppercase text-brand-gray mb-2">Key Factors:</h5>
-                  <ul class="space-y-1.5">
-                    <li class="flex items-start">
-                      <svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                      <span class="text-sm text-brand-dark">Active state tax lien</span>
-                    </li>
-                    <li class="flex items-start">
-                      <svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                      <span class="text-sm text-brand-dark">No verifiable website or social footprint</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="chart-visual" style="height: 100px; padding: 10px 12px 0 12px;">
-                  <div class="bar-wrapper"><div class="bar bar-red" style="height: 60%"></div><div class="bar-label" style="padding-top: 2px;">Sep</div></div>
-                  <div class="bar-wrapper"><div class="bar bar-red" style="height: 40%"></div><div class="bar-label" style="padding-top: 2px;">Oct</div></div>
-                  <div class="bar-wrapper"><div class="bar bar-red" style="height: 35%"></div><div class="bar-label" style="padding-top: 2px;">Nov</div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
@@ -1110,75 +816,49 @@
       <div class="container mx-auto px-6">
         <h2 class="text-xs text-brand-yellow font-semibold text-center uppercase tracking-wider">Pricing</h2>
         <h3 class="font-heading font-bold text-4xl text-brand-dark text-center mt-3">Simple, Transparent Pricing</h3>
-        <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">
-          Choose the plan that's right for your business. No hidden fees, no long-term contracts.
-        </p>
+        <p class="text-lg text-brand-gray text-center mt-4 max-w-2xl mx-auto">Choose the plan that's right for your business. No hidden fees, no long-term contracts.</p>
         <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-8 flex flex-col">
             <h4 class="font-heading font-bold text-2xl text-brand-dark">Standard</h4>
             <p class="mt-2 text-brand-gray">For individuals and small teams.</p>
-            <div class="mt-6">
-              <span class="font-heading font-extrabold text-5xl text-brand-dark">$10</span>
-              <span class="text-lg text-brand-gray">/ report</span>
-            </div>
+            <div class="mt-6"><span class="font-heading font-extrabold text-5xl text-brand-dark">$10</span><span class="text-lg text-brand-gray">/ report</span></div>
             <ul class="mt-8 space-y-4 text-brand-gray">
-              <li class="flex items-center">
-                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Comprehensive AI Report
-              </li>
-              <li class="flex items-center">
-                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Public Records Check
-              </li>
-              <li class="flex items-center">
-                <svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Basic Risk Score
-              </li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Comprehensive AI Report</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Public Records Check</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Basic Risk Score</li>
             </ul>
-            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">
-              Get Started
-            </a>
+            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">Get Started</a>
           </div>
 
           <div class="bg-brand-card border-2 border-brand-yellow rounded-lg shadow-2xl p-8 flex flex-col relative overflow-hidden">
             <span class="absolute top-0 right-0 bg-brand-yellow text-black text-xs font-bold px-4 py-1 rounded-bl-lg">Most Popular</span>
             <h4 class="font-heading font-bold text-2xl text-brand-dark">Pro</h4>
             <p class="mt-2 text-brand-gray">For growing businesses and lenders.</p>
-            <div class="mt-6">
-              <span class="font-heading font-extrabold text-5xl text-brand-dark">$500</span>
-              <span class="text-lg text-brand-gray">/ mo</span>
-            </div>
+            <div class="mt-6"><span class="font-heading font-extrabold text-5xl text-brand-dark">$500</span><span class="text-lg text-brand-gray">/ mo</span></div>
             <ul class="mt-8 space-y-4 text-brand-gray">
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>100 Reports / month</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Bank Data Analysis</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Advanced Risk Score</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Sentiment Analysis</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>100 Reports / month</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Bank Data Analysis</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Advanced Risk Score</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Sentiment Analysis</li>
             </ul>
-            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 mt-8">
-              Get Started
-            </a>
+            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-yellow text-black font-bold py-3 px-6 rounded-lg text-lg hover:bg-yellow-300 mt-8">Get Started</a>
           </div>
 
           <div class="bg-brand-card border border-brand-border rounded-lg shadow-lg p-8 flex flex-col">
             <h4 class="font-heading font-bold text-2xl text-brand-dark">Enterprise</h4>
             <p class="mt-2 text-brand-gray">For large-scale operations.</p>
-            <div class="mt-6">
-              <span class="font-heading font-extrabold text-4xl text-brand-dark">Custom</span>
-            </div>
+            <div class="mt-6"><span class="font-heading font-extrabold text-4xl text-brand-dark">Custom</span></div>
             <ul class="mt-8 space-y-4 text-brand-gray">
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Unlimited Reports</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Full API Access</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>AI Governance Suite</li>
-              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Dedicated Support</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Unlimited Reports</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Full API Access</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>AI Governance Suite</li>
+              <li class="flex items-center"><svg class="w-5 h-5 text-brand-yellow mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Dedicated Support</li>
             </ul>
-            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">
-              Contact Sales
-            </a>
+            <a href="#demo" class="mt-auto w-full text-center cta-button bg-brand-card text-brand-dark font-bold py-3 px-6 rounded-lg text-lg border border-brand-border hover:border-brand-gray mt-8">Contact Sales</a>
           </div>
         </div>
       </div>
     </section>
-
   </main>
 
   <!-- Footer -->
@@ -1198,48 +878,37 @@
           <a href="#demo" class="text-sm font-medium text-brand-gray hover:text-brand-dark transition-colors">Demo</a>
         </nav>
       </div>
-      <div class="mt-8 text-center text-brand-gray text-sm">
-        &copy; 2025 TrustBureau.ai. All rights reserved.
-      </div>
+      <div class="mt-8 text-center text-brand-gray text-sm">&copy; 2025 TrustBureau.ai. All rights reserved.</div>
     </div>
   </footer>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="fixed inset-0 z-50 hidden">
-    <div id="settings-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>
-    <div class="relative min-h-full flex items-center justify-center p-4">
-      <div class="relative w-full max-w-md rounded-xl bg-black border border-brand-border shadow-2xl">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-brand-border">
-          <h2 class="font-heading font-semibold text-lg text-brand-dark">Settings</h2>
-          <button id="settings-close" class="text-brand-gray hover:text-brand-dark" aria-label="Close settings">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-        <div class="px-6 py-4 space-y-4">
-          <div>
-            <label for="settings-api-key" class="block text-sm font-medium text-brand-dark">Gemini API key</label>
-            <input type="password" id="settings-api-key" class="mt-1 block w-full px-3 py-2 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-yellow focus:border-brand-yellow sm:text-sm bg-black text-brand-dark" placeholder="AIza...">
-            <p class="mt-2 text-xs text-brand-gray">
-              Your key is stored only in this browser (localStorage) and used solely for Gemini calls from this page.
-            </p>
-            <p id="settings-status" class="mt-2 text-xs text-brand-gray"></p>
-          </div>
-        </div>
-        <div class="px-6 py-4 border-t border-brand-border flex justify-end space-x-3">
-          <button id="settings-cancel" type="button" class="px-4 py-2 text-sm font-medium text-brand-gray hover:text-brand-dark">Cancel</button>
-          <button id="settings-save" type="button" class="cta-button px-4 py-2 text-sm font-semibold rounded-lg bg-brand-yellow text-black hover:bg-yellow-300">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<!-- Gemini + UI Script -->
+<!-- Settings Modal -->
+<div id="settings-modal" class="fixed inset-0 z-50 hidden settings-overlay items-center justify-center">
+  <div class="bg-brand-card border border-brand-border rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="font-heading font-semibold text-lg text-brand-dark">Settings</h2>
+      <button id="settings-close-btn" type="button" class="text-brand-gray hover:text-brand-dark"><span class="sr-only">Close settings</span>&times;</button>
+    </div>
+    <div class="space-y-3">
+      <div>
+        <label for="settings-api-key-input" class="block text-sm font-medium text-brand-dark">Gemini API key</label>
+        <input id="settings-api-key-input" type="password" class="mt-1 block w-full px-3 py-2 border border-brand-border rounded-md shadow-sm placeholder-brand-gray focus:outline-none focus:ring-brand-yellow focus:border-brand-yellow text-sm bg-brand-card text-brand-dark" placeholder="AIza..." />
+      </div>
+      <p class="text-xs text-brand-gray">Stored locally in your browser (localStorage). Used only when generating a report.</p>
+    </div>
+    <div class="mt-6 flex justify-end space-x-3">
+      <button id="settings-cancel-btn" type="button" class="text-sm px-3 py-2 rounded-lg border border-brand-border text-brand-gray hover:text-brand-dark hover:bg-brand-card">Cancel</button>
+      <button id="settings-save-btn" type="button" class="text-sm px-4 py-2 rounded-lg bg-brand-yellow text-black font-semibold hover:bg-yellow-300">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Script -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    /*** GET REFS ***/
     const bankingChartAvgBalance = document.getElementById('banking-chart-avg-balance');
     const bankingChartDebt = document.getElementById('banking-chart-debt');
     const bankingChartEndBalance = document.getElementById('banking-chart-end-balance');
@@ -1276,6 +945,8 @@
     const keyWebsite = document.getElementById('report-key-website');
     const legalList = document.getElementById('report-legal-list');
     const loader = document.getElementById('report-loader');
+    const loaderSubtext = document.getElementById('loader-subtext');
+    const loaderStepEls = document.querySelectorAll('.loader-step');
     const mainWidgetContainer = document.getElementById('main-widget-container');
     const mapFallback = document.getElementById('report-map-fallback');
     const mapIframe = document.getElementById('report-map-iframe');
@@ -1309,374 +980,261 @@
     const sourcesContainer = document.getElementById('report-sources-container');
     const sourcesList = document.getElementById('report-sources');
     const summaryHeader = document.getElementById('report-summary-header');
+    const swotOpportunities = document.getElementById('report-swot-opportunities');
+    const swotStrengths = document.getElementById('report-swot-strengths');
+    const swotThreats = document.getElementById('report-swot-threats');
+    const swotWeaknesses = document.getElementById('report-swot-weaknesses');
 
-    // Loader step animation
-    const loaderSteps = document.querySelectorAll('.loader-step');
-    let loaderStepInterval = null;
+    /* THEME TOGGLE (persisted) */
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeLabel = document.getElementById('theme-toggle-label');
+    const themeToggleBtnMobile = document.getElementById('theme-toggle-btn-mobile');
+    const themeIconSunMobile = document.getElementById('theme-icon-sun-mobile');
+    const themeIconMoonMobile = document.getElementById('theme-icon-moon-mobile');
+    const themeLabelMobile = document.getElementById('theme-toggle-label-mobile');
 
-    // Settings elements
+    function updateThemeVisual(theme) {
+      const isDark = theme === 'dark';
+      if (themeIconSun) themeIconSun.classList.toggle('hidden', isDark);
+      if (themeIconMoon) themeIconMoon.classList.toggle('hidden', !isDark);
+      if (themeLabel) themeLabel.textContent = isDark ? 'Dark' : 'Light';
+      if (themeIconSunMobile) themeIconSunMobile.classList.toggle('hidden', isDark);
+      if (themeIconMoonMobile) themeIconMoonMobile.classList.toggle('hidden', !isDark);
+      if (themeLabelMobile) themeLabelMobile.textContent = isDark ? 'Dark' : 'Light';
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', isDark ? '#020617' : '#F8FAFC');
+    }
+    function applyTheme(theme) {
+      const finalTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', finalTheme);
+      localStorage.setItem('tb-theme', finalTheme);
+      updateThemeVisual(finalTheme);
+    }
+    applyTheme(localStorage.getItem('tb-theme') || 'light');
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', () => applyTheme((document.body.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light'));
+    if (themeToggleBtnMobile) themeToggleBtnMobile.addEventListener('click', () => applyTheme((document.body.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light'));
+
+    /* SETTINGS MODAL */
+    const settingsModal = document.getElementById('settings-modal');
     const settingsBtn = document.getElementById('settings-btn');
     const settingsBtnMobile = document.getElementById('settings-btn-mobile');
-    const settingsModal = document.getElementById('settings-modal');
-    const settingsBackdrop = document.getElementById('settings-backdrop');
-    const settingsClose = document.getElementById('settings-close');
-    const settingsCancel = document.getElementById('settings-cancel');
-    const settingsSave = document.getElementById('settings-save');
-    const settingsApiInput = document.getElementById('settings-api-key');
-    const settingsStatus = document.getElementById('settings-status');
+    const settingsSaveBtn = document.getElementById('settings-save-btn');
+    const settingsCancelBtn = document.getElementById('settings-cancel-btn');
+    const settingsCloseBtn = document.getElementById('settings-close-btn');
+    const settingsApiInput = document.getElementById('settings-api-key-input');
 
-    function startLoaderSteps() {
-      if (!loaderSteps || loaderSteps.length === 0) return;
-      if (loaderStepInterval) return;
-      let index = 0;
-      loaderSteps.forEach(step => step.classList.remove('loader-step-active'));
-      loaderSteps[index].classList.add('loader-step-active');
-      loaderStepInterval = setInterval(() => {
-        loaderSteps[index].classList.remove('loader-step-active');
-        index = (index + 1) % loaderSteps.length;
-        loaderSteps[index].classList.add('loader-step-active');
-      }, 1300);
+    function openSettingsModal() {
+      settingsModal.classList.remove('hidden'); settingsModal.classList.add('flex');
+      const existingKey = localStorage.getItem('tb-gemini-key') || '';
+      settingsApiInput.value = existingKey;
+      setTimeout(() => settingsApiInput.focus(), 50);
     }
+    function closeSettingsModal() { settingsModal.classList.add('hidden'); settingsModal.classList.remove('flex'); }
 
-    function stopLoaderSteps() {
-      if (loaderStepInterval) {
-        clearInterval(loaderStepInterval);
-        loaderStepInterval = null;
-      }
-      if (loaderSteps) {
-        loaderSteps.forEach(step => step.classList.remove('loader-step-active'));
-      }
+    if (settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
+    if (settingsBtnMobile) settingsBtnMobile.addEventListener('click', openSettingsModal);
+    if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeSettingsModal);
+    if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettingsModal);
+    if (settingsModal) settingsModal.addEventListener('click', (e)=>{ if(e.target===settingsModal) closeSettingsModal(); });
+    if (settingsSaveBtn) settingsSaveBtn.addEventListener('click', () => {
+      const key = (settingsApiInput.value || '').trim();
+      if (key) localStorage.setItem('tb-gemini-key', key); else localStorage.removeItem('tb-gemini-key');
+      closeSettingsModal();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !settingsModal.classList.contains('hidden')) closeSettingsModal(); });
+
+    /* LOADER STEPS */
+    let loaderIntervalId = null;
+    let loaderStepIndex = 0;
+    const loaderStepMessages = [
+      'Step 1 of 4 · Searching corporate filings',
+      'Step 2 of 4 · Aggregating financial & banking data',
+      'Step 3 of 4 · Analyzing news, reviews & sentiment',
+      'Step 4 of 4 · Scoring risk & assembling report'
+    ];
+    function updateLoaderStep() {
+      document.querySelectorAll('.loader-step').forEach((el, idx) => {
+        el.classList.remove('active','completed');
+        if (idx < loaderStepIndex) el.classList.add('completed');
+        else if (idx === loaderStepIndex) el.classList.add('active');
+      });
+      if (loaderSubtext) loaderSubtext.textContent = loaderStepMessages[loaderStepIndex] || '';
     }
+    function startLoaderAnimation() {
+      loaderStepIndex = 0; updateLoaderStep();
+      if (loaderIntervalId) clearInterval(loaderIntervalId);
+      loaderIntervalId = setInterval(() => { loaderStepIndex = (loaderStepIndex + 1) % loaderStepMessages.length; updateLoaderStep(); }, 2200);
+    }
+    function stopLoaderAnimation() { if (loaderIntervalId) { clearInterval(loaderIntervalId); loaderIntervalId = null; } }
 
-    function showReportState(state, message = '') {
-      if (!loader || !errorContainer || !contentContainer || !resultsUi || !mainWidgetContainer) return;
-
-      resultsUi.style.display = 'block';
+    /* UI STATE */
+    function showReportState(state, message='') {
       if (reportStaticHeader) reportStaticHeader.style.display = 'none';
-
       if (state === 'loading') {
-        startLoaderSteps();
-        loader.style.display = 'flex';
-        errorContainer.style.display = 'none';
-        contentContainer.style.display = 'none';
+        loader.style.display = 'flex'; errorContainer.style.display = 'none'; contentContainer.style.display = 'none'; startLoaderAnimation();
       } else if (state === 'error') {
-        stopLoaderSteps();
-        loader.style.display = 'none';
-        errorContainer.style.display = 'flex';
-        contentContainer.style.display = 'none';
-        if (errorMessage) errorMessage.innerHTML = message;
-      } else if (state === 'content') {
-        stopLoaderSteps();
-        loader.style.display = 'none';
-        errorContainer.style.display = 'none';
-        contentContainer.style.display = 'block';
-        mainWidgetContainer.classList.add('max-w-7xl');
-        mainWidgetContainer.classList.remove('max-w-xl');
-      }
-    }
-
-    function populateGenericList(element, items, formatter, placeholder = 'No information found.') {
-      if (!element) return;
-      element.innerHTML = '';
-      if (items && items.length > 0) {
-        items.forEach(item => { element.innerHTML += formatter(item); });
+        loader.style.display = 'none'; stopLoaderAnimation(); errorContainer.style.display = 'flex'; contentContainer.style.display = 'none'; errorMessage.innerHTML = message;
       } else {
-        element.innerHTML = `<li class="text-sm text-brand-gray italic">${placeholder}</li>`;
+        loader.style.display = 'none'; stopLoaderAnimation(); errorContainer.style.display = 'none'; contentContainer.style.display = 'block';
+        mainWidgetContainer.classList.add('max-w-7xl'); mainWidgetContainer.classList.remove('max-w-xl');
       }
     }
 
-    const formatFinding = (finding) => {
-      const type = finding.type || 'Finding';
-      const details = finding.details || 'No details';
-      let color = 'text-brand-gray';
-      if (/(no records|clear)/i.test(type)) {
-        color = 'text-brand-green';
-      } else if (/(lien|judgment|lawsuit|fine|penalty)/i.test(type)) {
-        color = 'text-red-400';
-      }
+    /* HELPERS */
+    function populateGenericList(el, items, formatter, placeholder='No information found.') {
+      if (!el) return;
+      el.innerHTML = '';
+      if (!items || items.length === 0) { el.innerHTML = `<li class="text-sm text-brand-gray italic">${placeholder}</li>`; return; }
+      const pieces = [];
+      items.forEach(item => { const html = formatter(item); if (html && html.trim()) pieces.push(html); });
+      el.innerHTML = pieces.length ? pieces.join('') : `<li class="text-sm text-brand-gray italic">${placeholder}</li>`;
+    }
+    const formatFinding = f => {
+      const type=(f.type||'Finding'), details=(f.details||'No details'); let color='text-brand-gray';
+      const t = type.toLowerCase(); if (t.includes('no records')||t.includes('clear')) color='text-brand-green'; else if (t.includes('lien')||t.includes('judgment')||t.includes('lawsuit')) color='text-red-500';
       return `<li class="${color}"><strong>${type}:</strong> <span class="text-brand-gray">${details}</span></li>`;
     };
-
-    const formatSwotItem = (item) => `<li class="text-sm text-brand-gray">${item}</li>`;
-
-    const formatNewsItem = (item) => {
-      const title = item.title || item.source || 'News item';
-      const summary = item.summary || 'Summary not available.';
-      const source = item.source || 'News';
-      return `<li class="report-list-item">
-        <strong class="text-sm font-medium text-brand-dark">${title}</strong>
-        <p class="text-sm text-brand-gray mt-1 mb-2">${summary}</p>
-        <span class="text-xs text-brand-gray font-medium">${source}</span>
-      </li>`;
+    const formatSwotItem = i => `<li class="text-sm text-brand-gray">${i}</li>`;
+    const formatNewsItem = n => {
+      const title=n.title||'', summary=n.summary||'', source=n.source||'';
+      if (!title && !summary && !source) return '';
+      return `<li class="report-list-item">${title?`<strong class="text-sm font-medium text-brand-dark">${title}</strong>`:''}${summary?`<p class="text-sm text-brand-gray mt-1 mb-2">${summary}</p>`:''}${source?`<span class="text-xs text-brand-gray font-medium">${source}</span>`:''}</li>`;
+    };
+    const formatReviewItem = r => {
+      const source=r.source||'', rating=r.rating||'', snippet=r.snippet||'';
+      if (!source && !rating && !snippet) return '';
+      return `<blockquote class="p-4 border-l-4 border-brand-border bg-brand-card report-list-item"><div class="flex justify-between items-center mb-1"><span class="text-sm font-medium text-brand-dark">${source||'Customer review'}</span>${rating?`<span class="text-sm font-bold text-brand-green">${rating}</span>`:''}</div>${snippet?`<p class="text-sm italic text-brand-gray">"${snippet}"</p>`:''}</blockquote>`;
+    };
+    const formatCompetitorItem = c => {
+      const name=c.name||'', summary=c.summary||''; if (!name && !summary) return '';
+      return `<li class="report-list-item">${name?`<strong class="text-sm font-medium text-brand-dark">${name}</strong>`:''}${summary?`<p class="text-sm text-brand-gray mt-1">${summary}</p>`:''}</li>`;
+    };
+    const formatDebtItem = d => `<li class="report-list-item"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1"><strong class="text-sm font-medium text-brand-dark">${d.type||'Unknown Debt'}</strong><span class="text-sm font-bold text-red-500 sm:text-right">${d.monthlyPayment||'N/A'} / mo</span></div><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray"><span>Lender: <strong>${d.lender||'Unknown'}</strong></span><span class="sm:text-right">Est. Balance: <strong>${d.estimatedBalance||'N/A'}</strong></span></div></li>`;
+    };
+    const formatCounterpartyItem = cp => {
+      const flowColor = (cp.flow||'outflow').toLowerCase()==='inflow' ? 'text-brand-green' : 'text-red-500';
+      return `<li class="report-list-item"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1"><strong class="text-sm font-medium text-brand-dark">${cp.name||'Unknown Counterparty'}</strong><span class="text-sm font-bold ${flowColor} sm:text-right">${cp.avgAmount||'N/A'} / mo</span></div><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray"><span>Type: ${cp.type||'N/A'}</span><span class="sm:text-right">Relationship: ${cp.relationship||'External'}</span></div></li>`;
     };
 
-    const formatReviewItem = (item) => {
-      const snippet = item.snippet || 'Review text not available.';
-      const source = item.source || 'Review';
-      const rating = item.rating || '';
-      return `<blockquote class="p-4 border-l-4 border-brand-border bg-slate-900 report-list-item">
-        <div class="flex justify-between items-center mb-1">
-          <span class="text-sm font-medium text-brand-dark">${source}</span>
-          <span class="text-sm font-bold text-brand-yellow">${rating}</span>
-        </div>
-        <p class="text-sm italic text-brand-gray">"${snippet}"</p>
-      </blockquote>`;
-    };
-
-    const formatCompetitorItem = (item) => {
-      const name = item.name || 'Competitor';
-      const summary = item.summary || 'Summary not available.';
-      return `<li class="report-list-item">
-        <strong class="text-sm font-medium text-brand-dark">${name}</strong>
-        <p class="text-sm text-brand-gray mt-1">${summary}</p>
-      </li>`;
-    };
-
-    const formatDebtItem = (item) => {
-      return `<li class="report-list-item">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
-          <strong class="text-sm font-medium text-brand-dark">${item.type || 'Unknown Debt'}</strong>
-          <span class="text-sm font-bold text-red-table sm:text-right">${item.monthlyPayment || 'N/A'} / mo</span>
-        </div>
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
-          <span>Lender: <strong>${item.lender || 'Unknown Lender'}</strong></span>
-          <span class="sm:text-right">Est. Balance: <strong>${item.estimatedBalance || 'N/A'}</strong></span>
-        </div>
-      </li>`;
-    };
-
-    const formatCounterpartyItem = (item) => {
-      const flowColor = (item.flow || 'outflow').toLowerCase() === 'inflow' ? 'text-green-table' : 'text-red-table';
-      return `<li class="report-list-item">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1">
-          <strong class="text-sm font-medium text-brand-dark">${item.name || 'Unknown Counterparty'}</strong>
-          <span class="text-sm font-bold ${flowColor} sm:text-right">${item.avgAmount || 'N/A'} / mo</span>
-        </div>
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-brand-gray">
-          <span>Type: ${item.type || 'N/A'}</span>
-          <span class="sm:text-right">Relationship: ${item.relationship || 'External'}</span>
-        </div>
-      </li>`;
-    };
-
-    function populateBankingCharts(element, data, barColorClass) {
+    function populateBankingCharts(element, data, barClass) {
       if (!element) return;
       element.innerHTML = '';
-      if (!data || data.length === 0) {
-        element.innerHTML = `<div class="chart-empty">No recent data available.</div>`;
-        return;
-      }
+      if (!data || data.length === 0) { element.innerHTML = `<div class="chart-empty">No recent data available.</div>`; return; }
       const maxAmount = Math.max(...data.map(d => d.amount || 0));
       const scaleMax = maxAmount === 0 ? 1 : maxAmount * 1.1;
       data.forEach(item => {
-        const barHeight = (item.amount / scaleMax) * 100;
-        element.innerHTML += `
-          <div class="bar-wrapper" title="${item.label}: ${item.value}">
-            <div class="bar-value">${item.value || 'N/A'}</div>
-            <div class="bar ${barColorClass || 'bar-green'}" style="height: ${barHeight}%"></div>
-            <div class="bar-label">${item.label || 'N/A'}</div>
-          </div>
-        `;
+        const h = (item.amount / scaleMax) * 100;
+        element.innerHTML += `<div class="bar-wrapper" title="${item.label}: ${item.value}"><div class="bar-value">${item.value||'N/A'}</div><div class="bar ${barClass||'bar-green'}" style="height:${h}%"></div><div class="bar-label">${item.label||'N/A'}</div></div>`;
       });
     }
 
-    function populateMonthlyTable(bodyElement, months, averages) {
-      if (!bodyElement) return;
-      bodyElement.innerHTML = '';
-      if (!months || months.length === 0) {
-        bodyElement.innerHTML = `<tr><td colspan="8" class="text-center italic text-brand-gray">No monthly statement breakdown available.</td></tr>`;
-        return;
-      }
-      months.forEach(month => {
-        const netColor = (month.netCashflow || '').startsWith('-') ? 'text-red-table' : 'text-green-table';
-        bodyElement.innerHTML += `
-          <tr>
-            <td class="font-medium text-brand-dark">${month.month || 'N/A'}</td>
-            <td class="text-green-table">${month.credits || '$0.00'}</td>
-            <td class="text-red-table">${month.debits || '$0.00'}</td>
-            <td>${month.avgBalance || '$0.00'}</td>
-            <td>${month.minBalance || '$0.00'}</td>
-            <td class="${(month.daysNeg || 0) > 0 ? 'text-red-table font-bold' : ''}">${month.daysNeg || 0}</td>
-            <td class="${(month.nsfs || 0) > 0 ? 'text-red-table font-bold' : ''}">${month.nsfs || 0}</td>
-            <td class="font-medium ${netColor}">${month.netCashflow || '$0.00'}</td>
-          </tr>
-        `;
+    function populateMonthlyTable(body, months, avg) {
+      if (!body) return;
+      body.innerHTML = '';
+      if (!months || months.length === 0) { body.innerHTML = `<tr><td colspan="8" class="text-center italic text-brand-gray">No monthly statement breakdown available.</td></tr>`; return; }
+      months.forEach(m => {
+        const netColor = (m.netCashflow||'').startsWith('-') ? 'text-red-table' : 'text-green-table';
+        body.innerHTML += `<tr><td class="font-medium text-brand-dark">${m.month||'N/A'}</td><td class="text-green-table">${m.credits||'$0.00'}</td><td class="text-red-table">${m.debits||'$0.00'}</td><td>${m.avgBalance||'$0.00'}</td><td>${m.minBalance||'$0.00'}</td><td class="${(m.daysNeg||0)>0?'text-red-table font-bold':''}">${m.daysNeg||0}</td><td class="${(m.nsfs||0)>0?'text-red-table font-bold':''}">${m.nsfs||0}</td><td class="font-medium ${netColor}">${m.netCashflow||'$0.00'}</td></tr>`;
       });
-      if (averages) {
-        const avgNetColor = (averages.netCashflow || '').startsWith('-') ? 'text-red-table' : 'text-green-table';
-        bodyElement.innerHTML += `
-          <tr class="monthly-avg">
-            <td>Average</td>
-            <td>${averages.credits || '$0.00'}</td>
-            <td>${averages.debits || '$0.00'}</td>
-            <td>${averages.avgBalance || '$0.00'}</td>
-            <td>${averages.minBalance || '$0.00'}</td>
-            <td>${averages.daysNeg || 0}</td>
-            <td>${averages.nsfs || 0}</td>
-            <td class="${avgNetColor}">${averages.netCashflow || '$0.00'}</td>
-          </tr>
-        `;
+      if (avg) {
+        const avgColor = (avg.netCashflow||'').startsWith('-')?'text-red-table':'text-green-table';
+        body.innerHTML += `<tr class="monthly-avg"><td>Average</td><td>${avg.credits||'$0.00'}</td><td>${avg.debits||'$0.00'}</td><td>${avg.avgBalance||'$0.00'}</td><td>${avg.minBalance||'$0.00'}</td><td>${avg.daysNeg||0}</td><td>${avg.nsfs||0}</td><td class="${avgColor}">${avg.netCashflow||'$0.00'}</td></tr>`;
       }
     }
 
-    function populateRiskChecklist(element, items) {
-      if (!element) return;
-      element.innerHTML = '';
-      if (!items || items.length === 0) {
-        element.innerHTML = `<li class="text-sm text-brand-gray italic">No checklist items available.</li>`;
-        return;
-      }
-      items.forEach(item => {
-        let colorClass = 'risk-grey';
-        if (item.color === 'green') colorClass = 'risk-green';
-        else if (item.color === 'red') colorClass = 'risk-red';
-        else if (item.color === 'yellow') colorClass = 'risk-yellow';
-        element.innerHTML += `
-          <li class="risk-checklist-item">
-            <span class="risk-label">${item.label || 'Unknown Check'}</span>
-            <span class="risk-status ${colorClass}">${item.status || 'Not assessed.'}</span>
-          </li>
-        `;
+    function populateRiskChecklist(el, items) {
+      if (!el) return; el.innerHTML = '';
+      if (!items || items.length === 0) { el.innerHTML = `<li class="text-sm text-brand-gray italic">No checklist items available.</li>`; return; }
+      items.forEach(i => {
+        let color = 'risk-grey'; if (i.color==='green') color='risk-green'; else if (i.color==='red') color='risk-red'; else if (i.color==='yellow') color='risk-yellow';
+        el.innerHTML += `<li class="risk-checklist-item"><span class="risk-label">${i.label||'Unknown Check'}</span><span class="risk-status ${color}">${i.status||'Not assessed.'}</span></li>`;
       });
     }
 
     function populateSources(sources) {
       if (!sourcesList || !sourcesContainer) return;
       sourcesList.innerHTML = '';
-      if (sources && sources.length > 0) {
-        sources.forEach(source => {
-          const li = document.createElement('li');
-          li.className = 'text-xs truncate';
-          li.innerHTML = `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-300">${source.title || source.uri}</a>`;
+      if (sources && sources.length) {
+        sources.forEach(s => {
+          const li = document.createElement('li'); li.className = 'text-xs truncate';
+          li.innerHTML = `<a href="${s.uri}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:text-yellow-500">${s.title || s.uri}</a>`;
           sourcesList.appendChild(li);
-        });
-        sourcesContainer.style.display = 'block';
-      } else {
-        sourcesContainer.style.display = 'none';
-      }
+        }); sourcesContainer.style.display = 'block';
+      } else { sourcesContainer.style.display = 'none'; }
     }
 
+    /* REPORT POPULATOR (drives all UI) */
     function populateReport(data) {
       if (!data) return;
 
-      if (companyNameHeader) companyNameHeader.innerText = data.keyInfo?.companyName || 'Business Report';
-      if (summaryHeader) summaryHeader.innerText = data.keyInfo?.summary || 'A comprehensive AI-generated report.';
+      companyNameHeader.innerText = data.keyInfo?.companyName || 'Business Report';
+      summaryHeader.innerText     = data.keyInfo?.summary || 'A comprehensive AI-generated report.';
 
       const decision = data.aiRecommendation?.decision || 'Manual Review';
-      if (recommendationDecision) recommendationDecision.innerText = decision;
-      if (recommendationJustification) recommendationJustification.innerText = data.aiRecommendation?.justification || 'AI justification not provided.';
-
-      if (recommendationBox) {
-        recommendationBox.className = 'p-4 border-l-4 rounded-r-lg';
-        const d = (decision || '').toLowerCase();
-        if (d === 'approve') {
-          recommendationBox.classList.add('bg-emerald-900/20', 'border-emerald-500', 'text-emerald-200');
-          recommendationDecision.className = 'font-heading font-bold text-2xl text-emerald-400';
-        } else if (d === 'decline') {
-          recommendationBox.classList.add('bg-red-900/20', 'border-red-500', 'text-red-200');
-          recommendationDecision.className = 'font-heading font-bold text-2xl text-red-400';
-        } else {
-          recommendationBox.classList.add('bg-amber-900/20', 'border-amber-500', 'text-amber-200');
-          recommendationDecision.className = 'font-heading font-bold text-2xl text-amber-400';
-        }
-      }
+      recommendationDecision.innerText = decision;
+      recommendationJustification.innerText = data.aiRecommendation?.justification || 'AI justification not provided.';
+      recommendationBox.className = 'p-4 border-l-4 rounded-r-lg';
+      if (decision.toLowerCase()==='approve') { recommendationBox.classList.add('bg-yellow-50','border-yellow-500','text-yellow-900'); recommendationDecision.className='font-heading font-bold text-2xl text-yellow-700'; }
+      else if (decision.toLowerCase()==='decline') { recommendationBox.classList.add('bg-red-50','border-red-500','text-red-800'); recommendationDecision.className='font-heading font-bold text-2xl text-red-700'; }
+      else { recommendationBox.classList.add('bg-amber-50','border-amber-500','text-amber-900'); recommendationDecision.className='font-heading font-bold text-2xl text-amber-700'; }
 
       const score = data.aiRiskScore?.score || 0;
-      if (scoreDigit) scoreDigit.innerText = score;
-      if (scoreJustification) scoreJustification.innerText = data.aiRiskScore?.justification || 'No justification provided.';
-      if (scoreCircle) {
-        scoreCircle.className = 'score-circle mb-4';
-        if (score < 550) scoreCircle.classList.add('score-red');
-        else if (score < 700) scoreCircle.classList.add('score-yellow');
-        else scoreCircle.classList.add('score-green');
-      }
+      scoreDigit.innerText = score;
+      scoreJustification.innerText = data.aiRiskScore?.justification || 'No justification provided.';
+      scoreCircle.className = 'score-circle mb-4'; if (score<550) scoreCircle.classList.add('score-red'); else if (score<700) scoreCircle.classList.add('score-yellow'); else scoreCircle.classList.add('score-green');
 
-      const checkIcon = '<svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
-      const xIcon = '<svg class="w-4 h-4 text-red-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+      const checkIcon = '<svg class="w-4 h-4 text-brand-green mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
+      const xIcon    = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
 
-      const positiveFactors = (data.aiRiskScore?.positiveFactors || []).filter(Boolean);
-      const negativeFactors = (data.aiRiskScore?.negativeFactors || []).filter(Boolean);
+      populateGenericList(positiveList, data.aiRiskScore?.positiveFactors, i => `<li class="flex items-start">${checkIcon}<span class="text-sm text-brand-dark">${i}</span></li>`, 'No positive factors noted.');
+      populateGenericList(negativeList, data.aiRiskScore?.negativeFactors, i => `<li class="flex items-start">${xIcon}<span class="text-sm text-brand-dark">${i}</span></li>`, 'No negative factors noted.');
 
-      populateGenericList(
-        positiveList,
-        positiveFactors,
-        (item) => `<li class="flex items-start">${checkIcon}<span class="text-sm text-brand-dark">${item}</span></li>`,
-        'No positive factors noted.'
-      );
-      populateGenericList(
-        negativeList,
-        negativeFactors,
-        (item) => `<li class="flex items-start">${xIcon}<span class="text-sm text-brand-dark">${item}</span></li>`,
-        'No negative factors noted.'
-      );
-
-      if (keyWebsite) {
-        const site = data.keyInfo?.website;
-        keyWebsite.innerHTML = site
-          ? `<a href="${site.startsWith('http') ? site : '//' + site}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">${site}</a>`
-          : 'N/A';
-      }
-      if (keyIndustry) keyIndustry.innerText = data.keyInfo?.industry || 'N/A';
-      if (keyCeo) keyCeo.innerText = data.keyInfo?.ceoName || 'N/A';
-      if (keyFounded) keyFounded.innerText = data.keyInfo?.yearFounded || 'N/A';
-      if (keyEmployees) keyEmployees.innerText = data.keyInfo?.employeeCount || 'N/A';
-      if (keyPhone) keyPhone.innerText = data.keyInfo?.phone || 'N/A';
-      if (keyAddress) keyAddress.innerText = data.keyInfo?.fullAddress || 'N/A';
+      keyWebsite.innerHTML = data.keyInfo?.website ? `<a href="${data.keyInfo.website.startsWith('http')?'':'//'}${data.keyInfo.website}" target="_blank" rel="noopener noreferrer" class="text-brand-yellow hover:underline">${data.keyInfo.website}</a>` : 'N/A';
+      keyIndustry.innerText = data.keyInfo?.industry || 'N/A';
+      keyCeo.innerText      = data.keyInfo?.ceoName || 'N/A';
+      keyFounded.innerText  = data.keyInfo?.yearFounded || 'N/A';
+      keyEmployees.innerText= data.keyInfo?.employeeCount || 'N/A';
+      keyPhone.innerText    = data.keyInfo?.phone || 'N/A';
+      keyAddress.innerText  = data.keyInfo?.fullAddress || 'N/A';
 
       const address = data.keyInfo?.fullAddress;
-      if (address && address !== 'N/A' && mapIframe && mapFallback) {
-        const encodedAddress = encodeURIComponent(address);
-        mapIframe.src = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-        mapIframe.style.display = 'block';
-        mapFallback.style.display = 'none';
-      } else if (mapIframe && mapFallback) {
-        mapIframe.style.display = 'none';
-        mapFallback.style.display = 'block';
-      }
+      if (address && address !== 'N/A') { const enc = encodeURIComponent(address); mapIframe.src = `https://maps.google.com/maps?q=${enc}&t=&z=13&ie=UTF8&iwloc=&output=embed`; mapIframe.style.display='block'; mapFallback.style.display='none'; }
+      else { mapIframe.style.display='none'; mapFallback.style.display='block'; }
 
-      if (sosName) sosName.innerText = data.sos?.entityName || 'N/A';
-      if (sosEntity) sosEntity.innerText = data.sos?.entityType || 'N/A';
-      if (sosJurisdiction) sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
-      if (sosDate) sosDate.innerText = data.sos?.formationDate || 'N/A';
-      if (sosAgent) sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
-      if (sosStatus) {
-        sosStatus.innerText = data.sos?.status || 'N/A';
-        sosStatus.className = 'font-medium text-brand-dark sm:text-right break-words';
-        if (data.sos?.status?.toLowerCase().includes('active')) {
-          sosStatus.classList.add('text-brand-green');
-        } else if (data.sos?.status && !data.sos.status.toLowerCase().includes('n/a')) {
-          sosStatus.classList.add('text-red-400');
-        }
-      }
+      // SOS
+      sosName.innerText = data.sos?.entityName || 'N/A';
+      sosStatus.innerText = data.sos?.status || 'N/A';
+      sosEntity.innerText = data.sos?.entityType || 'N/A';
+      sosJurisdiction.innerText = data.sos?.jurisdiction || 'N/A';
+      sosDate.innerText = data.sos?.formationDate || 'N/A';
+      sosAgent.innerText = data.sos?.registeredAgent || 'N/A';
+      sosStatus.className = 'font-medium text-brand-dark sm:text-right break-words';
+      const st = (data.sos?.status || '').toLowerCase();
+      if (st.includes('active')) sosStatus.classList.add('text-brand-green'); else if (st) sosStatus.classList.add('text-red-500');
 
+      // Financials
       const fin = data.financialSummary;
-      if (fin && finPublicDiv && finPrivateDiv && finNote) {
+      if (fin) {
         if (fin.isPublic) {
-          finPublicDiv.style.display = 'block';
-          finPrivateDiv.style.display = 'none';
-          if (finTicker) finTicker.innerText = fin.tickerSymbol || 'N/A';
-          if (finMarketCap) finMarketCap.innerText = fin.marketCap || 'N/A';
-          if (finRevenue) finRevenue.innerText = fin.latestRevenue || 'N/A';
-          if (finNetIncome) finNetIncome.innerText = fin.netIncome || 'N/A';
+          finPublicDiv.style.display = 'block'; finPrivateDiv.style.display = 'none';
+          finTicker.innerText = fin.tickerSymbol || 'N/A';
+          finMarketCap.innerText = fin.marketCap || 'N/A';
+          finRevenue.innerText = fin.latestRevenue || 'N/A';
+          finNetIncome.innerText = fin.netIncome || 'N/A';
         } else {
-          finPublicDiv.style.display = 'none';
-          finPrivateDiv.style.display = 'block';
-          if (finEstRevenue) finEstRevenue.innerText = fin.estAnnualRevenue || 'N/A';
-          if (finEstMargin) finEstMargin.innerText = fin.estProfitMargin || 'N/A';
-          if (finEstCash) finEstCash.innerText = fin.cashOnHand || 'N/A';
+          finPublicDiv.style.display = 'none'; finPrivateDiv.style.display = 'block';
+          finEstRevenue.innerText = fin.estAnnualRevenue || 'N/A';
+          finEstMargin.innerText  = fin.estProfitMargin || 'N/A';
+          finEstCash.innerText    = fin.cashOnHand || 'N/A';
         }
-
-        if (finCreditDecision) finCreditDecision.innerText = fin.creditDecision || 'N/A';
-        if (finCreditScore) finCreditScore.innerText = fin.ficoScore || 'N/A';
-        if (finCreditTotalDebt) finCreditTotalDebt.innerText = fin.totalDebt || 'N/A';
-        if (finCreditRevolvingDebt) finCreditRevolvingDebt.innerText = fin.revolvingDebt || 'N/A';
-        if (finCreditAvgRevenue) finCreditAvgRevenue.innerText = fin.avgMonthlyRevenue || 'N/A';
-
-        finNote.innerText =
-          fin.note ||
-          (fin.isPublic
-            ? 'Data sourced from public filings.'
-            : 'Fictional but realistic estimates generated by AI for demonstration.');
+        finCreditDecision.innerText = fin.creditDecision || 'N/A';
+        finCreditScore.innerText    = fin.ficoScore || 'N/A';
+        finCreditTotalDebt.innerText= fin.totalDebt || 'N/A';
+        finCreditRevolvingDebt.innerText = fin.revolvingDebt || 'N/A';
+        finCreditAvgRevenue.innerText    = fin.avgMonthlyRevenue || 'N/A';
+        finNote.innerText = fin.note || (fin.isPublic ? 'Data sourced from public filings.' : 'Fictional data generated by AI for demonstration.');
       }
 
       populateGenericList(swotStrengths, data.swotAnalysis?.strengths, formatSwotItem, 'No strengths identified.');
@@ -1684,303 +1242,214 @@
       populateGenericList(swotOpportunities, data.swotAnalysis?.opportunities, formatSwotItem, 'No opportunities identified.');
       populateGenericList(swotThreats, data.swotAnalysis?.threats, formatSwotItem, 'No threats identified.');
 
-      if (sentimentRating) sentimentRating.innerText = data.publicSentiment?.rating || 'Neutral';
-      if (sentimentJustification) sentimentJustification.innerText = data.publicSentiment?.justification || 'No sentiment analysis available.';
+      sentimentRating.innerText = data.publicSentiment?.rating || 'Neutral';
+      sentimentJustification.innerText = data.publicSentiment?.justification || 'No sentiment analysis available.';
 
-      const newsItems = (data.recentNews || []).filter(item => item && (item.title || item.summary));
-      const reviewItems = (data.customerReviews || []).filter(item => item && item.snippet);
-      const competitorItems = (data.competitors || []).filter(item => item && (item.name || item.summary));
-
-      populateGenericList(newsList, newsItems, formatNewsItem, 'No recent news found.');
-      populateGenericList(reviewsList, reviewItems, formatReviewItem, 'No customer reviews found.');
-      populateGenericList(competitorsList, competitorItems, formatCompetitorItem, 'No competitors identified.');
+      populateGenericList(newsList, data.recentNews, formatNewsItem, 'No recent news found.');
+      populateGenericList(reviewsList, data.customerReviews, formatReviewItem, 'No customer reviews found.');
+      populateGenericList(competitorsList, data.competitors, formatCompetitorItem, 'No competitors identified.');
       populateGenericList(recordsList, data.publicRecords?.findings, formatFinding, 'No public records found.');
       populateGenericList(legalList, data.legalAndRegulatory?.findings, formatFinding, 'No legal or regulatory flags found.');
 
-      populateBankingCharts(bankingChartRevenue, data.bankingSnapshot?.revenue, 'bar-green');
-      populateBankingCharts(bankingChartAvgBalance, data.bankingSnapshot?.avgDailyBalance, 'bar-grey');
-      populateBankingCharts(bankingChartEndBalance, data.bankingSnapshot?.endingBalance, 'bar-yellow');
-      populateBankingCharts(bankingChartDebt, data.bankingSnapshot?.debtService, 'bar-red');
+      populateBankingCharts(bankingChartRevenue,     data.bankingSnapshot?.revenue,        'bar-green');
+      populateBankingCharts(bankingChartAvgBalance,  data.bankingSnapshot?.avgDailyBalance,'bar-grey');
+      populateBankingCharts(bankingChartEndBalance,  data.bankingSnapshot?.endingBalance,  'bar-yellow');
+      populateBankingCharts(bankingChartDebt,        data.bankingSnapshot?.debtService,    'bar-red');
 
       populateMonthlyTable(monthlyBreakdownBody, data.monthlyBreakdown?.months, data.monthlyBreakdown?.averages);
       populateGenericList(debtObligationsList, data.debtObligations, formatDebtItem, 'No extrapolated debt obligations found.');
-      populateGenericList(counterpartiesList, data.topCounterparties, formatCounterpartyItem, 'No counterparty data found.');
+      populateGenericList(counterpartiesList,  data.topCounterparties, formatCounterpartyItem, 'No counterparty data found.');
       populateRiskChecklist(riskChecklist, data.aiRiskChecklist);
     }
 
-    async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+    /* NETWORKING */
+    async function fetchWithBackoff(url, options, retries=3, delay=1000) {
       let lastError;
-      for (let i = 0; i < retries; i++) {
+      for (let i=0;i<retries;i++) {
         try {
-          const response = await fetch(url, options);
-          if (!response.ok) {
-            let errorBody;
-            try { errorBody = await response.json(); } catch (e) { errorBody = null; }
-            const errorMessage = errorBody?.error?.message || response.statusText;
-            lastError = new Error(`API Error: ${errorMessage} (Status: ${response.status})`);
-            if ((response.status === 429 || response.status >= 500) && i < retries - 1) {
-              await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-              continue;
-            } else {
-              throw lastError;
-            }
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            let body=null; try{ body=await res.json(); }catch{}
+            const msg = body?.error?.message || res.statusText;
+            lastError = new Error(`API Error: ${msg} (Status: ${res.status})`);
+            if ((res.status===429||res.status>=500) && i<retries-1) { await new Promise(r=>setTimeout(r, delay*Math.pow(2,i))); continue; }
+            throw lastError;
           }
-          return await response.json();
-        } catch (error) {
-          lastError = error;
-          if (i < retries - 1) {
-            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-          }
+          return await res.json();
+        } catch (err) {
+          lastError = err; if (i<retries-1) await new Promise(r=>setTimeout(r, delay*Math.pow(2,i)));
         }
       }
       throw lastError || new Error('API request failed after all retries.');
     }
 
-    async function callReportAPI(systemPrompt, userQuery, logId = 'api') {
-      const apiKey = (typeof localStorage !== 'undefined') ? (localStorage.getItem('geminiApiKey') || '') : '';
-      if (!apiKey) {
-        throw new Error('No Gemini API key found. Open Settings and add your key.');
-      }
+    async function callReportAPI(systemPrompt, userQuery, logId='api') {
+      const apiKey = localStorage.getItem('tb-gemini-key') || '';
+      if (!apiKey) throw new Error('Gemini API key is missing. Open Settings and add your key first.');
 
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-      const textPayload = {
+      const payload = {
         contents: [{ parts: [{ text: userQuery }] }],
         tools: [{ google_search: {} }],
         systemInstruction: { parts: [{ text: systemPrompt }] },
       };
 
-      const result = await fetchWithBackoff(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(textPayload)
-      });
+      const result = await fetchWithBackoff(apiUrl, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
 
       const candidate = result.candidates?.[0];
       const text = candidate?.content?.parts?.[0]?.text;
       if (!text) throw new Error('No content received from API.');
 
-      let json = null;
+      // Extract a single JSON object from the text
+      let json=null;
       try {
-        const startIndex = text.indexOf('{');
-        const endIndex = text.lastIndexOf('}');
-        if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
-          console.error('Raw text was:', text);
-          throw new Error('Received non-JSON response from API.');
-        }
-        const jsonString = text.substring(startIndex, endIndex + 1).trim();
-        json = JSON.parse(jsonString);
+        const s = text.indexOf('{'); const e = text.lastIndexOf('}');
+        if (s===-1 || e===-1 || e<s) throw new Error('Received non-JSON response from API.');
+        json = JSON.parse(text.substring(s, e+1).trim());
       } catch (e) {
-        console.error(`[${logId}] Failed to parse JSON response:`, e);
-        console.error('Raw text was:', text);
+        console.error(`[${logId}] parse error`, e, '\nRaw:', text);
         throw new Error('Received an invalid JSON response from the API.');
       }
 
       let sources = [];
-      const groundingMetadata = candidate.groundingMetadata;
-      if (groundingMetadata && groundingMetadata.groundingAttributions) {
-        sources = groundingMetadata.groundingAttributions
-          .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-          .filter(s => s.uri && s.title);
+      const gm = candidate.groundingMetadata;
+      if (gm && gm.groundingAttributions) {
+        sources = gm.groundingAttributions.map(a => ({ uri: a.web?.uri, title: a.web?.title })).filter(s => s.uri && s.title);
       }
-
       return { json, sources };
     }
 
     function getMasterPrompt() {
-      return `You are a world-class Tier-4 Senior Underwriting Analyst and business intelligence expert. A user is requesting an *insanely comprehensive* master report on a specific company. You MUST use Google Search heavily to pull real-world data.
+      return `You are a world-class underwriting analyst and business intelligence expert.
 
-Hard rules:
-- Aggressively search for corporate filings, news, reviews, and other credible sources (use the provided google_search tool).
-- Prefer authoritative sources: government registries, regulators, courts, major news, the company's own site, major review platforms (BBB, Trustpilot, Google Reviews, etc.).
-- Never invent real legal cases, sanctions, or regulatory actions that don't appear in search.
-- Never use placeholders like "Unknown Source", "No Title", or "No summary". If you cannot find enough detail, omit the item instead or clearly mark it as "N/A".
-- Fill every field you reasonably can; if something genuinely cannot be found, use "N/A" or an empty array [].
+You are given a COMPANY NAME and must produce an insanely comprehensive business verification and underwriting report.
 
-1. Determine if the company is PUBLIC (has a stock ticker) or PRIVATE.
-2. With multiple searches, build:
-   - keyInfo: companyName, website, fullAddress, phone, yearFounded, industry, ceoName, employeeCount, summary (1–2 sentences).
-   - sos: entityName, status, entityType, jurisdiction, formationDate, registeredAgent (from Secretary of State or equivalent).
-   - publicRecords: findings for liens, judgments, UCC filings, bankruptcies (real where possible).
-   - legalAndRegulatory: lawsuits, enforcement actions, regulatory investigations; include dates if available.
-   - recentNews: 3–5 items with title, source (e.g., "Reuters", "BBB complaint database"), and a concise summary.
-   - customerReviews: 3–5 snippets from major review sources (Trustpilot, BBB, Google Reviews, etc.) with rating and source.
-   - competitors: top 2–3 competitors with short summaries.
-3. Build:
-   - publicSentiment: rating string like "Positive (8/10)" and a clear justification.
-   - swotAnalysis: 3–4 bullets each for strengths, weaknesses, opportunities, threats.
-   - aiRiskScore: fictional score 300–850 with justification plus 2–4 positiveFactors and 2–4 negativeFactors.
-   - aiRecommendation: decision in {"Approve","Decline","Manual Review"} with detailed justification that an underwriter could paste into a memo.
-4. financialSummary:
-   - If PUBLIC: real tickerSymbol, marketCap, latestRevenue, netIncome from recent filings or market data.
-   - If PRIVATE: create fictional but realistic estAnnualRevenue, estProfitMargin, cashOnHand.
-   - Always include: note explaining which parts are real vs fictional, creditDecision, ficoScore (estimated for the business), totalDebt, revolvingDebt, avgMonthlyRevenue.
-5. bankingSnapshot (fictional but realistic, consistent with financialSummary):
-   - revenue, avgDailyBalance, endingBalance, debtService: each is an array of 3 months [{label, value, amount}] where amount is a numeric magnitude used for charts.
-6. monthlyBreakdown (fictional but realistic, consistent with everything else):
-   - months: 3 rows for recent months with fields (month, credits, debits, avgBalance, minBalance, daysNeg, nsfs, netCashflow).
-   - averages: aggregated row matching the same columns.
-7. aiRiskChecklist:
-   - 6 items, each {label, status, color} where color is "green", "red", "yellow", or "grey".
-8. debtObligations:
-   - 2–4 fictional but realistic items like MCA, term loans, credit lines; each {type, lender, estimatedBalance, monthlyPayment}.
-9. topCounterparties:
-   - 2–4 fictional but realistic items; each {name, type ("Customer" or "Vendor / ..."), flow ("inflow"|"outflow"), avgAmount, relationship ("External"|"Internal")}.
-10. Respond ONLY with a single valid JSON object, nothing before or after it. The response MUST start with '{' and end with '}'.
+TOOLS
+- You have access to the google_search tool.
+- You MUST use google_search aggressively. Run multiple searches for:
+  - corporate filings / secretary of state
+  - official website and contact information
+  - financials / investor pages / market cap (if public)
+  - public records: liens, judgments, UCC, bankruptcies
+  - lawsuits and regulatory actions
+  - news coverage
+  - customer reviews (Trustpilot, BBB, Google, etc.)
+  - competitors and market position
 
-Use exactly this JSON shape (fill with "N/A" or [] when truly unknown):
+HARD RULES
+- NO hallucinated facts when real data is available.
+- NEVER output placeholders like "No Title", "Unknown Source", "No summary".
+- If you truly cannot find a value after searching, set that specific field to "N/A" or omit the item entirely.
+- Prefer fewer high-quality, well-sourced items.
 
-{"keyInfo":{"companyName":"string","summary":"string","website":"string","fullAddress":"string","phone":"string","yearFounded":"string","industry":"string","ceoName":"string","employeeCount":"string"},"financialSummary":{"isPublic":false,"tickerSymbol":"string","marketCap":"string","latestRevenue":"string","netIncome":"string","estAnnualRevenue":"string","estProfitMargin":"string","cashOnHand":"string","note":"string","creditDecision":"string","ficoScore":"string","totalDebt":"string","revolvingDebt":"string","avgMonthlyRevenue":"string"},"bankingSnapshot":{"revenue":[{"label":"string","value":"string","amount":0}],"avgDailyBalance":[{"label":"string","value":"string","amount":0}],"endingBalance":[{"label":"string","value":"string","amount":0}],"debtService":[{"label":"string","value":"string","amount":0}]},"monthlyBreakdown":{"months":[{"month":"string","credits":"string","debits":"string","avgBalance":"string","minBalance":"string","daysNeg":0,"nsfs":0,"netCashflow":"string"}],"averages":{"credits":"string","debits":"string","avgBalance":"string","minBalance":"string","daysNeg":0,"nsfs":0,"netCashflow":"string"}},"debtObligations":[{"type":"string","lender":"string","estimatedBalance":"string","monthlyPayment":"string"}],"topCounterparties":[{"name":"string","type":"string","flow":"string","avgAmount":"string","relationship":"string"}],"sos":{"entityName":"string","status":"string","entityType":"string","jurisdiction":"string","formationDate":"string","registeredAgent":"string"},"publicRecords":{"findings":[{"type":"string","details":"string"}]},"legalAndRegulatory":{"findings":[{"type":"string","details":"string","date":"string"}]},"recentNews":[{"title":"string","source":"string","summary":"string"}],"customerReviews":[{"snippet":"string","source":"string","rating":"string"}],"competitors":[{"name":"string","summary":"string"}],"publicSentiment":{"rating":"string","justification":"string"},"swotAnalysis":{"strengths":["string"],"weaknesses":["string"],"opportunities":["string"],"threats":["string"]},"aiRiskScore":{"score":0,"justification":"string","positiveFactors":["string"],"negativeFactors":["string"]},"aiRiskChecklist":[{"label":"string","status":"string","color":"string"}],"aiRecommendation":{"decision":"string","justification":"string"}}`;
+OUTPUT SHAPE
+Return ONE JSON object only (no prose around it) with this exact shape:
+
+{
+  "keyInfo": {
+    "companyName": "string",
+    "summary": "1-2 sentence summary",
+    "website": "string",
+    "fullAddress": "string",
+    "phone": "string",
+    "yearFounded": "string",
+    "industry": "string",
+    "ceoName": "string",
+    "employeeCount": "string"
+  },
+  "financialSummary": {
+    "isPublic": true,
+    "tickerSymbol": "string (if public)",
+    "marketCap": "string (if public)",
+    "latestRevenue": "string (if public)",
+    "netIncome": "string (if public)",
+    "estAnnualRevenue": "string (if private)",
+    "estProfitMargin": "string (if private)",
+    "cashOnHand": "string (if private)",
+    "note": "Explain what is real vs fictional.",
+    "creditDecision": "Approve | Decline | Manual Review",
+    "ficoScore": "string",
+    "totalDebt": "string",
+    "revolvingDebt": "string",
+    "avgMonthlyRevenue": "string"
+  },
+  "bankingSnapshot": {
+    "revenue":        [{"label": "Sep '24", "value": "$X", "amount": 0}],
+    "avgDailyBalance":[{"label": "Sep '24", "value": "$X", "amount": 0}],
+    "endingBalance":  [{"label": "Sep '24", "value": "$X", "amount": 0}],
+    "debtService":    [{"label": "Sep '24", "value": "$X", "amount": 0}]
+  },
+  "monthlyBreakdown": {
+    "months": [
+      {"month":"Nov '24","credits":"string","debits":"string","avgBalance":"string","minBalance":"string","daysNeg":0,"nsfs":0,"netCashflow":"string"}
+    ],
+    "averages": {"credits":"string","debits":"string","avgBalance":"string","minBalance":"string","daysNeg":0,"nsfs":0,"netCashflow":"string"}
+  },
+  "debtObligations": [{"type":"string","lender":"string","estimatedBalance":"string","monthlyPayment":"string"}],
+  "topCounterparties":[{"name":"string","type":"Customer|Vendor","flow":"inflow|outflow","avgAmount":"string","relationship":"Internal|External"}],
+  "sos":{"entityName":"string","status":"string","entityType":"string","jurisdiction":"string","formationDate":"string","registeredAgent":"string"},
+  "publicRecords":{"findings":[{"type":"string","details":"string"}]},
+  "legalAndRegulatory":{"findings":[{"type":"string","details":"string","date":"string"}]},
+  "recentNews":[{"title":"Real headline","source":"Publisher","summary":"1-2 sentence summary"}],
+  "customerReviews":[{"snippet":"Quoted snippet","source":"Site","rating":"4.2/5"}],
+  "competitors":[{"name":"Competitor","summary":"1 sentence positioning"}],
+  "publicSentiment":{"rating":"Positive (8/10)","justification":"Short explanation"},
+  "swotAnalysis":{"strengths":["..."],"weaknesses":["..."],"opportunities":["..."],"threats":["..."]},
+  "aiRiskScore":{"score":300,"justification":"Explain score","positiveFactors":["..."],"negativeFactors":["..."]},
+  "aiRiskChecklist":[{"label":"Corporate filings","status":"Active & in good standing","color":"green"}],
+  "aiRecommendation":{"decision":"Approve|Decline|Manual Review","justification":"Underwriting rationale"}
+}
+
+Respond ONLY with that JSON (no Markdown, no commentary).`;
     }
 
-    // Generate report
+    /* Generate report */
     if (generateReportBtn) {
       generateReportBtn.addEventListener('click', async () => {
-        const businessName = businessNameInput.value.trim();
-        if (!businessName) {
-          if (resultsUi) resultsUi.style.display = 'block';
-          if (reportSearchHeader) reportSearchHeader.style.display = 'none';
-          showReportState('error', 'Please enter a business name.');
-          return;
-        }
-
-        if (resultsUi) resultsUi.style.display = 'block';
-        if (reportSearchHeader) reportSearchHeader.style.display = 'none';
-
-        showReportState('loading');
-        generateReportBtn.disabled = true;
-
-        const systemPrompt = getMasterPrompt();
-        const userQuery = `Generate a master comprehensive AI business report for: "${businessName}"`;
+        const businessName = (businessNameInput.value || '').trim();
+        if (!businessName) { resultsUi.style.display='block'; reportSearchHeader.style.display='none'; showReportState('error','Please enter a business name.'); return; }
+        resultsUi.style.display='block'; reportSearchHeader.style.display='none';
+        showReportState('loading'); generateReportBtn.disabled = true;
 
         try {
-          const { json, sources } = await callReportAPI(systemPrompt, userQuery, 'full-report');
-          populateReport(json);
-          populateSources(sources);
-          showReportState('content');
-        } catch (error) {
-          console.error('Full Report Error:', error);
-          showReportState('error', `Failed to generate report: ${error.message}.`);
+          const { json, sources } = await callReportAPI(getMasterPrompt(), `Generate a master comprehensive AI business report for: "${businessName}"`, 'full-report');
+          populateReport(json); populateSources(sources); showReportState('content');
+        } catch (err) {
+          console.error('Full Report Error:', err);
+          showReportState('error', `Failed to generate report: ${err.message}`);
         } finally {
           generateReportBtn.disabled = false;
         }
       });
     }
 
-    // "Try the demo" scroll
-    const tryDemoBtns = document.querySelectorAll('a[href="#demo"]');
-    if (tryDemoBtns) {
-      tryDemoBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const demoSection = document.getElementById('demo');
-          if (demoSection) demoSection.scrollIntoView({ behavior: 'smooth' });
-          if (reportSearchHeader) reportSearchHeader.style.display = 'block';
-          if (resultsUi) resultsUi.style.display = 'none';
-          if (mainWidgetContainer) {
-            mainWidgetContainer.classList.add('max-w-xl');
-            mainWidgetContainer.classList.remove('max-w-7xl');
-          }
-          if (mobileMenu) mobileMenu.classList.add('hidden');
-          if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
-        });
+    /* Smooth scroll & menu */
+    document.querySelectorAll('a[href="#demo"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+        reportSearchHeader.style.display='block'; resultsUi.style.display='none';
+        mainWidgetContainer.classList.add('max-w-xl'); mainWidgetContainer.classList.remove('max-w-7xl');
+        mobileMenu.classList.add('hidden'); mobileMenuBtn.setAttribute('aria-expanded','false');
       });
-    }
-
-    // Mobile nav toggle
+    });
     if (mobileMenuBtn && mobileMenu) {
       mobileMenuBtn.addEventListener('click', () => {
         const isOpen = !mobileMenu.classList.contains('hidden');
-        mobileMenu.classList.toggle('hidden');
-        mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+        mobileMenu.classList.toggle('hidden'); mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
       });
     }
-
-    const navLinks = document.querySelectorAll('a[href="#platform"], a[href="#pricing"]');
-    navLinks.forEach(link => {
+    document.querySelectorAll('a[href="#platform"], a[href="#pricing"]').forEach(link => {
       link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
-        if (mobileMenu) mobileMenu.classList.add('hidden');
-        if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        e.preventDefault(); const t = document.querySelector(link.getAttribute('href')); t?.scrollIntoView({ behavior:'smooth' });
+        mobileMenu.classList.add('hidden'); mobileMenuBtn.setAttribute('aria-expanded','false');
       });
     });
 
-    // Default: show sample report
-    if (reportSearchHeader) reportSearchHeader.style.display = 'none';
-    if (resultsUi) resultsUi.style.display = 'block';
-    if (mainWidgetContainer) {
-      mainWidgetContainer.classList.add('max-w-7xl');
-      mainWidgetContainer.classList.remove('max-w-xl');
-    }
-
-    // SETTINGS MODAL
-    function openSettings() {
-      if (!settingsModal) return;
-      settingsModal.classList.remove('hidden');
-
-      if (settingsApiInput && typeof localStorage !== 'undefined') {
-        const storedKey = localStorage.getItem('geminiApiKey') || '';
-        settingsApiInput.value = storedKey;
-        if (settingsStatus) {
-          if (storedKey) {
-            settingsStatus.textContent = 'API key is saved locally in this browser.';
-            settingsStatus.className = 'mt-2 text-xs text-emerald-400';
-          } else {
-            settingsStatus.textContent = 'Not set. Key is stored only in this browser using localStorage.';
-            settingsStatus.className = 'mt-2 text-xs text-brand-gray';
-          }
-        }
-      }
-      setTimeout(() => { if (settingsApiInput) settingsApiInput.focus(); }, 50);
-    }
-
-    function closeSettings() {
-      if (settingsModal) settingsModal.classList.add('hidden');
-    }
-
-    if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
-    if (settingsBtnMobile) {
-      settingsBtnMobile.addEventListener('click', () => {
-        openSettings();
-        if (mobileMenu) mobileMenu.classList.add('hidden');
-        if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
-      });
-    }
-    if (settingsBackdrop) settingsBackdrop.addEventListener('click', closeSettings);
-    if (settingsClose) settingsClose.addEventListener('click', closeSettings);
-    if (settingsCancel) settingsCancel.addEventListener('click', closeSettings);
-
-    if (settingsSave && settingsApiInput) {
-      settingsSave.addEventListener('click', () => {
-        const value = settingsApiInput.value.trim();
-        if (typeof localStorage !== 'undefined') {
-          if (value) {
-            localStorage.setItem('geminiApiKey', value);
-            if (settingsStatus) {
-              settingsStatus.textContent = 'API key saved locally.';
-              settingsStatus.className = 'mt-2 text-xs text-emerald-400';
-            }
-          } else {
-            localStorage.removeItem('geminiApiKey');
-            if (settingsStatus) {
-              settingsStatus.textContent = 'API key cleared.';
-              settingsStatus.className = 'mt-2 text-xs text-amber-400';
-            }
-          }
-        }
-      });
-    }
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && settingsModal && !settingsModal.classList.contains('hidden')) {
-        closeSettings();
-      }
-    });
+    // Default landing view shows results demo
+    reportSearchHeader.style.display='none'; resultsUi.style.display='block';
+    mainWidgetContainer.classList.add('max-w-7xl'); mainWidgetContainer.classList.remove('max-w-xl');
   });
 </script>
-
 </body>
 </html>
