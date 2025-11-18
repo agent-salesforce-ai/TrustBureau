@@ -12,25 +12,24 @@
   <style>
     :root {
       /* Defaults – overridden by theme/accent classes */
-      /* TrustBureau.ai brand green as default */
-      --accent-color: #00C09A;
-      --accent-color-light: #22D3A6;
-      --accent-color-dark: #00806A;
-      --accent-shadow: 0 0 26px rgba(0, 192, 154, 0.55);
+      --accent-color: #f59e0b;
+      --accent-color-light: #fbbf24;
+      --accent-color-dark: #92400e;
+      --accent-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
 
-      --bg-body: #F8F9FA;
+      --bg-body: #f1f5f9;
       --bg-card: #ffffff;
-      --bg-card-inner: #F3F4F6;
+      --bg-card-inner: #f9fafb;
       --bg-slider-track: #e5e7eb;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
 
-      --border-primary: #e5e7eb;
-      --text-primary: #1A1A1A;
+      --border-primary: #cbd5e1;
+      --text-primary: #020617;
       --text-secondary: #111827;
-      --text-muted: #6b7280;
+      --text-muted: #4b5563;
 
-      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.12);
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.14);
     }
 
     body {
@@ -52,16 +51,16 @@
      * -------------------------------- */
     html.theme-light {
       color-scheme: light;
-      --bg-body: #F8F9FA;
+      --bg-body: #eef2f7;
       --bg-card: #ffffff;
-      --bg-card-inner: #F3F4F6;
-      --bg-slider-track: #e5e7eb;
+      --bg-card-inner: #f9fbff;
+      --bg-slider-track: #e2e8f0;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
-      --border-primary: #e5e7eb;
-      --text-primary: #1A1A1A;
+      --border-primary: #cbd5e1;
+      --text-primary: #0f172a;
       --text-secondary: #111827;
-      --text-muted: #6b7280;
+      --text-muted: #4b5563;
       --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.12);
     }
     html.theme-light body { background-color: var(--bg-body); }
@@ -342,8 +341,14 @@
     /* --------------------------------
      * ACCENT PALETTES
      * -------------------------------- */
-    /* Repurpose "gold" as TrustBureau green default */
-    html.accent-gold     { --accent-color:#00C09A; --accent-color-light:#22D3A6; --accent-color-dark:#00806A; --accent-shadow:0 0 26px rgba(0,192,154,.6); }
+
+    /* Default accent = TrustBureau-ish emerald */
+    html.accent-gold {
+      --accent-color: #10b981;
+      --accent-color-light: #34d399;
+      --accent-color-dark: #047857;
+      --accent-shadow: 0 0 26px rgba(16, 185, 129, 0.75);
+    }
 
     html.accent-red      { --accent-color:#ef4444; --accent-color-light:#f97373; --accent-color-dark:#b91c1c; --accent-shadow:0 0 18px rgba(239,68,68,.55);}
     html.accent-orange   { --accent-color:#f97316; --accent-color-light:#fdba74; --accent-color-dark:#c2410c; --accent-shadow:0 0 18px rgba(249,115,22,.55);}
@@ -504,29 +509,35 @@
       <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
         <div class="flex items-center justify-center">
           <img id="customLogoImg" class="h-9 w-auto hidden" alt="Logo" />
-          <!-- Default TrustBureau shield logo -->
-          <svg
-            id="defaultLogoSvg"
-            class="h-9 w-9"
-            viewBox="0 0 50 50"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <!-- Default TrustBureau-style shield logo -->
+          <svg id="defaultLogoSvg" class="h-9 w-9" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="tbShieldGradient" x1="10" y1="4" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#22C55E"/>
+                <stop offset="1" stop-color="#0EA5E9"/>
+              </linearGradient>
+            </defs>
             <path
-              d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z"
-              fill="#00C09A"
+              d="M32 4L12 12V30C12 41.5 20 51.5 32 56C44 51.5 52 41.5 52 30V12L32 4Z"
+              fill="url(#tbShieldGradient)"
             />
             <path
-              d="M17.5 25L22.5 30L32.5 20"
-              stroke="white"
-              stroke-width="4"
+              d="M32 4L12 12V30C12 41.5 20 51.5 32 56C44 51.5 52 41.5 52 30V12L32 4Z"
+              stroke="rgba(15,23,42,0.9)"
+              stroke-width="2"
+              fill="none"
+            />
+            <path
+              d="M23 31L30 38L43 24"
+              stroke="#FFFFFF"
+              stroke-width="3"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
         </div>
         <div class="flex flex-col items-center leading-tight mt-1">
-          <!-- Company name: now ~2x larger than before -->
+          <!-- Company name: ~2x larger -->
           <span id="companyNameDisplay" class="text-[22px] font-bold tracking-tight text-secondary"></span>
           <span id="platformBrandDisplay" class="text-[11px] font-medium text-muted"></span>
         </div>
@@ -590,10 +601,13 @@
                  placeholder="(555) 123-4567" />
         </div>
         <div>
-          <label for="logoInput" class="block font-semibold text-muted">Logo</label>
-          <input id="logoInput" type="file" accept="image/*"
-                 class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5" />
-          <p class="mt-1 text-[11px] text-muted">We compress to keep the link short (≈256px, WebP if possible).</p>
+          <label for="logoInput" class="block font-semibold text-muted">Logo URL</label>
+          <input id="logoInput" type="url"
+                 class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5"
+                 placeholder="https://yourdomain.com/logo.png" />
+          <p class="mt-1 text-[11px] text-muted">
+            Paste a public image URL; this logo is shown to clients and included in the approval link.
+          </p>
         </div>
       </div>
     </div>
@@ -638,7 +652,7 @@
           <div>
             <label for="accentSelector" class="block font-semibold text-muted">Accent</label>
             <select id="accentSelector" class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
-              <option value="accent-gold">TrustBureau Green (Default)</option>
+              <option value="accent-gold">TrustBureau (Default)</option>
               <option value="accent-red">Red</option>
               <option value="accent-orange">Orange</option>
               <option value="accent-yellow">Yellow</option>
@@ -943,7 +957,7 @@
     let isApprovalView = false;
     let termLengthManualDirty = false;
 
-    // Load saved theme/accent/background/logo/company, fallback to system dark if no theme
+    // Load saved theme/accent/background/logo/company
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
@@ -958,7 +972,16 @@
       }
       if (storedAccent) currentAccent = storedAccent;
       if (storedBackground) currentBackground = storedBackground;
-      if (storedLogo) currentLogoDataUrl = storedLogo;
+
+      if (storedLogo) {
+        if (storedLogo.length < 500) {
+          currentLogoDataUrl = storedLogo;
+        } else {
+          currentLogoDataUrl = '';
+          localStorage.removeItem('generic_offer_calc_logo');
+        }
+      }
+
       if (storedCompany) companyName = storedCompany;
     } catch (_) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -973,16 +996,18 @@
         style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0,
       }).format(numericValue);
     }
+
     function parseFormattedNumber(val) {
       if (typeof val !== 'string' || !val) return 0;
       return parseFloat(val.replace(/[\$,]/g, '')) || 0;
     }
+
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
       if (elements.calcAmountSlider) elements.calcAmountSlider.max = String(cap);
     }
 
-    // Base64 helpers that support Unicode
+    // Base64 helpers for compact config
     function b64EncodeUnicode(str) {
       return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
     }
@@ -992,7 +1017,6 @@
       ).join(''));
     }
 
-    // Encode/decode config (kept compact)
     function encodeConfig(config) {
       try { return b64EncodeUnicode(JSON.stringify(config)); } catch { return ''; }
     }
@@ -1000,7 +1024,6 @@
       try { return JSON.parse(b64DecodeUnicode(encoded)); } catch { return null; }
     }
 
-    // Read #hash param (preferred) or ?query param
     function getParam(name) {
       const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
       if (hash) {
@@ -1030,6 +1053,7 @@
 
       return { amount, factor, termMonths: termPayments, termLengthMonths, totalPayback, totalCost, payment: paymentAmount, paymentLabel, frequency };
     }
+
     function getCurrentOffer() {
       const amount = parseFormattedNumber(elements.calcAmountInput.value);
       const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
@@ -1072,6 +1096,7 @@
       if (!elements.addOfferButton) return;
       elements.addOfferButton.disabled = savedOffers.length >= MAX_ADDITIONAL_OFFERS;
     }
+
     function handleAddOffer() {
       if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
       savedOffers.push(getCurrentOffer());
@@ -1136,32 +1161,6 @@
         if (dataUrl) localStorage.setItem('generic_offer_calc_logo', dataUrl);
         else localStorage.removeItem('generic_offer_calc_logo');
       } catch (_) {}
-    }
-
-    // Resize/compress uploaded logo to keep links short
-    function processLogoFile(file, maxDim = 256) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          let dataUrl = '';
-          try {
-            dataUrl = canvas.toDataURL('image/webp', 0.8);
-            if (!dataUrl || dataUrl.length < 16) throw new Error('webp failed');
-          } catch { dataUrl = canvas.toDataURL('image/png'); }
-          currentLogoDataUrl = dataUrl;
-          applyLogoFromDataUrl(currentLogoDataUrl);
-        };
-        img.src = e.target?.result;
-      };
-      reader.readAsDataURL(file);
     }
 
     function updateBrandDisplay() {
@@ -1237,7 +1236,10 @@
           if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
           if (typeof cfg.cn === 'string') companyNameParam = cfg.cn;
 
-          if (typeof cfg.lg === 'string') currentLogoDataUrl = cfg.lg;
+          if (typeof cfg.lg === 'string') {
+            currentLogoDataUrl = cfg.lg.length < 500 ? cfg.lg : '';
+          }
+
           if (Array.isArray(cfg.o)) offersRaw = cfg.o;
         }
       }
@@ -1341,7 +1343,7 @@
       applyTheme();
       applyLogoFromDataUrl(currentLogoDataUrl);
 
-      // React to system theme changes when on Auto
+      // react to system theme changes when on Auto
       if (window.matchMedia) {
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
         const handleSystemThemeChange = () => { if (currentTheme === 'theme-auto') applyTheme(); };
@@ -1352,6 +1354,7 @@
       if (elements.themeSelector) elements.themeSelector.value = currentTheme;
       if (elements.accentSelector) elements.accentSelector.value = currentAccent;
       if (elements.backgroundSelector) elements.backgroundSelector.value = currentBackground;
+      if (elements.logoInput && currentLogoDataUrl) elements.logoInput.value = currentLogoDataUrl;
 
       if (elements.calcAmountSlider && elements.calcAmountInput) {
         syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
@@ -1389,7 +1392,7 @@
         });
       }
 
-      // Settings vs Theme panels (toggle open/close, close the other)
+      // Settings vs Theme panels
       if (!isApprovalView) {
         if (elements.repSettingsToggle && elements.repSettingsPanel) {
           elements.repSettingsToggle.addEventListener('click', () => {
@@ -1411,10 +1414,11 @@
 
       if (!isApprovalView && elements.companyNameInput) elements.companyNameInput.addEventListener('input', updateBrandDisplay);
 
+      // Logo URL input (no upload, small share payload)
       if (!isApprovalView && elements.logoInput) {
-        elements.logoInput.addEventListener('change', () => {
-          const file = elements.logoInput.files && elements.logoInput.files[0];
-          if (file) processLogoFile(file, 256);
+        elements.logoInput.addEventListener('input', () => {
+          currentLogoDataUrl = elements.logoInput.value.trim();
+          applyLogoFromDataUrl(currentLogoDataUrl);
         });
       }
 
@@ -1466,7 +1470,7 @@
 
           const encoded = encodeConfig(payload);
 
-          // Build share URL with hash to avoid server/proxy limits
+          // Share via URL hash to keep query string small
           const url = new URL(window.location.href);
           url.search = new URLSearchParams({ view: 'approval' }).toString();
           url.hash = 'c=' + encoded;
