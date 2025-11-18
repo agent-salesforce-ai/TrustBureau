@@ -370,11 +370,22 @@
     /* --------------------------------
      * SHARED UI
      * -------------------------------- */
-    .card-bg { background-color: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 0.75rem; box-shadow: var(--shadow-soft); }
-    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); border-radius: 0.75rem; }
+    .card-bg {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow-soft);
+    }
+    .card-inner-bg {
+      background-color: var(--bg-card-inner);
+      border: 1px solid var(--border-primary);
+      border-radius: 0.75rem;
+    }
 
     .shell {
-      border-radius: 1rem; border: 1px solid var(--border-primary); box-shadow: var(--shadow-soft);
+      border-radius: 1rem;
+      border: 1px solid var(--border-primary);
+      box-shadow: var(--shadow-soft);
     }
     html.theme-dark .shell,
     html.theme-black .shell,
@@ -391,24 +402,25 @@
       box-shadow: 0 0 0 1px rgba(15,23,42,.9), 0 0 24px var(--accent-shadow);
     }
 
-    /* Widget glow toggle – accents whole widget */
-    html.widget-glow-enabled .shell {
+    /* Main offer card glow (controlled by toggle; only in light theme) */
+    #offerCard {
+      transition: border-color .18s ease, box-shadow .18s ease, transform .15s ease;
+    }
+    html.glow-on[data-effective-theme="theme-light"] #offerCard {
       border-color: var(--accent-color);
       box-shadow:
-        0 0 0 1px rgba(148,163,184,.35),
-        0 0 0 1px var(--accent-color),
-        0 18px 50px rgba(15,23,42,.18),
-        0 0 35px var(--accent-shadow);
+        0 0 0 1px rgba(15, 23, 42, 0.04),
+        0 18px 40px rgba(15, 23, 42, 0.16),
+        var(--accent-shadow);
     }
 
-    /* Main offer glow toggle – accents main offer card */
-    html.offer-glow-enabled #offerCard {
+    /* Optional glow around the whole widget (shell) */
+    html.widget-glow-on .shell {
       border-color: var(--accent-color);
       box-shadow:
-        0 0 0 1px rgba(148,163,184,.35),
-        0 0 0 1px var(--accent-color),
-        0 18px 40px rgba(15,23,42,.15),
-        0 0 30px var(--accent-shadow);
+        0 0 0 1px rgba(148, 163, 184, 0.35),
+        0 20px 60px rgba(15, 23, 42, 0.22),
+        var(--accent-shadow);
     }
 
     .text-primary { color: var(--text-primary); }
@@ -417,20 +429,11 @@
     .border-primary { border-color: var(--border-primary); }
 
     .text-hero { color: var(--accent-color); }
-    /* No glow for amount text in light-ish themes; add subtle glow only in darker ones */
-    html.theme-dark .text-hero,
-    html.theme-black .text-hero,
-    html.theme-ocean .text-hero,
-    html.theme-forest .text-hero,
-    html.theme-sunset .text-hero,
-    html.theme-neon .text-hero,
-    html.theme-terminal .text-hero,
-    html.theme-synthwave .text-hero,
-    html.theme-laser .text-hero,
-    html.theme-fiesta .text-hero,
-    html.theme-slime .text-hero {
-      text-shadow: 0 0 18px rgba(0,0,0,.6);
-    }
+    /* Slight inner glow for hero text only on dark-ish themes */
+    html.theme-dark .text-hero, html.theme-black .text-hero, html.theme-ocean .text-hero,
+    html.theme-forest .text-hero, html.theme-sunset .text-hero, html.theme-neon .text-hero,
+    html.theme-terminal .text-hero, html.theme-synthwave .text-hero, html.theme-laser .text-hero,
+    html.theme-fiesta .text-hero, html.theme-slime .text-hero { text-shadow: 0 0 18px rgba(0,0,0,.6); }
 
     .slider-track { -webkit-appearance: none; appearance: none; width: 100%; height: .3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
     .slider-track::-webkit-slider-runnable-track { height: .3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
@@ -453,19 +456,71 @@
       outline: none;
     }
 
-    #toggleContainer { background-color: var(--bg-card-inner); border-radius: 9999px; border: 1px solid var(--border-primary); padding: .15rem; gap: .15rem; }
-    #toggleContainer button { flex: 1 1 0; border-radius: 9999px; border: none; font-size: .8rem; line-height: 1.25rem; }
-    .toggle-inactive { background-color: transparent; color: var(--text-muted); }
+    /* Frequency toggle pill */
+    #toggleContainer {
+      background-color: var(--bg-card-inner);
+      border-radius: 9999px;
+      border: 1px solid var(--border-primary);
+      padding: 0.2rem;
+      gap: 0.2rem;
+    }
+
+    #toggleContainer button {
+      flex: 1 1 0;
+      border-radius: 9999px;
+      border: none;
+      font-size: 0.8rem;
+      line-height: 1.2rem;
+      padding: 0.45rem 0.75rem;
+      transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease,
+        color 0.15s ease;
+    }
+
+    .toggle-inactive {
+      background-color: transparent;
+      color: var(--text-muted);
+    }
+
+    .toggle-inactive:hover {
+      background-color: rgba(148, 163, 184, 0.09);
+      color: var(--text-secondary);
+    }
+
     .toggle-active {
       background-image: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
-      color: #020617; box-shadow: 0 10px 25px rgba(15,23,42,.4); transform: translateY(-.5px);
+      color: #020617;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.28);
+      transform: translateY(-0.5px);
+    }
+
+    .toggle-active:hover {
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.35);
     }
 
     .button-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+
       background-image: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
-      color: #020617; font-weight: 600; border-radius: 9999px; padding: .6rem 1.75rem;
-      border: 1px solid var(--accent-color-dark); box-shadow: 0 12px 30px rgba(15,23,42,.4);
-      transition: background-color .2s ease, box-shadow .2s ease, filter .2s ease, transform .15s ease;
+      color: #020617;
+      font-weight: 600;
+      font-size: 0.95rem;
+
+      border-radius: 9999px;
+      padding: 0.6rem 1.75rem;
+      border: 1px solid var(--accent-color-dark);
+
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.4);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease,
+        transform 0.15s ease;
     }
     .button-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 40px rgba(15,23,42,.55); filter: brightness(1.03); }
     .button-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 10px 24px rgba(15,23,42,.45); filter: brightness(.98); }
@@ -527,57 +582,6 @@
         radial-gradient(at 10% 90%, rgba(236,72,153,.25), transparent 45%),
         var(--bg-body);
     }
-
-    /* --------------------------------
-     * Glow toggle switches
-     * -------------------------------- */
-    .glow-toggle-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      cursor: pointer;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .glow-switch {
-      width: 34px;
-      height: 18px;
-      border-radius: 9999px;
-      background-color: var(--bg-toggle-inactive);
-      border: 1px solid var(--border-primary);
-      display: flex;
-      align-items: center;
-      padding: 0;
-      box-sizing: border-box;
-      position: relative;
-      transition: background-color .15s ease, border-color .15s ease;
-    }
-    .glow-switch-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 9999px;
-      background-color: #ffffff;
-      box-shadow: 0 1px 3px rgba(15,23,42,.35);
-      position: absolute;
-      top: 1px;
-      left: 2px;
-      transform: translateX(0);
-      transition: transform .15s ease;
-    }
-    .glow-switch[data-checked="true"] {
-      background-image: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
-      border-color: var(--accent-color-dark);
-    }
-    .glow-switch[data-checked="true"] .glow-switch-thumb {
-      transform: translateX(14px);
-    }
-
-    /* --------------------------------
-     * TrustBureau shield logo
-     * -------------------------------- */
-    .tb-shield { fill: var(--accent-color); }
-    .tb-shield-check { fill: #ffffff; }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
@@ -589,14 +593,19 @@
       <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
         <div class="flex items-center justify-center">
           <img id="customLogoImg" class="h-9 w-auto hidden" alt="Logo" />
-          <!-- Default TrustBureau shield logo (no black showing through) -->
-          <svg id="defaultLogoSvg" class="h-9 w-9" viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <path class="tb-shield" d="M16 3L7 6.75V15c0 5.1 3.2 9.9 8.4 12.1.4.2.8.2 1.2 0C21.8 24.9 25 20.1 25 15V6.75L16 3Z"/>
-            <path class="tb-shield-check" d="M14.2 18.4 11 15.2l1.4-1.4 1.8 1.8 4-4 1.4 1.4-5.6 5.8z"/>
+          <!-- Default TrustBureau shield logo -->
+          <svg id="defaultLogoSvg" class="h-9 w-9 text-hero" viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M16 3.25 7 7v8.2c0 5.33 3.82 10.44 9 11.8 5.18-1.36 9-6.47 9-11.8V7L16 3.25Z"
+              fill="currentColor"
+            />
+            <path
+              d="M14.2 18.4 11 15.2a1 1 0 0 1 1.4-1.4l1.8 1.8 4.4-4.4a1 1 0 1 1 1.4 1.4l-5.1 5.1a1 1 0 0 1-1.7 0Z"
+              fill="#ffffff"
+            />
           </svg>
         </div>
         <div class="flex flex-col items-center leading-tight mt-1">
-          <!-- Company name: now ~2x larger than before -->
           <span id="companyNameDisplay" class="text-[22px] font-bold tracking-tight text-secondary"></span>
           <span id="platformBrandDisplay" class="text-[11px] font-medium text-muted"></span>
         </div>
@@ -628,7 +637,7 @@
       </div>
     </div>
 
-    <!-- REP SETTINGS PANEL (rep info + logo + company name) -->
+    <!-- REP SETTINGS PANEL -->
     <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary">Rep Settings</span>
@@ -660,15 +669,16 @@
                  placeholder="(555) 123-4567" />
         </div>
         <div>
-          <label for="logoInput" class="block font-semibold text-muted">Logo</label>
-          <input id="logoInput" type="file" accept="image/*"
-                 class="mt-1 w-full text-[11px] border rounded-lg input-field py-1 px-1.5" />
-          <p class="mt-1 text-[11px] text-muted">We compress to keep the link short (≈256px, WebP if possible).</p>
+          <label for="logoInput" class="block font-semibold text-muted">Logo URL</label>
+          <input id="logoInput" type="url"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="https://yourdomain.com/logo.svg" />
+          <p class="mt-1 text-[11px] text-muted">Optional. Used in the shared approval view.</p>
         </div>
       </div>
     </div>
 
-    <!-- THEME PANEL (theme + accent + background + glow options) -->
+    <!-- THEME PANEL -->
     <div id="themePanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary">Theme Settings</span>
@@ -751,30 +761,22 @@
         </div>
 
         <!-- Glow toggles -->
-        <div class="mt-3 pt-2 border-t border-primary space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex flex-col">
-              <span class="text-xs font-semibold text-muted">Main Offer Glow</span>
-              <span class="text-[11px] text-muted">Accent glow around the approved offer card.</span>
+        <div class="space-y-1 pt-1">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <input id="offerGlowToggle" type="checkbox"
+                     class="h-3.5 w-3.5 rounded border-primary text-hero focus:ring-0" />
+              <label for="offerGlowToggle" class="text-[11px] font-medium text-secondary">
+                Main offer glow
+              </label>
             </div>
-            <label class="glow-toggle-wrapper">
-              <span>Enable in light theme</span>
-              <div id="offerGlowToggle" class="glow-switch" role="switch" aria-checked="true" tabindex="0">
-                <div class="glow-switch-thumb"></div>
-              </div>
-            </label>
+            <span class="text-[11px] text-muted">Enabled in light theme</span>
           </div>
-
-          <div class="flex items-center justify-between">
-            <div class="flex flex-col">
-              <span class="text-xs font-semibold text-muted">Widget Glow</span>
-              <span class="text-[11px] text-muted">Accent glow around the whole widget.</span>
-            </div>
-            <label class="glow-toggle-wrapper">
-              <span>Enable in light theme</span>
-              <div id="widgetGlowToggle" class="glow-switch" role="switch" aria-checked="false" tabindex="0">
-                <div class="glow-switch-thumb"></div>
-              </div>
+          <div class="flex items-center gap-2">
+            <input id="widgetGlowToggle" type="checkbox"
+                   class="h-3.5 w-3.5 rounded border-primary text-hero focus:ring-0" />
+            <label for="widgetGlowToggle" class="text-[11px] font-medium text-secondary">
+              Glow around whole widget
             </label>
           </div>
         </div>
@@ -861,9 +863,9 @@
 
       <!-- Frequency toggle -->
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
-        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Daily</button>
-        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Weekly</button>
-        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Monthly</button>
+        <button id="toggleDaily" class="text-sm font-semibold rounded-lg">Daily</button>
+        <button id="toggleWeekly" class="text-sm font-semibold rounded-lg">Weekly</button>
+        <button id="toggleMonthly" class="text-sm font-semibold rounded-lg">Monthly</button>
       </div>
     </div>
 
@@ -934,18 +936,18 @@
     <!-- BUTTONS -->
     <div id="buttonContainer" class="pt-4 border-t border-primary mt-4">
       <div class="relative flex justify-center gap-3 flex-wrap">
-        <button id="addOfferButton" class="button-primary flex items-center gap-2">
+        <button id="addOfferButton" class="button-primary">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          Add Offer
+          <span>Add Offer</span>
         </button>
-        <button id="shareLinkButton" class="button-primary flex items-center gap-2" type="button">
+        <button id="shareLinkButton" class="button-primary" type="button">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round"
                   d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
           </svg>
-          Share Approval Link
+          <span>Share Approval Link</span>
         </button>
       </div>
       <div id="shareLinkContainer" class="mt-3 hidden">
@@ -980,9 +982,6 @@
       themePanelToggle: document.getElementById('themePanelToggle'),
       repSettingsPanel: document.getElementById('repSettingsPanel'),
       themePanel: document.getElementById('themePanel'),
-
-      offerGlowToggle: document.getElementById('offerGlowToggle'),
-      widgetGlowToggle: document.getElementById('widgetGlowToggle'),
 
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
@@ -1031,33 +1030,33 @@
       shareLinkButton: document.getElementById('shareLinkButton'),
       shareLinkContainer: document.getElementById('shareLinkContainer'),
       shareLinkOutput: document.getElementById('shareLinkOutput'),
+
+      offerGlowToggle: document.getElementById('offerGlowToggle'),
+      widgetGlowToggle: document.getElementById('widgetGlowToggle'),
     };
 
     let paymentFrequency = 'daily';
     let currentTheme = 'theme-light';
     let currentAccent = 'accent-gold';
     let currentBackground = 'bg-default';
-    let currentLogoDataUrl = '';
+    let currentLogoUrl = '';
     let companyName = '';
-
-    // glow preferences (only applied in light theme)
-    let mainOfferGlowPref = true;   // default ON
-    let widgetGlowPref = false;     // default OFF
-
     let amountSliderMax = 1000000;
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
     let termLengthManualDirty = false;
+    let offerGlowEnabled = true;
+    let widgetGlowEnabled = false;
 
-    // Load saved theme/accent/background/logo/company and glow prefs
+    // Load saved theme/accent/background/logo/company/glow
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
       const storedBackground = localStorage.getItem('generic_offer_calc_bg');
       const storedLogo = localStorage.getItem('generic_offer_calc_logo');
       const storedCompany = localStorage.getItem('generic_offer_calc_company');
-      const storedOfferGlow = localStorage.getItem('generic_offer_calc_offer_glow');
+      const storedGlow = localStorage.getItem('generic_offer_calc_glow');
       const storedWidgetGlow = localStorage.getItem('generic_offer_calc_widget_glow');
 
       if (storedTheme) {
@@ -1067,15 +1066,14 @@
       }
       if (storedAccent) currentAccent = storedAccent;
       if (storedBackground) currentBackground = storedBackground;
-      if (storedLogo) currentLogoDataUrl = storedLogo;
+      if (storedLogo) currentLogoUrl = storedLogo;
       if (storedCompany) companyName = storedCompany;
 
-      if (storedOfferGlow !== null) {
-        mainOfferGlowPref = storedOfferGlow === '1';
-      }
-      if (storedWidgetGlow !== null) {
-        widgetGlowPref = storedWidgetGlow === '1';
-      }
+      if (storedGlow === 'off') offerGlowEnabled = false;
+      else if (storedGlow === 'on') offerGlowEnabled = true;
+
+      if (storedWidgetGlow === 'on') widgetGlowEnabled = true;
+      else if (storedWidgetGlow === 'off') widgetGlowEnabled = false;
     } catch (_) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         currentTheme = 'theme-dark';
@@ -1098,9 +1096,11 @@
       if (elements.calcAmountSlider) elements.calcAmountSlider.max = String(cap);
     }
 
-    // Base64 helpers that support Unicode
+    // Base64 helpers
     function b64EncodeUnicode(str) {
-      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+        String.fromCharCode('0x' + p1)
+      ));
     }
     function b64DecodeUnicode(str) {
       return decodeURIComponent(Array.prototype.map.call(atob(str), c =>
@@ -1108,7 +1108,6 @@
       ).join(''));
     }
 
-    // Encode/decode config (kept compact)
     function encodeConfig(config) {
       try { return b64EncodeUnicode(JSON.stringify(config)); } catch { return ''; }
     }
@@ -1116,7 +1115,7 @@
       try { return JSON.parse(b64DecodeUnicode(encoded)); } catch { return null; }
     }
 
-    // Read #hash param (preferred) or ?query param
+    // Read param from hash (#c=...) first, then query
     function getParam(name) {
       const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
       if (hash) {
@@ -1146,16 +1145,21 @@
 
       return { amount, factor, termMonths: termPayments, termLengthMonths, totalPayback, totalCost, payment: paymentAmount, paymentLabel, frequency };
     }
+
     function getCurrentOffer() {
       const amount = parseFormattedNumber(elements.calcAmountInput.value);
       const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
       const termPayments = parseInt(elements.calcTermInput.value) || 1;
-      return computeOffer(amount, factor, paymentFrequency === 'monthly' ? termPayments : termPayments, paymentFrequency);
+      return computeOffer(amount, factor, termPayments, paymentFrequency);
     }
 
     function renderSavedOffers() {
       if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
-      if (!savedOffers.length) { elements.savedOffersSection.classList.add('hidden'); elements.savedOffersContainer.innerHTML = ''; return; }
+      if (!savedOffers.length) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
+        return;
+      }
       elements.savedOffersSection.classList.remove('hidden');
       const html = savedOffers.map((offer, index) => {
         const labelIndex = index + 2;
@@ -1222,10 +1226,29 @@
       });
     }
 
-    function applyLogoFromDataUrl(dataUrl) {
+    function applyTheme() {
+      let themeClass = currentTheme;
+      if (currentTheme === 'theme-auto') {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        themeClass = prefersDark ? 'theme-dark' : 'theme-light';
+      }
+      const glowClass = offerGlowEnabled ? 'glow-on' : '';
+      const widgetGlowClass = widgetGlowEnabled ? 'widget-glow-on' : '';
+      document.documentElement.className = `${themeClass} ${currentAccent} ${currentBackground} ${glowClass} ${widgetGlowClass}`.trim();
+      document.documentElement.dataset.effectiveTheme = themeClass;
+      try {
+        localStorage.setItem('generic_offer_calc_theme', currentTheme);
+        localStorage.setItem('generic_offer_calc_accent', currentAccent);
+        localStorage.setItem('generic_offer_calc_bg', currentBackground);
+        localStorage.setItem('generic_offer_calc_glow', offerGlowEnabled ? 'on' : 'off');
+        localStorage.setItem('generic_offer_calc_widget_glow', widgetGlowEnabled ? 'on' : 'off');
+      } catch (_) {}
+    }
+
+    function applyLogoFromUrl(url) {
       if (!elements.customLogoImg || !elements.defaultLogoSvg) return;
-      if (dataUrl && typeof dataUrl === 'string') {
-        elements.customLogoImg.src = dataUrl;
+      if (url && typeof url === 'string') {
+        elements.customLogoImg.src = url;
         elements.customLogoImg.classList.remove('hidden');
         elements.defaultLogoSvg.classList.add('hidden');
       } else {
@@ -1234,35 +1257,16 @@
         elements.defaultLogoSvg.classList.remove('hidden');
       }
       try {
-        if (dataUrl) localStorage.setItem('generic_offer_calc_logo', dataUrl);
-        else localStorage.removeItem('generic_offer_calc_logo');
+        if (url) {
+          const trimmed = url.trim();
+          const safe = trimmed.length > 500 ? trimmed.slice(0, 500) : trimmed;
+          currentLogoUrl = safe;
+          localStorage.setItem('generic_offer_calc_logo', safe);
+        } else {
+          currentLogoUrl = '';
+          localStorage.removeItem('generic_offer_calc_logo');
+        }
       } catch (_) {}
-    }
-
-    // Resize/compress uploaded logo to keep links shorter
-    function processLogoFile(file, maxDim = 256) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          let dataUrl = '';
-          try {
-            dataUrl = canvas.toDataURL('image/webp', 0.8);
-            if (!dataUrl || dataUrl.length < 16) throw new Error('webp failed');
-          } catch { dataUrl = canvas.toDataURL('image/png'); }
-          currentLogoDataUrl = dataUrl;
-          applyLogoFromDataUrl(currentLogoDataUrl);
-        };
-        img.src = e.target?.result;
-      };
-      reader.readAsDataURL(file);
     }
 
     function updateBrandDisplay() {
@@ -1311,58 +1315,6 @@
       });
     }
 
-    function updateGlowTogglesUI() {
-      if (elements.offerGlowToggle) {
-        elements.offerGlowToggle.dataset.checked = mainOfferGlowPref ? 'true' : 'false';
-        elements.offerGlowToggle.setAttribute('aria-checked', mainOfferGlowPref ? 'true' : 'false');
-      }
-      if (elements.widgetGlowToggle) {
-        elements.widgetGlowToggle.dataset.checked = widgetGlowPref ? 'true' : 'false';
-        elements.widgetGlowToggle.setAttribute('aria-checked', widgetGlowPref ? 'true' : 'false');
-      }
-    }
-
-    function applyGlowStates() {
-      const html = document.documentElement;
-      const effectiveTheme = html.dataset.effectiveTheme || currentTheme;
-      const isLightTheme = effectiveTheme === 'theme-light';
-
-      if (mainOfferGlowPref && isLightTheme) {
-        html.classList.add('offer-glow-enabled');
-      } else {
-        html.classList.remove('offer-glow-enabled');
-      }
-
-      if (widgetGlowPref && isLightTheme) {
-        html.classList.add('widget-glow-enabled');
-      } else {
-        html.classList.remove('widget-glow-enabled');
-      }
-    }
-
-    function applyTheme() {
-      let themeClass = currentTheme;
-      if (currentTheme === 'theme-auto') {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        themeClass = prefersDark ? 'theme-dark' : 'theme-light';
-      }
-
-      const html = document.documentElement;
-      const existing = html.className.split(/\s+/).filter(Boolean);
-      const filtered = existing.filter(cls => !cls.startsWith('theme-') && !cls.startsWith('accent-') && !cls.startsWith('bg-'));
-      filtered.push(themeClass, currentAccent, currentBackground);
-      html.className = filtered.join(' ');
-      html.dataset.effectiveTheme = themeClass;
-
-      try {
-        localStorage.setItem('generic_offer_calc_theme', currentTheme);
-        localStorage.setItem('generic_offer_calc_accent', currentAccent);
-        localStorage.setItem('generic_offer_calc_bg', currentBackground);
-      } catch (_) {}
-
-      applyGlowStates();
-    }
-
     function initializeFromURL() {
       const viewMode = (new URLSearchParams(window.location.search)).get('view');
       isApprovalView = viewMode === 'approval';
@@ -1390,11 +1342,17 @@
           if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
           if (typeof cfg.cn === 'string') companyNameParam = cfg.cn;
 
-          if (typeof cfg.lg === 'string') currentLogoDataUrl = cfg.lg;
-          if (Array.isArray(cfg.o)) offersRaw = cfg.o;
+          if (typeof cfg.lg === 'string' && cfg.lg.length) {
+            currentLogoUrl = cfg.lg.slice(0, 500);
+          }
 
-          if (typeof cfg.og !== 'undefined') mainOfferGlowPref = !!cfg.og;
-          if (typeof cfg.wg !== 'undefined') widgetGlowPref = !!cfg.wg;
+          if (cfg.gl === 'off') offerGlowEnabled = false;
+          else if (cfg.gl === 'on') offerGlowEnabled = true;
+
+          if (cfg.wg === 'on') widgetGlowEnabled = true;
+          else if (cfg.wg === 'off') widgetGlowEnabled = false;
+
+          if (Array.isArray(cfg.o)) offersRaw = cfg.o;
         }
       }
 
@@ -1495,8 +1453,7 @@
     function initializeCalculator() {
       initializeFromURL();
       applyTheme();
-      applyLogoFromDataUrl(currentLogoDataUrl);
-      updateGlowTogglesUI();
+      applyLogoFromUrl(currentLogoUrl);
 
       // React to system theme changes when on Auto
       if (window.matchMedia) {
@@ -1509,6 +1466,8 @@
       if (elements.themeSelector) elements.themeSelector.value = currentTheme;
       if (elements.accentSelector) elements.accentSelector.value = currentAccent;
       if (elements.backgroundSelector) elements.backgroundSelector.value = currentBackground;
+      if (elements.offerGlowToggle) elements.offerGlowToggle.checked = offerGlowEnabled;
+      if (elements.widgetGlowToggle) elements.widgetGlowToggle.checked = widgetGlowEnabled;
 
       if (elements.calcAmountSlider && elements.calcAmountInput) {
         syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
@@ -1546,7 +1505,7 @@
         });
       }
 
-      // Settings vs Theme panels (toggle open/close, close the other)
+      // Settings vs Theme panels
       if (!isApprovalView) {
         if (elements.repSettingsToggle && elements.repSettingsPanel) {
           elements.repSettingsToggle.addEventListener('click', () => {
@@ -1569,9 +1528,12 @@
       if (!isApprovalView && elements.companyNameInput) elements.companyNameInput.addEventListener('input', updateBrandDisplay);
 
       if (!isApprovalView && elements.logoInput) {
-        elements.logoInput.addEventListener('change', () => {
-          const file = elements.logoInput.files && elements.logoInput.files[0];
-          if (file) processLogoFile(file, 256);
+        if (currentLogoUrl && !elements.logoInput.value) {
+          elements.logoInput.value = currentLogoUrl;
+        }
+        elements.logoInput.addEventListener('input', () => {
+          const url = elements.logoInput.value.trim();
+          applyLogoFromUrl(url);
         });
       }
 
@@ -1585,39 +1547,18 @@
         elements.backgroundSelector.addEventListener('change', e => { currentBackground = e.target.value; applyTheme(); });
       }
 
-      // Glow toggles
-      function attachGlowToggle(el, getterSetter) {
-        if (!el) return;
-        const handler = () => {
-          const current = getterSetter();
-          getterSetter(!current);
-          updateGlowTogglesUI();
-          applyGlowStates();
-          try {
-            if (el === elements.offerGlowToggle) {
-              localStorage.setItem('generic_offer_calc_offer_glow', mainOfferGlowPref ? '1' : '0');
-            } else if (el === elements.widgetGlowToggle) {
-              localStorage.setItem('generic_offer_calc_widget_glow', widgetGlowPref ? '1' : '0');
-            }
-          } catch (_) {}
-        };
-        el.addEventListener('click', handler);
-        el.addEventListener('keydown', (ev) => {
-          if (ev.key === ' ' || ev.key === 'Enter') {
-            ev.preventDefault();
-            handler();
-          }
+      if (!isApprovalView && elements.offerGlowToggle) {
+        elements.offerGlowToggle.addEventListener('change', () => {
+          offerGlowEnabled = elements.offerGlowToggle.checked;
+          applyTheme();
         });
       }
-
-      attachGlowToggle(elements.offerGlowToggle, (value) => {
-        if (typeof value === 'boolean') mainOfferGlowPref = value;
-        return mainOfferGlowPref;
-      });
-      attachGlowToggle(elements.widgetGlowToggle, (value) => {
-        if (typeof value === 'boolean') widgetGlowPref = value;
-        return widgetGlowPref;
-      });
+      if (!isApprovalView && elements.widgetGlowToggle) {
+        elements.widgetGlowToggle.addEventListener('change', () => {
+          widgetGlowEnabled = elements.widgetGlowToggle.checked;
+          applyTheme();
+        });
+      }
 
       if (!isApprovalView && elements.addOfferButton) {
         elements.addOfferButton.addEventListener('click', handleAddOffer);
@@ -1652,14 +1593,13 @@
             b: businessName, rn: repName, re: repEmail, rp: repPhone,
             cn: companyNameVal,
             o: offersForUrl,
-            lg: currentLogoDataUrl || '',
-            og: mainOfferGlowPref ? 1 : 0,
-            wg: widgetGlowPref ? 1 : 0,
+            lg: (currentLogoUrl || '').slice(0, 500),
+            gl: offerGlowEnabled ? 'on' : 'off',
+            wg: widgetGlowEnabled ? 'on' : 'off',
           };
 
           const encoded = encodeConfig(payload);
 
-          // Build share URL with hash to avoid server/proxy limits
           const url = new URL(window.location.href);
           url.search = new URLSearchParams({ view: 'approval' }).toString();
           url.hash = 'c=' + encoded;
@@ -1672,7 +1612,10 @@
             elements.shareLinkOutput.select();
           }
 
-          const setStatus = (msg) => { shareBtn.innerText = msg; setTimeout(() => { shareBtn.innerText = originalText; }, 2000); };
+          const setStatus = (msg) => {
+            shareBtn.innerText = msg;
+            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
+          };
 
           try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1699,7 +1642,6 @@
       renderSavedOffers();
       updateAddOfferButtonState();
       updateBrandDisplay();
-      applyGlowStates();
     }
 
     initializeCalculator();
