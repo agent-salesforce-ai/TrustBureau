@@ -900,14 +900,18 @@
 
     initializeCalculator();
 
-    // Load branding from localStorage (set in dashboard)
+    // Load branding from URL params (priority) or localStorage (fallback)
     (function loadBranding() {
       const STORAGE_COLOR_KEY = 'tbAccentColor';
       const STORAGE_LOGO_KEY = 'tbLogoDataUrl';
       
-      // Load accent color
+      const urlParams = new URLSearchParams(window.location.search);
+      const colorFromUrl = urlParams.get('color');
+      const logoFromUrl = urlParams.get('logo');
+      
+      // Load accent color (URL params take priority)
       try {
-        const savedColor = localStorage.getItem(STORAGE_COLOR_KEY);
+        const savedColor = colorFromUrl || localStorage.getItem(STORAGE_COLOR_KEY);
         if (savedColor) {
           // Convert hex to RGB for shadow calculations
           const hex = savedColor.replace('#', '');
@@ -926,17 +930,22 @@
           document.documentElement.style.setProperty('--accent-color-light', lightColor);
           document.documentElement.style.setProperty('--accent-color-dark', darkColor);
           document.documentElement.style.setProperty('--accent-shadow', `0 0 18px rgba(${r}, ${g}, ${b}, 0.55)`);
+          
+          // Save to localStorage for future use
+          if (colorFromUrl) localStorage.setItem(STORAGE_COLOR_KEY, colorFromUrl);
         }
       } catch (e) {
         console.error('Error loading accent color:', e);
       }
       
-      // Load logo
+      // Load logo (URL params take priority)
       try {
-        const savedLogo = localStorage.getItem(STORAGE_LOGO_KEY);
+        const savedLogo = logoFromUrl || localStorage.getItem(STORAGE_LOGO_KEY);
         const logoEl = document.getElementById('dynamicLogo');
         if (savedLogo && logoEl) {
           logoEl.src = savedLogo;
+          // Save to localStorage for future use
+          if (logoFromUrl) localStorage.setItem(STORAGE_LOGO_KEY, logoFromUrl);
         }
       } catch (e) {
         console.error('Error loading logo:', e);
