@@ -268,20 +268,41 @@
 </div>
 
 <script>
-  // Load saved branding
+  // Load branding from URL params or localStorage
   (function() {
     var STORAGE_COLOR_KEY = 'tbAccentColor';
+    var STORAGE_LOGO_KEY = 'tbLogoDataUrl';
     
-    function loadAccentColor() {
-      try {
-        var saved = localStorage.getItem(STORAGE_COLOR_KEY);
-        if (saved) {
-          document.documentElement.style.setProperty('--accent-color', saved);
-        }
-      } catch (e) {}
+    var urlParams = new URLSearchParams(window.location.search);
+    var colorFromUrl = urlParams.get('color');
+    var logoFromUrl = urlParams.get('logo');
+    
+    // Use URL params first, fallback to localStorage
+    var accentColor = colorFromUrl || localStorage.getItem(STORAGE_COLOR_KEY) || '#10b981';
+    var logoData = logoFromUrl || localStorage.getItem(STORAGE_LOGO_KEY);
+    
+    // Apply color
+    document.documentElement.style.setProperty('--accent-color', accentColor);
+    
+    // Save to localStorage for consistency
+    if (colorFromUrl) {
+      try { localStorage.setItem(STORAGE_COLOR_KEY, colorFromUrl); } catch (e) {}
     }
-
-    loadAccentColor();
+    if (logoFromUrl) {
+      try { localStorage.setItem(STORAGE_LOGO_KEY, logoFromUrl); } catch (e) {}
+    }
+    
+    // Update offer calculator link with branding params
+    var offerCalcLink = document.getElementById('offerCalc');
+    if (offerCalcLink) {
+      offerCalcLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        var url = new URL('/offer-calculator', window.location.origin);
+        url.searchParams.set('color', accentColor);
+        if (logoData) url.searchParams.set('logo', logoData);
+        window.location.href = url.toString();
+      });
+    }
   })();
 </script>
 
