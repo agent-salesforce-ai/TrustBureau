@@ -273,7 +273,7 @@
     </div>
 
     <div class="nav-actions">
-      <a class="primary-btn" href="/broker-toolbox">My Broker Box</a>
+      <a class="primary-btn" href="/broker-toolbox" id="brokerBoxLink">My Broker Box</a>
       <a class="logout-link" href="javascript:OutsetaAuth.logout()">Log out</a>
     </div>
   </header>
@@ -421,6 +421,20 @@
 
     loadAccentColor();
     loadLogo();
+
+    // Update Broker Box link with branding params
+    const brokerBoxLink = document.getElementById('brokerBoxLink');
+    if (brokerBoxLink) {
+      brokerBoxLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        const color = localStorage.getItem(STORAGE_COLOR_KEY) || '#10b981';
+        const logo = localStorage.getItem(STORAGE_LOGO_KEY) || '';
+        const url = new URL('/broker-toolbox', window.location.origin);
+        url.searchParams.set('color', color);
+        if (logo) url.searchParams.set('logo', logo);
+        window.location.href = url.toString();
+      });
+    }
   })();
 </script>
 
