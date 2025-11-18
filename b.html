@@ -435,6 +435,27 @@
     html.theme-terminal .text-hero, html.theme-synthwave .text-hero, html.theme-laser .text-hero,
     html.theme-fiesta .text-hero, html.theme-slime .text-hero { text-shadow: 0 0 18px rgba(0,0,0,.6); }
 
+    /* Offer card typography tweaks */
+    #offerCard .offer-label {
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    #offerCard .offer-term {
+      color: var(--text-secondary);
+    }
+    #offerCard .offer-value,
+    #offerCard .offer-value-strong {
+      color: #1e293b; /* slate-800 – softer than near‑black, still high contrast */
+    }
+    html.theme-dark #offerCard .offer-value,
+    html.theme-dark #offerCard .offer-value-strong,
+    html.theme-black #offerCard .offer-value,
+    html.theme-black #offerCard .offer-value-strong {
+      color: var(--text-secondary);
+    }
+
     .slider-track { -webkit-appearance: none; appearance: none; width: 100%; height: .3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
     .slider-track::-webkit-slider-runnable-track { height: .3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
     .slider-track::-moz-range-track { height: .3rem; border-radius: 9999px; background-color: var(--bg-slider-track); }
@@ -483,7 +504,6 @@
       background-color: transparent;
       color: var(--text-muted);
     }
-
     .toggle-inactive:hover {
       background-color: rgba(148, 163, 184, 0.09);
       color: var(--text-secondary);
@@ -495,7 +515,6 @@
       box-shadow: 0 4px 10px rgba(15, 23, 42, 0.28);
       transform: translateY(-0.5px);
     }
-
     .toggle-active:hover {
       box-shadow: 0 6px 14px rgba(15, 23, 42, 0.35);
     }
@@ -522,9 +541,25 @@
         filter 0.2s ease,
         transform 0.15s ease;
     }
-    .button-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 40px rgba(15,23,42,.55); filter: brightness(1.03); }
-    .button-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 10px 24px rgba(15,23,42,.45); filter: brightness(.98); }
-    .button-primary:disabled { background-image: none; background-color: var(--bg-slider-track); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; border-color: var(--border-primary); }
+    .button-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(15,23,42,.55);
+      filter: brightness(1.03);
+    }
+    .button-primary:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(15,23,42,.45);
+      filter: brightness(.98);
+    }
+    .button-primary:disabled {
+      background-image: none;
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border-primary);
+    }
 
     #headerContainer { border-bottom-color: var(--border-primary); }
     #themeControls button {
@@ -863,9 +898,9 @@
 
       <!-- Frequency toggle -->
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
-        <button id="toggleDaily" class="text-sm font-semibold rounded-lg">Daily</button>
-        <button id="toggleWeekly" class="text-sm font-semibold rounded-lg">Weekly</button>
-        <button id="toggleMonthly" class="text-sm font-semibold rounded-lg">Monthly</button>
+        <button id="toggleDaily" class="text-sm font-semibold">Daily</button>
+        <button id="toggleWeekly" class="text-sm font-semibold">Weekly</button>
+        <button id="toggleMonthly" class="text-sm font-semibold">Monthly</button>
       </div>
     </div>
 
@@ -876,10 +911,11 @@
       </div>
       <div class="text-center py-6">
         <span id="businessNameDisplay" class="text-sm font-semibold text-primary block mb-1 hidden"></span>
-        <span class="text-sm font-semibold text-muted block">You Get</span>
+        <span class="text-sm font-semibold text-muted block offer-label">You Get</span>
         <span id="summaryAmountOut" class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
         <span class="text-base font-medium text-secondary block">
-          Total Payback: <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
+          Total Payback:
+          <span id="summaryPaybackOut" class="font-semibold offer-value"></span>
         </span>
       </div>
       <div class="flex justify-center items-center border-b border-primary pb-2">
@@ -888,32 +924,54 @@
       <div class="pt-6">
         <div class="grid grid-cols-2 gap-4 justify-items-center">
           <div class="text-center col-span-2">
-            <span class="text-[11px] font-semibold text-muted uppercase tracking-wide block">Term Length</span>
-            <span id="summaryTermLengthOut" class="text-2xl font-semibold text-primary block"></span>
+            <span class="text-[11px] font-semibold text-muted uppercase tracking-wide block offer-label">
+              Term Length
+            </span>
+            <span id="summaryTermLengthOut"
+                  class="text-2xl font-semibold text-primary offer-term block"></span>
           </div>
           <div class="text-center">
-            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Factor Rate</span>
-            <span id="summaryFactorOut" class="text-lg font-semibold text-primary block"></span>
+            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block offer-label">
+              Factor Rate
+            </span>
+            <span id="summaryFactorOut"
+                  class="text-lg font-semibold text-primary offer-value-strong block"></span>
           </div>
           <div class="text-center">
-            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Payments</span>
-            <span id="summaryTermOut" class="text-lg font-semibold text-primary block"></span>
+            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block offer-label">
+              Payments
+            </span>
+            <span id="summaryTermOut"
+                  class="text-lg font-semibold text-primary offer-value-strong block"></span>
           </div>
           <div class="text-center">
-            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Total Cost of Funds</span>
-            <span id="summaryCostOut" class="text-lg font-semibold text-primary block"></span>
+            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block offer-label">
+              Total Cost of Funds
+            </span>
+            <span id="summaryCostOut"
+                  class="text-lg font-semibold text-primary offer-value block"></span>
           </div>
           <div class="text-center">
-            <span id="summaryPaymentLabel" class="text-[11px] font-medium text-muted uppercase tracking-wide block">Est. Daily Payment</span>
-            <span id="summaryPaymentValue" class="text-lg font-semibold text-primary block"></span>
+            <span id="summaryPaymentLabel"
+                  class="text-[11px] font-medium text-muted uppercase tracking-wide block offer-label">
+              Est. Daily Payment
+            </span>
+            <span id="summaryPaymentValue"
+                  class="text-lg font-semibold text-primary offer-value-strong block"></span>
           </div>
           <div class="text-center">
-            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Origination Fee (%)</span>
-            <span id="summaryOriginationPercentOut" class="text-lg font-semibold text-primary block"></span>
+            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block offer-label">
+              Origination Fee (%)
+            </span>
+            <span id="summaryOriginationPercentOut"
+                  class="text-lg font-semibold text-primary offer-value block"></span>
           </div>
           <div class="text-center">
-            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block">Origination Fee ($)</span>
-            <span id="summaryOriginationAmountOut" class="text-lg font-semibold text-primary block"></span>
+            <span class="text-[11px] font-medium text-muted uppercase tracking-wide block offer-label">
+              Origination Fee ($)
+            </span>
+            <span id="summaryOriginationAmountOut"
+                  class="text-lg font-semibold text-primary offer-value block"></span>
           </div>
         </div>
       </div>
@@ -1049,7 +1107,6 @@
     let offerGlowEnabled = true;
     let widgetGlowEnabled = false;
 
-    // Load saved theme/accent/background/logo/company/glow
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
@@ -1096,7 +1153,6 @@
       if (elements.calcAmountSlider) elements.calcAmountSlider.max = String(cap);
     }
 
-    // Base64 helpers
     function b64EncodeUnicode(str) {
       return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
         String.fromCharCode('0x' + p1)
@@ -1115,7 +1171,6 @@
       try { return JSON.parse(b64DecodeUnicode(encoded)); } catch { return null; }
     }
 
-    // Read param from hash (#c=...) first, then query
     function getParam(name) {
       const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
       if (hash) {
@@ -1174,13 +1229,13 @@
             </div>
             <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
               <div><span class="text-[11px] font-semibold text-muted block">Factor</span>
-                   <span class="text-sm font-semibold text-primary block">${offer.factor.toFixed(2)}x</span></div>
+                   <span class="text-sm font-semibold text-primary block offer-value-strong">${offer.factor.toFixed(2)}x</span></div>
               <div><span class="text-[11px] font-semibold text-muted block">Payments</span>
-                   <span class="text-sm font-semibold text-primary block">${offer.termMonths}</span></div>
+                   <span class="text-sm font-semibold text-primary block offer-value-strong">${offer.termMonths}</span></div>
               <div><span class="text-[11px] font-semibold text-muted block">Payback</span>
-                   <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.totalPayback)}</span></div>
+                   <span class="text-sm font-semibold text-primary block offer-value">${formatCurrency(offer.totalPayback)}</span></div>
               <div><span class="text-[11px] font-semibold text-muted block">${offer.paymentLabel}</span>
-                   <span class="text-sm font-semibold text-primary block">${formatCurrency(offer.payment)}</span></div>
+                   <span class="text-sm font-semibold text-primary block offer-value-strong">${formatCurrency(offer.payment)}</span></div>
             </div>
           </div>
         `;
@@ -1413,8 +1468,13 @@
 
         const businessName = elements.businessNameInput?.value.trim() || '';
         if (elements.businessNameDisplay) {
-          if (businessName) { elements.businessNameDisplay.textContent = businessName; elements.businessNameDisplay.classList.remove('hidden'); }
-          else { elements.businessNameDisplay.textContent = ''; elements.businessNameDisplay.classList.add('hidden'); }
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
         }
 
         elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
@@ -1447,7 +1507,9 @@
         }
 
         updateRepDisplay();
-      } catch (e) { console.error('Calculator error:', e); }
+      } catch (e) {
+        console.error('Calculator error:', e);
+      }
     }
 
     function initializeCalculator() {
@@ -1455,7 +1517,6 @@
       applyTheme();
       applyLogoFromUrl(currentLogoUrl);
 
-      // React to system theme changes when on Auto
       if (window.matchMedia) {
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
         const handleSystemThemeChange = () => { if (currentTheme === 'theme-auto') applyTheme(); };
@@ -1505,7 +1566,6 @@
         });
       }
 
-      // Settings vs Theme panels
       if (!isApprovalView) {
         if (elements.repSettingsToggle && elements.repSettingsPanel) {
           elements.repSettingsToggle.addEventListener('click', () => {
@@ -1621,15 +1681,24 @@
             if (navigator.clipboard && navigator.clipboard.writeText) {
               await navigator.clipboard.writeText(shareUrl);
               setStatus('Copied!');
-            } else { throw new Error('Clipboard API not available'); }
+            } else {
+              throw new Error('Clipboard API not available');
+            }
           } catch (err) {
             try {
               const ta = document.createElement('textarea');
-              ta.value = shareUrl; ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
-              document.body.appendChild(ta); ta.focus(); ta.select();
+              ta.value = shareUrl;
+              ta.style.position = 'fixed';
+              ta.style.top = '0';
+              ta.style.left = '0';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
               const ok = document.execCommand('copy');
               document.body.removeChild(ta);
-              if (ok) setStatus('Copied!'); else throw new Error('execCommand copy failed');
+              if (ok) setStatus('Copied!');
+              else throw new Error('execCommand copy failed');
             } catch {
               setStatus('Copy failed');
             }
