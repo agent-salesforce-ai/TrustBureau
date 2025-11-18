@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-light accent-gold">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,10 +10,26 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 
   <style>
-    /* ----------------------------
-     * Global base
-     * ---------------------------- */
     :root {
+      /* Defaults (light) */
+      --bg-body: #eef2f7;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fbff;
+      --bg-slider-track: #e5e7eb;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+
+      --border-primary: #d1d5db;
+      --text-primary: #0f172a;
+      --text-secondary: #111827;
+      --text-muted: #6b7280;
+
+      --accent-color: #f59e0b;
+      --accent-color-light: #fbbf24;
+      --accent-color-dark: #92400e;
+      --accent-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
+
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
       --transition-fast: 150ms ease-out;
     }
 
@@ -22,19 +38,16 @@
       color: var(--text-primary);
       background-color: var(--bg-body);
       transition:
-        background-color 200ms ease-out,
-        color 150ms ease-out;
+        background-color 0.2s ease-out,
+        color 0.15s ease-out;
     }
 
-    /* Remove number spin buttons */
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
+    input[type=number] { -moz-appearance: textfield; }
 
     input,
     button,
@@ -43,82 +56,84 @@
       font-family: inherit;
     }
 
-    .input-icon {
-      top: 50%;
-      transform: translateY(-50%);
-    }
+    .input-icon { top: 50%; transform: translateY(-50%); }
 
-    /* ----------------------------
-     * THEMES
-     * ---------------------------- */
+    /* THEMES --------------------------------------------------------- */
 
-    /* LIGHT */
+    /* Light theme */
     html.theme-light {
       --bg-body: #eef2f7;
-      --bg-card: rgba(255, 255, 255, 0.96);
-      --bg-card-inner: #f9fbff;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
       --bg-slider-track: #e5e7eb;
-      --bg-input: rgba(255, 255, 255, 0.95);
+      --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
+
       --border-primary: #d1d5db;
-      --text-primary: #0f172a;
+      --text-primary: #020617;
       --text-secondary: #111827;
-      --text-muted: #6b7280;
+      --text-muted: #4b5563;
+
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
     }
     html.theme-light body {
       background:
-        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.22), transparent 55%),
+        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.18), transparent 55%),
         linear-gradient(to bottom, #eef2f7, #e5e7eb);
       background-attachment: fixed;
     }
 
-    /* DARK (navy / slate) */
+    /* Dark theme */
     html.theme-dark {
       --bg-body: #020617;
-      --bg-card: rgba(15, 23, 42, 0.98);
-      --bg-card-inner: rgba(15, 23, 42, 0.96);
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
       --bg-slider-track: #111827;
-      --bg-input: rgba(15, 23, 42, 0.98);
+      --bg-input: #020617;
       --bg-toggle-inactive: #020617;
+
       --border-primary: #1f2937;
-      --text-primary: #e5e7eb;
-      --text-secondary: #f9fafb;
-      --text-muted: #9ca3af;
-      --shadow-soft: 0 28px 70px rgba(15, 23, 42, 0.9);
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #cbd5e1;
+
+      --shadow-soft: 0 26px 70px rgba(15, 23, 42, 0.9);
     }
     html.theme-dark body {
       background:
-        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.2), transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(15, 118, 110, 0.35), #020617);
+        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.26), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.22), #020617);
       background-attachment: fixed;
     }
 
-    /* AMOLED BLACK – full black, neon accent */
+    /* AMOLED black */
     html.theme-black {
       --bg-body: #000000;
-      --bg-card: rgba(0, 0, 0, 0.98);
-      --bg-card-inner: rgba(0, 0, 0, 0.98);
+      --bg-card: #000000;
+      --bg-card-inner: #000000;
       --bg-slider-track: #111111;
-      --bg-input: rgba(0, 0, 0, 0.98);
-      --bg-toggle-inactive: #0b0b0b;
+      --bg-input: #000000;
+      --bg-toggle-inactive: #050505;
+
       --border-primary: #171717;
-      --text-primary: #ffffff;
+      --text-primary: #f9fafb;
       --text-secondary: #e5e5e5;
-      --text-muted: #9ca3af;
+      --text-muted: #a1a1aa;
+
+      /* default monochrome accent if no accent-* class overrides */
       --accent-color: #ffffff;
       --accent-color-light: #e5e5e5;
       --accent-color-dark: #ffffff;
       --accent-shadow: 0 0 22px rgba(255, 255, 255, 0.7);
+
       --shadow-soft: 0 32px 80px rgba(0, 0, 0, 1);
     }
     html.theme-black body {
       background-color: #000000;
+      background-attachment: fixed;
     }
 
-    /* ----------------------------
-     * Accent palettes
-     * ---------------------------- */
+    /* ACCENT COLORS -------------------------------------------------- */
 
     html.accent-red {
       --accent-color: #ef4444;
@@ -138,15 +153,12 @@
       --accent-color-dark: #a16207;
       --accent-shadow: 0 0 18px rgba(234, 179, 8, 0.55);
     }
-
-    /* Gold theme (default) */
     html.accent-gold {
       --accent-color: #f59e0b;
       --accent-color-light: #fbbf24;
       --accent-color-dark: #92400e;
       --accent-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
     }
-
     html.accent-green {
       --accent-color: #22c55e;
       --accent-color-light: #4ade80;
@@ -233,9 +245,7 @@
       --accent-shadow: 0 0 18px rgba(146, 64, 14, 0.55);
     }
 
-    /* ----------------------------
-     * Layout / containers
-     * ---------------------------- */
+    /* COMPONENTS ----------------------------------------------------- */
 
     .card-bg,
     .card-inner-bg,
@@ -273,27 +283,17 @@
       box-shadow:
         0 18px 50px rgba(15, 23, 42, 0.35),
         0 0 0 1px rgba(15, 23, 42, 0.12);
-      transition:
-        border-color var(--transition-fast),
-        box-shadow var(--transition-fast),
-        transform var(--transition-fast);
       border-radius: 1.25rem;
     }
-
     html.theme-black .shell {
       border-color: var(--accent-color);
       box-shadow:
         0 0 0 1px rgba(148, 163, 184, 0.4),
         var(--accent-shadow);
     }
-
     .shell:hover {
       transform: translateY(-1px);
     }
-
-    /* ----------------------------
-     * Text helpers
-     * ---------------------------- */
 
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
@@ -302,12 +302,14 @@
 
     .text-hero {
       color: var(--accent-color);
-      text-shadow: 0 0 18px rgba(15, 23, 42, 0.35);
     }
-
-    /* ----------------------------
-     * Inputs
-     * ---------------------------- */
+    html.theme-dark .text-hero,
+    html.theme-black .text-hero {
+      text-shadow: 0 0 18px rgba(15, 23, 42, 0.8);
+    }
+    html.theme-light .text-hero {
+      text-shadow: none; /* remove glow in light theme */
+    }
 
     .input-field {
       background-color: var(--bg-input);
@@ -325,14 +327,11 @@
       border-color: var(--accent-color-light);
       box-shadow:
         0 0 0 1px rgba(148, 163, 184, 0.7),
-        0 0 0 4px rgba(56, 189, 248, 0.5);
+        0 0 0 4px rgba(56, 189, 248, 0.45);
       outline: none;
     }
 
-    /* ----------------------------
-     * Slider styling
-     * ---------------------------- */
-
+    /* Sliders */
     .slider-track {
       -webkit-appearance: none;
       appearance: none;
@@ -341,17 +340,11 @@
       border-radius: 9999px;
       background-color: var(--bg-slider-track);
     }
-
     .slider-track::-webkit-slider-runnable-track {
       height: 0.25rem;
       border-radius: 9999px;
-      background: linear-gradient(
-        to right,
-        rgba(148, 163, 184, 0.85),
-        var(--bg-slider-track)
-      );
+      background-color: var(--bg-slider-track);
     }
-
     .slider-track::-moz-range-track {
       height: 0.25rem;
       border-radius: 9999px;
@@ -361,8 +354,7 @@
     .slider-thumb {
       accent-color: var(--accent-color);
     }
-
-    .slider-thumb::-webkit-slider-thumb {
+    .slider-track::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 16px;
@@ -374,10 +366,9 @@
         0 0 0 1px rgba(15, 23, 42, 0.18),
         0 0 0 6px rgba(148, 163, 184, 0.35);
       cursor: pointer;
-      margin-top: -6px; /* align with track */
+      margin-top: -6px;
     }
-
-    .slider-thumb::-moz-range-thumb {
+    .slider-track::-moz-range-thumb {
       width: 16px;
       height: 16px;
       border-radius: 9999px;
@@ -389,18 +380,7 @@
       cursor: pointer;
     }
 
-    .slider-track:focus-visible::-webkit-slider-thumb,
-    .slider-track:active::-webkit-slider-thumb {
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.36),
-        0 0 0 8px rgba(56, 189, 248, 0.55);
-      transform: scale(1.02);
-    }
-
-    /* ----------------------------
-     * Toggles (Daily / Weekly / Monthly)
-     * ---------------------------- */
-
+    /* Frequency toggle */
     #toggleContainer {
       background-color: var(--bg-card-inner);
       border-radius: 9999px;
@@ -408,71 +388,51 @@
       padding: 0.15rem;
       gap: 0.15rem;
     }
-
     #toggleContainer button {
       flex: 1 1 0;
       border-radius: 9999px;
       border: none;
       font-size: 0.8rem;
-      line-height: 1.25rem;
     }
-
     .toggle-inactive {
       background-color: transparent;
       color: var(--text-muted);
     }
-
     .toggle-active {
       background: radial-gradient(
         circle at 0 0,
         var(--accent-color-light),
         var(--accent-color)
       );
-      color: #0b1120;
+      color: #020617;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
       transform: translateY(-0.5px);
     }
 
-    html.theme-dark .toggle-active,
-    html.theme-black .toggle-active {
-      color: #020617;
-    }
-
-    /* ----------------------------
-     * Primary buttons
-     * ---------------------------- */
-
+    /* Buttons */
     .button-primary {
       background-image: linear-gradient(
         135deg,
         var(--accent-color-light),
         var(--accent-color)
       );
-      color: #0b1120;
+      color: #020617;
       font-weight: 600;
       border-radius: 9999px;
       padding: 0.6rem 1.75rem;
       border: 1px solid var(--accent-color-dark);
       box-shadow: 0 14px 36px rgba(15, 23, 42, 0.45);
     }
-
-    html.theme-dark .button-primary,
-    html.theme-black .button-primary {
-      color: #020617;
-    }
-
     .button-primary:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.6);
       filter: brightness(1.03);
     }
-
     .button-primary:active:not(:disabled) {
       transform: translateY(0);
       box-shadow: 0 10px 26px rgba(15, 23, 42, 0.42);
       filter: brightness(0.98);
     }
-
     .button-primary:disabled {
       background-image: none;
       background-color: var(--bg-slider-track);
@@ -483,20 +443,15 @@
       border-color: var(--border-primary);
     }
 
-    /* ----------------------------
-     * Header / theme controls polish
-     * ---------------------------- */
-
+    /* Header theme controls */
     #headerContainer {
       border-bottom-color: rgba(148, 163, 184, 0.6);
     }
-
     #themeControls button {
       border-radius: 9999px;
       background-color: rgba(148, 163, 184, 0.08);
       border-color: rgba(148, 163, 184, 0.45);
     }
-
     #themeControls button:hover {
       background-color: rgba(148, 163, 184, 0.16);
       border-color: rgba(148, 163, 184, 0.7);
@@ -504,7 +459,6 @@
       transform: translateY(-0.5px);
     }
 
-    /* Make selectors feel more “theme-aware” */
     #themeSelector,
     #accentSelector {
       background-image: linear-gradient(
@@ -574,7 +528,7 @@
                     class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
               <option value="theme-light">Light</option>
               <option value="theme-dark">Dark</option>
-              <option value="theme-black">AMOLED (Pure Black)</option>
+              <option value="theme-black">Black (AMOLED)</option>
               <option value="theme-auto">Auto (System)</option>
             </select>
           </div>
@@ -1089,7 +1043,6 @@
     function applyTheme() {
       let themeClass = currentTheme;
 
-      // Resolve "auto" theme against system preference
       if (currentTheme === 'theme-auto') {
         const prefersDark =
           window.matchMedia &&
@@ -1136,22 +1089,68 @@
 
     function initializeFromURL() {
       const params = new URLSearchParams(window.location.search);
-
-      const amountParam = params.get('amount');
-      const amount = amountParam ? parseFloat(amountParam) : 50000;
-      const factor = params.get('factor') || 1.25;
-      const term = params.get('term') || 6;
-      const freq = params.get('freq');
-      const paramTheme = params.get('theme');
-      const paramAccent = params.get('accent');
-      const offersParam = params.get('offers');
-      const businessNameParam = params.get('businessName') || '';
-      const repNameParam = params.get('repName') || '';
-      const repEmailParam = params.get('repEmail') || '';
-      const repPhoneParam = params.get('repPhone') || '';
+      const encodedConfig = params.get('c');
       const viewMode = params.get('view');
-
       isApprovalView = viewMode === 'approval';
+
+      let amount = 50000;
+      let factor = 1.25;
+      let term = 6;
+      let freq = 'daily';
+      let paramTheme = null;
+      let paramAccent = null;
+      let businessNameParam = '';
+      let repNameParam = '';
+      let repEmailParam = '';
+      let repPhoneParam = '';
+      let offersFromConfig = null;
+      let offersJsonString = null;
+
+      if (encodedConfig) {
+        try {
+          const decodedStr = decodeURIComponent(atob(encodedConfig));
+          const cfg = JSON.parse(decodedStr);
+
+          if (typeof cfg.a === 'number') amount = cfg.a;
+          if (typeof cfg.f === 'number') factor = cfg.f;
+          if (typeof cfg.t === 'number') term = cfg.t;
+          if (typeof cfg.q === 'string') freq = cfg.q;
+          if (typeof cfg.th === 'string') paramTheme = cfg.th;
+          if (typeof cfg.ac === 'string') paramAccent = cfg.ac;
+          if (typeof cfg.b === 'string') businessNameParam = cfg.b;
+          if (typeof cfg.rn === 'string') repNameParam = cfg.rn;
+          if (typeof cfg.re === 'string') repEmailParam = cfg.re;
+          if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
+          if (Array.isArray(cfg.o)) offersFromConfig = cfg.o;
+        } catch (e) {
+          console.error('Error decoding compact config', e);
+        }
+      } else {
+        const amountParam = params.get('amount');
+        if (amountParam !== null) {
+          const parsed = parseFloat(amountParam);
+          if (!isNaN(parsed)) amount = parsed;
+        }
+        const factorParam = params.get('factor');
+        if (factorParam !== null) {
+          const parsedF = parseFloat(factorParam);
+          if (!isNaN(parsedF)) factor = parsedF;
+        }
+        const termParam = params.get('term');
+        if (termParam !== null) {
+          const parsedT = parseInt(termParam, 10);
+          if (!isNaN(parsedT)) term = parsedT;
+        }
+
+        freq = params.get('freq') || freq;
+        paramTheme = params.get('theme');
+        paramAccent = params.get('accent');
+        businessNameParam = params.get('businessName') || '';
+        repNameParam = params.get('repName') || '';
+        repEmailParam = params.get('repEmail') || '';
+        repPhoneParam = params.get('repPhone') || '';
+        offersJsonString = params.get('offers');
+      }
 
       if (paramTheme) currentTheme = paramTheme;
       if (paramAccent) currentAccent = paramAccent;
@@ -1172,12 +1171,21 @@
       if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
       if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
 
-      paymentFrequency = freq || 'daily';
+      paymentFrequency = freq;
 
       savedOffers = [];
-      if (offersParam) {
+      if (offersFromConfig) {
+        savedOffers = offersFromConfig.map(o =>
+          computeOffer(
+            Number(o.a ?? o.amount ?? 0),
+            Number(o.f ?? o.factor ?? 1.1),
+            Number(o.t ?? o.term ?? 3),
+            o.q ?? o.frequency ?? 'daily'
+          )
+        );
+      } else if (offersJsonString) {
         try {
-          const raw = JSON.parse(offersParam);
+          const raw = JSON.parse(offersJsonString);
           if (Array.isArray(raw)) {
             savedOffers = raw.map(o =>
               computeOffer(
@@ -1188,8 +1196,8 @@
               )
             );
           }
-        } catch (e) {
-          console.error('Error parsing offers from URL', e);
+        } catch (err) {
+          console.error('Error parsing offers from URL', err);
         }
       }
 
@@ -1271,18 +1279,18 @@
       initializeFromURL();
       applyTheme();
 
-      // Keep system theme in sync when using "Auto"
+      // React to system theme changes when using Auto
       if (window.matchMedia) {
-        const mql = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleSchemeChange = () => {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleSystemThemeChange = () => {
           if (currentTheme === 'theme-auto') {
             applyTheme();
           }
         };
-        if (mql.addEventListener) {
-          mql.addEventListener('change', handleSchemeChange);
-        } else if (mql.addListener) {
-          mql.addListener(handleSchemeChange);
+        if (mq.addEventListener) {
+          mq.addEventListener('change', handleSystemThemeChange);
+        } else if (mq.addListener) {
+          mq.addListener(handleSystemThemeChange);
         }
       }
 
@@ -1353,7 +1361,14 @@
 
       if (!isApprovalView && elements.themePanelToggle && elements.repSettingsPanel) {
         elements.themePanelToggle.addEventListener('click', () => {
-          elements.repSettingsPanel.classList.remove('hidden');
+          const isHidden = elements.repSettingsPanel.classList.contains('hidden');
+          elements.repSettingsPanel.classList.toggle('hidden');
+          if (isHidden) {
+            elements.repSettingsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if (elements.themeSelector) {
+              elements.themeSelector.focus();
+            }
+          }
         });
       }
 
@@ -1403,22 +1418,46 @@
           }));
 
           const url = new URL(window.location.href);
-          const params = new URLSearchParams({
-            amount,
-            factor,
-            term,
-            freq,
-            theme,
-            accent,
-            businessName,
-            repName,
-            repEmail,
-            repPhone,
-            offers: JSON.stringify(offersForUrl),
-            view: 'approval',
-          });
-          url.search = params.toString();
-          const shareUrl = url.toString();
+          let shareUrl;
+
+          // Compact "short" URL using a single encoded config parameter
+          try {
+            const payload = {
+              a: amount,
+              f: factor,
+              t: term,
+              q: freq,
+              th: theme,
+              ac: accent,
+              b: businessName,
+              rn: repName,
+              re: repEmail,
+              rp: repPhone,
+              o: offersForUrl,
+            };
+            const encoded = btoa(encodeURIComponent(JSON.stringify(payload)));
+            const params = new URLSearchParams({ c: encoded, view: 'approval' });
+            url.search = params.toString();
+            shareUrl = url.toString();
+          } catch (e) {
+            console.error('Compact URL encoding failed, falling back to verbose URL', e);
+            const params = new URLSearchParams({
+              amount,
+              factor,
+              term,
+              freq,
+              theme,
+              accent,
+              businessName,
+              repName,
+              repEmail,
+              repPhone,
+              offers: JSON.stringify(offersForUrl),
+              view: 'approval',
+            });
+            url.search = params.toString();
+            shareUrl = url.toString();
+          }
 
           if (elements.shareLinkOutput && elements.shareLinkContainer) {
             elements.shareLinkOutput.value = shareUrl;
