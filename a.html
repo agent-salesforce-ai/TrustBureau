@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-light accent-gold">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,37 +11,42 @@
 
   <style>
     :root {
-      /* Defaults (light) */
-      --bg-body: #eef2f7;
-      --bg-card: #ffffff;
-      --bg-card-inner: #f9fbff;
-      --bg-slider-track: #e5e7eb;
-      --bg-input: #ffffff;
-      --bg-toggle-inactive: #e5e7eb;
-
-      --border-primary: #d1d5db;
-      --text-primary: #0f172a;
-      --text-secondary: #111827;
-      --text-muted: #6b7280;
-
+      /* Accent defaults (overridden by accent-* classes) */
       --accent-color: #f59e0b;
       --accent-color-light: #fbbf24;
       --accent-color-dark: #92400e;
       --accent-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
 
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
+      /* Base light-ish defaults (overridden by theme-* classes) */
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+      --bg-slider-track: #e5e7eb;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+
+      --border-primary: #cbd5e1;
+      --text-primary: #020617;
+      --text-secondary: #111827;
+      --text-muted: #4b5563;
+
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.16);
+
       --transition-fast: 150ms ease-out;
+      --transition-med: 220ms ease;
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      color: var(--text-primary);
+      min-height: 100vh;
       background-color: var(--bg-body);
+      color: var(--text-primary);
       transition:
-        background-color 0.2s ease-out,
-        color 0.15s ease-out;
+        background-color var(--transition-med),
+        color var(--transition-fast);
     }
 
+    /* Remove number spinners */
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
@@ -56,84 +61,85 @@
       font-family: inherit;
     }
 
-    .input-icon { top: 50%; transform: translateY(-50%); }
+    .input-icon {
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
-    /* THEMES --------------------------------------------------------- */
+    /* ----------------------------
+     * Themes
+     * ---------------------------- */
 
-    /* Light theme */
+    /* Light */
     html.theme-light {
+      color-scheme: light;
       --bg-body: #eef2f7;
       --bg-card: #ffffff;
       --bg-card-inner: #f9fafb;
       --bg-slider-track: #e5e7eb;
       --bg-input: #ffffff;
       --bg-toggle-inactive: #e5e7eb;
-
-      --border-primary: #d1d5db;
+      --border-primary: #cbd5e1;
       --text-primary: #020617;
       --text-secondary: #111827;
       --text-muted: #4b5563;
-
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.16);
     }
     html.theme-light body {
       background:
-        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.18), transparent 55%),
-        linear-gradient(to bottom, #eef2f7, #e5e7eb);
+        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.22), transparent 55%),
+        linear-gradient(to bottom, #f9fafb, #e5e7eb);
       background-attachment: fixed;
     }
 
-    /* Dark theme */
+    /* Dark */
     html.theme-dark {
+      color-scheme: dark;
       --bg-body: #020617;
-      --bg-card: #020617;
-      --bg-card-inner: #020617;
+      --bg-card: rgba(15, 23, 42, 0.98);
+      --bg-card-inner: rgba(15, 23, 42, 0.94);
       --bg-slider-track: #111827;
-      --bg-input: #020617;
+      --bg-input: rgba(15, 23, 42, 0.98);
       --bg-toggle-inactive: #020617;
-
       --border-primary: #1f2937;
       --text-primary: #f9fafb;
       --text-secondary: #e5e7eb;
-      --text-muted: #cbd5e1;
-
-      --shadow-soft: 0 26px 70px rgba(15, 23, 42, 0.9);
+      --text-muted: #9ca3af;
+      --shadow-soft: 0 28px 70px rgba(15, 23, 42, 0.85);
     }
     html.theme-dark body {
       background:
-        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.26), transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.22), #020617);
+        radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.35), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(20, 184, 166, 0.35), #020617);
       background-attachment: fixed;
     }
 
     /* AMOLED black */
     html.theme-black {
+      color-scheme: dark;
       --bg-body: #000000;
-      --bg-card: #000000;
-      --bg-card-inner: #000000;
+      --bg-card: rgba(0, 0, 0, 0.98);
+      --bg-card-inner: rgba(0, 0, 0, 0.98);
       --bg-slider-track: #111111;
-      --bg-input: #000000;
-      --bg-toggle-inactive: #050505;
-
+      --bg-input: rgba(0, 0, 0, 0.98);
+      --bg-toggle-inactive: #060606;
       --border-primary: #171717;
       --text-primary: #f9fafb;
       --text-secondary: #e5e5e5;
-      --text-muted: #a1a1aa;
-
-      /* default monochrome accent if no accent-* class overrides */
+      --text-muted: #9ca3af;
       --accent-color: #ffffff;
       --accent-color-light: #e5e5e5;
       --accent-color-dark: #ffffff;
       --accent-shadow: 0 0 22px rgba(255, 255, 255, 0.7);
-
       --shadow-soft: 0 32px 80px rgba(0, 0, 0, 1);
     }
     html.theme-black body {
       background-color: #000000;
-      background-attachment: fixed;
     }
 
-    /* ACCENT COLORS -------------------------------------------------- */
+    /* ----------------------------
+     * Accents
+     * ---------------------------- */
 
     html.accent-red {
       --accent-color: #ef4444;
@@ -245,7 +251,9 @@
       --accent-shadow: 0 0 18px rgba(146, 64, 14, 0.55);
     }
 
-    /* COMPONENTS ----------------------------------------------------- */
+    /* ----------------------------
+     * Shared UI styling
+     * ---------------------------- */
 
     .card-bg,
     .card-inner-bg,
@@ -295,6 +303,84 @@
       transform: translateY(-1px);
     }
 
+    /* Depth system */
+    .depth-scene {
+      perspective: 1400px;
+    }
+
+    .main-shell {
+      transform-style: preserve-3d;
+    }
+
+    .depth-layer-1,
+    .depth-layer-2 {
+      position: relative;
+      transform-style: preserve-3d;
+      transform-origin: center;
+    }
+
+    .depth-layer-1 {
+      transform: translateZ(0);
+    }
+
+    .depth-layer-2 {
+      transform: translateZ(24px);
+    }
+
+    .depth-layer-1:hover {
+      transform: translateZ(10px) translateY(-1px);
+    }
+
+    .depth-layer-2:hover {
+      transform: translateZ(32px) translateY(-2px);
+    }
+
+    /* Adjust card shadows by depth */
+    .card-inner-bg.depth-layer-1,
+    #savedOffersSection.depth-layer-1 {
+      box-shadow:
+        0 18px 45px rgba(15, 23, 42, 0.28),
+        0 0 0 1px rgba(148, 163, 184, 0.25);
+    }
+
+    #offerCard.depth-layer-2 {
+      box-shadow:
+        0 22px 55px rgba(15, 23, 42, 0.42),
+        0 0 0 1px rgba(148, 163, 184, 0.35);
+    }
+
+    /* The approved amount block: closest to the viewer */
+    .amount-elevated {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1.4rem;
+      padding: 0.9rem 1.8rem;
+      background:
+        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.22), transparent 60%),
+        var(--bg-card-inner);
+      box-shadow:
+        0 28px 70px rgba(15, 23, 42, 0.65),
+        0 0 0 1px rgba(148, 163, 184, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      transform: translateZ(48px) translateY(-2px);
+      transform-style: preserve-3d;
+    }
+    .amount-elevated::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.12), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .amount-elevated:hover {
+      transform: translateZ(60px) translateY(-4px) scale(1.01);
+    }
+
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
@@ -303,14 +389,13 @@
     .text-hero {
       color: var(--accent-color);
     }
+    /* Glow only on dark/black themes */
     html.theme-dark .text-hero,
     html.theme-black .text-hero {
-      text-shadow: 0 0 18px rgba(15, 23, 42, 0.8);
-    }
-    html.theme-light .text-hero {
-      text-shadow: none; /* remove glow in light theme */
+      text-shadow: 0 0 18px rgba(15, 23, 42, 0.7);
     }
 
+    /* Inputs */
     .input-field {
       background-color: var(--bg-input);
       border-color: var(--border-primary);
@@ -336,21 +421,20 @@
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 0.25rem;
+      height: 0.3rem;
       border-radius: 9999px;
       background-color: var(--bg-slider-track);
     }
     .slider-track::-webkit-slider-runnable-track {
-      height: 0.25rem;
+      height: 0.3rem;
       border-radius: 9999px;
       background-color: var(--bg-slider-track);
     }
     .slider-track::-moz-range-track {
-      height: 0.25rem;
+      height: 0.3rem;
       border-radius: 9999px;
       background-color: var(--bg-slider-track);
     }
-
     .slider-thumb {
       accent-color: var(--accent-color);
     }
@@ -360,13 +444,13 @@
       width: 16px;
       height: 16px;
       border-radius: 9999px;
+      margin-top: -6px;
       background: var(--accent-color);
       border: 2px solid var(--bg-card);
       box-shadow:
         0 0 0 1px rgba(15, 23, 42, 0.18),
         0 0 0 6px rgba(148, 163, 184, 0.35);
       cursor: pointer;
-      margin-top: -6px;
     }
     .slider-track::-moz-range-thumb {
       width: 16px;
@@ -393,14 +477,15 @@
       border-radius: 9999px;
       border: none;
       font-size: 0.8rem;
+      line-height: 1.25rem;
     }
     .toggle-inactive {
       background-color: transparent;
       color: var(--text-muted);
     }
     .toggle-active {
-      background: radial-gradient(
-        circle at 0 0,
+      background-image: linear-gradient(
+        135deg,
         var(--accent-color-light),
         var(--accent-color)
       );
@@ -443,7 +528,6 @@
       border-color: var(--border-primary);
     }
 
-    /* Header theme controls */
     #headerContainer {
       border-bottom-color: rgba(148, 163, 184, 0.6);
     }
@@ -458,7 +542,6 @@
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.28);
       transform: translateY(-0.5px);
     }
-
     #themeSelector,
     #accentSelector {
       background-image: linear-gradient(
@@ -467,11 +550,17 @@
         var(--bg-card-inner)
       );
     }
+
+    button:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--accent-color-light);
+      outline-offset: 2px;
+    }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+<body class="min-h-screen flex items-center justify-center p-4 transition-colors duration-200 depth-scene">
 
-  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+  <div class="w-full max-w-xl card-bg shell main-shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
 
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
@@ -515,7 +604,7 @@
 
     <!-- REP + THEME SETTINGS PANEL -->
     <div id="repSettingsPanel"
-         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden depth-layer-1">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold text-secondary">Rep & Theme Settings</span>
         <span class="text-[11px] text-muted">Shown on client approval view</span>
@@ -528,7 +617,7 @@
                     class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
               <option value="theme-light">Light</option>
               <option value="theme-dark">Dark</option>
-              <option value="theme-black">Black (AMOLED)</option>
+              <option value="theme-black">AMOLED (Pure Black)</option>
               <option value="theme-auto">Auto (System)</option>
             </select>
           </div>
@@ -589,7 +678,7 @@
                placeholder="e.g., Acme Holdings LLC" />
       </div>
 
-      <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
+      <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4 depth-layer-1">
         <!-- Amount -->
         <div id="amountContainer" class="space-y-1">
           <label for="calcAmount" class="block text-xs font-semibold text-muted">
@@ -669,7 +758,7 @@
       </div>
 
       <!-- Frequency toggle -->
-      <div id="toggleContainer" class="flex items-center justify-center space-x-2">
+      <div id="toggleContainer" class="flex items-center justify-center space-x-2 mt-2 depth-layer-1">
         <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
           Daily
         </button>
@@ -683,17 +772,22 @@
     </div>
 
     <!-- OFFER CARD -->
-    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary mt-4">
+    <div id="offerCard" class="card-bg depth-layer-2 p-4 rounded-lg shadow-md border border-primary mt-4">
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
         <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
       </div>
-      <div class="text-center py-6">
+      <div class="text-center py-6 space-y-3">
         <span id="businessNameDisplay"
               class="text-sm font-semibold text-primary block mb-1 hidden"></span>
-        <span class="text-sm font-semibold text-muted block">You Get</span>
-        <span id="summaryAmountOut"
-              class="text-5xl font-semibold block my-2 text-hero">$50,000</span>
-        <span class="text-base font-medium text-secondary block">
+
+        <!-- Approved amount: visually closest element -->
+        <div class="amount-elevated">
+          <span class="text-[11px] font-semibold text-muted tracking-wide uppercase">You Get</span>
+          <span id="summaryAmountOut"
+                class="text-5xl font-semibold text-hero leading-tight mt-1">$50,000</span>
+        </div>
+
+        <span class="text-base font-medium text-secondary block pt-1">
           Total Payback:
           <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
         </span>
@@ -759,7 +853,7 @@
 
     <!-- ADDITIONAL OFFERS -->
     <div id="savedOffersSection"
-         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+         class="card-bg depth-layer-1 mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
       <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
         <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
       </div>
@@ -869,7 +963,7 @@
     let isApprovalView = false;
     let termLengthManualDirty = false;
 
-    // Load saved theme/accent if present, otherwise respect OS preference
+    // Load saved theme/accent or respect OS preference
     try {
       const storedTheme = localStorage.getItem('generic_offer_calc_theme');
       const storedAccent = localStorage.getItem('generic_offer_calc_accent');
@@ -961,7 +1055,7 @@
       const html = savedOffers.map((offer, index) => {
         const labelIndex = index + 2;
         return `
-          <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3 depth-layer-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
             </div>
@@ -1087,9 +1181,37 @@
       });
     }
 
+    // Base64 encode/decode helpers for compact URL config
+    function encodeConfig(config) {
+      try {
+        const json = JSON.stringify(config);
+        // UTF-8 safe base64
+        return btoa(unescape(encodeURIComponent(json)));
+      } catch (e) {
+        console.error('encodeConfig failed', e);
+        return '';
+      }
+    }
+
+    function decodeConfig(encoded) {
+      try {
+        const json = decodeURIComponent(escape(atob(encoded)));
+        return JSON.parse(json);
+      } catch (e) {
+        console.error('decodeConfig failed', e);
+        return null;
+      }
+    }
+
     function initializeFromURL() {
       const params = new URLSearchParams(window.location.search);
-      const encodedConfig = params.get('c');
+      const configParam = params.get('c');
+      let config = null;
+
+      if (configParam) {
+        config = decodeConfig(configParam);
+      }
+
       const viewMode = params.get('view');
       isApprovalView = viewMode === 'approval';
 
@@ -1103,53 +1225,48 @@
       let repNameParam = '';
       let repEmailParam = '';
       let repPhoneParam = '';
-      let offersFromConfig = null;
-      let offersJsonString = null;
+      let offersRaw = null;
 
-      if (encodedConfig) {
-        try {
-          const decodedStr = decodeURIComponent(atob(encodedConfig));
-          const cfg = JSON.parse(decodedStr);
-
-          if (typeof cfg.a === 'number') amount = cfg.a;
-          if (typeof cfg.f === 'number') factor = cfg.f;
-          if (typeof cfg.t === 'number') term = cfg.t;
-          if (typeof cfg.q === 'string') freq = cfg.q;
-          if (typeof cfg.th === 'string') paramTheme = cfg.th;
-          if (typeof cfg.ac === 'string') paramAccent = cfg.ac;
-          if (typeof cfg.b === 'string') businessNameParam = cfg.b;
-          if (typeof cfg.rn === 'string') repNameParam = cfg.rn;
-          if (typeof cfg.re === 'string') repEmailParam = cfg.re;
-          if (typeof cfg.rp === 'string') repPhoneParam = cfg.rp;
-          if (Array.isArray(cfg.o)) offersFromConfig = cfg.o;
-        } catch (e) {
-          console.error('Error decoding compact config', e);
-        }
+      if (config) {
+        amount = Number(config.amount ?? amount) || amount;
+        factor = Number(config.factor ?? factor) || factor;
+        term = parseInt(config.term ?? term) || term;
+        freq = config.freq || freq;
+        paramTheme = config.theme || null;
+        paramAccent = config.accent || null;
+        businessNameParam = config.businessName || '';
+        repNameParam = config.repName || '';
+        repEmailParam = config.repEmail || '';
+        repPhoneParam = config.repPhone || '';
+        if (Array.isArray(config.offers)) offersRaw = config.offers;
       } else {
         const amountParam = params.get('amount');
-        if (amountParam !== null) {
-          const parsed = parseFloat(amountParam);
-          if (!isNaN(parsed)) amount = parsed;
+        if (amountParam) {
+          const parsedAmount = parseFloat(amountParam);
+          if (!isNaN(parsedAmount)) amount = parsedAmount;
         }
         const factorParam = params.get('factor');
-        if (factorParam !== null) {
-          const parsedF = parseFloat(factorParam);
-          if (!isNaN(parsedF)) factor = parsedF;
-        }
+        if (factorParam) factor = parseFloat(factorParam) || factor;
         const termParam = params.get('term');
-        if (termParam !== null) {
-          const parsedT = parseInt(termParam, 10);
-          if (!isNaN(parsedT)) term = parsedT;
-        }
+        if (termParam) term = parseInt(termParam) || term;
+        if (params.get('freq')) freq = params.get('freq');
 
-        freq = params.get('freq') || freq;
         paramTheme = params.get('theme');
         paramAccent = params.get('accent');
         businessNameParam = params.get('businessName') || '';
         repNameParam = params.get('repName') || '';
         repEmailParam = params.get('repEmail') || '';
         repPhoneParam = params.get('repPhone') || '';
-        offersJsonString = params.get('offers');
+
+        const offersParam = params.get('offers');
+        if (offersParam) {
+          try {
+            const parsed = JSON.parse(offersParam);
+            if (Array.isArray(parsed)) offersRaw = parsed;
+          } catch (e) {
+            console.error('Error parsing offers from URL', e);
+          }
+        }
       }
 
       if (paramTheme) currentTheme = paramTheme;
@@ -1171,11 +1288,11 @@
       if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
       if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
 
-      paymentFrequency = freq;
+      paymentFrequency = freq || 'daily';
 
       savedOffers = [];
-      if (offersFromConfig) {
-        savedOffers = offersFromConfig.map(o =>
+      if (Array.isArray(offersRaw)) {
+        savedOffers = offersRaw.map(o =>
           computeOffer(
             Number(o.a ?? o.amount ?? 0),
             Number(o.f ?? o.factor ?? 1.1),
@@ -1183,22 +1300,6 @@
             o.q ?? o.frequency ?? 'daily'
           )
         );
-      } else if (offersJsonString) {
-        try {
-          const raw = JSON.parse(offersJsonString);
-          if (Array.isArray(raw)) {
-            savedOffers = raw.map(o =>
-              computeOffer(
-                Number(o.a ?? o.amount ?? 0),
-                Number(o.f ?? o.factor ?? 1.1),
-                Number(o.t ?? o.term ?? 3),
-                o.q ?? o.frequency ?? 'daily'
-              )
-            );
-          }
-        } catch (err) {
-          console.error('Error parsing offers from URL', err);
-        }
       }
 
       if (isApprovalView) {
@@ -1353,23 +1454,17 @@
         });
       }
 
-      if (!isApprovalView && elements.repSettingsToggle && elements.repSettingsPanel) {
-        elements.repSettingsToggle.addEventListener('click', () => {
+      // Settings + Theme buttons both toggle the same panel (open/close)
+      if (!isApprovalView && elements.repSettingsPanel) {
+        const togglePanel = () => {
           elements.repSettingsPanel.classList.toggle('hidden');
-        });
-      }
-
-      if (!isApprovalView && elements.themePanelToggle && elements.repSettingsPanel) {
-        elements.themePanelToggle.addEventListener('click', () => {
-          const isHidden = elements.repSettingsPanel.classList.contains('hidden');
-          elements.repSettingsPanel.classList.toggle('hidden');
-          if (isHidden) {
-            elements.repSettingsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            if (elements.themeSelector) {
-              elements.themeSelector.focus();
-            }
-          }
-        });
+        };
+        if (elements.repSettingsToggle) {
+          elements.repSettingsToggle.addEventListener('click', togglePanel);
+        }
+        if (elements.themePanelToggle) {
+          elements.themePanelToggle.addEventListener('click', togglePanel);
+        }
       }
 
       if (!isApprovalView && elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
@@ -1417,47 +1512,29 @@
             q: o.frequency || freq,
           }));
 
-          const url = new URL(window.location.href);
-          let shareUrl;
+          const config = {
+            amount,
+            factor,
+            term,
+            freq,
+            theme,
+            accent,
+            businessName,
+            repName,
+            repEmail,
+            repPhone,
+            offers: offersForUrl,
+          };
 
-          // Compact "short" URL using a single encoded config parameter
-          try {
-            const payload = {
-              a: amount,
-              f: factor,
-              t: term,
-              q: freq,
-              th: theme,
-              ac: accent,
-              b: businessName,
-              rn: repName,
-              re: repEmail,
-              rp: repPhone,
-              o: offersForUrl,
-            };
-            const encoded = btoa(encodeURIComponent(JSON.stringify(payload)));
-            const params = new URLSearchParams({ c: encoded, view: 'approval' });
-            url.search = params.toString();
-            shareUrl = url.toString();
-          } catch (e) {
-            console.error('Compact URL encoding failed, falling back to verbose URL', e);
-            const params = new URLSearchParams({
-              amount,
-              factor,
-              term,
-              freq,
-              theme,
-              accent,
-              businessName,
-              repName,
-              repEmail,
-              repPhone,
-              offers: JSON.stringify(offersForUrl),
-              view: 'approval',
-            });
-            url.search = params.toString();
-            shareUrl = url.toString();
-          }
+          const encodedConfig = encodeConfig(config);
+
+          const url = new URL(window.location.href);
+          const params = new URLSearchParams({
+            c: encodedConfig,
+            view: 'approval',
+          });
+          url.search = params.toString();
+          const shareUrl = url.toString();
 
           if (elements.shareLinkOutput && elements.shareLinkContainer) {
             elements.shareLinkOutput.value = shareUrl;
