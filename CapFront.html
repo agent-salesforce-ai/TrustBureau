@@ -33,6 +33,7 @@
       --text-primary: #f9fafb;
       --text-secondary: #e5e7eb;
       --text-muted: #9ca3af;
+      --text-success: #4ade80; /* green-400 */
     }
     html.theme-slate body { background-color: var(--bg-body); }
 
@@ -47,6 +48,7 @@
       --text-primary: #0f172a;
       --text-secondary: #1f2937;
       --text-muted: #6b7280;
+      --text-success: #16a34a; /* green-600 */
     }
     html.theme-corporate body { background-color: var(--bg-body); }
 
@@ -68,6 +70,7 @@
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
+    .text-success { color: var(--text-success); }
     .border-primary { border-color: var(--border-primary); }
 
     .slider-track { background-color: var(--bg-slider-track); }
@@ -83,6 +86,17 @@
       border-color: var(--accent-color);
       box-shadow: 0 0 0 2px var(--accent-color-light);
       outline: none;
+    }
+
+    /* Date Input Styling */
+    input[type="date"] {
+      background-color: var(--bg-input);
+      color: var(--text-primary);
+      border-color: var(--border-primary);
+    }
+    ::-webkit-calendar-picker-indicator {
+      filter: invert(0.5);
+      cursor: pointer;
     }
 
     .text-hero {
@@ -221,7 +235,7 @@
           <label for="calcAmount" class="block text-xs font-semibold text-muted">
             Amount You Get ($)
           </label>
-          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000"
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1"
                  value="50000"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
@@ -341,6 +355,49 @@
           </div>
         </div>
       </div>
+
+      <!-- Prepay Discount Section -->
+      <div id="prepaySection" class="mt-6 pt-4 border-t border-primary">
+        <button id="togglePrepay" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Calculate Prepayment Discount
+        </button>
+
+        <div id="prepayContainer" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-secondary">Prepayment Discount</span>
+            <span id="prepayPercentDisplay" class="text-xs font-bold text-hero">0%</span>
+          </div>
+
+          <!-- Rep View: Slider -->
+          <div id="prepaySliderContainer">
+             <input id="prepaySlider" type="range" min="0" max="25" step="1" value="0"
+                    class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-4" />
+             <p class="text-[10px] text-muted text-center italic">Adjust max discount policy (Rep View)</p>
+          </div>
+
+          <!-- Client View: Date Picker -->
+          <div id="prepayDateContainer" class="hidden mb-4">
+            <label class="block text-[11px] font-semibold text-muted mb-1 text-center">Select Payoff Date</label>
+            <input id="prepayDateInput" type="date"
+                   class="w-full p-2 text-sm rounded-lg border border-primary input-field text-center" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-center border-t border-primary pt-3">
+            <div>
+              <span class="text-[10px] font-semibold text-muted block uppercase tracking-wider">Savings</span>
+              <span id="prepaySavingsDisplay" class="text-sm font-bold text-success">$0.00</span>
+            </div>
+            <div>
+              <span class="text-[10px] font-semibold text-muted block uppercase tracking-wider">New Payoff</span>
+              <span id="prepayTotalDisplay" class="text-sm font-bold text-primary">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="repContactBlock"
            class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
         <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
@@ -436,6 +493,18 @@
       addOfferButton: document.getElementById('addOfferButton'),
       savedOffersSection: document.getElementById('savedOffersSection'),
       savedOffersContainer: document.getElementById('savedOffersContainer'),
+
+      // Prepay Elements
+      prepaySection: document.getElementById('prepaySection'),
+      togglePrepay: document.getElementById('togglePrepay'),
+      prepayContainer: document.getElementById('prepayContainer'),
+      prepaySliderContainer: document.getElementById('prepaySliderContainer'),
+      prepaySlider: document.getElementById('prepaySlider'),
+      prepayDateContainer: document.getElementById('prepayDateContainer'),
+      prepayDateInput: document.getElementById('prepayDateInput'),
+      prepayPercentDisplay: document.getElementById('prepayPercentDisplay'),
+      prepaySavingsDisplay: document.getElementById('prepaySavingsDisplay'),
+      prepayTotalDisplay: document.getElementById('prepayTotalDisplay'),
     };
 
     let paymentFrequency = 'daily';
@@ -446,6 +515,7 @@
     let savedOffers = [];
     let isApprovalView = false;
     let termLengthManualDirty = false;
+    let prepayDiscountPercent = 0;
 
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
@@ -460,8 +530,9 @@
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
+        // Ensure exact digits are kept if needed, but standard amounts look clean
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        maximumFractionDigits: 2,
       }).format(numericValue);
     }
 
@@ -676,6 +747,13 @@
       const repNameParam = params.get('repName') || '';
       const repEmailParam = params.get('repEmail') || '';
       const repPhoneParam = params.get('repPhone') || '';
+      // Prepay setting persistence
+      const prepayParam = params.get('prepay');
+      if (prepayParam) {
+        prepayDiscountPercent = parseInt(prepayParam, 10);
+        if (elements.prepaySlider) elements.prepaySlider.value = prepayDiscountPercent;
+      }
+
       const viewMode = params.get('view');
 
       isApprovalView = (viewMode === 'approval');
@@ -722,6 +800,7 @@
       }
 
       if (isApprovalView) {
+        // Hide inputs
         if (elements.factorContainer) elements.factorContainer.style.display = 'none';
         if (elements.termContainer) elements.termContainer.style.display = 'none';
         if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
@@ -735,9 +814,92 @@
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
         if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
 
+        // Prepay View Mode Switch
+        if (elements.prepaySliderContainer) elements.prepaySliderContainer.style.display = 'none';
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.remove('hidden');
+
         elements.headerContainer.classList.remove('justify-between');
         elements.headerContainer.classList.add('justify-center');
+      } else {
+        // Rep mode: ensure date container hidden, slider shown
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.add('hidden');
       }
+    }
+
+    function calculatePrepay(offer) {
+      if (!elements.prepayContainer || elements.prepayContainer.classList.contains('hidden')) return;
+
+      const totalPayback = offer.totalPayback;
+      let savings = 0;
+
+      if (isApprovalView) {
+        // --- CLIENT SIDE (DATE BASED) ---
+        // Logic: Discount scales linearly from MaxDiscount (Today) to 0 (End of Term)
+        // This implies "You only pay for the days you used" plus the discount policy.
+        // Simplest interpretation of "slider goes up to 25% off":
+        // Max Discount = totalPayback * (percent/100).
+        // Actual Savings = Max Discount * (DaysRemaining / TotalTermDays)
+
+        const dateVal = elements.prepayDateInput.value;
+        if (!dateVal) {
+           // Default to today if not set
+           const today = new Date().toISOString().split('T')[0];
+           elements.prepayDateInput.value = today;
+        }
+
+        const startDate = new Date();
+        startDate.setHours(0,0,0,0);
+
+        // Approx term length in days
+        const termDays = (offer.termLengthMonths || 1) * 30.44;
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + termDays);
+
+        // Set min/max for date picker
+        elements.prepayDateInput.min = startDate.toISOString().split('T')[0];
+        elements.prepayDateInput.max = endDate.toISOString().split('T')[0];
+
+        const selectedDate = new Date(elements.prepayDateInput.value);
+        selectedDate.setHours(0,0,0,0);
+
+        if (selectedDate < startDate) selectedDate = startDate;
+        if (selectedDate > endDate) selectedDate = endDate;
+
+        // Time math
+        const totalTime = endDate.getTime() - startDate.getTime();
+        const remainingTime = endDate.getTime() - selectedDate.getTime();
+        let fractionRemaining = 0;
+        if (totalTime > 0) {
+          fractionRemaining = remainingTime / totalTime;
+        }
+        if (fractionRemaining < 0) fractionRemaining = 0;
+        if (fractionRemaining > 1) fractionRemaining = 1;
+
+        // Calculate max possible savings based on rep's slider percentage
+        const maxPotentialSavings = totalPayback * (prepayDiscountPercent / 100);
+
+        // Apply time decay
+        savings = maxPotentialSavings * fractionRemaining;
+
+        // Display effective percentage for this date
+        // const effectivePercent = (savings / totalPayback) * 100;
+        // elements.prepayPercentDisplay.textContent = `${effectivePercent.toFixed(1)}%`;
+        // ACTUALLY: Keep the display showing the Policy Max, or the effective?
+        // Usually clearer to show the calculated amount.
+        // Let's show the "Max Policy" percentage in the corner, but savings reflect reality.
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}% Max`;
+
+      } else {
+        // --- REP SIDE (SLIDER BASED) ---
+        // Standard calculation based purely on slider position (Max Potential)
+        savings = totalPayback * (prepayDiscountPercent / 100);
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}%`;
+      }
+
+      const newPayoff = totalPayback - savings;
+
+      elements.prepaySavingsDisplay.textContent = formatCurrency(savings);
+      elements.prepayTotalDisplay.textContent = formatCurrency(newPayoff);
     }
 
     function runCalculator() {
@@ -796,6 +958,9 @@
             elements.summaryTermLengthOut.textContent = '';
           }
         }
+
+        // Prepay logic integration
+        calculatePrepay(offer);
 
         updateRepDisplay();
       } catch (e) {
@@ -888,6 +1053,26 @@
         });
       }
 
+      // Prepay Listeners
+      if (elements.togglePrepay) {
+        elements.togglePrepay.addEventListener('click', () => {
+          elements.prepayContainer.classList.toggle('hidden');
+          runCalculator(); // Force recalculate to update if amount changed while hidden
+        });
+      }
+      if (elements.prepaySlider) {
+        elements.prepaySlider.addEventListener('input', (e) => {
+          prepayDiscountPercent = parseInt(e.target.value, 10);
+          runCalculator();
+        });
+      }
+      // Date picker listener
+      if (elements.prepayDateInput) {
+        elements.prepayDateInput.addEventListener('change', () => {
+          runCalculator();
+        });
+      }
+
       if (elements.repSettingsToggle && elements.repSettingsPanel) {
         elements.repSettingsToggle.addEventListener('click', () => {
           elements.repSettingsPanel.classList.toggle('hidden');
@@ -943,6 +1128,7 @@
             repName,
             repEmail,
             repPhone,
+            prepay: prepayDiscountPercent,
             offers: JSON.stringify(offersForUrl),
             view: 'approval',
           });
@@ -972,6 +1158,12 @@
           }
           document.body.removeChild(textArea);
         });
+      }
+
+      // Set default date
+      if (elements.prepayDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        elements.prepayDateInput.value = today;
       }
 
       updatePaymentToggleUI();
