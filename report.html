@@ -3,8 +3,8 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trust Bureau - Forensic Aggregator v8.1 (Stable)</title>
-  <meta name="theme-color" content="#F8FAFC" />
+  <title>Trust Bureau - Forensic Aggregator v8.9 (Uppercase)</title>
+  <meta name="theme-color" content="#FAFAFA" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -72,6 +72,9 @@
     .forensic-table td { padding: 14px 16px; border-bottom: 1px solid #f4f4f5; vertical-align: top; color: #27272a; }
     .forensic-table tr:hover td { background-color: #fafafa; }
 
+    /* Report Section - Relative Positioning Fix */
+    .report-section { position: relative; }
+
     /* SVG Gauge */
     .risk-gauge-svg { transform: rotate(-90deg); }
     .risk-gauge-progress { transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1); stroke-linecap: round; }
@@ -81,6 +84,7 @@
       font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: #18181b; background: #fff;
       border: 1px solid #d4d4d8; padding: 6px 14px; border-radius: 999px; display: flex; align-items: center;
       gap: 6px; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      cursor: pointer;
     }
     .enhance-btn:hover:not(:disabled) { background: #f4f4f5; border-color: #a1a1aa; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .enhance-btn:active { transform: translateY(0); }
@@ -120,6 +124,14 @@
     /* Toast */
     #error-toast { transition: all 0.3s ease-out; transform: translateY(-150%); opacity: 0; }
     #error-toast.show { transform: translateY(0); opacity: 1; }
+    
+    /* Log Fade Effect */
+    .log-line { animation: fadeIn 0.2s ease-out forwards; opacity: 0; transform: translateY(2px); }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* Blinking Cursor */
+    .cursor-blink { animation: blink 1s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
   </style>
 </head>
 
@@ -140,11 +152,11 @@
         <div class="w-9 h-9 bg-brand-primary rounded flex items-center justify-center shadow-lg shadow-zinc-500/20 group-hover:scale-105 transition-transform">
           <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 5.5l5.5 9.5h-11L12 7.5z"/></svg>
         </div>
-        <h1 class="font-heading font-black text-lg text-brand-dark tracking-tight uppercase">Trust Bureau <span class="hidden sm:inline opacity-50 font-medium text-xs align-top ml-1">v8.1</span></h1>
+        <h1 class="font-heading font-black text-lg text-brand-dark tracking-tight uppercase">Trust Bureau <span class="hidden sm:inline opacity-50 font-medium text-xs align-top ml-1">v8.9</span></h1>
       </div>
 
       <div class="flex items-center gap-3">
-        <button id="settings-btn" class="text-brand-gray hover:text-brand-dark p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <button id="settings-btn" class="text-brand-gray hover:text-brand-dark p-2 rounded-full hover:bg-gray-100 transition-colors" title="Settings & API Key">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </button>
         <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-200 rounded-full">
@@ -162,16 +174,16 @@
     <div id="search-view" class="hero-bg absolute inset-0 z-10 flex flex-col items-center justify-center p-4 text-center transition-all duration-500">
       <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-zinc-300/20 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div class="inline-flex items-center gap-2 bg-white/50 border border-zinc-200 backdrop-blur px-4 py-1.5 rounded-full text-xs font-semibold text-brand-gray mb-8">
+      <div class="inline-flex items-center gap-2 bg-white/50 border border-zinc-200 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold text-brand-gray mb-8 uppercase tracking-widest">
         <span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Live Aggregation
       </div>
 
-      <h2 class="text-4xl md:text-7xl font-heading font-black text-brand-dark mb-6 tracking-tighter leading-[0.9]">
-        Forensic Data <br />
-        <span class="text-zinc-400">Extraction.</span>
+      <h2 class="text-4xl md:text-7xl font-heading font-black text-brand-dark mb-6 tracking-tighter leading-[0.9] uppercase">
+        VERIFY <br />
+        <span class="text-zinc-400">EVERYTHING.</span>
       </h2>
 
-      <p class="text-brand-gray mb-10 text-lg max-w-xl">
+      <p class="text-brand-gray mb-10 text-sm md:text-base font-bold max-w-xl uppercase tracking-widest">
         Corporate Filings • Litigation History • Consumer Sentiment • Compliance • Financial Firmographics
       </p>
 
@@ -179,42 +191,44 @@
         <div class="bg-white p-2 rounded-2xl shadow-2xl shadow-zinc-200/50 border border-zinc-200 flex flex-col sm:flex-row gap-2 transition-shadow group-hover:shadow-zinc-300/50 focus-within:ring-4 focus-within:ring-zinc-100">
           <div class="flex-grow relative flex items-center">
             <svg class="w-5 h-5 text-zinc-400 absolute left-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" id="search-input" class="w-full bg-transparent border-none outline-none pl-12 pr-4 py-3 text-lg font-medium text-brand-dark placeholder-zinc-400" placeholder="Entity name (e.g., Neuralink, Tesla)" />
+            <input type="text" id="search-input" class="w-full bg-transparent border-none outline-none pl-12 pr-4 py-3 text-lg font-medium text-brand-dark placeholder-zinc-400 uppercase" placeholder="ENTITY NAME (E.G., NEURALINK, TESLA)" />
           </div>
-          <button id="generate-btn" class="bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors active:scale-95">
+          <button id="generate-btn" class="bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors active:scale-95 uppercase tracking-widest text-sm">
             Begin Audit
           </button>
         </div>
       </div>
 
       <div class="mt-12 flex gap-2 flex-wrap justify-center opacity-60">
-        <button onclick="window.runSearch('OpenAI')" class="text-xs font-semibold bg-white border border-zinc-200 px-3 py-1 rounded-full hover:border-brand-primary hover:text-black transition-colors">OpenAI</button>
-        <button onclick="window.runSearch('Stripe')" class="text-xs font-semibold bg-white border border-zinc-200 px-3 py-1 rounded-full hover:border-brand-primary hover:text-black transition-colors">Stripe</button>
-        <button onclick="window.runSearch('SpaceX')" class="text-xs font-semibold bg-white border border-zinc-200 px-3 py-1 rounded-full hover:border-brand-primary hover:text-black transition-colors">SpaceX</button>
+        <button onclick="window.runSearch('OpenAI')" class="text-xs font-bold bg-white border border-zinc-200 px-4 py-1.5 rounded-full hover:border-brand-primary hover:text-black transition-colors uppercase tracking-wider">OpenAI</button>
+        <button onclick="window.runSearch('Stripe')" class="text-xs font-bold bg-white border border-zinc-200 px-4 py-1.5 rounded-full hover:border-brand-primary hover:text-black transition-colors uppercase tracking-wider">Stripe</button>
+        <button onclick="window.runSearch('SpaceX')" class="text-xs font-bold bg-white border border-zinc-200 px-4 py-1.5 rounded-full hover:border-brand-primary hover:text-black transition-colors uppercase tracking-wider">SpaceX</button>
       </div>
     </div>
 
-    <!-- LOADER VIEW -->
-    <div id="loader-view" class="hidden absolute inset-0 z-20 bg-brand-bg/90 backdrop-blur-sm flex flex-col items-center justify-center p-4">
-      <div class="bg-white p-10 rounded-2xl shadow-2xl border border-brand-border max-w-md w-full text-center">
-        <!-- Professional Spinner -->
-        <div class="relative w-12 h-12 mx-auto mb-6">
-           <div class="absolute inset-0 border-4 border-zinc-100 rounded-full"></div>
-           <div class="absolute inset-0 border-4 border-t-brand-primary rounded-full animate-spin"></div>
-        </div>
-
-        <h3 class="text-xl font-heading font-bold text-brand-dark mb-2">Forensic Deep Scan</h3>
-        <p id="loader-step" class="text-sm text-brand-gray font-medium mb-8 min-h-[1.25rem]">Initializing secure connection...</p>
+    <!-- LOADER VIEW (AUDIT LOG) -->
+    <div id="loader-view" class="hidden absolute inset-0 z-20 bg-brand-bg/95 backdrop-blur-sm flex flex-col items-center justify-center p-4">
+      <div class="bg-white p-1 rounded-2xl shadow-2xl border border-brand-border max-w-xl w-full relative overflow-hidden flex flex-col">
         
-        <!-- Progress Bar -->
-        <div class="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden relative">
-           <div class="absolute inset-y-0 left-0 bg-brand-primary w-1/3 animate-[loading_2s_ease-in-out_infinite]"></div>
+        <!-- Header -->
+        <div class="bg-zinc-50 px-4 py-3 border-b border-zinc-100 flex justify-between items-center flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span class="text-[10px] font-bold uppercase text-zinc-700 tracking-widest">Forensic Audit Active</span>
+            </div>
+            <span class="font-mono text-[10px] text-zinc-300">SECURE_SHELL_v8.9</span>
         </div>
-        <style> @keyframes loading { 0% { left: -35%; width: 30%; } 50% { width: 60%; } 100% { left: 100%; width: 30%; } } </style>
-      </div>
-      
-      <div class="mt-6 text-[10px] text-zinc-400 font-medium uppercase tracking-widest">
-        Trust Bureau Forensic Engine v8.1
+    
+        <!-- Log Window -->
+        <div id="audit-log" class="h-[350px] bg-zinc-900 p-6 overflow-y-auto font-mono text-xs space-y-1.5 scroll-smooth text-zinc-300 shadow-inner">
+            <!-- Log lines injected here -->
+        </div>
+        
+        <!-- Footer with Blinking Cursor -->
+        <div class="bg-zinc-900 px-6 pb-4 pt-0 flex-shrink-0 border-t border-zinc-800">
+            <span class="text-emerald-500 font-mono text-xs mr-2">root@trust-bureau:~#</span>
+            <span class="text-zinc-500 font-mono text-xs">awaiting_payload</span><span class="w-2 h-4 bg-zinc-500 inline-block align-middle ml-1 cursor-blink"></span>
+        </div>
       </div>
     </div>
 
@@ -302,27 +316,31 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="sos">Deep Search</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
-                 <div class="col-span-1 sm:col-span-2">
-                    <span class="label-text">Legal Entity Name</span>
-                    <div id="c-name" class="value-text text-lg font-bold">--</div>
+              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
+                    <div class="col-span-1 sm:col-span-2">
+                        <span class="label-text">Legal Entity Name</span>
+                        <div id="c-name" class="value-text text-lg font-bold">--</div>
+                    </div>
+                    <div>
+                        <span class="label-text">Registration / Entity ID</span>
+                        <div id="c-id" class="value-text">--</div>
+                    </div>
+                    <div>
+                        <span class="label-text">Jurisdiction (State)</span>
+                        <div id="c-state" class="value-text">--</div>
+                    </div>
+                    <div>
+                        <span class="label-text">Formation Date</span>
+                        <div id="c-date" class="value-text">--</div>
+                    </div>
+                    <div>
+                        <span class="label-text">Registered Agent</span>
+                        <div id="c-agent" class="value-text text-sm">--</div>
+                    </div>
                  </div>
-                 <div>
-                    <span class="label-text">Registration / Entity ID</span>
-                    <div id="c-id" class="value-text font-mono bg-zinc-100 px-2 py-1 rounded inline-block text-sm">--</div>
-                 </div>
-                 <div>
-                    <span class="label-text">Jurisdiction (State)</span>
-                    <div id="c-state" class="value-text">--</div>
-                 </div>
-                 <div>
-                    <span class="label-text">Formation Date</span>
-                    <div id="c-date" class="value-text">--</div>
-                 </div>
-                 <div>
-                    <span class="label-text">Registered Agent</span>
-                    <div id="c-agent" class="value-text text-sm">--</div>
-                 </div>
+                 <!-- ANALYSIS INJECT -->
+                 <div id="c-analysis"></div>
               </div>
            </div>
 
@@ -339,10 +357,10 @@
                  <div id="leadership-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      <!-- Filled by JS -->
                  </div>
+                 <!-- ANALYSIS INJECT -->
+                 <div id="l-analysis"></div>
               </div>
            </div>
-
-           <!-- Financials Module Removed -->
 
            <!-- DIGITAL FOOTPRINT -->
            <div id="sec-digital" class="report-section mt-8 pt-8 border-t border-brand-border">
@@ -368,6 +386,8 @@
                         <div id="d-tech" class="flex flex-wrap gap-1"></div>
                      </li>
                   </ul>
+                  <!-- ANALYSIS INJECT -->
+                  <div id="d-analysis"></div>
               </div>
            </div>
 
@@ -380,20 +400,24 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="litigation">Check Dockets</button>
               </div>
-              <div class="overflow-x-auto max-h-[400px] bg-white border border-brand-border rounded-xl shadow-sm">
-                 <table class="forensic-table min-w-[700px]">
-                    <thead>
-                       <tr>
-                          <th class="w-[15%]">Type</th>
-                          <th class="w-[20%]">Case ID</th>
-                          <th class="w-[35%]">Parties / Plaintiff</th>
-                          <th class="w-[15%]">Date</th>
-                          <th class="w-[15%]">Status</th>
-                       </tr>
-                    </thead>
-                    <tbody id="legal-rows"></tbody>
-                 </table>
-                 <div id="legal-empty" class="p-8 text-center text-zinc-400 italic text-sm hidden border-t border-zinc-100">No adverse litigation records located in scan.</div>
+              <div class="bg-white border border-brand-border rounded-xl shadow-sm">
+                 <div class="overflow-x-auto max-h-[400px]">
+                    <table class="forensic-table min-w-[700px]">
+                       <thead>
+                          <tr>
+                             <th class="w-[15%]">Type</th>
+                             <th class="w-[20%]">Case ID</th>
+                             <th class="w-[35%]">Parties / Plaintiff</th>
+                             <th class="w-[15%]">Date</th>
+                             <th class="w-[15%]">Status</th>
+                          </tr>
+                       </thead>
+                       <tbody id="legal-rows"></tbody>
+                    </table>
+                    <div id="legal-empty" class="p-8 text-center text-zinc-400 italic text-sm hidden border-t border-zinc-100">No adverse litigation records located in scan.</div>
+                 </div>
+                 <!-- ANALYSIS INJECT -->
+                 <div id="legal-analysis" class="px-6 pb-6"></div>
               </div>
            </div>
 
@@ -406,27 +430,31 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="reputation">Verify BBB</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6 flex items-center gap-8">
-                 <div class="text-center min-w-[100px]">
-                    <span class="label-text mb-1">Grade</span>
-                    <div id="bbb-grade" class="text-6xl font-black text-brand-dark tracking-tighter">--</div>
+              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+                 <div class="flex flex-col md:flex-row items-center gap-8">
+                     <div class="text-center min-w-[100px]">
+                        <span class="label-text mb-1">Grade</span>
+                        <div id="bbb-grade" class="text-6xl font-black text-brand-dark tracking-tighter">--</div>
+                     </div>
+                     <div class="flex-grow w-full md:border-l border-zinc-100 md:pl-8">
+                        <div class="grid grid-cols-2 gap-4">
+                           <div>
+                              <span class="label-text">Accreditation</span>
+                              <div id="bbb-status" class="value-text">--</div>
+                           </div>
+                           <div>
+                              <span class="label-text">Complaints (3 Yr)</span>
+                              <div id="bbb-complaints" class="value-text">--</div>
+                           </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-zinc-100">
+                            <span class="label-text block mb-1">Bureau Analysis</span>
+                            <p id="bbb-summary" class="text-sm text-zinc-600 leading-relaxed">--</p>
+                        </div>
+                     </div>
                  </div>
-                 <div class="flex-grow border-l border-zinc-100 pl-8">
-                    <div class="grid grid-cols-2 gap-4">
-                       <div>
-                          <span class="label-text">Accreditation</span>
-                          <div id="bbb-status" class="value-text">--</div>
-                       </div>
-                       <div>
-                          <span class="label-text">Complaints (3 Yr)</span>
-                          <div id="bbb-complaints" class="value-text">--</div>
-                       </div>
-                    </div>
-                    <div class="mt-3 pt-3 border-t border-zinc-100">
-                        <span class="label-text block mb-1">Bureau Analysis</span>
-                        <p id="bbb-summary" class="text-sm text-zinc-600 leading-relaxed">--</p>
-                    </div>
-                 </div>
+                 <!-- ANALYSIS INJECT -->
+                 <div id="r-analysis"></div>
               </div>
            </div>
 
@@ -466,6 +494,8 @@
                        <span id="reg-gov" class="text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500">--</span>
                     </li>
                   </ul>
+                  <!-- ANALYSIS INJECT -->
+                  <div id="reg-analysis"></div>
               </div>
            </div>
 
@@ -516,11 +546,8 @@
                 <div class="relative">
                     <select id="model-select" class="w-full appearance-none border border-zinc-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black bg-white">
                         <option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash (Recommended)</option>
+                        <option value="gemini-3-pro-preview">Gemini 3.0 Pro Preview (Reasoning Fallback)</option>
                         <option value="gemini-2.5-pro-preview-09-2025">Gemini 2.5 Pro (Complex Reasoning)</option>
-                        <option value="gemini-3.0-pro-exp">Gemini 3.0 Pro (Experimental)</option>
-                        <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Experimental</option>
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy)</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-500">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -544,6 +571,7 @@
         if (url && url.startsWith('http') && text && text !== '--') {
             return `<a href="${url}" target="_blank" class="${cls} decoration-zinc-400 inline-flex items-center gap-1" title="Verified Source">${text} <svg class="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>`;
         }
+        // If no specific item URL, but text exists, just return styled text
         return `<span class="${cls}">${text || '--'}</span>`;
     };
 
@@ -618,9 +646,9 @@
 
         $('reverify-btn').onclick = () => runAudit($('h-name').innerText, true);
 
-        document.querySelectorAll('.enhance-btn').forEach(btn => {
+        // FIX: Selector only gets buttons that are NOT the reverify button
+        document.querySelectorAll('.enhance-btn:not(#reverify-btn)').forEach(btn => {
             btn.onclick = function(e) {
-                if(this.id === 'reverify-btn') return;
                 const section = this.dataset.section;
                 runAudit($('h-name').innerText, true, section, this);
                 e.stopPropagation(); // Stop header click overlap
@@ -655,20 +683,66 @@
                 $('report-view').classList.add('hidden');
                 $('loader-view').classList.remove('hidden');
 
-                // Start professional text cycle
-                const steps = [
-                    "Authenticating with global registries...",
-                    "Querying federal & state databases...",
-                    "Aggregating regulatory filings...",
-                    "Cross-referencing litigation records...",
-                    "Analyzing sentiment & reputation...",
-                    "Finalizing forensic dossier..."
+                // RESET LOGS
+                const logBox = $('audit-log');
+                logBox.innerHTML = '';
+                
+                // LOGGING UTILS
+                const addLog = (msg, type='info') => {
+                    const div = document.createElement('div');
+                    div.className = 'log-line flex gap-2';
+                    let color = 'text-zinc-300';
+                    if(type === 'success') color = 'text-emerald-400';
+                    if(type === 'warn') color = 'text-amber-400';
+                    
+                    div.innerHTML = `<span class="text-zinc-500 select-none">[${new Date().toLocaleTimeString('en-US', {hour12:false, hour:"2-digit", minute:"2-digit", second:"2-digit"})}.${Math.floor(Math.random()*999)}]</span> <span class="${color}">${msg}</span>`;
+                    logBox.appendChild(div);
+                    logBox.scrollTop = logBox.scrollHeight;
+                };
+
+                // STEP SEQUENCE (Startup)
+                const startSteps = [
+                    "Initializing secure handshake (TLS 1.3)...",
+                    `Resolving entity GUID for '${name}'...`,
+                    "Connecting to Global Business Registry...",
+                    "Authenticating with SOS databases...",
+                    "Parsing EDGAR financial filings...",
+                    "Querying federal litigation dockets (PACER)...",
+                    "Scanning international sanctions lists (OFAC)...",
+                    "Running sentiment analysis on consumer reviews..."
                 ];
+
+                // RANDOM PROCESSING LOGS (Loop while waiting)
+                const processingSteps = [
+                    "Cross-referencing beneficial ownership...",
+                    "Vectorizing text data for sentiment analysis...",
+                    "Decrypting SSL certificate chain...",
+                    "Analyzing shell company indicators...",
+                    "Verifying registered agent physical address...",
+                    "Checking bankruptcy court records...",
+                    "Validating domain DNS records...",
+                    "Scanning for adverse media...",
+                    "Compiling executive leadership profiles...",
+                    "Detecting known bad actor associations...",
+                    "Triangulating geolocation data...",
+                    "Parsing HTML metadata from corporate site..."
+                ];
+
                 let stepIdx = 0;
+                
+                // Start the "Loop"
                 loaderInterval = setInterval(() => {
-                    $('loader-step').innerText = steps[stepIdx];
-                    stepIdx = (stepIdx + 1) % steps.length;
-                }, 1200);
+                    if (stepIdx < startSteps.length) {
+                        addLog(startSteps[stepIdx]);
+                        stepIdx++;
+                    } else {
+                        // Random "keep alive" log every ~800ms
+                        if(Math.random() > 0.3) {
+                             const randomMsg = processingSteps[Math.floor(Math.random() * processingSteps.length)];
+                             addLog(randomMsg, 'info');
+                        }
+                    }
+                }, 200); // Fast initial scroll, then random updates
             }
 
             // PROMPT GENERATION
@@ -678,7 +752,8 @@
             
             let specificInstr = `
                 GLOBAL REQUIREMENT: Populate all JSON fields. Use real world data found via search tools.
-                CRITICAL INSTRUCTION: For the "reviews" array, you MUST find and summarize AT LEAST 6 distinct reviews from different sources (Reddit, Glassdoor, Trustpilot, Google Maps, BBB, Yelp, Industry Forums). Look for sentiment, specific complaints, or praise.
+                CRITICAL INSTRUCTION 1: For the "reviews" array, you MUST find and summarize AT LEAST 6 distinct reviews from different sources (Reddit, Glassdoor, Trustpilot, Google Maps, BBB, Yelp, Industry Forums). Look for sentiment, specific complaints, or praise.
+                CRITICAL INSTRUCTION 2: For "leadership", aggressively extrapolate business OWNERS, FOUNDERS, and PARTNERS. If exact ownership isn't public, infer from titles like "Member", "Principal", "Managing Director" or news reports.
                 REQUIRED JSON SCHEMA (Output ONLY Valid JSON). Output PURE JSON. No intro. No markdown.
             `;
             
@@ -695,28 +770,46 @@
                 {
                     "meta": { "memo": "Forensic summary (3 sentences).", "trustScore": 0-1000 (integer), "status": "Active/Inactive/Warning" },
                     "info": { "name": "string", "location": "string", "website": "string", "phone": "string" },
-                    "sos": { "name": "Legal Name", "id": "File ID", "date": "YYYY-MM-DD", "state": "string", "agent": "string", "url": "string" },
-                    "leadership": { "executives": [{"name": "string", "role": "string", "notes": "background notes", "url": "linkedin/bio url"}] },
-                    "digital": { "domain": "string", "age": "string", "tech": ["string"], "url": "string" },
-                    "litigation": [{"type": "string", "case_id": "string", "parties": "string", "date": "string", "status": "string", "url": "string"}],
+                    "sos": { 
+                        "name": "Legal Name", "id": "File ID", "date": "YYYY-MM-DD", "state": "string", "agent": "string", "url": "string",
+                        "analysis": "2-3 sentences of expert analysis on corporate structure/standing."
+                    },
+                    "leadership": { 
+                        "executives": [{"name": "string", "role": "string", "notes": "background notes - note ownership status if applicable", "url": "linkedin/bio url"}],
+                        "analysis": "2-3 sentences analyzing the leadership team's experience, specifically highlighting identified owners or partners."
+                    },
+                    "digital": { 
+                        "domain": "string", "age": "string", "tech": ["string"], "url": "string",
+                        "analysis": "2-3 sentences analyzing the digital maturity and web presence."
+                    },
+                    "litigation": {
+                        "cases": [{"type": "string", "case_id": "string", "parties": "string", "date": "string", "status": "string", "url": "string"}],
+                        "analysis": "2-3 sentences summarizing legal risks and litigation history."
+                    },
                     "reputation": { 
                         "bbb": { "grade": "string", "accredited": "Yes/No", "complaints": "string", "summary": "string", "url": "string" },
-                        "reviews": [{"source": "string", "rating": "string", "text": "string (summary of review)", "url": "string"}] 
+                        "reviews": [{"source": "string", "rating": "string", "text": "string (summary of review)", "url": "string"}],
+                        "analysis": "2-3 sentences analyzing overall consumer sentiment and brand reputation."
                     },
-                    "compliance": { "ofac": "Clean/Hit", "govContracts": "Yes/No" },
+                    "compliance": { 
+                        "ofac": "Clean/Hit", "govContracts": "Yes/No", "url": "string",
+                        "analysis": "2-3 sentences on regulatory standing and government interaction."
+                    },
                     "sources": [{"title": "string", "url": "string"}]
                 }
             `;
 
+            // Minimum wait time for "Dramatic Effect"
+            const startTime = Date.now();
+            const MIN_ANIMATION_MS = 4500;
+
             try {
-                // Using standard model to ensure availability
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
                         tools: [{ google_search: {} }], // Enable grounding
-                        // generationConfig: { responseMimeType: "application/json" } // REMOVED to fix conflict with tools
                     })
                 });
                 
@@ -726,6 +819,13 @@
                 }
                 
                 const data = await response.json();
+                
+                // FORCE WAIT if API was too fast
+                const elapsed = Date.now() - startTime;
+                if(elapsed < MIN_ANIMATION_MS && !focusSection) {
+                    await new Promise(r => setTimeout(r, MIN_ANIMATION_MS - elapsed));
+                }
+
                 let jsonRaw = data.candidates[0].content.parts[0].text;
 
                 // Robust JSON extraction
@@ -737,10 +837,9 @@
                 }
                 
                 jsonRaw = jsonRaw.substring(startIndex, endIndex + 1);
-
                 const resultData = JSON.parse(jsonRaw);
 
-                // Fallback source links if Google grounding metadata exists
+                // Fallback source links
                 if(data.candidates[0].groundingMetadata?.webSearchQueries) {
                    const queries = data.candidates[0].groundingMetadata.webSearchQueries;
                    if((!resultData.sources || resultData.sources.length === 0)) {
@@ -771,6 +870,9 @@
             $('report-view').classList.remove('hidden');
             $('search-view').classList.add('hidden');
 
+            // Calculate Trust Score First to determine gradient
+            const score = data.meta.trustScore || 0;
+            
             // Helper for simple text
             const txt = (id, val) => { 
                 const el = $(id); 
@@ -788,6 +890,16 @@
             const html = (id, val) => { 
                 const el = $(id);
                 if(el) el.innerHTML = val || '--'; 
+            };
+            
+            // HELPER FOR ANALYSIS (Uses simple grey italics)
+            const renderAnalysis = (text) => {
+                if (!text) return '';
+                return `
+                <div class="mt-4 pt-3 border-t border-zinc-100">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">AI Insight</h4>
+                    <p class="text-sm font-medium italic text-zinc-500 leading-relaxed">${cleanMd(text)}</p>
+                </div>`;
             };
 
             // Markdown Cleaner for Summaries
@@ -824,21 +936,26 @@
 
             // GAUGE
             txt('g-score', data.meta.trustScore);
-            const score = data.meta.trustScore || 0;
             const circle = $('g-circle-progress');
             const circumference = 283;
             const offset = 283 - ((score / 1000) * 283);
-            circle.style.strokeDashoffset = offset;
-            // Color logic
-            circle.style.stroke = score > 700 ? '#10b981' : score > 500 ? '#f59e0b' : '#ef4444';
+            
+            // Trigger animation after small delay
+            setTimeout(() => {
+                circle.style.strokeDashoffset = offset;
+                // Color logic
+                circle.style.stroke = score > 700 ? '#10b981' : score > 500 ? '#f59e0b' : '#ef4444';
+            }, 100);
+            
             $('g-badge').innerText = score > 700 ? 'Low Risk' : score > 500 ? 'Med Risk' : 'High Risk';
 
             // SOS
             html('c-name', makeLink(data.sos.name, data.sos.url));
-            txt('c-id', data.sos.id);
-            txt('c-state', data.sos.state);
-            txt('c-date', data.sos.date);
-            txt('c-agent', data.sos.agent);
+            html('c-id', makeLink(data.sos.id, data.sos.url, 'font-mono bg-zinc-100 px-2 py-1 rounded inline-block text-sm hover:underline hover:bg-zinc-200 transition-colors text-zinc-700'));
+            html('c-state', makeLink(data.sos.state, data.sos.url, 'value-text hover:underline'));
+            html('c-date', makeLink(data.sos.date, data.sos.url, 'value-text hover:underline'));
+            html('c-agent', makeLink(data.sos.agent, data.sos.url, 'text-sm hover:underline'));
+            html('c-analysis', renderAnalysis(data.sos.analysis));
 
             if(data.sos.date) {
                 $('h-founded-container').classList.remove('hidden');
@@ -858,34 +975,38 @@
                     </div>`;
                 });
             } else { leadList.innerHTML = '<span class="text-zinc-400 italic text-sm col-span-2">No public leadership records located.</span>'; }
-
-            // FINANCIALS REMOVED
+            html('l-analysis', renderAnalysis(data.leadership.analysis));
 
             // LITIGATION
+            // Note: Litigation is now an object { cases: [], analysis: "" }
+            const litigationCases = data.litigation?.cases || []; // Safely access cases
             const legalRows = $('legal-rows');
             legalRows.innerHTML = '';
-            if(data.litigation && data.litigation.length) {
+            
+            if(litigationCases.length) {
                 $('legal-empty').classList.add('hidden');
-                data.litigation.forEach(row => {
+                litigationCases.forEach(row => {
                     legalRows.innerHTML += `
                     <tr>
                         <td><span class="bg-zinc-100 text-zinc-600 text-[10px] px-2 py-1 rounded font-bold uppercase border border-zinc-200">${row.type}</span></td>
                         <td class="font-mono text-xs">${makeLink(row.case_id, row.url, 'text-blue-600 hover:underline')}</td>
-                        <td class="text-xs font-medium text-zinc-700 truncate max-w-[200px]">${row.parties}</td>
+                        <td class="text-xs font-medium text-zinc-700 truncate max-w-[200px]">${makeLink(row.parties, row.url, 'hover:underline')}</td>
                         <td class="text-xs text-zinc-500">${row.date}</td>
                         <td class="text-xs font-bold text-zinc-500">${row.status}</td>
                     </tr>`;
                 });
             } else { $('legal-empty').classList.remove('hidden'); }
+            html('legal-analysis', renderAnalysis(data.litigation.analysis));
+
 
             // REPUTATION
             const bbb = data.reputation?.bbb || {};
             html('bbb-grade', makeLink(bbb.grade, bbb.url, 'hover:underline text-brand-primary'));
-            txt('bbb-status', bbb.accredited);
-            txt('bbb-complaints', bbb.complaints);
-            
-            // Use cleaner for summary
+            html('bbb-status', makeLink(bbb.accredited, bbb.url, 'value-text hover:underline'));
+            html('bbb-complaints', makeLink(bbb.complaints, bbb.url, 'value-text hover:underline'));
             html('bbb-summary', cleanMd(bbb.summary));
+            html('r-analysis', renderAnalysis(data.reputation.analysis));
+
 
             // REVIEWS (Logic for 6 items formatting)
             const revList = $('reviews-list');
@@ -917,16 +1038,21 @@
             }
 
             // DIGITAL
-            txt('d-domain', data.digital?.domain);
-            txt('d-age', data.digital?.age);
+            // Create direct link for domain, and use digital source URL for age
+            const domainUrl = data.digital?.domain ? (data.digital.domain.startsWith('http') ? data.digital.domain : 'https://' + data.digital.domain) : '#';
+            html('d-domain', makeLink(data.digital?.domain, domainUrl, 'font-mono text-brand-primary truncate font-bold text-sm hover:underline'));
+            html('d-age', makeLink(data.digital?.age, data.digital?.url, 'font-medium text-sm hover:underline'));
+            html('d-analysis', renderAnalysis(data.digital.analysis));
+            
             const techList = $('d-tech'); techList.innerHTML = '';
             (data.digital?.tech || []).forEach(t => {
                 techList.innerHTML += `<span class="text-[10px] bg-zinc-100 border border-zinc-200 px-2 py-1 rounded text-zinc-600 font-medium uppercase">${t}</span>`;
             });
 
             // COMPLIANCE
-            txt('reg-ofac', data.compliance?.ofac);
-            txt('reg-gov', data.compliance?.govContracts);
+            html('reg-ofac', makeLink(data.compliance?.ofac, data.compliance?.url, 'text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500 hover:underline hover:text-zinc-800 cursor-pointer transition-colors'));
+            html('reg-gov', makeLink(data.compliance?.govContracts, data.compliance?.url, 'text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500 hover:underline hover:text-zinc-800 cursor-pointer transition-colors'));
+            html('reg-analysis', renderAnalysis(data.compliance.analysis));
 
             // SOURCES
             const srcBox = $('source-links'); srcBox.innerHTML = '';
