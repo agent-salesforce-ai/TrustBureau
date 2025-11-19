@@ -286,7 +286,16 @@
         <p>Manage your profile, billing details, and subscription.</p>
 
         <div style="margin-bottom: 20px;">
-          <button onclick="Outseta.getUser().then(function(user) { if (user && user.Account && user.Account.Uid) { window.location.href = 'trustbureau.outseta'; } else { window.location.href = 'https://trustbureau.outseta.com/profile?tab=planChange#o-authenticated'; } })" class="subscribe-btn">
+          <button onclick="
+            var urlParams = new URLSearchParams(window.location.search);
+            var accessToken = urlParams.get('access_token');
+            var planChangeUrl = 'https://trustbureauai.outseta.com/profile?tab=planChange';
+            if (accessToken) {
+              planChangeUrl += '&access_token=' + accessToken;
+            }
+            planChangeUrl += '#o-authenticated';
+            window.location.href = planChangeUrl;
+          " class="subscribe-btn">
             Subscribe
           </button>
         </div>
