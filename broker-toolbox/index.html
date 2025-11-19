@@ -20,6 +20,72 @@
   </script>
   <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
 
+  <!-- Auth Protection -->
+  <script>
+    // Check subscription and trial status
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const user = await Outseta.getUser();
+        
+        if (!user) {
+          // Not logged in - redirect to login
+          window.location.href = 'https://trustbureauai.outseta.com/auth';
+          return;
+        }
+
+        // Check subscription plan
+        let planName = 'Free Trial';
+        let subscriptionStartDate = null;
+
+        // Get plan info from user object
+        if (user.Account && user.Account.CurrentSubscription) {
+          const currentSubscription = user.Account.CurrentSubscription;
+          if (currentSubscription.Plan && currentSubscription.Plan.Name) {
+            planName = currentSubscription.Plan.Name;
+          }
+          if (currentSubscription.StartDate) {
+            subscriptionStartDate = currentSubscription.StartDate;
+          }
+        }
+
+        console.log('Plan:', planName);
+        console.log('Start date:', subscriptionStartDate);
+
+        // If paid plan "Broker Box", allow full access
+        if (planName === 'Broker Box') {
+          console.log('User has Broker Box plan - full access granted');
+          return;
+        }
+
+        // If Free Trial, check if expired (3 days)
+        if (planName === 'Free Trial' && subscriptionStartDate) {
+          const startDate = new Date(subscriptionStartDate);
+          const trialEndDate = new Date(startDate);
+          trialEndDate.setDate(trialEndDate.getDate() + 3); // 3 day trial
+          const today = new Date();
+
+          console.log('Trial start:', startDate);
+          console.log('Trial end:', trialEndDate);
+          console.log('Today:', today);
+
+          if (today > trialEndDate) {
+            // Trial expired - redirect to upgrade
+            console.log('Trial expired - redirecting to subscribe');
+            alert('Your 3-day free trial has expired. Please subscribe to continue using Broker Box.');
+            window.location.href = 'https://trustbureauai.outseta.com/profile?tab=planChange#o-authenticated';
+            return;
+          } else {
+            console.log('Free trial still active');
+          }
+        }
+
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        window.location.href = 'https://trustbureauai.outseta.com/auth';
+      }
+    });
+  </script>
+
   <style>
     :root {
       --accent-color: #10b981;
@@ -227,13 +293,13 @@
   <!-- TOOLS GRID -->
   <div class="tools-grid">
     
-    <a href="/offer-calculator" class="tool-card" id="offerCalc">
+    <a href="/approval-calculator" class="tool-card" id="offerCalc">
       <div class="tool-icon">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
         </svg>
       </div>
-      <h2 class="tool-title">Offer Calculator</h2>
+      <h2 class="tool-title">Approval Calculator</h2>
       <p class="tool-description">Calculate accurate offer amounts and terms for your clients</p>
     </a>
 
@@ -252,7 +318,7 @@
 </div>
 
 <script>
-  // Load saved branding
+  // Load branding from localStorage
   (function() {
     var STORAGE_COLOR_KEY = 'tbAccentColor';
     
