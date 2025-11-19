@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRUST BUREAU</title>
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Light Mode (Paper Style) */
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #000000;
+            --input-bg: #ffffff;
+            --input-border: #333333;
+            --input-focus: #f0f0f0;
+            --btn-bg: #ffffff;
+            --btn-hover: #eeeeee;
+            --btn-text: #000000;
+            --log-bg: #ffffff;
+            --log-border: #eeeeee;
+            --strong-bg: #eeeeee;
+            --interact-bg: #f9f9f9;
+            --interact-border: #cccccc;
+            --time-color: #666666;
+            --err-color: #D00000;
+            --success-color: #006400;
+            --user-query: #00008B;
+        }
+
+        body.dark-mode {
+            /* Dark Mode (AMOLED / True Black) */
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --border-color: #ffffff;
+            --input-bg: #000000;
+            --input-border: #555555;
+            --input-focus: #111111;
+            --btn-bg: #000000;
+            --btn-hover: #222222;
+            --btn-text: #ffffff;
+            --log-bg: #000000;
+            --log-border: #333333;
+            --strong-bg: #222222;
+            --interact-bg: #000000;
+            --interact-border: #444444;
+            --time-color: #888888;
+            --err-color: #ff3333;
+            --success-color: #00ff00;
+            --user-query: #87CEEB;
+        }
+
+        /* BASE SETTINGS */
+        * { box-sizing: border-box; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: 'Courier New', Courier, monospace; 
+            padding: 40px; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            margin: 0;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* CONTAINER */
+        .container { 
+            max-width: 850px; 
+            margin: 0 auto; 
+            border: 2px solid var(--border-color); 
+            padding: 30px; 
+            position: relative;
+        }
+
+        /* HEADER */
+        .header { 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 20px; 
+            margin-bottom: 30px; 
+            text-align: center; 
+            font-weight: 900; 
+            letter-spacing: 4px; 
+            font-size: 24px;
+            text-transform: uppercase;
+            position: relative;
+        }
+        
+        /* THEME TOGGLE ICON */
+        .theme-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .theme-btn:hover { opacity: 1; background: transparent; }
+        .theme-btn svg { width: 100%; height: 100%; fill: currentColor; }
+
+        /* LABELS */
+        .label { 
+            font-weight: 900; 
+            text-decoration: underline;
+            margin-bottom: 8px;
+            font-size: 12px; 
+            text-transform: uppercase;
+            display: block;
+        }
+        
+        /* INPUTS */
+        input, select { 
+            width: 100%; 
+            background: var(--input-bg); 
+            color: var(--text-color); 
+            border: 1px solid var(--input-border); 
+            padding: 12px; 
+            font-family: inherit; 
+            font-weight: bold;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 20px;
+        }
+        input:focus, select:focus { 
+            border-color: var(--border-color); 
+            background: var(--input-focus); 
+        }
+
+        /* BUTTONS */
+        button {
+            width: 100%;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            font-family: inherit;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 13px;
+            transition: background 0.1s;
+        }
+        button:hover { background: var(--btn-hover); }
+        button:active { opacity: 0.8; }
+
+        /* INTERACTION AREA */
+        .interaction-box {
+            border: 1px solid var(--interact-border);
+            background: var(--interact-bg);
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .q-input-group { display: flex; gap: 10px; border-top: 1px solid var(--interact-border); padding-top: 10px; }
+        .q-input { margin-bottom: 0; border: 1px solid var(--input-border); font-size: 13px; }
+        
+        /* LAYOUT */
+        .section { margin-bottom: 30px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* LOGS */
+        #console {
+            height: 600px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 13px;
+            white-space: pre-wrap;
+            background: var(--log-bg);
+        }
+        .log-entry { 
+            margin-bottom: 15px; 
+            border-bottom: 1px solid var(--log-border); 
+            padding-bottom: 10px; 
+        }
+        .log-time { font-weight: normal; color: var(--time-color); margin-right: 10px; font-size: 11px; }
+        
+        /* TEXT STYLES */
+        .strong { font-weight: 900; color: var(--text-color); background-color: var(--strong-bg); padding: 0 4px; }
+        .key { font-weight: bold; text-transform: uppercase; }
+        .user-query { color: var(--user-query); font-weight: bold; font-style: italic; }
+        
+        /* ERROR / SUCCESS */
+        .err { color: var(--err-color); font-weight: bold; }
+        .success { color: var(--success-color); font-weight: bold; }
+
+        /* UTILS */
+        .hidden { display: none; }
+        #status-bar { margin-top: 5px; font-size: 11px; text-align: right; color: var(--time-color); }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); border-left: 1px solid var(--border-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle Theme">
+        <!-- Moon/Sun Icon -->
+        <svg viewBox="0 0 24 24">
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+        </svg>
+    </button>
+    
+    <div class="header">
+        Trust Bureau
+    </div>
+
+    <!-- CONFIGURATION -->
+    <div class="section" id="config-panel">
+        <div class="label">1.0 Credentials</div>
+        <input type="password" id="api-key" placeholder="Paste Google API Key..." />
+        
+        <select id="model-select">
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Standard)</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (High Reasoning)</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fallback)</option>
+        </select>
+
+        <div class="grid-2">
+            <button onclick="saveAndConnect()">Connect</button>
+            <button onclick="clearData()">Clear Key</button>
+        </div>
+        <div id="status-bar">Disconnected</div>
+    </div>
+
+    <!-- OPERATIONS -->
+    <div class="section hidden" id="ops-panel">
+        <div class="label">2.0 Subject Target</div>
+        <input type="text" id="target-input" placeholder="Enter Name / Entity..." onkeydown="if(event.key==='Enter') runScan()"/>
+        
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <button onclick="runScan()" style="border-width: 3px;">BEGIN DOSSIER</button>
+            <button onclick="resetAll()" style="border-style: dashed;">New Target / Reset</button>
+        </div>
+        
+        <div class="label">3.0 Investigation Modules</div>
+        <div class="grid-2">
+            <button onclick="deepScan('REGISTRY')">Registry (SOS)</button>
+            <button onclick="deepScan('LEGAL')">Legal / Dockets</button>
+            <button onclick="deepScan('REVIEWS')">Reviews / Reputation</button>
+            <button onclick="deepScan('UCC')">UCC / Liens</button>
+        </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="label">4.0 Investigation Log</div>
+    <div id="console">System initialized. Waiting for credentials...</div>
+</div>
+
+<script>
+    // --- STATE ---
+    const STORAGE_KEY = 'tb_prod_1';
+    let CURRENT_KEY = '';
+    let CURRENT_MODEL = 'gemini-2.5-flash';
+    let CURRENT_TARGET = '';
+
+    // --- WORKFLOW MAP ---
+    const NEXT_STEP = {
+        'BASE': { next: 'REGISTRY', label: 'Run Next: Registry >>' },
+        'REGISTRY': { next: 'LEGAL', label: 'Run Next: Legal >>' },
+        'LEGAL': { next: 'REVIEWS', label: 'Run Next: Reviews >>' },
+        'REVIEWS': { next: 'UCC', label: 'Run Next: UCC / Judgments >>' },
+        'UCC': { next: null, label: 'All Modules Complete.' }
+    };
+
+    // --- DOM ---
+    const consoleDiv = document.getElementById('console');
+    const apiKeyInput = document.getElementById('api-key');
+    const modelSelect = document.getElementById('model-select');
+    const statusLabel = document.getElementById('status-bar');
+    const opsPanel = document.getElementById('ops-panel');
+
+    // --- STARTUP ---
+    window.onload = () => {
+        // Load Theme
+        const savedTheme = localStorage.getItem('tb_theme');
+        if(savedTheme === 'dark') document.body.classList.add('dark-mode');
+
+        // Load Key
+        const savedKey = localStorage.getItem(STORAGE_KEY);
+        if (savedKey) {
+            apiKeyInput.value = savedKey;
+            CURRENT_KEY = savedKey;
+            log("Credentials found. Connecting...", "success");
+            verifyConnection();
+        }
+    };
+
+    // --- THEME LOGIC ---
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('tb_theme', isDark ? 'dark' : 'light');
+    }
+
+    // --- HELPERS ---
+    function log(msg, type = '') {
+        const time = new Date().toLocaleTimeString([], { hour12: false });
+        const formattedMsg = msg.replace(/\*\*(.*?)\*\*/g, '<span class="strong">$1</span>');
+        
+        const div = document.createElement('div');
+        div.className = `log-entry ${type}`;
+        div.innerHTML = `<span class="log-time">${time}</span> ${formattedMsg}`;
+        consoleDiv.appendChild(div);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        return div;
+    }
+
+    function saveAndConnect() {
+        const k = apiKeyInput.value.trim();
+        if (k.length < 10) return log("Error: Key too short", "err");
+        
+        localStorage.setItem(STORAGE_KEY, k);
+        CURRENT_KEY = k;
+        CURRENT_MODEL = modelSelect.value;
+        
+        log("Key saved locally.");
+        verifyConnection();
+    }
+
+    function clearData() {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+    }
+
+    function resetAll() {
+        document.getElementById('target-input').value = '';
+        document.getElementById('target-input').focus();
+        window.scrollTo(0, 0);
+    }
+
+    async function verifyConnection() {
+        try {
+            await callGemini("Reply 'ACK'.");
+            log("Connection Verified.", "success");
+            opsPanel.classList.remove('hidden');
+            statusLabel.textContent = `Connected: ${CURRENT_MODEL}`;
+            document.getElementById('target-input').focus();
+        } catch (e) {
+            log(`Connection Failed: ${e.message}`, "err");
+            statusLabel.textContent = "Connection Error";
+        }
+    }
+
+    // --- MAIN SCAN ---
+    async function runScan() {
+        const target = document.getElementById('target-input').value.trim();
+        if(!target) return log("Please enter a target.", "err");
+        CURRENT_TARGET = target;
+
+        document.querySelectorAll('.interaction-box').forEach(e => e.remove());
+
+        log(`Building Dossier: <span class="strong">${target.toUpperCase()}</span>...`);
+        
+        const prompt = `
+            Investigate "${target}" using Google Search.
+            Find: Legal Name, HQ Location, Operational Status, Incorporation Date (Start Date), and Trust Score (0-100).
+            Output strictly Valid JSON:
+            { 
+                "name": "Legal Name", 
+                "location": "HQ", 
+                "status": "Active/Defunct", 
+                "start_date": "YYYY-MM-DD or Unknown",
+                "score": 0-100, 
+                "summary": "2 sentence summary" 
+            }
+        `;
+
+        try {
+            const raw = await callGemini(prompt);
+            const data = JSON.parse(cleanJSON(raw));
+            
+            const report = `
+<span class="key">SUBJECT:</span>   <span class="strong">${data.name}</span>
+<span class="key">LOCATION:</span>  ${data.location}
+<span class="key">STATUS:</span>    ${data.status}
+<span class="key">FOUNDED:</span>   ${data.start_date}
+<span class="key">TRUST:</span>     <span class="strong">${data.score}/100</span>
+
+<span class="key">SUMMARY:</span>   ${data.summary}
+            `;
+            
+            log(report.trim());
+            appendInteractionArea('REGISTRY', 'BASE');
+            
+        } catch (e) {
+            log(`Scan Failed: ${e.message}`, "err");
+        }
+    }
+
+    // --- DEEP SCANS ---
+    async function deepScan(type) {
+        if(!CURRENT_TARGET) return log("No target selected.", "err");
+        
+        document.querySelectorAll('.interaction-box').forEach(e => e.remove());
+        log(`Running Module: <span class="strong">${type}</span>...`);
+        
+        let prompt = "";
+        
+        switch(type) {
+            case 'REGISTRY': 
+                prompt = `Search "${CURRENT_TARGET}" Secretary of State filings. Return a list. Use **bold** for the **Entity ID**, **Registered Agent**, and **State of Formation**.`; 
+                break;
+            case 'LEGAL': 
+                prompt = `Search "${CURRENT_TARGET}" litigation and court dockets. Return a list. Use **bold** for **Case Names** (e.g. **Name v. Name**) and **Docket Numbers**.`; 
+                break;
+            case 'REVIEWS': 
+                prompt = `Search "${CURRENT_TARGET}" reviews. Return a list. Use **bold** for the **Source** and **Rating**. Highlight recurring complaints in **bold**.`; 
+                break;
+            case 'UCC': 
+                prompt = `Search for public records of tax liens, civil judgments, bankruptcies, and Uniform Commercial Code (UCC) filings for "${CURRENT_TARGET}". Look for secured debt and tax warrants. Return a list. Use **bold** for **Dates** and **Amounts**.`; 
+                break;
+        }
+        
+        try {
+            const raw = await callGemini(prompt);
+            // Indent findings
+            log(`<div style="margin-left: 15px; border-left: 2px solid var(--border-color); padding-left: 10px;">${raw}</div>`);
+            
+            const flow = NEXT_STEP[type];
+            appendInteractionArea(flow ? flow.next : null, type);
+
+        } catch (e) {
+            log(`Module Failed: ${e.message}`, "err");
+        }
+    }
+
+    // --- FOLLOW UP LOGIC ---
+    async function runFollowUp(btn) {
+        const input = btn.previousElementSibling;
+        const question = input.value.trim();
+        if(!question) return;
+
+        const parentBox = btn.closest('.interaction-box');
+        const currentType = parentBox.dataset.type;
+        const nextType = parentBox.dataset.next;
+
+        document.querySelectorAll('.interaction-box').forEach(e => e.remove());
+
+        log(`<span class="user-query">Q: ${question}</span>`);
+        log("Researching query...");
+
+        const prompt = `Context: Forensic investigation of "${CURRENT_TARGET}".
+        User Question: "${question}".
+        Instructions: Answer the question using Google Search. Be concise and specific. Use **bold** for key facts.`;
+
+        try {
+            const raw = await callGemini(prompt);
+            log(raw);
+            appendInteractionArea(nextType, currentType);
+        } catch(e) {
+            log("Answer generation failed.", "err");
+        }
+    }
+
+    // --- UI COMPONENT: INTERACTION AREA ---
+    function appendInteractionArea(nextType, currentType) {
+        const container = document.createElement('div');
+        container.className = 'interaction-box';
+        container.dataset.type = currentType;
+        container.dataset.next = nextType || '';
+        
+        let html = `<div class="btn-row">`;
+        
+        // 1. Re-Run Current (Left)
+        const rerunAction = (currentType === 'BASE') ? `runScan()` : `deepScan('${currentType}')`;
+        const rerunLabel = (currentType === 'BASE') ? `RE-RUN BASE DOSSIER` : `RE-RUN ${currentType}`;
+        
+        html += `<button onclick="${rerunAction}" style="background:var(--bg-color); border:1px dashed var(--input-border); color:var(--text-color);">${rerunLabel}</button>`;
+        
+        // 2. Run Next Button (Right)
+        if(nextType) {
+            const label = NEXT_STEP[currentType]?.label || `Run Next: ${nextType}`;
+            html += `<button onclick="deepScan('${nextType}')" style="background:var(--interact-bg); border:2px solid var(--border-color);">${label}</button>`;
+        } else {
+            html += `<button disabled style="opacity:0.5; cursor:default;">End of Sequence</button>`;
+        }
+        
+        html += `</div>`;
+
+        // 3. Question Input
+        html += `
+            <div class="q-input-group">
+                <input type="text" class="q-input" placeholder="Ask a follow-up question about ${CURRENT_TARGET}..." onkeydown="if(event.key==='Enter') this.nextElementSibling.click()">
+                <button onclick="runFollowUp(this)" style="width: auto; padding: 0 20px;">ASK</button>
+            </div>
+        `;
+
+        container.innerHTML = html;
+        consoleDiv.appendChild(container);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+
+    // --- API CORE ---
+    async function callGemini(text) {
+        CURRENT_MODEL = modelSelect.value;
+        let url = `https://generativelanguage.googleapis.com/v1beta/models/${CURRENT_MODEL}:generateContent?key=${CURRENT_KEY}`;
+        let response = await fetchReq(url, text);
+        
+        if (response.status === 404) {
+            log(`Model ${CURRENT_MODEL} unavailable. Switching to 1.5-flash...`, "err");
+            url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CURRENT_KEY}`;
+            response = await fetchReq(url, text);
+        }
+
+        if (!response.ok) {
+            const errBody = await response.json();
+            throw new Error(errBody.error?.message || response.statusText);
+        }
+
+        const json = await response.json();
+        const content = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if(!content) throw new Error("No data returned.");
+        return content;
+    }
+
+    function fetchReq(url, text) {
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: text }] }],
+                tools: [{ google_search: {} }]
+            })
+        });
+    }
+
+    function cleanJSON(str) {
+        return str.replace(/```json/g, '').replace(/```/g, '').trim();
+    }
+</script>
+
+</body>
+</html>
