@@ -1,1149 +1,1026 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Live AI Business Report — TrustBureau.ai</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Bureau - Forensic Report</title>
+  <meta name="theme-color" content="#F8FAFC">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            heading: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          },
-          colors: {
-            'brand-green': '#00C09A',
-            'brand-dark':  '#101418',
-            'brand-gray':  '#6B7280',
-            'brand-light': '#F8F9FA',
-            'brand-border':'#E5E7EB',
-          },
-          boxShadow: { card: '0 10px 24px rgba(0,0,0,.06)' }
-        }
-      }
-    }
-  </script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Added weight 900 (Black) to Plus Jakarta Sans for the heavy logo text -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <style>
-    html { scroll-behavior: smooth; }
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background:white; }
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            'brand-yellow': '#FACC15',
+            'brand-dark': '#0F172A',
+            'brand-gray': '#64748B',
+            'brand-bg': '#F8FAFC',
+            'brand-border': '#E2E8F0',
+          },
+          backgroundImage: {
+            'grid-pattern': "radial-gradient(#E2E8F0 1px, transparent 1px)",
+          },
+          backgroundSize: {
+            'grid-pattern': '24px 24px',
+          }
+        },
+      },
+    };
+  </script>
 
-    .widget-card{border:1px solid #E5E7EB;border-radius:.75rem;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.06)}
-    .cta-button { transition: all .25s ease; }
-    .cta-button:hover { transform: translateY(-1px); box-shadow:0 12px 20px rgba(0,192,154,.15); }
-    .cta-disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
+  <style>
+    /* UTILS */
+    :root { --tb-yellow: #FACC15; }
+    body { background-color: #F8FAFC; color: #0F172A; }
+    .forensic-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .forensic-table th { text-align: left; padding: 10px 12px; background: #F8FAFC; color: #64748B; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0; white-space: nowrap; }
+    .forensic-table td { padding: 10px 12px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
+    .forensic-table tr:last-child td { border-bottom: none; }
+    
+    /* GAUGE */
+    .risk-gauge {
+      width: 140px; height: 140px; border-radius: 50%; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      border: 8px solid #E2E8F0; font-family: 'Plus Jakarta Sans'; 
+      background: #fff; transition: all 1s ease;
+    }
+    .risk-high { border-color: #EF4444; background-color: #FEF2F2; color: #B91C1C; }
+    .risk-med  { border-color: #FACC15; background-color: #FEFCE8; color: #854D0E; }
+    .risk-low  { border-color: #22C55E; background-color: #F0FDF4; color: #15803D; }
 
-    .score-circle{width:120px;height:120px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.25rem;border:8px solid}
-    .score-red{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
-    .score-yellow{border-color:#FDE68A;color:#D97706;background:#FFFBEB}
-    .score-green{border-color:#A7F3D0;color:#059669;background:#ECFDF5}
+    /* CHARTS */
+    .chart-container { height: 100px; display: flex; align-items: flex-end; gap: 4px; }
+    .bar { flex: 1; background: #E2E8F0; border-radius: 2px 2px 0 0; position: relative; min-height: 2px; transition: height 1s ease; }
+    .bar:hover { background: #FACC15; }
 
-    .step-icon{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border-radius:9999px;background:#E5E7EB;color:#fff;flex:none;margin-top:.2rem}
-    .step-icon.done{background:#059669}
-    .step-icon>svg{width:.7rem;height:.7rem;display:none}
-    .step-icon.done>svg{display:block}
-    .loader-bar{height:.5rem;border-radius:9999px;background:#E5E7EB;overflow:hidden}
-    .loader-bar>span{display:block;height:100%;background:#00C09A;width:6%;transition:width .6s ease}
+    /* LOADER */
+    .scan-line { width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #FACC15, transparent); animation: scan 1.5s linear infinite; }
+    @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    
+    /* ENHANCE BTN - YELLOW THEME */
+    .enhance-btn {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: #854D0E; /* yellow-900ish */
+        border: 1px solid #FDE047; /* yellow-300 */
+        background: #FEFCE8; /* yellow-50 */
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .enhance-btn:hover:not(:disabled) {
+        color: #0F172A; /* brand-dark */
+        border-color: #FACC15; /* brand-yellow */
+        background: #FACC15; /* brand-yellow */
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(250, 204, 21, 0.2);
+    }
+    .enhance-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        filter: grayscale(100%);
+    }
+    .enhance-btn svg {
+        color: #EAB308; /* yellow-600 */
+    }
+    .enhance-btn:hover svg {
+        color: #0F172A;
+    }
 
-    .radar { width:72px;height:72px;border-radius:9999px;position:relative;border:2px solid #E5E7EB;overflow:hidden;
-      background: radial-gradient(closest-side, rgba(0,192,154,.12), transparent 70%),
-                  conic-gradient(from 0deg, rgba(0,192,154,0) 0deg, rgba(0,192,154,.35) 35deg, rgba(0,192,154,0) 36deg);
-      animation: radar-spin 1.5s linear infinite; }
-    .radar::before{content:"";position:absolute;inset:10%;border-radius:9999px;box-shadow:0 0 0 1px rgba(0,192,154,.12) inset,0 0 0 22px rgba(0,192,154,.06) inset}
-    @keyframes radar-spin { to { transform: rotate(360deg); } }
+    /* LINKS */
+    a.data-link {
+        color: #2563EB;
+        text-decoration: none;
+        border-bottom: 1px dotted #2563EB;
+        transition: all 0.2s;
+        word-break: break-all; /* Prevent long URLs from breaking layout */
+    }
+    a.data-link:hover {
+        color: #1E40AF;
+        background-color: #EFF6FF;
+        border-bottom: 1px solid #1E40AF;
+    }
+    
+    /* SECTION OVERLAY */
+    .section-loading {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        transition: opacity 0.3s ease;
+    }
 
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .shimmer { background: linear-gradient(100deg,#F3F4F6 40%,#E5E7EB 50%,#F3F4F6 60%); background-size:200% 100%; animation:shimmer 1.15s ease-in-out infinite; }
-
-    .map-grid {
-      background-image:
-        linear-gradient(to right, rgba(17,24,39,.06) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(17,24,39,.06) 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
-
-    /* Dev error panel */
-    #dev-error {
-      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
-      max-width: 80vw; background: #111827; color: #fff; font-size: 12px;
-      border-radius: 8px; border: 1px solid #374151; padding: 10px 12px;
-      box-shadow: 0 10px 24px rgba(0,0,0,.3); display: none;
-    }
-    #dev-error b { color: #FBBF24; }
-    #dev-error a { color: #34D399; text-decoration: underline; }
-  </style>
+    /* SEARCH BACKGROUND */
+    .hero-bg {
+        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+        background-size: 32px 32px;
+    }
+  </style>
 </head>
 
-<body class="font-sans text-brand-dark">
-  <noscript>
-    <div style="padding:12px;background:#FFFBEB;border-bottom:1px solid #FDE68A;text-align:center">
-      JavaScript is disabled, so the report can’t run. Enable JS and reload.
-    </div>
-  </noscript>
-
-    <div id="dev-error"></div>
-  <script>
-    (function(){
-      const box = document.getElementById('dev-error');
-      const show = (msg) => {
-        box.style.display = 'block';
-        const pre = document.createElement('pre');
-        pre.style.whiteSpace = 'pre-wrap';
-        pre.style.margin = '4px 0 0';
-        pre.textContent = msg;
-        if (!box.firstChild) {
-          const h = document.createElement('div');
-          h.innerHTML = '<b>Script error</b> — see console for details.';
-          box.appendChild(h);
-        }
-        box.appendChild(pre);
-      };
-      window.addEventListener('error', (e) => show(`${e.message}  @ ${e.filename}:${e.lineno}:${e.colno}`));
-      window.addEventListener('unhandledrejection', (e) => show(`Unhandled rejection: ${e.reason && e.reason.message ? e.reason.message : String(e.reason)}`));
-    })();
-  </script>
-
-    <header class="bg-white/80 border-b border-brand-border sticky top-0 z-50 backdrop-blur-md">
-    <nav class="max-w-6xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-      <a href="#" class="flex items-center gap-2.5">
-        <svg width="34" height="34" viewBox="0 0 50 50" fill="none" aria-hidden="true">
-          <path d="M25 5L42.5 12.5V27.5C42.5 37.5 25 45 25 45C25 45 7.5 37.5 7.5 27.5V12.5L25 5Z" fill="#00C09A"/>
-          <path d="M17.5 25L22.5 30L32.5 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="font-heading text-xl md:text-2xl font-extrabold">TrustBureau.ai</span>
-      </a>
-      <div class="flex items-center gap-4">
-        <a href="/index.html" class="inline-flex items-center gap-2 text-sm md:text-base font-medium text-brand-dark hover:text-brand-green transition-colors">
-          <span aria-hidden="true">←</span> Back to Main
-        </a>
-        <button id="settings-btn" title="Settings" class="text-brand-gray hover:text-brand-dark transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
-      </div>
-    </nav>
-  </header>
-
-    <section class="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14">
-    <div class="max-w-3xl mx-auto text-center">
-      <h1 class="font-heading text-4xl md:text-6xl font-extrabold leading-tight">Live AI Business Report</h1>
-      <p class="text-brand-gray mt-3 md:mt-4">Search a <span class="font-semibold">US company</span>. The full report renders below.</p>
-
-      <div class="widget-card mt-7 p-4">
-        <form id="search-form" class="w-full flex flex-col sm:flex-row gap-3 justify-center" autocomplete="off">
-          <input id="business-name" type="text" placeholder="e.g., Tesla, Inc.; Taco Bell Corp.; Aquamark.io"
-                 class="flex-1 px-4 py-3 border border-brand-border rounded-lg placeholder-gray-500 focus:outline-none focus:ring-brand-green focus:border-brand-green" />
-          <button id="generate-report-btn" type="submit"
-                  class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-5 py-3 text-lg cta-button">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M17.293 15.707a1 1 0 00-1.414-1.414l-3.04-3.04A7 7 0 109 16a6.96 6.96 0 004.253-1.469l3.04 3.04a1 1 0 001.414-1.414zM9 14a5 5 0 110-10 5 5 0 010 10z"/>
-            </svg>
-            Generate
-          </button>
-        </form>
-        <p class="text-xs text-gray-500 mt-2">Tip: Use the legal name for better Secretary‑of‑State matching.</p>
-      </div>
-    </div>
-  </section>
-
-    <section id="results" class="max-w-6xl mx-auto px-4 md:px-6 pb-16">
-    <div id="report-results-container" class="max-w-6xl mx-auto" style="display:none;">
-            <div id="report-loader" style="display:none;" class="widget-card p-6 md:p-8 space-y-6" role="status" aria-live="polite" aria-busy="true">
-        <div class="flex items-center gap-5">
-          <div class="radar" aria-hidden="true"></div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-2">
-              <div class="font-heading font-semibold">Building your report…</div>
-              <div id="loader-timer" class="text-xs text-gray-500">00:00</div>
-            </div>
-            <div class="loader-bar"><span id="loader-bar" style="width:6%"></span></div>
-            <p class="text-xs text-gray-500 mt-2">Scanning public data and synthesizing a complete snapshot.</p>
-          </div>
-        </div>
-        <ol id="loader-steps" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></ol>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="skeleton-card space-y-3">
-            <div class="w-28 h-3 rounded shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-3/4 h-3 rounded shimmer"></div>
-          </div>
-          <div class="skeleton-card space-y-3">
-            <div class="w-32 h-3 rounded shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-D;         <div class="w-1/2 h-3 rounded shimmer"></div>
-          </div>
-          <div class="skeleton-card space-y-3">
-            <div class="w-36 h-3 rounded shimmer"></div>
-            <div class="w-full h-20 shimmer rounded-md"></div>
-            <div class="w-5/6 h-3 rounded shimmer"></div>
-          </div>
-        </div>
-      </div>
-                  <div id="report-error-container" style="display:none;" class="widget-card p-6 border-red-200 bg-red-50">
-        <p id="report-error-message" class="text-sm text-red-700"></p>
-      </div>
-
-            <div id="report-content" style="display:none;" class="space-y-8">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <h2 id="report-title" class="font-heading text-2xl md:text-3xl font-extrabold"></h2>
-            <p class="text-xs text-gray-500 mt-1">Live business verification snapshot</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button id="rerun" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Re‑run</button>
-            <button id="share-btn" class="inline-flex items-center justify-center gap-2 bg-gray-200 text-brand-dark font-bold rounded-lg px-4 py-2 cta-button">Share</button>
-          </div>
-        </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">AI Risk Score</h3>
-            <div class="flex flex-col items-center">
-              <div id="report-score-circle" class="score-circle mb-4"><span id="report-score-digit">—</span></div>
-              <p id="report-score-justification" class="text-center text-gray-600 text-sm mb-3 italic"></p>
-              <div class="w-full text-left">
-                <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Positives</h4>
-                <ul id="report-score-positives" class="space-y-1.5 mb-3"></ul>
-                <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Key Risks</h4>
-                <ul id="report-score-negatives" class="space-y-1.5"></ul>
-              </div>
-            </div>
-          </div>
-
-                    <div class="lg:col-span-2 widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Business Summary</h3>
-            <p id="report-summary" class="text-sm text-gray-800 leading-relaxed"></p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Corporate Filings</h4>
-                <ul class="text-sm text-gray-800 space-y-1">
-                  <li><span class="text-gray-500">Entity Name:</span> <span id="report-sos-name" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Entity Type:</span> <span id="report-sos-entity" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Status:</span> <span id="report-sos-status" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Jurisdiction:</span> <span id="report-sos-jurisdiction" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Formation Date:</span> <span id="report-sos-date" class="ml-1"></span></li>
-                  <li><span class="text-gray-500">Registered Agent:</span> <span id="report-sos-agent" class="ml-1"></span></li>
-                </ul>
-              </div>
-
-              <div class="p-4 border border-brand-border rounded-lg bg-brand-light">
-                <h4 class="text-sm font-semibold text-brand-dark mb-3">Operational Highlights</h4>
-                <ul id="report-highlights" class="space-y-2 text-sm text-gray-800"></ul>
-              </div>
-
-                            <div class="md:col-span-2 p-4 border border-brand-border rounded-lg bg-white">
-                <div class="flex items-center justify-between mb-2">
-                  <h4 class="text-sm font-semibold text-brand-dark">Recent Headlines</h4>
-                  <span id="news-updated" class="text-xs text-gray-500"></span>
-                </div>
-                <ul id="report-news-list" class="space-y-2"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Contact & Location</h3>
-            <ul class="text-sm text-gray-800 space-y-1">
-              <li><span class="text-gray-500">Phone:</span> <span id="contact-phone" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Email:</span> <span id="contact-email" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Address:</span> <span id="contact-address" class="ml-1"></span></li>
-              <li class="mt-2"><a id="contact-maplink" class="text-brand-green hover:underline text-sm" target="_blank" rel="noopener">Open in Google Maps</a></li>
-            </ul>
-          </div>
-          <div class="widget-card p-0 md:p-0 overflow-hidden">
-D;         <div id="map-shell" class="relative w-full h-[260px] md:h-[300px]">
-              <iframe id="map-iframe" title="Map" class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="display:none;"></iframe>
-              <div id="map-placeholder" class="map-grid absolute inset-0 flex items-center justify-center text-sm text-gray-500">
-                Map will appear here when a valid address is available.
-  s;           </div>
-          </div>
-        </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Company Facts</h3>
-            <ul class="text-sm text-gray-700 space-y-1">
-              <li><span class="text-gray-500">Founded:</span> <span id="facts-founded" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Headquarters:</span> <span id="facts-hq" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Employees:</span> <span id="facts-employees" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Industry:</span> <span id="facts-industry" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Ticker:</span> <span id="facts-ticker" class="ml-1"></span></li>
-              <li><span class="text-gray-500">Website:</span> <span id="facts-website" class="ml-1"></span></li>
-            </ul>
-          </div>
-
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Public Records</h3>
-            <ul id="report-records-list" class="space-y-2 list-disc list-inside text-sm text-gray-800 leading-relaxed"></ul>
-          </div>
-        </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Leadership</h3>
-            <ul id="report-leadership-list" class="space-y-2 text-sm text-gray-800"></ul>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Products & Services</h3>
-            <ul id="report-products-list" class="space-y-2 text-sm text-gray-800"></ul>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Competitors</h3>
-            <ul id="report-competitors-list" class="space-y-2 text-sm text-gray-800"></ul>
-          </div>
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Web & Social Signals</h3>
-            <ul id="report-social-list" class="space-y-1.5 text-sm text-gray-800"></ul>
-          </div>
-        </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="widget-card p-5 md:p-6">
-            <h3 class="font-heading font-semibold mb-3">Customer Reviews</h3>
-            <div id="report-reviews-list" class="space-y-3"></div>
-          </div>
-
-          <div class="widget-card p-5 md:p-6">
-D;         <h3 class="font-heading font-semibold mb-3">Financial Charts</h3>
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <h5 class="text-sm font-medium text-brand-dark mb-1">Revenue Trend</h5>
-                <div id="report-chart-revenue" class="h-24"></div>
-              </div>
-              <div>
-                <h5 class="text-sm font-medium text-brand-dark mb-1">Cash Flow</h5>
-                <div id="report-chart-cashflow" class="h-24"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-                <div id="report-sources-container" class="widget-card p-5 md:p-6" style="display:none;">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-semibold text-gray-500 uppercase">Sources & Links</h4>
-            <button id="toggle-sources" type="button" class="text-xs text-brand-green hover:underline">Hide list</button>
-          </div>
-          <div id="report-sources-chips" class="flex flex-wrap gap-2 mt-3"></div>
-          <ul id="report-sources" class="mt-4 space-y-1 list-disc list-inside"></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="border-t border-brand-border">
-    <div class="max-w-6xl mx-auto px-4 md:px-6 py-10 text-center text-sm text-gray-500">
-      © 2025 TrustBureau.ai — Live AI Business Report
-    </div>
-  </footer>
-
-    <div id="settings-modal" class="fixed inset-0 bg-black/30 z-50 hidden items-center justify-center p-4">
-    <div class="widget-card w-full max-w-md p-6 relative">
-      <button id="close-settings-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h3 class="font-heading text-lg font-bold mb-4">Settings</h3>
-      <div>
-        <label for="api-key-input" class="block text-sm font-medium text-gray-700 mb-1">Gemini API Key</label>
-        <input type="password" id="api-key-input" class="w-full px-3 py-2 border border-brand-border rounded-lg" placeholder="Enter your API key">
-        <p class="text-xs text-gray-500 mt-1">Your key is stored only in your browser's local storage.</p>
-      </div>
-      <div class="mt-4 flex justify-end">
-        <button id="save-settings-btn" class="bg-brand-green text-white font-bold rounded-lg px-4 py-2 cta-button">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* ===================== Config (v1beta + modern models; NO FAKE DATA) ===================== */
-    const zakk = "";              // or set window.zakk at runtime
-    const PROXY_BASE = "";        // optional proxy base (must forward /v1beta unchanged)
-
-    const MODEL_CANDIDATES = [
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
-      'gemini-2.0-flash'
-      // 'gemini-2.5-pro' // include if your key has access
-    ];
-    const DIRECT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-    const MAX_OUTPUT_TOKENS = 8192;
-
-    /* ===================== Utilities ===================== */
-    function getApiKey() {
-      const fromStorage = localStorage.getItem('apiKey');
-      if (fromStorage && fromStorage.trim()) return fromStorage.trim();
-      const fromWindow = (typeof window !== 'undefined' && window.zakk) ? String(window.zakk).trim() : '';
-      const fromConst  = (typeof zakk !== 'undefined' && zakk) ? String(zakk).trim() : '';
-      return fromWindow || fromConst || "";
-    }
-    function makeUrl(model) {
-      if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models/${model}:generateContent`;
-      return `${DIRECT_BASE}/${model}:generateContent`;
-    }
-    function listModelsUrl() {
-      if (PROXY_BASE) return `${PROXY_BASE}/v1beta/models`;
-      return `https://generativelanguage.googleapis.com/v1beta/models`;
-    }
-    function setText(el, v){ el.textContent = (v ?? '') !== '' ? String(v) : 'N/A'; }
-    function toDomain(url) { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; } }
-    function linkifyMaybe(v) {
-      if (!v) return 'N/A';
-      const s = String(v).trim();
-      if (/^https?:\/\//i.test(s)) {
-        return `<a href="${s}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(s)}</a>`;
-      }
-      return s;
-    }
-    function renderLineChart(container, values, color) {
-      if (!Array.isArray(values) || values.length < 2 || values.every(v => !Number.isFinite(+v))) {
-        container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
-        return;
-      }
-      const nums = values.map(v => Number.isFinite(+v) ? +v : 0);
-      const min = Math.min(...nums), max = Math.max(...nums);
-      if (!isFinite(min) || !isFinite(max) || max === min) {
-        container.innerHTML = '<p class="text-sm text-gray-700">Chart not available.</p>';
-        return;
-      }
-      const norm = nums.map(n => (100 * (n - min)) / (max - min));
-      const step = 100 / (norm.length - 1);
-      const pts = norm.map((v,i) => `${(i*step).toFixed(2)},${(50 - (v/100)*44 - 3).toFixed(2)}`).join(' ');
-      container.innerHTML =
-        `<svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
-          <polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}" />
-          <line x1="0" y1="48" x2="100" y2="48" stroke="#E5E7EB" stroke-width="1" />
-        </svg>`;
-    }
-
-    /* ===================== Loader UI ===================== */
-    let __loaderCtl = null;
-    function startLoadingAnimation() {
-      const steps = [
-        'Matching business identity (US bias)','Searching open web','Pulling SOS filings',
-        'Parsing metadata','Checking public records','Gathering leadership',
-        'Mapping products & services','Finding competitors','Collecting web & social',
-        'Crawling headlines','Reading customer reviews','Synthesizing risk score'
-      ];
-      const stepsOl = document.getElementById('loader-steps');
-      const barEl   = document.getElementById('loader-bar');
-      const timerEl = document.getElementById('loader-timer');
-
-      stepsOl.innerHTML = steps.map((s,i) => `
-        <li class="flex items-start gap-2">
-          <span class="step-icon" id="ld_${i}">
-            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
-          </span>
-          <span>${s}</span>
-        </li>`).join('');
-
-      let elapsed = 0;
-      const tTimer = setInterval(() => {
-        elapsed += 200;
-        const m = Math.floor(elapsed/1000/60);
-        const s = Math.floor((elapsed/1000)%60);
-        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      }, 200);
-
-      let idx = 0;
-      const stepMs = Math.max(900, Math.floor(24000 / steps.length));
-      const tSteps = setInterval(() => {
-        if (idx < steps.length) {
-          document.getElementById(`ld_${idx}`)?.classList.add('done');
-          idx++;
-          const pct = Math.min(98, Math.round((idx/steps.length)*100 - 2));
-          barEl.style.width = pct + '%';
-        } else {
-          const cur = parseFloat(barEl.style.width) || 98;
-          barEl.style.width = Math.min(99, cur + 0.2) + '%';
-        }
-      }, stepMs);
-
-      return { stop(){ clearInterval(tSteps); clearInterval(tTimer); barEl.style.width = '100%'; } };
-    }
-
-    const results = document.getElementById('report-results-container');
-    const loader  = document.getElementById('report-loader');
-    const errBox  = document.getElementById('report-error-container');
-    const errMsg  = document.getElementById('report-error-message');
-    const content = document.getElementById('report-content');
-
-    function showState(state, message = '') {
-      loader.style.display = 'none';
-      errBox.style.display = 'none';
-      content.style.display = 'none';
-      results.style.display = 'block';
-
-      if (__loaderCtl) { __loaderCtl.stop(); __loaderCtl = null; }
-
-      if (state === 'loading') {
-        loader.style.display = 'block';
-        __loaderCtl = startLoadingAnimation();
-      } else if (state === 'error') {
-        errBox.style.display = 'block';
-        errMsg.textContent = message || 'Something went wrong.';
-      } else if (state === 'content') {
-        content.style.display = 'block';
-      }
-    }
-
-    /* ===================== JSON parsing (v1beta) ===================== */
-    function parseCandidateJSON(candidate) {
-      const part = candidate?.content?.parts?.[0];
-      if (part && part.text) {
-        try { return JSON.parse(part.text); } catch (e) {
-          const raw = part.text.trim().replace(/```json/g, '```').replace(/```/g, '');
-          try { return JSON.parse(raw); } catch {}
-          const lastCurly = raw.lastIndexOf('}'), lastSquare = raw.lastIndexOf(']');
-          const cut = Math.max(lastCurly, lastSquare);
-          if (cut > 0) { try { return JSON.parse(raw.slice(0, cut + 1)); } catch {} }
-          throw new Error(`Model returned unparseable JSON: ${e.message}`);
-        }
-      }
-      for (const p of (candidate?.content?.parts || [])) {
-        if (p?.inline_data?.data && String(p.inline_data.mimeType || '').toLowerCase().includes('json')) {
-          try { return JSON.parse(atob(p.inline_data.data)); } catch {}
-        }
-      }
-      throw new Error('Model returned no parseable JSON payload.');
-    }
-
-    /* ===================== Fetch helper ===================== */
-    async function fetchWithBackoff(url, options, retries = 2, delay = 900) {
-      let lastError;
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url, options);
-          if (!res.ok) {
-            let body=null; try { body = await res.json(); } catch {}
-            const msg = body?.error?.message || res.statusText || 'Request failed';
-            const err = new Error(`${msg} (HTTP ${res.status})`);
-            err.httpStatus = res.status;
-            err.code = body?.error?.status;
-            throw err;
-          }
-          return await res.json();
-        } catch (e) {
-          lastError = e;
-          if ((e.httpStatus && e.httpStatus < 500) || (e.code && String(e.code).startsWith('4'))) break;
-          if (i < retries - 1) await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
-        }
-      }
-      throw lastError || new Error('API request failed.');
-    }
-
-    /* ===================== Model resolution ===================== */
-    const isRetired = (name) => /^gemini-(1(\.0|\.5)|0)\b/i.test(name);
-
-    async function resolveUsableModel(candidates, apiHeaders) {
-      for (const m of candidates.filter(m => !isRetired(m))) {
-        try {
-          const ping = await fetchWithBackoff(makeUrl(m), {
-            method: 'POST',
-            headers: apiHeaders,
-            body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
-          });
-          if (Array.isArray(ping?.candidates)) return m;
-        } catch (e) { /* try next */ }
-      }
-      try {
-        const res = await fetch(listModelsUrl(), { headers: apiHeaders });
-        const data = await res.json();
-        const models = data?.models || [];
-        const prefer = models.find(x => /gemini-2\.5-flash/i.test(x.name || x.baseModelId || ''));
-        if (prefer) return (prefer.baseModelId || prefer.name).replace(/^models\//,'');
-        const anyGC = models.find(x => (x.supportedGenerationMethods || []).includes('generateContent'));
-        if (anyGC) return (anyGC.baseModelId || anyGC.name).replace(/^models\//,'');
-      } catch (e) { console.warn('Model listing failed:', e); }
-      return 'gemini-2.5-flash';
-    }
-
-    /* ===================== API (v1beta, schema, grounding) ===================== */
-    const responseSchema = {
-      type: "OBJECT",
-      properties: {
-        summary: { type: "OBJECT", properties: { companyName: { type: "STRING" }, summary: { type: "STRING" } } },
-        sos: { type: "OBJECT", properties: { entityName: { type: "STRING" }, status: { type: "STRING" }, entityType: { type: "STRING" }, jurisdiction: { type: "STRING" }, formationDate: { type: "STRING" }, registeredAgent: { type: "STRING" }, principalAddress: { type: "STRING" } } },
-        publicRecords: { type: "OBJECT", properties: { findings: { type: "ARRAY", items: { type: "OBJECT", properties: { type: { type: "STRING" }, details: { type: "STRING" } } } } } },
-        riskScore: { type: "OBJECT", properties: { score: { type: "NUMBER" }, justification: { type: "STRING" }, positiveFactors: { type: "ARRAY", items: { type: "STRING" } }, negativeFactors: { type: "ARRAY", items: { type: "STRING" } } } },
-        reviews: { type: "ARRAY", items: { type: "OBJECT", properties: { snippet: { type: "STRING" }, source: { type: "STRING" }, url: { type: "STRING" } } } },
-        chartPoints: { type: "OBJECT", properties: { revenue: { type: "ARRAY", items: { type: "NUMBER" } }, cashFlow: { type: "ARRAY", items: { type: "NUMBER" } } } },
-        profile: { type: "OBJECT", properties: { founded: { type: "STRING" }, headquarters: { type: "STRING" }, employees: { type: "STRING" }, website: { type: "STRING" }, industry: { type: "STRING" }, subindustry: { type: "STRING" }, ticker: { type: "STRING" } } },
-        news: { type: "ARRAY", items: { type: "OBJECT", properties: { title: { type: "STRING" }, date: { type: "STRING" }, source: { type: "STRING" }, url: { type: "STRING" } } } },
-        leadership: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, title: { type: "STRING" }, linkedin: { type: "STRING" } } } },
-        products: { type: "ARRAY", items: { type: "STRING" } },
-        competitors: { type: "ARRAY", items: { type: "STRING" } },
-        webPresence: { type: "OBJECT", properties: { twitter: { type: "STRING" }, linkedin: { type: "STRING" }, youtube: { type: "STRING" }, traffic: { type: "STRING" } } },
-        contact: { type: "OBJECT", properties: { phone: { type: "STRING" }, email: { type: "STRING" }, address: { type: "STRING" }, lat: { type: "NUMBER" }, lng: { type: "NUMBER" }, mapsLink: { type: "STRING" } } },
-        highlights: { type: "ARRAY", items: { type: "STRING" } },
-        kpis: { type: "ARRAY", items: { type: "OBJECT", properties: { metric: { type: "STRING" }, q1: { type: "STRING" }, q2: { type: "STRING" }, q3: { type: "STRING" }, q4: { type: "STRING" }, yoy: { type: "STRING" } } } },
-        citations: { type: "ARRAY", items: { type: "OBJECT", properties: { title: { type: "STRING" }, url: { type: "STRING" } } } }
-      }
-    };
-
-    function makePayload(systemPrompt, userQuery) {
-      return {
-        contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-        tools: [{ "google_search": {} }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.2,
-          topP: 0.95
-        }
-      };
-    }
-
-    async function callReportAPI(systemPrompt, userQuery) {
-      const key = getApiKey();
-      if (!PROXY_BASE && !key) throw new Error('Missing API key. Open Settings (gear) and add a valid Gemini key.');
-
-      const apiHeaders = { 'Content-Type': 'application/json' };
-      if (key) apiHeaders['x-goog-api-key'] = key;
-
-      const model = await resolveUsableModel(MODEL_CANDIDATES, apiHeaders);
-      const url = makeUrl(model);
-      const payload = makePayload(systemPrompt, userQuery);
-
-      const data = await fetchWithBackoff(url, {
-        method: 'POST',
-        headers: apiHeaders,
-        body: JSON.stringify(payload)
-      });
-
-      const cand = data?.candidates?.[0];
-      if (!cand) {
-        if (data?.promptFeedback?.blockReason) throw new Error(`Request blocked: ${data.promptFeedback.blockReason}`);
-        throw new Error('No candidates in API response.');
-      }
-      if (cand.finishReason && cand.finishReason !== 'STOP') {
-        throw new Error(`Generation stopped: ${cand.finishReason}`);
-      }
-
-      const json = parseCandidateJSON(cand);
-
-      let sources = [];
-      const gm = cand.groundingMetadata;
-      if (gm && gm.groundingAttributions) {
-        sources = gm.groundingAttributions
-          .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-          .filter(s => s.uri && s.title);
-      }
-      return { json, sources };
-    }
-
-    /* ===================== Prompt ===================== */
-    function buildSystemPrompt() {
-      return `
-You are a meticulous US-focused business analyst.
-Constrain to the US when interpreting ambiguous names. Use "N/A" or [] when unknown.
-
-Reviews: include 3–6 concise snippets (12–40 words) from US-centric sources with URLs (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).
-Map rule: prefer the SOS principal/registered address; if unknown, use contact.address; then profile.headquarters.
-
-Fill all fields in the provided JSON schema to the best of your ability using live search data.
-You MUST return ONLY the JSON object, enclosed in \`\`\`json ... \`\`\` tags.
-      `.trim();
-    }
-
-    /* ===================== Reviews booster (still real data via search/tooling) ===================== */
-    const reviewsSchema = {
-      type: "OBJECT",
-      properties: {
-        reviews: {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              snippet: { type: "STRING" },
-              source:  { type: "STRING" },
-              url:     { type: "STRING" }
-            }
-          }
-        }
-      }
-    };
-
-    function reviewsNeeded(json) {
-      const n = Array.isArray(json?.reviews) ? json.reviews.length : 0;
-      return n < 2;
-    }
-
-    async function supplementReviews(companyName, baseJson) {
-      const sys = `
-You are a US-focused research assistant. Return ONLY a JSON object with a "reviews" array, enclosed in \`\`\`json ... \`\`\` tags.
-Each review item must be: { "snippet": string (12–40 words), "source": string, "url": string }.
-Collect 3–6 impartial snippets summarizing public sentiment from credible US sources (Google reviews, Yelp, Trustpilot, BBB, G2, Reddit, forums, reputable media).
-Avoid duplicates; include direct URLs when possible. If nothing exists, return {"reviews": []}.
-`.trim();
-
-      const userQ = `Provide 5 review snippets for "${companyName}" as specified. US bias; business context only.`;
-      try {
-        const key = getApiKey();
-        const apiHeaders = { 'Content-Type': 'application/json' };
-        if (key) apiHeaders['x-goog-api-key'] = key;
-
-        const model = await resolveUsableModel(MODEL_CANDIDATES, apiHeaders);
-        const url = makeUrl(model);
-        const payload = {
-          contents: [{ role: 'user', parts: [{ text: userQ }] }],
-          tools: [{ "google_search": {} }],
-          systemInstruction: { parts: [{ text: sys }] },
-          generationConfig: {
-            maxOutputTokens: 2048,
-            temperature: 0.2
-          }
-        };
-
-        const data = await fetchWithBackoff(url, {
-          method: 'POST',
-          headers: apiHeaders,
-          body: JSON.stringify(payload)
-        });
-
-        const cand = data?.candidates?.[0];
-        if (!cand) throw new Error('No candidate in reviews booster.');
-        const json = parseCandidateJSON(cand);
-
-        const arr = json?.reviews;
-        if (Array.isArray(arr) && arr.length) {
-          const existingSnippets = new Set((baseJson.reviews || []).map(r => r.snippet));
-          const newReviews = arr.filter(r => r.snippet && !existingSnippets.has(r.snippet));
-          baseJson.reviews = (baseJson.reviews || []).concat(newReviews).slice(0, 6);
-  T;     }
-      } catch (_e) {
-        console.error("Reviews booster failed:", _e);
-      }
-      return baseJson;
-    }
-
-    /* ===================== Sources helpers ===================== */
-    function normalizeUrl(u) { try { const url = new URL(u); url.search=''; if (url.pathname!== '/' && url.pathname.endsWith('/')) url.pathname=url.pathname.slice(0,-1); return url.toString(); } catch { return null; } }
-    function prettyUrl(u) { try { const url = new URL(u); let out = url.hostname.replace(/^www\./,''); if (url.pathname && url.pathname !== '/') out += url.pathname; return out.length>60?out.slice(0,57)+'…':out; } catch { return u; } }
-Example   function collectSources(json, modelSources) {
-      const out = [], push = (title, url, kind) => { const norm = normalizeUrl(url); if (!norm) return; out.push({ title: title || prettyUrl(norm), url: norm, kind }); };
-      (modelSources || []).forEach(s => push(s.title || s.uri, s.uri, 'source'));
-      (json?.citations || []).forEach(c => push(c.title || c.url, c.url, 'citation'));
-Read     if (json?.profile?.website) push('Official Website', json.profile.website, 'site');
-      const w = json?.webPresence || {};
-      if (w.twitter && /^https?:\/\//.test(w.twitter)) push('Twitter / X', w.twitter, 'social');
-      if (w.linkedin && /^https?:\/\//.test(w.linkedin)) push('LinkedIn', w.linkedin, 'social');
-      if (w.youtube && /^https?:\/\//.test(w.youtube)) push('YouTube', w.youtube, 'social');
-      (json?.news || []).forEach(n => { if (n?.url) push(n.title || n.source || 'News', n.url, 'news'); });
-      (json?.reviews || []).forEach(r => { if (r?.url) push(r.source || 'Review', r.url, 'review'); });
-
-      const seen = new Set();
-      return out.filter(({ url }) => !seen.has(url) && seen.add(url));
-    }
-    function populateSources(links) {
-      const chips = document.getElementById('report-sources-chips');
-      const ul = document.getElementById('report-sources');
-      const box = document.getElementById('report-sources-container');
-      chips.innerHTML = ''; ul.innerHTML = '';
-      if (!Array.isArray(links) || links.length === 0) { box.style.display = 'none'; return; }
-      box.style.display = 'block';
-      links.forEach(({ url, title, kind }) => {
-        const emoji = kind === 'news' ? '📰' : kind === 'review' ? '⭐' : kind === 'social' ? '🔗' : kind === 'site' ? '🏢' : kind === 'citation' ? '📚' : '🔗';
-        const span = document.createElement('span');
-        span.className = 'border border-brand-border rounded-full bg-brand-light px-2 py-1 text-xs';
-        span.innerHTML = `${emoji} <a href="${url}" target="_blank" rel="noopener" class="text-brand-green font-semibold hover:underline">${title || prettyUrl(url)}</a>`;
-        chips.appendChild(span);
-      });
-      links.forEach(({ url, title }) => {
-        const li = document.createElement('li');
-        li.className = 'text-sm';
-        li.innerHTML = `<a class="text-brand-green hover:underline" href="${url}" target="_blank" rel="noopener">${title || prettyUrl(url)}</a>
-                        <span class="text-xs text-gray-400 ml-1">(${prettyUrl(url)})</span>`;
-        ul.appendChild(li);
-      });
-      ul.classList.remove('hidden');
-      let open = true;
-      const toggle = document.getElementById('toggle-sources');
-      toggle.textContent = 'Hide list';
-      toggle.onclick = () => {
-        open = !open;
-        ul.classList.toggle('hidden', !open);
-s;       toggle.textContent = open ? 'Hide list' : 'Show list';
-      };
-    }
-
-    /* ===================== DOM refs ===================== */
-    const titleEl = document.getElementById('report-title');
-    const summaryEl = document.getElementById('report-summary');
-
-    const scoreCircle = document.getElementById('report-score-circle');
-    const scoreDigit  = document.getElementById('report-score-digit');
-    const scoreJust   = document.getElementById('report-score-justification');
-    const posList     = document.getElementById('report-score-positives');
-    const negList     = document.getElementById('report-score-negatives');
-
-    const sosName = document.getElementById('report-sos-name');
-    const sosStatus = document.getElementById('report-sos-status');
-    const sosEntity = document.getElementById('report-sos-entity');
-    const sosJuris  = document.getElementById('report-sos-jurisdiction');
-    const sosDate   = document.getElementById('report-sos-date');
-    const sosAgent  = document.getElementById('report-sos-agent');
-
-    const factsFounded   = document.getElementById('facts-founded');
-    const factsHQ        = document.getElementById('facts-hq');
-    const factsEmployees = document.getElementById('facts-employees');
-    const factsIndustry  = document.getElementById('facts-industry');
-    const factsTicker    = document.getElementById('facts-ticker');
-    const factsWebsite   = document.getElementById('facts-website');
-
-    const highlightsList = document.getElementById('report-highlights');
-
-    const contactPhone = document.getElementById('contact-phone');
-    const contactEmail = document.getElementById('contact-email');
-    const contactAddr  = document.getElementById('contact-address');
-    const contactMap   = document.getElementById('contact-maplink');
-    const mapIframe    = document.getElementById('map-iframe');
-    const mapPh        = document.getElementById('map-placeholder');
-
-    const recList    = document.getElementById('report-records-list');
-    const reviewsList= document.getElementById('report-reviews-list');
-s;   const leaderList = document.getElementById('report-leadership-list');
-    const productsList = document.getElementById('report-products-list');
-    const compList   = document.getElementById('report-competitors-list');
-    const socialList = document.getElementById('report-social-list');
-
-    const newsRoll   = document.getElementById('report-news-list');
-    const newsUpdated= document.getElementById('news-updated');
-
-    const chartRevenue = document.getElementById('report-chart-revenue');
-    const chartCash    = document.getElementById('report-chart-cashflow');
-
-    function colorizeStatus(el, status) {
-      const s = (status || '').toLowerCase();
-      el.className = 'ml-1 font-medium';
-      if (s.includes('active')) el.classList.add('text-green-600');
-      else if (s && !s.includes('n/a')) el.classList.add('text-red-600');
-    }
-
-    function firstSOSAddress(sos) {
-      if (!sos) return '';
-      const candidates = [
-        sos.principalAddress,
-        sos.principalOfficeAddress,
-        sos.principalPlaceOfBusiness,
-        sos.registeredOffice,
-        sos.registeredAgentAddress,
-        sos.registeredAddress,
-        sos.mailingAddress,
-        sos.address
-      ].filter(s => s && String(s).trim() && s.toLowerCase() !== 'n/a');
-      return candidates[0] || '';
-    }
-
-    function setMapByAddress(addr) {
-      if (!addr) {
-        mapIframe.style.display = 'none';
-        mapPh.style.display = 'flex';
-        return;
-      }
-      const embed = `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`;
-      mapIframe.src = embed;
-      mapIframe.style.display = 'block';
-      mapPh.style.display = 'none';
-    }
-
-    /* ===================== Populate Report ===================== */
-    function populateReport(data) {
-      // Title & summary
-      setText(titleEl, data?.summary?.companyName);
-      summaryEl.textContent = data?.summary?.summary || 'Not available.';
-
-      // Score
-      const scoreVal = data?.riskScore?.score;
-      const hasScore = typeof scoreVal === 'number' && Number.isFinite(scoreVal);
-      scoreDigit.textContent = hasScore ? String(scoreVal) : 'N/A';
-      scoreJust.textContent = data?.riskScore?.justification || 'Not available.';
-      scoreCircle.className = 'score-circle mb-4';
-      if (hasScore) {
-        if (scoreVal < 550) scoreCircle.classList.add('score-red');
-        else if (scoreVal < 700) scoreCircle.classList.add('score-yellow');
-        else scoreCircle.classList.add('score-green');
-      }
-
-      // Positives / Negatives
-      posList.innerHTML = '';
-      (data?.riskScore?.positiveFactors || []).forEach(f => {
-        const li = document.createElement('li');
-        li.className = 'flex items-start';
-        li.innerHTML = '<svg class="w-4 h-4 text-green-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
-                        `<span class="text-sm text-brand-dark">${f}</span>`;
-        posList.appendChild(li);
-      });
-      if (!posList.children.length) posList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-
-      negList.innerHTML = '';
-      (data?.riskScore?.negativeFactors || []).forEach(f => {
-        const li = document.createElement('li');
-        li.className = 'flex items-start';
-        li.innerHTML = '<svg class="w-4 h-4 text-red-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>' +
-                        `<span class="text-sm text-brand-dark">${f}</span>`;
-        negList.appendChild(li);
-      });
-      if (!negList.children.length) negList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-
-      // Filings
-      const sos = data?.sos || {};
-      setText(sosName,  sos.entityName);
-      setText(sosEntity,sos.entityType);
-      setText(sosStatus,sos.status);
-      colorizeStatus(sosStatus, sos.status);
-      setText(sosJuris, sos.jurisdiction);
-      setText(sosDate,  sos.formationDate);
-      setText(sosAgent, sos.registeredAgent);
-
-      // Company facts
-      const p = data?.profile || {};
-      setText(factsFounded, p.founded);
-      setText(factsHQ, p.headquarters || p.hq);
-      setText(factsEmployees, p.employees);
-      setText(factsIndustry, p.industry || p.subindustry);
-      setText(factsTicker, p.ticker);
-      if (p.website && /^https?:\/\//.test(p.website)) factsWebsite.innerHTML = linkifyMaybe(p.website); else setText(factsWebsite, p.website);
-
-      // Highlights
-      const highlights = (data?.highlights || []);
-      if (!highlights.length) {
-        highlightsList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-      } else {
-        highlightsList.innerHTML = '';
-        highlights.slice(0,8).forEach(t => { const li = document.createElement('li'); li.innerHTML = t; highlightsList.appendChild(li); });
-      }
-
-      // News
-      newsRoll.innerHTML = '';
-      const news = (data?.news || []).slice(0,8);
-      if (news.length) {
-        newsUpdated.textContent = `${news.length} items`;
-        news.forEach(n => {
-          const li = document.createElement('li');
-          const href = n.url && /^https?:\/\//.test(n.url) ? n.url : '#';
-          const dat  = n.date ? ` • ${n.date}` : '';
-          li.innerHTML =
-            `<a class="text-brand-dark hover:text-brand-green font-medium leading-tight" href="${href}" target="_blank" rel="noopener">${n.title || 'Untitled'}</a>
-             <div class="text-xs text-gray-500">${n.source || 'Source'}${dat}</div>`;
-          newsRoll.appendChild(li);
-        });
-      } else {
-        newsUpdated.textContent = '';
-        newsRoll.innerHTML = '<li class="text-sm text-gray-600">No recent headlines found.</li>';
-image     }
-
-      // Contact + Map
-      const c = data?.contact || {};
-      const sosAddress = firstSOSAddress(sos);
-      const bestAddress = sosAddress || c.address || p.headquarters || p.hq || '';
-      setText(contactPhone, c.phone);
-      setText(contactEmail, c.email);
-      setText(contactAddr,  bestAddress || 'N/A');
-      if (bestAddress) {
-        contactMap.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(bestAddress)}`;
-        contactMap.style.pointerEvents = 'auto';
-        setMapByAddress(bestAddress);
-      } else {
-        contactMap.href = '#'; contactMap.style.pointerEvents = 'none'; setMapByAddress('');
-      }
-
-      // Public records
-      recList.innerHTML = '';
-      (data?.publicRecords?.findings || []).forEach(r => {
-        const li = document.createElement('li');
-        li.textContent = `${r.type || 'Record'}: ${r.details || ''}`;
-        recList.appendChild(li);
-      });
-      if (!recList.children.length) recList.innerHTML = '<li class="list-none text-sm text-gray-600">Not available.</li>';
-
-      // Leadership
-      leaderList.innerHTML = '';
-      (data?.leadership || []).slice(0,8).forEach(l => {
-        const li = document.createElement('li');
-        const linked = l.linkedin && /^https?:\/\//.test(l.linkedin)
-          ? ` — <a class="text-brand-green hover:underline" href="${l.linkedin}" target="_blank" rel="noopener">LinkedIn</a>` : '';
-        li.innerHTML = `<span class="font-medium text-brand-dark">${l.name || 'N/A'}</span> — <span class="text-gray-700">${l.title || ''}</span>${linked}`;
-        leaderList.appendChild(li);
-  Answer   });
-      if (!leaderList.children.length) leaderList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-
-      // Products
-      productsList.innerHTML = '';
-      (data?.products || []).slice(0,12).forEach(t => { const li = document.createElement('li'); li.textContent = t; productsList.appendChild(li); });
-      if (!productsList.children.length) productsList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-
-      // Competitors
-      compList.innerHTML = '';
-      (data?.competitors || []).slice(0,12).forEach(cmp => { const li = document.createElement('li'); li.textContent = cmp; compList.appendChild(li); });
-s;     if (!compList.children.length) compList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-
-      // Social presence
-      socialList.innerHTML = '';
-      const w = data?.webPresence || {};
-      [['Website Traffic', w.traffic], ['Twitter/X', w.twitter], ['LinkedIn', w.linkedin], ['YouTube', w.youtube]].forEach(([k,v]) => {
-s;       if (!v || String(v).toLowerCase() === 'n/a') return;
-        const li = document.createElement('li');
-        let valueHtml = v;
-        if (typeof v === 'string' && /^https?:\/\//.test(v)) {
-          valueHtml = `<a href="${v}" target="_blank" rel="noopener" class="text-brand-green hover:underline">${toDomain(v)}</a>`;
-        }
-        li.innerHTML = `<span class="text-gray-500">${k}:</span> <span class="font-medium text-brand-dark">${valueHtml}</span>`;
-        socialList.appendChild(li);
-      });
-      if (!socialList.children.length) socialList.innerHTML = '<li class="text-sm text-gray-600">Not available.</li>';
-
-      // Charts (NO fabricated values)
-      const points = data?.chartPoints || {};
-      renderLineChart(chartRevenue, points.revenue, '#00C09A');
-      renderLineChart(chartCash, points.cashFlow, '#3B82F6');
-    }
-
-    /* ===================== Boot & Events ===================== */
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('search-form');
-      const input = document.getElementById('business-name');
-      const btn = document.getElementById('generate-report-btn');
-      const rerunBtn = document.getElementById('rerun');
-      const shareBtn = document.getElementById('share-btn');
-
-      // Settings Modal
-      const settingsModal = document.getElementById('settings-modal');
-      const settingsBtn = document.getElementById('settings-btn');
-      const closeSettingsBtn = document.getElementById('close-settings-btn');
-      const saveSettingsBtn = document.getElementById('save-settings-btn');
-      const apiKeyInput = document.getElementById('api-key-input');
-
-      const openModal = () => {
-        apiKeyInput.value = getApiKey();
-        settingsModal.classList.remove('hidden');
-s;       settingsModal.classList.add('flex');
-      };
-      const closeModal = () => {
-        settingsModal.classList.add('hidden');
-        settingsModal.classList.remove('flex');
-      };
-
-      settingsBtn.addEventListener('click', openModal);
-      closeSettingsBtn.addEventListener('click', closeModal);
-      settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeModal(); });
-
-s;     saveSettingsBtn.addEventListener('click', () => {
-        const key = apiKeyInput.value.trim();
-        if (key) { localStorage.setItem('apiKey', key); window.zakk = key; }
-        else { localStorage.removeItem('apiKey'); window.zakk = ''; }
-        closeModal();
-      });
-
-      async function runReport(query) {
-        document.getElementById('report-results-container').style.display = 'block';
-document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-        showState('loading');
-        btn.classList.add('cta-disabled'); btn.disabled = true;
-
-        const systemPrompt = buildSystemPrompt();
-        const userQuery = `Generate a comprehensive US-focused AI business report for: "${query}"`;
-
-        // Hard requirement: never fabricate data; require valid key
-        if (!getApiKey()) {
-          showState('error', 'Missing API key. Open the Settings (gear) and add a valid Gemini API key.');
-          btn.disabled = false; btn.classList.remove('cta-disabled');
-          return;
-        }
-
-        try {
-          let { json, sources } = await callReportAPI(systemPrompt, userQuery);
-          if (reviewsNeeded(json)) {
-            json = await supplementReviews(json?.summary?.companyName || query, json);
-          }
-          populateReport(json);
-          const links = collectSources(json, sources);
-s;         populateSources(links);
-          showState('content');
-        } catch (e) {
-          console.error(e);
-          const keyRelated = /API key|401|403|PERMISSION/i.test(String(e));
-          const corsHint = (!PROXY_BASE && /Failed to fetch|NetworkError|CORS/i.test(String(e)))
-            ? 'Network/CORS error. If opening the file directly, serve it (e.g., `python3 -m http.server`).'
-S           : '';
-          const keyHint = keyRelated ? 'API key invalid or lacks access. Verify billing and model access in Google AI Studio.' : '';
-          const nfHint  = /404|NOT_FOUND/i.test(String(e)) ? 'Model not found for this API version. The app auto‑selects a supported model; try again.' : '';
-          showState('error', keyHint || corsHint || nfHint || e.message || 'Failed to generate report.');
-        } finally {
-          btn.disabled = false; btn.classList.remove('cta-disabled');
-Example       }
-      }
-
-      function handleSearch(query) {
-        if (!query) { showState('error', 'Please enter a business name.'); return; }
-        window.location.hash = encodeURIComponent(query);
-        runReport(query);
-      }
-      
-      form.addEventListener('submit', (ev) => {
-s;       ev.preventDefault();
-        const q = (input.value || '').trim();
-        handleSearch(q);
-  s;   });
-
-      rerunBtn?.addEventListener('click', () => {
-        const q = (input.value || '').trim();
-        handleSearch(q);
-      });
-
-      shareBtn?.addEventListener('click', () => {
-        const copyToClipboard = (text) => {
-s;         if (navigator.clipboard) { return navigator.clipboard.writeText(text); }
-          return new Promise((resolve, reject) => {
-            const ta = document.createElement("textarea");
-  Example         ta.value = text; ta.style.position = "fixed"; ta.style.top = "0"; ta.style.left = "0"; ta.style.opacity = "0";
-            document.body.appendChild(ta); ta.focus(); ta.select();
-            try { document.execCommand('copy') ? resolve() : reject(new Error('Copy failed')); }
-            catch (err) { reject(err); }
-            document.body.removeChild(ta);
-          });
-        };
-        copyToClipboard(window.location.href).then(() => {
-Example         const originalText = shareBtn.textContent;
-          shareBtn.textContent = 'Copied!';
-        s;   shareBtn.classList.add('bg-brand-green', 'text-white');
-          setTimeout(() => {
-            shareBtn.textContent = originalText;
-            shareBtn.classList.remove('bg-brand-green', 'text-white');
-          }, 2000);
-        }).catch(err => {
-          console.error('Failed to copy URL: ', err);
-S         const originalText = shareBtn.textContent;
-          shareBtn.textContent = 'Failed!';
-          setTimeout(() => { shareBtn.textContent = originalText; }, 2000);
-        });
-      });
-
-      // Deep link
-      if (window.location.hash) {
-        const queryFromHash = decodeURIComponent(window.location.hash.substring(1));
-image         if (queryFromHash) {
-          document.getElementById('report-results-container').style.display = 'block';
-          input.value = queryFromHash;
-          runReport(queryFromHash);
-        }
-      }
-    });
-  </script>
+<body>
+<div id="app" class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-brand-border shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="location.reload()">
+        <!-- Updated "T" Box Logo -->
+        <div class="w-8 h-8 md:w-10 md:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+          <span class="text-white font-heading font-bold text-lg md:text-2xl">T</span>
+        </div>
+        
+        <div>
+          <!-- Updated Header Text: Matches Image (TRUST BUREAU) with Heavy Weight -->
+          <h1 class="font-heading font-black text-xl md:text-2xl text-brand-dark tracking-tight uppercase leading-none">TRUST BUREAU</h1>
+          <p class="text-[8px] text-brand-gray uppercase tracking-wider font-bold hidden sm:block mt-0.5">Data Aggregator v5.12</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+          <button id="settings-btn" class="text-brand-gray hover:text-brand-dark p-2 rounded-full hover:bg-gray-100 transition-colors" title="API Settings">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </button>
+          <div class="text-[10px] md:text-xs font-bold uppercase tracking-wide text-green-600 bg-green-50 border border-green-200 rounded px-2 py-1 md:px-3 md:py-2">
+            ● Active
+          </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow bg-brand-bg hero-bg relative">
+    <!-- Optional overlay gradient to soften the grid edges -->
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-bg/50 to-brand-bg pointer-events-none"></div>
+    
+    <!-- SEARCH HERO -->
+    <div id="search-view" class="relative z-10 py-20 md:py-32 px-4 md:px-6 text-center max-w-4xl mx-auto transition-all duration-300 flex flex-col items-center justify-center min-h-[60vh]">
+      
+      <div class="inline-flex items-center gap-2 bg-white border border-brand-border px-3 py-1.5 rounded-full text-xs font-semibold text-brand-gray mb-8 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+        Live Data Aggregation System
+      </div>
+
+      <h2 class="text-4xl md:text-6xl font-heading font-bold text-brand-dark mb-6 leading-tight tracking-tight">
+        Verify Any Business. <br class="hidden md:block"/> <span class="text-brand-gray">Instantly.</span>
+      </h2>
+      
+      <p class="text-lg text-brand-gray mb-12 leading-relaxed max-w-2xl font-light">
+        Forensic-grade aggregation of Secretary of State filings, court dockets, BBB profiles, and corporate compliance records.
+      </p>
+      
+      <div class="relative w-full max-w-2xl mx-auto group">
+        <!-- Grey shadow search bar -->
+        <div class="relative flex flex-col sm:flex-row bg-white rounded-xl shadow-xl shadow-gray-200 border border-gray-100 overflow-hidden p-1">
+          <div class="flex-grow relative flex items-center">
+             <svg class="w-5 h-5 text-gray-400 absolute left-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+             <input type="text" id="search-input" class="w-full pl-12 pr-4 py-4 text-base md:text-lg text-brand-dark outline-none placeholder-gray-400 bg-transparent font-medium" placeholder="Enter entity name (e.g., Tesla, Inc.)">
+          </div>
+          <button id="generate-btn" class="mt-1 sm:mt-0 bg-brand-dark text-white font-bold text-sm uppercase tracking-wide px-8 py-4 rounded-lg hover:bg-gray-800 transition-all transform hover:scale-[1.02] active:scale-95 sm:ml-1 shadow-lg">
+            Start Audit
+          </button>
+        </div>
+      </div>
+      
+      <!-- Quick Suggestions -->
+      <div class="mt-10 flex justify-center gap-3 flex-wrap opacity-80">
+         <span class="text-xs font-bold text-gray-400 uppercase tracking-wide pt-1.5">Try:</span>
+         <button onclick="window.runSearch('OpenAI')" class="text-xs font-medium text-gray-600 bg-white border border-gray-200 hover:border-brand-yellow hover:text-brand-dark px-4 py-1.5 rounded-full transition-all cursor-pointer shadow-sm">OpenAI</button>
+         <button onclick="window.runSearch('SpaceX')" class="text-xs font-medium text-gray-600 bg-white border border-gray-200 hover:border-brand-yellow hover:text-brand-dark px-4 py-1.5 rounded-full transition-all cursor-pointer shadow-sm">SpaceX</button>
+         <button onclick="window.runSearch('Anthropic')" class="text-xs font-medium text-gray-600 bg-white border border-gray-200 hover:border-brand-yellow hover:text-brand-dark px-4 py-1.5 rounded-full transition-all cursor-pointer shadow-sm">Anthropic</button>
+      </div>
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader-view" class="hidden py-32 text-center px-6 relative z-20">
+      <div class="max-w-md mx-auto bg-white rounded-xl shadow-2xl border border-brand-border overflow-hidden p-10">
+        <div class="relative w-16 h-16 mx-auto mb-6">
+            <div class="absolute inset-0 border-4 border-brand-bg rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-t-brand-yellow rounded-full animate-spin"></div>
+        </div>
+        <h3 class="text-xl font-bold text-brand-dark mb-2">Initializing Forensic Scan</h3>
+        <p id="loader-step" class="text-sm text-brand-gray font-mono mb-6">Connecting to secure databases...</p>
+        <div class="h-1 w-full bg-gray-100 overflow-hidden rounded-full">
+          <div class="scan-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT VIEW -->
+    <div id="report-view" class="hidden max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 space-y-8 relative z-20">
+      
+      <!-- 1. HEADER & SCORE -->
+      <div class="bg-white border border-brand-border rounded-2xl p-4 md:p-8 shadow-sm relative overflow-hidden">
+        <div class="flex flex-col lg:flex-row justify-between items-start gap-6 md:gap-8">
+          <div class="flex-grow w-full">
+            <div class="flex flex-wrap items-center gap-3 mb-2">
+              <h1 id="h-name" class="text-2xl md:text-4xl font-heading font-extrabold text-brand-dark break-words">--</h1>
+              <span id="sos-badge" class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded font-bold uppercase tracking-wider border border-gray-200 whitespace-nowrap">Verifying...</span>
+              <span id="h-founded" class="text-xs font-mono text-gray-500 border-l pl-3 border-gray-300 hidden"></span>
+            </div>
+            <div class="flex flex-wrap gap-4 md:gap-6 text-sm text-brand-gray mb-6">
+              <span class="flex items-center gap-1.5"><span class="text-brand-yellow">📍</span> <span id="h-loc" class="break-all">--</span></span>
+              <span class="flex items-center gap-1.5"><span class="text-brand-yellow">🌐</span> <a id="h-web" href="#" target="_blank" class="data-link break-all">--</a></span>
+              <span class="flex items-center gap-1.5"><span class="text-brand-yellow">📞</span> <span id="h-phone">--</span></span>
+            </div>
+            <div class="bg-gray-50 border-l-4 border-brand-yellow pl-4 py-3 pr-4 rounded-r-lg">
+              <h4 class="text-[10px] font-bold uppercase text-gray-400 mb-1">Risk Analysis</h4>
+              <p id="h-memo" class="text-sm leading-relaxed text-gray-700 italic"></p>
+            </div>
+          </div>
+
+          <div class="flex-shrink-0 flex flex-col items-center w-full lg:w-auto">
+            <button id="reverify-btn" class="mb-4 text-xs font-bold text-green-700 hover:text-green-900 border border-green-200 hover:border-green-400 bg-green-50 px-4 py-2 rounded-full shadow-sm transition-all flex items-center gap-2 group">
+              <svg class="w-3 h-3 text-green-600 group-hover:text-green-800 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Run Full Audit
+            </button>
+            <div id="g-circle" class="risk-gauge mb-3">
+              <span id="g-score" class="text-4xl font-extrabold">--</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide mt-1 text-gray-400">Risk Score</span>
+            </div>
+            <div id="g-badge" class="px-5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide text-white bg-gray-400 shadow-sm">
+              Pending
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- LEFT COLUMN (8) -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <!-- 2. CORPORATE REGISTRY -->
+          <div id="sec-sos" class="relative bg-white border border-brand-border rounded-xl shadow-sm overflow-hidden transition-all">
+            <div class="bg-gray-50 px-4 md:px-6 py-3 border-b border-brand-border flex justify-between items-center">
+              <h3 class="font-bold text-brand-dark text-sm uppercase tracking-wider">Official Corporate Filings</h3>
+              <button class="enhance-btn" data-section="sos">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                ENHANCE
+              </button>
+            </div>
+            <div class="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div class="col-span-1 sm:col-span-2">
+                <label class="text-[10px] text-gray-400 uppercase font-bold">Legal Entity Name</label>
+                <div id="c-name" class="font-mono text-sm text-brand-dark font-semibold mt-1 break-words">--</div>
+              </div>
+              <div class="col-span-1 sm:col-span-2">
+                <label class="text-[10px] text-gray-400 uppercase font-bold">Entity / File ID</label>
+                <div id="c-id" class="font-mono text-sm text-brand-dark mt-1 bg-gray-50 inline-block px-2 py-0.5 rounded border border-gray-200 break-all">--</div>
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-400 uppercase font-bold">Jurisdiction</label>
+                <div id="c-state" class="text-sm text-brand-dark mt-1">--</div>
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-400 uppercase font-bold">Date Founded</label>
+                <div id="c-date" class="text-sm text-brand-dark mt-1">--</div>
+              </div>
+              <div class="col-span-1 sm:col-span-2">
+                <label class="text-[10px] text-gray-400 uppercase font-bold">Registered Agent</label>
+                <div id="c-agent" class="text-sm text-brand-dark mt-1 break-words">--</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. CONSUMER PROTECTION (BBB) - NEW -->
+          <div id="sec-reputation" class="relative bg-white border border-brand-border rounded-xl shadow-sm overflow-hidden transition-all">
+            <div class="bg-gray-50 px-4 md:px-6 py-3 border-b border-brand-border flex justify-between items-center">
+               <h3 class="font-bold text-brand-dark text-sm uppercase tracking-wider">Consumer Protection &amp; BBB</h3>
+               <button class="enhance-btn" data-section="reputation">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                ENHANCE
+               </button>
+            </div>
+            <div class="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-b border-brand-border">
+               <!-- Grade -->
+               <div class="text-center border-b sm:border-b-0 sm:border-r border-gray-100 pb-4 sm:pb-0 last:border-0">
+                  <span class="text-[10px] text-gray-400 uppercase font-bold">BBB Grade</span>
+                  <div id="bbb-grade" class="text-3xl font-extrabold text-brand-dark mt-1">--</div>
+               </div>
+               <!-- Accreditation -->
+               <div class="text-center border-b sm:border-b-0 sm:border-r border-gray-100 pb-4 sm:pb-0 last:border-0">
+                  <span class="text-[10px] text-gray-400 uppercase font-bold">Status</span>
+                  <div id="bbb-status" class="text-sm font-bold text-brand-dark mt-2">Checking...</div>
+               </div>
+               <!-- Complaints -->
+               <div class="text-center">
+                  <span class="text-[10px] text-gray-400 uppercase font-bold">Complaints (3 Yrs)</span>
+                  <div id="bbb-complaints" class="text-xs font-semibold text-brand-dark mt-1 leading-tight px-1">--</div>
+               </div>
+            </div>
+            <div class="p-4 bg-gray-50">
+               <h5 class="text-[10px] text-gray-400 uppercase font-bold mb-2">BBB Analysis</h5>
+               <p id="bbb-summary" class="text-xs text-gray-600 italic">Connecting to Better Business Bureau database...</p>
+            </div>
+          </div>
+
+          <!-- 4. LITIGATION & UCC -->
+          <div id="sec-litigation" class="relative bg-white border border-brand-border rounded-xl shadow-sm overflow-hidden transition-all">
+             <div class="bg-gray-50 px-4 md:px-6 py-3 border-b border-brand-border flex justify-between items-center">
+               <h3 class="font-bold text-brand-dark text-sm uppercase tracking-wider">Legal &amp; Collateral</h3>
+               <button class="enhance-btn" data-section="litigation">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                ENHANCE
+               </button>
+             </div>
+             
+             <!-- Litigation Table -->
+             <div class="px-4 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase">Litigation History</div>
+             <div class="overflow-x-auto">
+               <table class="forensic-table">
+                 <thead><tr><th>Type</th><th>Case ID</th><th>Plaintiff / Parties</th><th>Date</th><th>Status</th></tr></thead>
+                 <tbody id="legal-rows"></tbody>
+               </table>
+             </div>
+             <div id="legal-empty" class="p-3 text-center text-xs text-gray-400 italic hidden">No adverse court records found.</div>
+
+             <!-- UCC Table -->
+             <div class="px-4 py-2 bg-gray-50 border-y border-gray-200 text-xs font-bold text-gray-500 uppercase">UCC Filings</div>
+             <div class="overflow-x-auto">
+               <table class="forensic-table">
+                 <thead><tr><th>Filing Date</th><th>Filing #</th><th>Secured Party (Lender)</th><th>Status</th></tr></thead>
+                 <tbody id="ucc-rows"></tbody>
+               </table>
+             </div>
+             <div id="ucc-empty" class="p-3 text-center text-xs text-gray-400 italic hidden">No UCC-1 records found.</div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN (4) -->
+        <div class="lg:col-span-4 space-y-8">
+          
+          <!-- 5. REVIEWS FEED (NEW) -->
+          <div id="sec-reviews" class="relative bg-white border border-brand-border rounded-xl shadow-sm overflow-hidden transition-all">
+            <div class="bg-gray-50 px-4 md:px-6 py-3 border-b border-brand-border flex justify-between items-center">
+               <h3 class="font-bold text-brand-dark text-sm uppercase tracking-wider">Voice of Customer</h3>
+               <button class="enhance-btn" data-section="reviews">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                ENHANCE
+               </button>
+            </div>
+            <div id="reviews-list" class="divide-y divide-gray-100 max-h-[400px] overflow-y-auto"></div>
+          </div>
+
+          <!-- 7. COMPLIANCE -->
+          <div id="sec-compliance" class="relative bg-white border border-brand-border rounded-xl shadow-sm p-4 md:p-6 transition-all">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="font-bold text-brand-dark text-sm uppercase tracking-wider">Compliance</h4>
+              <button class="enhance-btn" data-section="compliance">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                ENHANCE
+              </button>
+            </div>
+            <ul class="space-y-3 text-sm">
+              <li class="flex justify-between items-center"><span class="text-gray-500">OFAC / Sanctions</span><span id="reg-ofac" class="text-xs font-bold px-2 py-1 rounded bg-gray-100">Checking...</span></li>
+              <li class="flex justify-between items-center"><span class="text-gray-500">Gov Contracts</span><span id="reg-gov" class="text-xs font-bold px-2 py-1 rounded bg-gray-100">Checking...</span></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 8. EVIDENCE LOCKER (LINKS) -->
+      <div class="bg-white border border-brand-border rounded-xl p-4 md:p-8 shadow-sm mt-12">
+        <h3 class="text-brand-dark font-heading font-bold text-lg mb-4 flex items-center gap-2">
+           <svg class="w-5 h-5 text-brand-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+           Evidence Locker & Verified Sources
+        </h3>
+        <div id="source-links" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs font-mono"></div>
+      </div>
+      
+      <!-- NEW: AI ANALYST Q&A (MOVED TO BOTTOM) -->
+      <div id="sec-qa" class="bg-white border border-brand-border rounded-xl p-8 shadow-sm mt-8">
+         <h3 class="font-bold text-brand-dark font-heading text-lg mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            Ask the Forensic Analyst
+         </h3>
+         <div class="relative max-w-3xl">
+           <input type="text" id="qa-input" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 pr-20 text-sm focus:outline-none focus:border-brand-yellow text-brand-dark placeholder-gray-400 transition-colors" placeholder="E.g., Is this a shell company?">
+           <button id="qa-btn" class="absolute right-1.5 top-1.5 bg-brand-dark text-white text-xs font-bold px-4 py-2 rounded hover:bg-gray-800 transition-colors">ASK</button>
+         </div>
+         <div id="qa-response" class="mt-6 text-sm leading-relaxed text-brand-gray hidden p-4 bg-gray-50 rounded-lg border border-gray-100"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Settings Modal -->
+<div id="api-modal" class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm hidden flex items-center justify-center">
+  <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-lg text-brand-dark">API Configuration</h3>
+        <button id="close-api-btn" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Enter Google Gemini API Key (overrides environment key).</p>
+    <input id="api-key-input" type="password" class="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:ring-2 focus:ring-brand-yellow outline-none text-sm" placeholder="AIza...">
+    <div class="flex justify-end gap-3">
+      <button id="clear-key" class="px-4 py-2 text-red-500 hover:bg-red-50 rounded text-sm font-bold">Clear</button>
+      <button id="save-key" class="px-6 py-2 bg-brand-dark text-white rounded hover:bg-gray-800 text-sm font-bold">Save Key</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Define global functions for quick actions
+window.runSearch = (name) => {
+  document.getElementById('search-input').value = name;
+  document.getElementById('generate-btn').click();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const envApiKey = ""; // Runtime injection
+  
+  // Global state within module
+  let lastReportData = null; 
+
+  // Settings Elements
+  const settingsBtn = document.getElementById('settings-btn');
+  const apiModal = document.getElementById('api-modal');
+  const closeApiBtn = document.getElementById('close-api-btn');
+  const saveKeyBtn = document.getElementById('save-key');
+  const clearKeyBtn = document.getElementById('clear-key');
+  const apiKeyInput = document.getElementById('api-key-input');
+
+  // Get API Key (User > Env)
+  const getApiKey = () => localStorage.getItem('tb_api_key') || envApiKey;
+
+  // Settings UI Logic
+  if(settingsBtn) {
+      settingsBtn.onclick = () => {
+          apiKeyInput.value = localStorage.getItem('tb_api_key') || '';
+          apiModal.classList.remove('hidden');
+      };
+  }
+  
+  const closeSettings = () => apiModal.classList.add('hidden');
+  if(closeApiBtn) closeApiBtn.onclick = closeSettings;
+  
+  if(saveKeyBtn) {
+      saveKeyBtn.onclick = () => {
+          const key = apiKeyInput.value.trim();
+          if(key) {
+              localStorage.setItem('tb_api_key', key);
+              alert("API Key saved locally.");
+          }
+          closeSettings();
+      };
+  }
+
+  if(clearKeyBtn) {
+      clearKeyBtn.onclick = () => {
+          localStorage.removeItem('tb_api_key');
+          apiKeyInput.value = '';
+          alert("API Key cleared.");
+      };
+  }
+
+  const refs = {
+    viewSearch: document.getElementById('search-view'),
+    viewLoader: document.getElementById('loader-view'),
+    viewReport: document.getElementById('report-view'),
+    input: document.getElementById('search-input'),
+    btn: document.getElementById('generate-btn'),
+    reverify: document.getElementById('reverify-btn'),
+    qaInput: document.getElementById('qa-input'),
+    qaBtn: document.getElementById('qa-btn'),
+    qaResponse: document.getElementById('qa-response'),
+  };
+
+  // --- HELPER: CREATE CLICKABLE LINK IF URL EXISTS ---
+  const makeLink = (text, url, className = "font-bold text-brand-dark") => {
+      if (url && url.startsWith('http') && text && text !== '--') {
+          return `<a href="${url}" target="_blank" class="${className} underline decoration-dotted hover:text-blue-600 hover:decoration-solid transition-colors" title="View Source">${text}</a> ↗`;
+      }
+      return `<span class="${className}">${text || '--'}</span>`;
+  };
+
+  // --- Q&A LOGIC ---
+  const handleQa = async () => {
+      const question = refs.qaInput.value.trim();
+      const currentKey = getApiKey();
+      
+      if (!question) return;
+      if (!lastReportData) {
+          alert("Please run a report first.");
+          return;
+      }
+      
+      const originalText = refs.qaBtn.innerText;
+      refs.qaBtn.innerText = "...";
+      refs.qaBtn.disabled = true;
+      
+      try {
+          // Special prompt for Q&A
+          const qaPrompt = `
+            ROLE: Senior Forensic Auditor.
+            CONTEXT: You have just generated a report for "${lastReportData.info.name}".
+            REPORT DATA: ${JSON.stringify(lastReportData)}
+            
+            USER QUESTION: "${question}"
+            
+            TASK: Answer the question based strictly on the report data and your forensic expertise. 
+            If the data is missing, state that clearly. Be professional, concise, and objective.
+            
+            OUTPUT: Plain text answer (max 3 sentences). No markdown.
+          `;
+          
+          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${currentKey}`, {
+             method: 'POST', 
+             headers: {'Content-Type':'application/json'},
+             body: JSON.stringify({
+               contents: [{parts:[{text: qaPrompt}]}]
+             })
+          });
+          
+          const raw = await resp.json();
+          const answer = raw.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to generate an answer.";
+          
+          refs.qaResponse.innerText = answer;
+          refs.qaResponse.classList.remove('hidden');
+          
+      } catch (e) {
+          console.error(e);
+          refs.qaResponse.innerText = "Error: " + e.message;
+          refs.qaResponse.classList.remove('hidden');
+      } finally {
+          refs.qaBtn.innerText = originalText;
+          refs.qaBtn.disabled = false;
+      }
+  };
+  
+  refs.qaBtn.onclick = handleQa;
+  refs.qaInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleQa();
+  });
+
+  // --- PROMPT ENGINEERING ---
+  const getPrompt = (name, isEnhanced, existingData, focusSection) => {
+    
+    let context = '';
+    let taskDescription = '';
+    let mandate = '';
+
+    if (isEnhanced) {
+        if (existingData) {
+            // RE-VERIFICATION or DEEP DIVE
+            taskDescription = `ROLE: FORENSIC DATA AUDITOR. OBJECTIVE: Verify and Expand Report.`;
+            let specificInstruction = "";
+            
+            if (focusSection) {
+                specificInstruction = `
+                FOCUS: DEEP DIVE into "${focusSection}".
+                MANDATE: Find URLS for this specific section.
+                - If 'sos': Return url to Secretary of State entity page or search portal. VERIFY the "Formation Date" or "Start Date".
+                - If 'reputation': Return url to BBB profile, Trustpilot, or general search results.
+                - If 'litigation': Return url to court docket, legal news source, or case summary.
+                `;
+            } else {
+                 specificInstruction = `
+                 FOCUS: Global Update. Find missing URLS and DATA for all fields.
+                 CRITICAL: Ensure "date" in "sos" is populated with a Year or Full Date.
+                 `;
+            }
+            
+            context += `
+            EXISTING DATA:
+            ${JSON.stringify(existingData)}
+            
+            INSTRUCTIONS:
+            ${specificInstruction}
+            1. PRESERVE valid data.
+            2. FILL missing URLs (use search portal links if deep links fail).
+            3. MERGE into complete JSON.
+            `;
+        } else {
+            // INITIAL SEARCH - AGGRESSIVE - V5.3 UPDATE
+            taskDescription = `ROLE: ELITE FORENSIC INVESTIGATOR. OBJECTIVE: Build a COMPLETE dossier on "${name}".`;
+            
+            mandate = `
+            EXECUTE THE FOLLOWING SEARCH PLAN BEFORE GENERATING JSON:
+            
+            1. **CRITICAL: BUSINESS START DATE VERIFICATION:**
+               - You MUST find the "Formation Date", "Incorporation Date", or "Founded Year".
+               - **CROSS-REFERENCE:** Do not rely solely on the first SOS result if it looks too old (e.g., 2005). Check the company's **LinkedIn "Founded" date** or Website "About Us" to match the *current* operational entity.
+               - If there is a discrepancy (e.g., SOS says 2005 but Website says 2017), prefer the date that matches the *current* active business operations.
+               - **DO NOT RETURN NULL.** Estimate the year (e.g., "Est. 2017") if exact date is hidden.
+
+            2. **LITIGATION SWEEP:**
+               - Search for: "${name} lawsuit", "${name} v.", "${name} court docket", "${name} class action", "${name} settlement", "${name} complaint".
+               - **REQUIREMENT:** You MUST populate the 'litigation' array. If no specific case is found, find a relevant legal news article or a search result page from a legal database (Justia, PacerMonitor, etc.) and use that as the URL. Do NOT return an empty array unless you are 100% certain no record exists anywhere.
+               
+            3. **REPUTATION & REVIEWS:**
+               - Search for: "${name} reviews", "${name} complaints", "BBB ${name}", "Trustpilot ${name}", "Glassdoor ${name}", "Reddit ${name} scam".
+               - **REQUIREMENT:** You MUST find at least 3 distinct reviews or ratings. If specific reviews are hidden, summarize the general sentiment found in search snippets. Populate the 'reviews' array with at least 3 items.
+               
+            4. **DATA COMPLETENESS:**
+               - **URLS:** Every major finding (SOS, BBB, Lawsuit) MUST have a 'url' field. If a direct link to the document is impossible, provide the URL of the search result page or the main portal where the info was found.
+            `;
+            
+            context = `
+            MODE: INITIAL AGGREGATION (AGGRESSIVE).
+            ${mandate}
+            `;
+        }
+    }
+
+    return `
+    ${taskDescription}
+    Target Entity: "${name}".
+    ${context}
+    
+    REQUIRED OUTPUT FORMAT (JSON ONLY):
+    {
+      "meta": { "memo": "Brief risk summary.", "trustScore": 0-1000, "status": "Active/Inactive" },
+      "info": { "name": "string", "address": "string", "website": "string", "phone": "string", "location": "string" },
+      "sos": { "name": "string", "id": "string", "date": "YYYY-MM-DD or Year", "state": "string", "agent": "string", "url": "URL_TO_SOS_FILING" },
+      "reputation": {
+        "bbb": { "grade": "A+/F/NR", "accredited": "Yes/No", "complaints": "count", "summary": "string", "url": "URL_TO_BBB_PROFILE" },
+        "reviews": [{"source":"Google/Trustpilot/Glassdoor/Reddit", "rating":"string", "text":"string", "url":"URL_TO_REVIEW_PAGE"}]
+      },
+      "ucc_filings": [{"date":"string", "file_num":"string", "lender":"string", "status":"Active", "url":"URL_TO_FILING"}],
+      "litigation": [{"type":"string", "case_id":"string", "parties":"string", "date":"string", "status":"string", "url":"URL_TO_DOCKET"}],
+      "financials": { "revenue": "string", "margin": "string", "cash": "string", "fico": "string", "charts": {"rev":[0,0,0], "debt":[0,0,0]} },
+      "compliance": { "ofac": "Clean/Hit", "govContracts": "Yes/No" },
+      "sources": [{"title":"string", "url":"string"}]
+    }
+    
+    RULES:
+    1. NO CONVERSATIONAL TEXT. JSON ONLY.
+    2. "url" fields MUST be valid http/https links or null.
+    3. Populate "sources" with all valid URLs found.
+    4. ENSURE "reviews" array has at least 3 items.
+    5. STRICTLY NO TRAILING COMMAS IN JSON.
+    6. STRICTLY NO EMPTY KEYS like "": "" in JSON.
+  `;
+  };
+
+  // --- RENDER LOGIC ---
+  const render = (data) => {
+    lastReportData = data; // Save state
+    
+    const txt = (id, v) => { const el = document.getElementById(id); if(el) el.innerText = v || '--'; };
+    const html = (id, v) => { const el = document.getElementById(id); if(el) el.innerHTML = v || '--'; };
+    
+    // Header
+    txt('h-name', data.info.name);
+    txt('h-loc', data.info.location);
+    txt('h-phone', data.info.phone);
+    const link = document.getElementById('h-web'); 
+    if(link) { 
+        link.href = data.info.website || '#'; 
+        link.innerText = data.info.website || '--'; 
+    }
+    txt('h-memo', data.meta.memo);
+    
+    // Gauge
+    txt('g-score', data.meta.trustScore);
+    const sc = data.meta.trustScore || 0;
+    const gc = document.getElementById('g-circle');
+    const gb = document.getElementById('g-badge');
+    
+    if(sc >= 700) { 
+       gc.className = 'risk-gauge risk-low'; gb.innerText = 'Low Risk'; gb.className = 'px-5 py-1.5 rounded-full text-xs font-extrabold uppercase bg-green-600 text-white';
+    } else if(sc >= 550) { 
+       gc.className = 'risk-gauge risk-med'; gb.innerText = 'Medium Risk'; gb.className = 'px-5 py-1.5 rounded-full text-xs font-extrabold uppercase bg-yellow-500 text-white';
+    } else { 
+       gc.className = 'risk-gauge risk-high'; gb.innerText = 'High Risk'; gb.className = 'px-5 py-1.5 rounded-full text-xs font-extrabold uppercase bg-red-600 text-white';
+    }
+
+    // SOS
+    const sosBadge = document.getElementById('sos-badge');
+    sosBadge.innerText = data.meta.status;
+    sosBadge.className = (data.meta.status||'').toLowerCase().includes('active') ? 'text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold uppercase border border-green-200' : 'text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded font-bold uppercase border border-red-200';
+    
+    html('c-name', makeLink(data.sos.name, data.sos.url));
+    html('c-id', makeLink(data.sos.id, data.sos.url, "font-mono text-sm text-brand-dark mt-1 bg-gray-50 inline-block px-2 py-0.5 rounded border border-gray-200 break-all"));
+    txt('c-state', data.sos.state);
+    txt('c-date', data.sos.date);
+    txt('c-agent', data.sos.agent);
+
+    // Populate header date
+    const hFounded = document.getElementById('h-founded');
+    if (data.sos.date) {
+        hFounded.innerText = `Est. ${data.sos.date}`;
+        hFounded.classList.remove('hidden');
+    } else {
+        hFounded.classList.add('hidden');
+    }
+
+    // BBB Section
+    const bbb = data.reputation?.bbb || {};
+    html('bbb-grade', makeLink(bbb.grade, bbb.url, "text-3xl font-extrabold text-brand-dark mt-1"));
+    txt('bbb-status', bbb.accredited === 'Yes' ? '✅ Accredited' : 'Not Accredited');
+    txt('bbb-complaints', bbb.complaints);
+    txt('bbb-summary', bbb.summary);
+    
+    // Grade Color Override
+    const grade = document.getElementById('bbb-grade').querySelector('a') || document.getElementById('bbb-grade').querySelector('span');
+    if(grade && (bbb.grade||'').includes('A')) grade.classList.add('text-green-600');
+    else if(grade && (bbb.grade||'').includes('F')) grade.classList.add('text-red-600');
+
+    // Reviews Feed
+    const revList = document.getElementById('reviews-list'); revList.innerHTML='';
+    if(data.reputation?.reviews && data.reputation.reviews.length > 0) {
+      data.reputation.reviews.forEach(r => {
+         const sourceHtml = makeLink(r.source, r.url, "font-bold text-xs text-brand-dark");
+         revList.innerHTML += `
+           <div class="p-4 hover:bg-gray-50 transition-colors">
+             <div class="flex justify-between items-center mb-1">
+               ${sourceHtml}
+               <span class="text-xs font-bold text-brand-yellow bg-gray-800 px-2 py-0.5 rounded">${r.rating}</span>
+             </div>
+             <p class="text-xs text-brand-gray italic line-clamp-2">"${r.text}"</p>
+           </div>
+         `;
+      });
+    } else {
+      revList.innerHTML = '<div class="p-6 text-center text-xs text-gray-400 italic">No recent reviews found.</div>';
+    }
+
+    // UCC & Legal
+    const uccTb = document.getElementById('ucc-rows'); uccTb.innerHTML='';
+    if(data.ucc_filings && data.ucc_filings.length > 0) {
+      document.getElementById('ucc-empty').classList.add('hidden');
+      data.ucc_filings.forEach(r => {
+         const fileLink = makeLink(r.file_num || 'View', r.url, "font-mono text-xs text-blue-600 underline break-all");
+         uccTb.innerHTML += `<tr><td class="font-mono text-xs">${r.date}</td><td>${fileLink}</td><td class="font-bold text-brand-dark text-xs">${r.lender}</td><td><span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">${r.status}</span></td></tr>`;
+      });
+    } else {
+      document.getElementById('ucc-empty').classList.remove('hidden');
+    }
+
+    const legTb = document.getElementById('legal-rows'); legTb.innerHTML='';
+    if(data.litigation && data.litigation.length > 0) {
+       document.getElementById('legal-empty').classList.add('hidden');
+       data.litigation.forEach(r => {
+          const caseLink = makeLink(r.case_id || 'Docket', r.url, "font-mono text-xs text-blue-600 underline break-all");
+          legTb.innerHTML += `<tr><td><span class="bg-red-50 text-red-600 border border-red-100 text-[10px] px-2 py-0.5 rounded font-bold uppercase">${r.type}</span></td><td>${caseLink}</td><td class="text-xs font-semibold text-brand-dark">${r.parties}</td><td class="text-xs">${r.date}</td><td class="text-xs text-gray-500 italic">${r.status}</td></tr>`;
+       });
+    } else {
+       document.getElementById('legal-empty').classList.remove('hidden');
+    }
+
+    // Financials - Removed UI but keep data structure intact if API returns it
+    // ...
+    
+    txt('reg-ofac', data.compliance.ofac);
+    txt('reg-gov', data.compliance.govContracts);
+    const ofac = document.getElementById('reg-ofac');
+    ofac.className = (data.compliance.ofac||'').includes('Clean') ? 'text-xs font-bold px-2 py-1 rounded bg-green-100 text-green-700' : 'text-xs font-bold px-2 py-1 rounded bg-red-100 text-red-700';
+    
+    // Sources
+    const linksDiv = document.getElementById('source-links'); linksDiv.innerHTML='';
+    const validSources = data.sources && data.sources.length > 0 ? data.sources : [];
+    
+    validSources.forEach(x => {
+        if (x.url && x.url.startsWith('http')) {
+            linksDiv.innerHTML += `<a href="${x.url}" target="_blank" class="flex items-center gap-2 text-brand-gray hover:text-brand-dark transition-colors truncate p-2 bg-gray-50 border border-gray-200 rounded hover:bg-gray-100"><span class="text-brand-yellow">🔗</span> ${x.title}</a>`;
+        }
+    });
+  };
+
+  // --- FETCH & RETRY ---
+  const cleanJson = (str) => {
+    let s = str;
+    // Remove markdown fences
+    s = s.replace(/```json/gi, '').replace(/```/g, '').trim();
+    
+    // Extract JSON object
+    const firstOpen = s.indexOf('{');
+    const lastClose = s.lastIndexOf('}');
+    if (firstOpen !== -1 && lastClose !== -1) {
+        s = s.substring(firstOpen, lastClose + 1);
+    }
+
+    // Fix common LLM JSON errors
+    // 1. Trailing commas before closing braces/brackets
+    s = s.replace(/,(\s*[}\]])/g, '$1');
+    
+    // 2. Fix empty keys resulting from hallucinations like "key": "val", ""
+    
+    return s;
+  };
+
+  const fetchWithRetry = async (url, options, retries = 5) => {
+    const delays = [1000, 2000, 4000, 8000, 16000];
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.ok) return response;
+        // Don't retry 404 (Not Found) or 400 (Bad Request), allow them to propagate
+        if (response.status === 404 || response.status === 400) return response;
+        if (response.status === 503 || response.status === 429) throw new Error(`Status ${response.status}`);
+        return response;
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, delays[i]));
+      }
+    }
+  };
+
+  // Core Investigation Function
+  const performInvestigation = async (name, isEnhanced = false, focusSection = null, btnElement = null) => {
+    // Get the current API Key for this request
+    const currentKey = getApiKey();
+    
+    // UI State Management
+    let overlay = null;
+    let originalBtnText = '';
+    const steps = document.getElementById('loader-step');
+
+    if (focusSection) {
+        // Local Loading
+        const sectionEl = document.getElementById(`sec-${focusSection}`);
+        if(sectionEl) {
+            overlay = document.createElement('div');
+            overlay.className = 'section-loading';
+            overlay.innerHTML = `<div class="flex flex-col items-center"><div class="w-8 h-8 border-4 border-brand-border border-t-brand-yellow rounded-full animate-spin mb-2"></div><span class="text-xs font-bold text-brand-gray animate-pulse">AGGREGATING LINKS...</span></div>`;
+            sectionEl.appendChild(overlay);
+        }
+    } else {
+        // Global Loading
+        refs.viewSearch.classList.add('hidden');
+        refs.viewLoader.classList.remove('hidden');
+    }
+
+    // Button Loading State
+    if (btnElement) {
+        originalBtnText = btnElement.innerHTML;
+        btnElement.disabled = true;
+        btnElement.innerHTML = `<svg class="animate-spin h-3 w-3 mr-1 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> WAIT`;
+    }
+    
+    let msgs = [];
+    if(focusSection) {
+        msgs = [`Scanning databases for ${focusSection}...`, "Locating direct links...", "Verifying source urls...", "Updating records..."];
+    } else {
+        // Default to deep audit messages
+        msgs = ["Scanning Secretary of State databases...", "Searching Court Dockets...", "Aggregating BBB & Trustpilot data...", "Compiling direct links..."];
+    }
+    
+    let s=0; 
+    if(steps) steps.innerText = msgs[0];
+    const t = setInterval(()=> { if(steps) steps.innerText=msgs[s++%msgs.length]; }, 2000);
+
+    // Fallback Model Logic
+    const models = ["gemini-3.0-pro-preview", "gemini-2.5-flash-preview-09-2025"];
+    let successRaw = null;
+
+    try {
+      for (const model of models) {
+        try {
+            console.log(`Attempting investigation using model: ${model}`);
+            const resp = await fetchWithRetry(
+             `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${currentKey}`, 
+             {
+               method: 'POST', 
+               headers: {'Content-Type':'application/json'},
+               body: JSON.stringify({
+                 contents: [{parts:[{text: `Generate FORENSIC report for: ${name}`}]}],
+                 tools: [{google_search:{}}],
+                 // ADDED SAFETY SETTINGS TO PREVENT BLOCKING
+                 safetySettings: [
+                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+                 ],
+                 systemInstruction: {parts:[{text: getPrompt(name, isEnhanced, isEnhanced ? lastReportData : null, focusSection)}]}
+               })
+             }
+           );
+           
+           if (resp.ok) {
+               const raw = await resp.json();
+               if (raw.candidates && raw.candidates[0]?.content) {
+                   successRaw = raw;
+                   break; 
+               }
+           }
+           console.warn(`Model ${model} failed or returned empty results. Switching to fallback...`);
+
+        } catch (e) {
+           console.warn(`Error with model ${model}:`, e);
+        }
+      }
+
+      if (!successRaw) {
+           throw new Error("All available models failed to generate a report. Please try again later.");
+      }
+
+      const jsonText = successRaw.candidates[0].content.parts[0].text;
+      let json;
+      try {
+           json = JSON.parse(cleanJson(jsonText));
+      } catch(e) {
+           console.error("JSON Parse Error", jsonText);
+           throw new Error("Failed to parse forensic data.");
+      }
+       
+      // Fallback: If JSON sources are empty, try metadata
+      if (!json.sources || json.sources.length === 0) {
+           const metaSources = successRaw.candidates[0].groundingMetadata?.groundingAttributions || [];
+           json.sources = metaSources.map(m => ({ title: m.web?.title || "Source", url: m.web?.uri || "#" }));
+      }
+       
+      render(json);
+
+    } catch(e) {
+       console.error(e);
+       alert("Investigation interrupted: " + e.message + ". Please try again.");
+    } finally {
+       clearInterval(t);
+       
+       // UI Reset
+       if (btnElement) {
+           btnElement.innerHTML = originalBtnText;
+           btnElement.disabled = false;
+       }
+       if (overlay) overlay.remove();
+       
+       // Only hide main loader if we weren't in a focusSection mode (because focusSection implies main view was already visible)
+       // Actually, regardless of mode, if we are done, we should ensure the report is visible and loader hidden
+       refs.viewLoader.classList.add('hidden');
+       if (lastReportData) {
+           refs.viewReport.classList.remove('hidden');
+           refs.viewSearch.classList.add('hidden');
+       } else {
+           // If failed and no data, show search
+           refs.viewSearch.classList.remove('hidden');
+       }
+    }
+  };
+
+  // Initial Search Button - FORCED ENHANCED MODE
+  refs.btn.onclick = function() {
+    const name = refs.input.value.trim();
+    if(!name) { 
+        refs.input.focus(); 
+        return; 
+    }
+    // Pass 'this' as the button element, FORCE isEnhanced = true
+    performInvestigation(name, true, null, this);
+  };
+  
+  // Top "Enhanced Search" Button
+  if(refs.reverify) {
+    refs.reverify.onclick = function() {
+        const currentName = document.getElementById('h-name').innerText;
+        if(currentName && currentName !== '--') {
+            performInvestigation(currentName, true, null, this); 
+        }
+    };
+  }
+
+  // Section "ENHANCE" Buttons
+  document.querySelectorAll('.enhance-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+          const currentName = document.getElementById('h-name').innerText;
+          const section = this.dataset.section;
+          if(currentName && currentName !== '--') {
+             performInvestigation(currentName, true, section, this);
+          }
+      });
+  });
+
+  // Allow Enter key
+  refs.input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') refs.btn.click();
+  });
+
+});
+</script>
 </body>
 </html>
