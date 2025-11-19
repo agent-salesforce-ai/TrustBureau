@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Approval Calculator</title>
 
+  <!-- Prevent caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../favicon.png" />
 
@@ -1326,20 +1331,25 @@
     }
 
     function applyLogo() {
-      if (!elements.customLogoImg || !elements.defaultLogoSvg) return;
+      if (!elements.customLogoImg || !elements.defaultLogoSvg) {
+        console.log('Logo elements not found!');
+        return;
+      }
       const url = (logoUrl || '').trim();
-      console.log('applyLogo called with logoUrl:', logoUrl);
-      console.log('Logo URL trimmed:', url);
-      if (url) {
+      console.log('applyLogo called with logoUrl:', url ? 'URL exists (length: ' + url.length + ')' : 'No URL');
+      
+      if (url && url.length > 0) {
+        // Show custom logo, hide shield
         elements.customLogoImg.src = url;
         elements.customLogoImg.classList.remove('hidden');
         elements.defaultLogoSvg.classList.add('hidden');
-        console.log('Custom logo shown');
+        console.log('✓ Custom logo displayed, shield hidden');
       } else {
+        // Show shield, hide custom logo
         elements.customLogoImg.src = '';
         elements.customLogoImg.classList.add('hidden');
         elements.defaultLogoSvg.classList.remove('hidden');
-        console.log('Default logo shown');
+        console.log('✓ Default shield displayed, custom logo hidden');
       }
 
       if (!isApprovalView) {
@@ -1536,7 +1546,10 @@
 
     /* ------------ STORAGE ------------ */
     function loadPreferencesFromStorage() {
-      if (!window.localStorage) return;
+      if (!window.localStorage) {
+        console.log('localStorage not available!');
+        return;
+      }
       try {
         const storedTheme = localStorage.getItem('generic_offer_calc_theme');
         const storedAccent = localStorage.getItem('generic_offer_calc_accent');
@@ -1548,17 +1561,25 @@
         const storedMainGlow = localStorage.getItem('generic_offer_calc_main_glow');
         const storedShellGlow = localStorage.getItem('generic_offer_calc_shell_glow');
 
-        console.log('Dashboard logo from localStorage:', dashboardLogo ? 'Found' : 'Not found');
-        console.log('Final stored logo URL:', storedLogoUrl ? 'Found' : 'Not found');
+        console.log('=== Loading Preferences ===');
+        console.log('Dashboard logo (tbLogoDataUrl):', dashboardLogo ? 'Found (length: ' + dashboardLogo.length + ')' : 'NOT FOUND');
+        console.log('Stored logo URL:', storedLogoUrl ? 'Found (length: ' + storedLogoUrl.length + ')' : 'NOT FOUND');
 
         if (storedTheme) currentTheme = storedTheme;
         if (storedAccent) currentAccent = storedAccent;
         if (storedBackground) currentBackground = storedBackground;
-        if (storedLogoUrl) logoUrl = storedLogoUrl;
+        if (storedLogoUrl) {
+          logoUrl = storedLogoUrl;
+          console.log('✓ logoUrl variable set');
+        } else {
+          console.log('✗ No logo found in localStorage');
+        }
         if (storedCompany) companyName = storedCompany;
         if (storedMainGlow !== null) mainGlowEnabled = storedMainGlow === '1';
         if (storedShellGlow !== null) shellGlowEnabled = storedShellGlow === '1';
-      } catch (_) {}
+      } catch (e) {
+        console.error('Error loading preferences:', e);
+      }
     }
 
     /* ------------ URL CONFIG -> STATE ------------ */
