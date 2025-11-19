@@ -29,64 +29,100 @@
     var urlParams = new URLSearchParams(window.location.search);
     var isApprovalView = urlParams.get('view') === 'approval';
     
-    // Only require login and subscription check for non-approval views (broker/rep view)
+    // For broker/rep view, require access_token in URL
     if (!isApprovalView) {
-      (async function() {
-        if (window.Outseta && typeof Outseta.getUser === 'function') {
-          await checkAuth();
-        } else {
-          setTimeout(async () => {
-            if (window.Outseta && typeof Outseta.getUser === 'function') {
-              await checkAuth();
-            }
-          }, 500);
-        }
-
-        async function checkAuth() {
-          try {
-            const user = await Outseta.getUser();
-            
-            if (!user) {
-              window.location.href = 'https://trustbureauai.outseta.com/auth';
-              return;
-            }
-
-            let planName = 'Free Trial';
-            let subscriptionStartDate = null;
-
-            if (user.Account && user.Account.CurrentSubscription) {
-              const currentSubscription = user.Account.CurrentSubscription;
-              if (currentSubscription.Plan && currentSubscription.Plan.Name) {
-                planName = currentSubscription.Plan.Name;
+      const accessToken = urlParams.get('access_token');
+      
+      // If no access token, lock the page immediately
+      if (!accessToken) {
+        document.addEventListener('DOMContentLoaded', function() {
+          lockPage();
+        });
+      } else {
+        // If access token exists, proceed with normal auth check
+        (async function() {
+          if (window.Outseta && typeof Outseta.getUser === 'function') {
+            await checkAuth();
+          } else {
+            setTimeout(async () => {
+              if (window.Outseta && typeof Outseta.getUser === 'function') {
+                await checkAuth();
               }
-              if (currentSubscription.StartDate) {
-                subscriptionStartDate = currentSubscription.StartDate;
-              }
-            }
+            }, 500);
+          }
 
-            if (planName === 'Broker Box') {
-              return;
-            }
-
-            if (planName === 'Free Trial' && subscriptionStartDate) {
-              const startDate = new Date(subscriptionStartDate);
-              const trialEndDate = new Date(startDate);
-              trialEndDate.setDate(trialEndDate.getDate() + 3);
-              const today = new Date();
-
-              if (today > trialEndDate) {
-                alert('Your 3-day free trial has expired. Please subscribe to continue using Broker Box.');
-                window.location.href = 'https://trustbureauai.outseta.com/profile?tab=planChange#o-authenticated';
+          async function checkAuth() {
+            try {
+              const user = await Outseta.getUser();
+              
+              if (!user) {
+                lockPage();
                 return;
               }
-            }
 
-          } catch (error) {
-            console.error('Error checking subscription:', error);
-            window.location.href = 'https://trustbureauai.outseta.com/auth';
+              let planName = 'Free Trial';
+              let subscriptionStartDate = null;
+
+              if (user.Account && user.Account.CurrentSubscription) {
+                const currentSubscription = user.Account.CurrentSubscription;
+                if (currentSubscription.Plan && currentSubscription.Plan.Name) {
+                  planName = currentSubscription.Plan.Name;
+                }
+                if (currentSubscription.StartDate) {
+                  subscriptionStartDate = currentSubscription.StartDate;
+                }
+              }
+
+              if (planName === 'Broker Box') {
+                return;
+              }
+
+              if (planName === 'Free Trial' && subscriptionStartDate) {
+                const startDate = new Date(subscriptionStartDate);
+                const trialEndDate = new Date(startDate);
+                trialEndDate.setDate(trialEndDate.getDate() + 3);
+                const today = new Date();
+
+                if (today > trialEndDate) {
+                  lockPage();
+                  return;
+                }
+              }
+
+            } catch (error) {
+              console.error('Error checking subscription:', error);
+              lockPage();
+            }
           }
-        }
-      })();
+        })();
+      }
+    }
+    
+    function lockPage() {
+      // Hide the entire page content
+      document.body.innerHTML = `
+        <style>
+          body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+          }
+        </style>
+        <div style="text-align: center; max-width: 500px; padding: 40px 20px;">
+          <div style="width: 80px; height: 80px; background: #fee2e2; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px; color: #dc2626;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h1 style="font-size: 28px; font-weight: 600; margin: 0 0 12px; color: #111827;">Access Required</h1>
+          <p style="font-size: 16px; color: #6b7280; margin: 0 0 32px; line-height: 1.6;">This tool requires an active Broker Box subscription. Please log in through your dashboard to access the calculator.</p>
+          <a href="https://trustbureauai.outseta.com/auth" style="display: inline-block; padding: 12px 32px; background: #10b981; color: white; text-decoration: none; border-radius: 999px; font-weight: 500; font-size: 16px;">Sign In</a>
+        </div>
+      `;
     }
   </script>
 
@@ -1559,6 +1595,17 @@
         console.log('localStorage not available!');
         return;
       }
+      
+      // Don't load custom branding if this is broker view without access token
+      if (!isApprovalView) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('access_token');
+        if (!accessToken) {
+          console.log('No access token - skipping custom branding load');
+          return;
+        }
+      }
+      
       try {
         const storedTheme = localStorage.getItem('generic_offer_calc_theme');
         const storedAccent = localStorage.getItem('generic_offer_calc_accent');
