@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trust Bureau - Forensic Aggregator v8.9 (Uppercase)</title>
+  <title>Trust Bureau - Forensic Aggregator v9.1 (Map + Dark Mode)</title>
   <meta name="theme-color" content="#FAFAFA" />
 
   <!-- Tailwind CSS -->
@@ -55,22 +55,42 @@
 
   <!-- Custom CSS -->
   <style>
-    body { background-color: #fafafa; color: #18181b; font-family: 'Inter', sans-serif; }
+    /* Base Styles with Dark Mode Support */
+    body { 
+        background-color: #fafafa; 
+        color: #18181b; 
+        font-family: 'Inter', sans-serif; 
+        transition: background-color 0.3s, color 0.3s;
+    }
+    
+    html.dark body {
+        background-color: #09090b; /* Zinc 950 */
+        color: #f4f4f5; /* Zinc 100 */
+    }
     
     /* Scrollbar Styling */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background-color: #d4d4d8; border-radius: 20px; }
+    html.dark ::-webkit-scrollbar-thumb { background-color: #3f3f46; }
     
     /* Forensic Table */
     .forensic-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; }
     .forensic-table th {
-      text-align: left; padding: 12px 16px; background: #f4f4f5; color: #52525b; font-weight: 700;
-      text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;
+      text-align: left; padding: 12px 16px; 
+      background: #f4f4f5; color: #52525b; 
+      font-weight: 700; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;
       border-bottom: 1px solid #e4e4e7; white-space: nowrap; position: sticky; top: 0; z-index: 10;
     }
+    html.dark .forensic-table th {
+        background: #18181b; color: #a1a1aa; border-bottom: 1px solid #27272a;
+    }
+
     .forensic-table td { padding: 14px 16px; border-bottom: 1px solid #f4f4f5; vertical-align: top; color: #27272a; }
+    html.dark .forensic-table td { border-bottom: 1px solid #27272a; color: #d4d4d8; }
+
     .forensic-table tr:hover td { background-color: #fafafa; }
+    html.dark .forensic-table tr:hover td { background-color: #27272a; }
 
     /* Report Section - Relative Positioning Fix */
     .report-section { position: relative; }
@@ -88,17 +108,30 @@
     }
     .enhance-btn:hover:not(:disabled) { background: #f4f4f5; border-color: #a1a1aa; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .enhance-btn:active { transform: translateY(0); }
+    
+    html.dark .enhance-btn {
+        background: #18181b; color: #e4e4e7; border-color: #3f3f46;
+    }
+    html.dark .enhance-btn:hover:not(:disabled) {
+        background: #27272a; border-color: #71717a;
+    }
 
     /* Links */
     a.data-link { color: #18181b; text-decoration: none; border-bottom: 1px dotted #a1a1aa; font-weight: 600; transition: all 0.2s; }
     a.data-link:hover { background-color: #f4f4f5; border-bottom-style: solid; border-color: #000; color: #000; }
+    
+    html.dark a.data-link { color: #e4e4e7; }
+    html.dark a.data-link:hover { background-color: #27272a; border-color: #fff; color: #fff; }
 
     /* Labels & Values */
     .label-text { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; margin-bottom: 4px; display: block; }
     .value-text { font-size: 0.95rem; font-weight: 500; color: #09090b; line-height: 1.5; }
+    html.dark .label-text { color: #a1a1aa; }
+    html.dark .value-text { color: #f4f4f5; }
     
     /* Empty State Styling */
     .empty-value { color: #a1a1aa; font-weight: 400; font-style: italic; }
+    html.dark .empty-value { color: #52525b; }
 
     /* Nav Pills */
     .nav-pill {
@@ -107,18 +140,24 @@
     }
     .nav-pill:hover { background-color: #f4f4f5; color: #18181b; }
     .nav-pill.active { background-color: #18181b; color: #ffffff; }
+    
+    html.dark .nav-pill:hover { background-color: #18181b; color: #fff; }
+    html.dark .nav-pill.active { background-color: #fafafa; color: #000; }
 
     /* Loading Overlay */
     .section-loading {
       position: absolute; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(2px); z-index: 50;
       display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 0.75rem;
     }
+    html.dark .section-loading { background: rgba(9,9,11,0.85); }
 
     /* Hero Background */
     .hero-bg { background: radial-gradient(circle at 50% 0%, #fafafa 0%, #e4e4e7 100%); }
+    html.dark .hero-bg { background: radial-gradient(circle at 50% 0%, #18181b 0%, #09090b 100%); }
     
     /* Loader Scan Line */
     .scan-line { width: 100%; height: 3px; background: linear-gradient(90deg, transparent, #18181b, transparent); animation: scan 1.5s linear infinite; }
+    html.dark .scan-line { background: linear-gradient(90deg, transparent, #e4e4e7, transparent); }
     @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
     /* Toast */
@@ -132,10 +171,14 @@
     /* Blinking Cursor */
     .cursor-blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Map Filter */
+    .map-frame { filter: grayscale(100%); transition: filter 0.3s ease; }
+    .map-frame:hover { filter: grayscale(0%); }
   </style>
 </head>
 
-<body class="antialiased min-h-screen flex flex-col">
+<body class="antialiased min-h-screen flex flex-col transition-colors duration-300">
 
   <!-- ERROR TOAST -->
   <div id="error-toast" class="fixed top-6 left-0 right-0 z-[100] flex justify-center pointer-events-none">
@@ -146,22 +189,28 @@
   </div>
 
   <!-- HEADER -->
-  <header id="main-header" class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-brand-border shadow-sm">
+  <header id="main-header" class="sticky top-0 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-brand-border dark:border-zinc-800 shadow-sm transition-colors duration-300">
     <div class="max-w-[1500px] mx-auto px-4 md:px-8 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3 cursor-pointer group" onclick="location.reload()">
-        <div class="w-9 h-9 bg-brand-primary rounded flex items-center justify-center shadow-lg shadow-zinc-500/20 group-hover:scale-105 transition-transform">
-          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 5.5l5.5 9.5h-11L12 7.5z"/></svg>
+        <div class="w-9 h-9 bg-brand-primary dark:bg-white rounded flex items-center justify-center shadow-lg shadow-zinc-500/20 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 text-white dark:text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 5.5l5.5 9.5h-11L12 7.5z"/></svg>
         </div>
-        <h1 class="font-heading font-black text-lg text-brand-dark tracking-tight uppercase">Trust Bureau <span class="hidden sm:inline opacity-50 font-medium text-xs align-top ml-1">v8.9</span></h1>
+        <h1 class="font-heading font-black text-lg text-brand-dark dark:text-white tracking-tight uppercase">Trust Bureau <span class="hidden sm:inline opacity-50 font-medium text-xs align-top ml-1">v9.1</span></h1>
       </div>
 
       <div class="flex items-center gap-3">
-        <button id="settings-btn" class="text-brand-gray hover:text-brand-dark p-2 rounded-full hover:bg-gray-100 transition-colors" title="Settings & API Key">
+        <button id="theme-toggle" class="text-brand-gray hover:text-brand-dark dark:text-zinc-400 dark:hover:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+            <!-- Moon Icon (Default) -->
+            <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            <!-- Sun Icon (Hidden) -->
+            <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </button>
+        <button id="settings-btn" class="text-brand-gray hover:text-brand-dark dark:text-zinc-400 dark:hover:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" title="Settings & API Key">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </button>
-        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-200 rounded-full">
+        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-full">
           <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span class="text-[10px] font-bold text-green-800 uppercase tracking-wide">System Online</span>
+          <span class="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase tracking-wide">System Online</span>
         </div>
       </div>
     </div>
@@ -172,116 +221,158 @@
     
     <!-- SEARCH VIEW -->
     <div id="search-view" class="hero-bg absolute inset-0 z-10 flex flex-col items-center justify-center p-4 text-center transition-all duration-500">
-      <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-zinc-300/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-zinc-300/20 dark:bg-zinc-600/10 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div class="inline-flex items-center gap-2 bg-white/50 border border-zinc-200 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold text-brand-gray mb-8 uppercase tracking-widest">
-        <span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Live Aggregation
+      <div class="inline-flex items-center gap-2 bg-white/50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold text-brand-gray dark:text-zinc-400 mb-8 uppercase tracking-widest">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-primary dark:bg-white"></span> Live Aggregation
       </div>
 
-      <h2 class="text-4xl md:text-7xl font-heading font-black text-brand-dark mb-6 tracking-tighter leading-[0.9] uppercase">
+      <h2 class="text-4xl md:text-7xl font-heading font-black text-brand-dark dark:text-white mb-6 tracking-tighter leading-[0.9] uppercase">
         VERIFY <br />
-        <span class="text-zinc-400">EVERYTHING.</span>
+        <span class="text-zinc-400 dark:text-zinc-600">EVERYTHING.</span>
       </h2>
 
-      <p class="text-brand-gray mb-10 text-sm md:text-base font-bold max-w-xl uppercase tracking-widest">
+      <p class="text-brand-gray dark:text-zinc-400 mb-10 text-sm md:text-base font-bold max-w-xl uppercase tracking-widest">
         Corporate Filings • Litigation History • Consumer Sentiment • Compliance • Financial Firmographics
       </p>
 
       <div class="w-full max-w-2xl relative group">
-        <div class="bg-white p-2 rounded-2xl shadow-2xl shadow-zinc-200/50 border border-zinc-200 flex flex-col sm:flex-row gap-2 transition-shadow group-hover:shadow-zinc-300/50 focus-within:ring-4 focus-within:ring-zinc-100">
+        <div class="bg-white dark:bg-zinc-900 p-2 rounded-2xl shadow-2xl shadow-zinc-200/50 dark:shadow-black/50 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-2 transition-shadow group-hover:shadow-zinc-300/50 dark:group-hover:shadow-zinc-900/50 focus-within:ring-4 focus-within:ring-zinc-100 dark:focus-within:ring-zinc-800">
           <div class="flex-grow relative flex items-center">
             <svg class="w-5 h-5 text-zinc-400 absolute left-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" id="search-input" class="w-full bg-transparent border-none outline-none pl-12 pr-4 py-3 text-lg font-medium text-brand-dark placeholder-zinc-400 uppercase" placeholder="ENTITY NAME (E.G., NEURALINK, TESLA)" />
+            <input type="text" id="search-input" class="w-full bg-transparent border-none outline-none pl-12 pr-4 py-3 text-lg font-medium text-brand-dark dark:text-white placeholder-zinc-400 uppercase" placeholder="ENTITY NAME (E.G., NEURALINK, TESLA)" />
           </div>
-          <button id="generate-btn" class="bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors active:scale-95 uppercase tracking-widest text-sm">
+          <button id="generate-btn" class="bg-brand-primary dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl font-bold hover:bg-black dark:hover:bg-zinc-200 transition-colors active:scale-95 uppercase tracking-widest text-sm">
             Begin Audit
           </button>
         </div>
       </div>
 
       <div class="mt-12 flex gap-2 flex-wrap justify-center opacity-60">
-        <button onclick="window.runSearch('OpenAI')" class="text-xs font-bold bg-white border border-zinc-200 px-4 py-1.5 rounded-full hover:border-brand-primary hover:text-black transition-colors uppercase tracking-wider">OpenAI</button>
-        <button onclick="window.runSearch('Stripe')" class="text-xs font-bold bg-white border border-zinc-200 px-4 py-1.5 rounded-full hover:border-brand-primary hover:text-black transition-colors uppercase tracking-wider">Stripe</button>
-        <button onclick="window.runSearch('SpaceX')" class="text-xs font-bold bg-white border border-zinc-200 px-4 py-1.5 rounded-full hover:border-brand-primary hover:text-black transition-colors uppercase tracking-wider">SpaceX</button>
+        <button onclick="window.runSearch('OpenAI')" class="text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-4 py-1.5 rounded-full hover:border-brand-primary dark:hover:border-zinc-500 hover:text-black dark:hover:text-white text-zinc-600 dark:text-zinc-400 transition-colors uppercase tracking-wider">OpenAI</button>
+        <button onclick="window.runSearch('Stripe')" class="text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-4 py-1.5 rounded-full hover:border-brand-primary dark:hover:border-zinc-500 hover:text-black dark:hover:text-white text-zinc-600 dark:text-zinc-400 transition-colors uppercase tracking-wider">Stripe</button>
+        <button onclick="window.runSearch('SpaceX')" class="text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-4 py-1.5 rounded-full hover:border-brand-primary dark:hover:border-zinc-500 hover:text-black dark:hover:text-white text-zinc-600 dark:text-zinc-400 transition-colors uppercase tracking-wider">SpaceX</button>
       </div>
     </div>
 
-    <!-- LOADER VIEW (AUDIT LOG) -->
-    <div id="loader-view" class="hidden absolute inset-0 z-20 bg-brand-bg/95 backdrop-blur-sm flex flex-col items-center justify-center p-4">
-      <div class="bg-white p-1 rounded-2xl shadow-2xl border border-brand-border max-w-xl w-full relative overflow-hidden flex flex-col">
+    <!-- LOADER VIEW (DASHBOARD) -->
+    <div id="loader-view" class="hidden absolute inset-0 z-20 bg-brand-bg/95 dark:bg-zinc-950/95 backdrop-blur-sm flex flex-col items-center justify-center p-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 max-w-2xl w-full overflow-hidden p-8">
         
-        <!-- Header -->
-        <div class="bg-zinc-50 px-4 py-3 border-b border-zinc-100 flex justify-between items-center flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span class="text-[10px] font-bold uppercase text-zinc-700 tracking-widest">Forensic Audit Active</span>
-            </div>
-            <span class="font-mono text-[10px] text-zinc-300">SECURE_SHELL_v8.9</span>
+        <!-- Loader Header -->
+        <div class="flex justify-between items-end mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-6">
+           <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-2 h-2 bg-brand-primary dark:bg-white rounded-full animate-pulse"></div>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Processing Request</span>
+              </div>
+              <h3 class="text-2xl font-heading font-bold text-brand-dark dark:text-white">Forensic Data Extraction</h3>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-medium">Establishing secure handshake with global registries...</p>
+           </div>
+           <div class="text-right">
+               <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest block mb-1">Elapsed Time</span>
+               <span class="block text-4xl font-mono font-bold text-brand-primary dark:text-white tracking-tight" id="scan-timer">00.00s</span>
+           </div>
         </div>
-    
-        <!-- Log Window -->
-        <div id="audit-log" class="h-[350px] bg-zinc-900 p-6 overflow-y-auto font-mono text-xs space-y-1.5 scroll-smooth text-zinc-300 shadow-inner">
-            <!-- Log lines injected here -->
+   
+        <!-- Module Grid (Visual Feedback) -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+           <!-- SOS -->
+           <div id="mod-sos" class="p-4 border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg opacity-40 transition-all duration-500">
+              <div class="text-[10px] font-bold uppercase text-zinc-400 mb-3 tracking-wider">Registry</div>
+              <div class="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                <div class="mod-bar h-full bg-zinc-800 dark:bg-white w-0 transition-all duration-1000"></div>
+              </div>
+           </div>
+           <!-- Legal -->
+           <div id="mod-legal" class="p-4 border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg opacity-40 transition-all duration-500">
+              <div class="text-[10px] font-bold uppercase text-zinc-400 mb-3 tracking-wider">Litigation</div>
+              <div class="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                 <div class="mod-bar h-full bg-zinc-800 dark:bg-white w-0 transition-all duration-1000"></div>
+              </div>
+           </div>
+           <!-- Sentiment -->
+           <div id="mod-rep" class="p-4 border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg opacity-40 transition-all duration-500">
+              <div class="text-[10px] font-bold uppercase text-zinc-400 mb-3 tracking-wider">Sentiment</div>
+              <div class="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                 <div class="mod-bar h-full bg-zinc-800 dark:bg-white w-0 transition-all duration-1000"></div>
+              </div>
+           </div>
+           <!-- Digital -->
+           <div id="mod-dig" class="p-4 border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg opacity-40 transition-all duration-500">
+              <div class="text-[10px] font-bold uppercase text-zinc-400 mb-3 tracking-wider">Digital</div>
+              <div class="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                 <div class="mod-bar h-full bg-zinc-800 dark:bg-white w-0 transition-all duration-1000"></div>
+              </div>
+           </div>
         </div>
-        
-        <!-- Footer with Blinking Cursor -->
-        <div class="bg-zinc-900 px-6 pb-4 pt-0 flex-shrink-0 border-t border-zinc-800">
-            <span class="text-emerald-500 font-mono text-xs mr-2">root@trust-bureau:~#</span>
-            <span class="text-zinc-500 font-mono text-xs">awaiting_payload</span><span class="w-2 h-4 bg-zinc-500 inline-block align-middle ml-1 cursor-blink"></span>
+   
+        <!-- Terminal/Log (Cleaner) -->
+        <div class="bg-zinc-900 rounded-lg p-5 h-48 overflow-y-auto font-mono text-xs text-zinc-300 shadow-inner border border-zinc-800" id="audit-log">
+           <!-- Logs go here -->
         </div>
-      </div>
-    </div>
+
+        <div class="mt-4 text-center">
+            <span class="text-[10px] font-bold text-zinc-300 dark:text-zinc-600 uppercase tracking-widest">Trust Bureau Secure Gateway</span>
+        </div>
+     </div>
+   </div>
 
     <!-- REPORT VIEW -->
     <div id="report-view" class="hidden relative z-30 max-w-[1600px] mx-auto px-4 md:px-8 py-8">
       
       <!-- HEADER INFO CARD -->
-      <div id="sec-header" class="bg-white border border-brand-border rounded-2xl p-6 md:p-8 shadow-card mb-8 animate-fade-in-up">
+      <div id="sec-header" class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-card mb-8 animate-fade-in-up transition-colors duration-300">
         <div class="flex flex-col xl:flex-row justify-between gap-8">
           <div class="flex-grow">
             <div class="flex flex-wrap items-center gap-4 mb-3">
-               <h1 id="h-name" class="text-3xl md:text-5xl font-heading font-extrabold text-brand-dark tracking-tight">--</h1>
-               <span id="sos-badge" class="text-xs font-bold px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-gray-500 uppercase tracking-wide">Verifying</span>
+               <h1 id="h-name" class="text-3xl md:text-5xl font-heading font-extrabold text-brand-dark dark:text-white tracking-tight">--</h1>
+               <span id="sos-badge" class="text-xs font-bold px-3 py-1 rounded-full border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Verifying</span>
             </div>
             
-            <div class="flex flex-wrap gap-y-2 gap-x-6 text-sm text-brand-gray mb-6">
+            <div class="flex flex-wrap gap-y-2 gap-x-6 text-sm text-brand-gray dark:text-zinc-400 mb-6">
               <div class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span id="h-loc" class="font-medium text-brand-dark">--</span>
+                <span id="h-loc" class="font-medium text-brand-dark dark:text-zinc-200">--</span>
               </div>
               <div class="flex items-center gap-2">
                  <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
                  <a id="h-web" href="#" target="_blank" class="data-link">--</a>
               </div>
-              <div id="h-founded-container" class="hidden flex items-center gap-2 border-l pl-6 border-zinc-200">
+              <div id="h-founded-container" class="hidden flex items-center gap-2 border-l pl-6 border-zinc-200 dark:border-zinc-700">
                  <span class="text-xs font-mono text-zinc-400">ESTABLISHED</span>
-                 <span id="h-founded" class="font-bold text-brand-dark">--</span>
+                 <span id="h-founded" class="font-bold text-brand-dark dark:text-zinc-200">--</span>
               </div>
             </div>
 
-            <div class="bg-zinc-50 border-l-4 border-brand-primary p-5 rounded-r-xl">
+            <div class="bg-zinc-50 dark:bg-zinc-800 border-l-4 border-brand-primary dark:border-zinc-400 p-5 rounded-r-xl mb-6">
               <h4 class="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">AI Forensic Analysis</h4>
-              <p id="h-memo" class="text-sm md:text-base text-zinc-800 leading-relaxed">Generating summary...</p>
+              <p id="h-memo" class="text-sm md:text-base text-zinc-800 dark:text-zinc-300 leading-relaxed">Generating summary...</p>
+            </div>
+
+            <!-- Map Container -->
+            <div id="map-container" class="hidden w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 mt-4 relative group">
+               <!-- Map injected here -->
             </div>
           </div>
 
-          <div class="flex-shrink-0 flex flex-col items-center justify-center xl:border-l xl:border-zinc-100 xl:pl-8 min-w-[220px]">
-             <button id="reverify-btn" class="mb-6 enhance-btn w-full justify-center bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-700 text-xs">
+          <div class="flex-shrink-0 flex flex-col items-center justify-center xl:border-l xl:border-zinc-100 dark:xl:border-zinc-800 xl:pl-8 min-w-[220px] mt-8 xl:mt-0">
+             <button id="reverify-btn" class="mb-6 enhance-btn w-full justify-center bg-zinc-900 dark:bg-white text-white dark:text-black border-zinc-900 dark:border-white hover:bg-zinc-700 dark:hover:bg-zinc-200 text-xs">
                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                Re-Audit Entity
              </button>
              
              <div class="relative w-32 h-32 mb-2">
                 <svg class="risk-gauge-svg w-full h-full" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="#f4f4f5" stroke-width="8"></circle>
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#f4f4f5" class="dark:stroke-zinc-800" stroke-width="8"></circle>
                   <circle id="g-circle-progress" class="risk-gauge-progress" cx="50" cy="50" r="45" fill="none" stroke="#71717a" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="283"></circle>
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                   <span id="g-score" class="text-3xl font-black text-brand-dark leading-none">--</span>
+                   <span id="g-score" class="text-3xl font-black text-brand-dark dark:text-white leading-none">--</span>
                    <span class="text-[9px] font-bold uppercase text-zinc-400 mt-1">Trust Score</span>
                 </div>
              </div>
-             <div id="g-badge" class="px-4 py-1 rounded text-xs font-bold uppercase tracking-wider bg-zinc-200 text-zinc-500">Pending</div>
+             <div id="g-badge" class="px-4 py-1 rounded text-xs font-bold uppercase tracking-wider bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">Pending</div>
           </div>
         </div>
       </div>
@@ -308,7 +399,7 @@
         <div class="lg:col-span-10 space-y-0 min-w-0">
            
            <!-- SOS MODULE -->
-           <div id="sec-sos" class="report-section mt-8 pt-8 border-t border-brand-border first:mt-0 first:pt-0 first:border-t-0">
+           <div id="sec-sos" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800 first:mt-0 first:pt-0 first:border-t-0">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
@@ -316,7 +407,7 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="sos">Deep Search</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm p-6">
                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
                     <div class="col-span-1 sm:col-span-2">
                         <span class="label-text">Legal Entity Name</span>
@@ -345,7 +436,7 @@
            </div>
 
            <!-- LEADERSHIP MODULE -->
-           <div id="sec-leadership" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-leadership" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -353,7 +444,7 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="leadership">Investigate</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm p-6">
                  <div id="leadership-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      <!-- Filled by JS -->
                  </div>
@@ -363,7 +454,7 @@
            </div>
 
            <!-- DIGITAL FOOTPRINT -->
-           <div id="sec-digital" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-digital" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
@@ -371,13 +462,13 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="digital">Scan</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm p-6">
                   <ul class="space-y-3 text-sm">
-                     <li class="flex justify-between items-center border-b border-zinc-100 pb-2 last:border-0 last:pb-0">
+                     <li class="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-2 last:border-0 last:pb-0">
                         <span class="label-text">Primary Domain</span>
-                        <div id="d-domain" class="font-mono text-brand-primary truncate font-bold text-sm">--</div>
+                        <div id="d-domain" class="font-mono text-brand-primary dark:text-zinc-200 truncate font-bold text-sm">--</div>
                      </li>
-                     <li class="flex justify-between items-center border-b border-zinc-100 pb-2 last:border-0 last:pb-0">
+                     <li class="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-2 last:border-0 last:pb-0">
                         <span class="label-text">Domain Age</span>
                         <div id="d-age" class="font-medium text-sm">--</div>
                      </li>
@@ -392,7 +483,7 @@
            </div>
 
            <!-- LITIGATION MODULE -->
-           <div id="sec-litigation" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-litigation" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
@@ -400,7 +491,7 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="litigation">Check Dockets</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm">
                  <div class="overflow-x-auto max-h-[400px]">
                     <table class="forensic-table min-w-[700px]">
                        <thead>
@@ -414,7 +505,7 @@
                        </thead>
                        <tbody id="legal-rows"></tbody>
                     </table>
-                    <div id="legal-empty" class="p-8 text-center text-zinc-400 italic text-sm hidden border-t border-zinc-100">No adverse litigation records located in scan.</div>
+                    <div id="legal-empty" class="p-8 text-center text-zinc-400 italic text-sm hidden border-t border-zinc-100 dark:border-zinc-800">No adverse litigation records located in scan.</div>
                  </div>
                  <!-- ANALYSIS INJECT -->
                  <div id="legal-analysis" class="px-6 pb-6"></div>
@@ -422,7 +513,7 @@
            </div>
 
            <!-- REPUTATION MODULE -->
-           <div id="sec-reputation" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-reputation" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -430,13 +521,13 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="reputation">Verify BBB</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm p-6">
                  <div class="flex flex-col md:flex-row items-center gap-8">
                      <div class="text-center min-w-[100px]">
                         <span class="label-text mb-1">Grade</span>
-                        <div id="bbb-grade" class="text-6xl font-black text-brand-dark tracking-tighter">--</div>
+                        <div id="bbb-grade" class="text-6xl font-black text-brand-dark dark:text-white tracking-tighter">--</div>
                      </div>
-                     <div class="flex-grow w-full md:border-l border-zinc-100 md:pl-8">
+                     <div class="flex-grow w-full md:border-l border-zinc-100 dark:border-zinc-800 md:pl-8">
                         <div class="grid grid-cols-2 gap-4">
                            <div>
                               <span class="label-text">Accreditation</span>
@@ -447,9 +538,9 @@
                               <div id="bbb-complaints" class="value-text">--</div>
                            </div>
                         </div>
-                        <div class="mt-3 pt-3 border-t border-zinc-100">
+                        <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                             <span class="label-text block mb-1">Bureau Analysis</span>
-                            <p id="bbb-summary" class="text-sm text-zinc-600 leading-relaxed">--</p>
+                            <p id="bbb-summary" class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">--</p>
                         </div>
                      </div>
                  </div>
@@ -459,7 +550,7 @@
            </div>
 
            <!-- REVIEWS MODULE -->
-           <div id="sec-reviews" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-reviews" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
@@ -467,15 +558,15 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="reviews">Deep Scan</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm overflow-hidden">
-                  <div id="reviews-list" class="divide-y divide-zinc-100 max-h-[600px] overflow-y-auto">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+                  <div id="reviews-list" class="divide-y divide-zinc-100 dark:divide-zinc-800 max-h-[600px] overflow-y-auto">
                       <!-- Reviews injected here -->
                   </div>
               </div>
            </div>
 
            <!-- COMPLIANCE MODULE -->
-           <div id="sec-compliance" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-compliance" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <div class="flex justify-between items-center mb-4">
                  <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
@@ -483,15 +574,15 @@
                  </h3>
                  <button class="enhance-btn text-xs" data-section="compliance">Check</button>
               </div>
-              <div class="bg-white border border-brand-border rounded-xl shadow-sm p-6">
+              <div class="bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl shadow-sm p-6">
                   <ul class="space-y-4 text-sm">
                     <li class="flex justify-between items-center">
-                       <span class="text-zinc-600 font-medium">OFAC / SDN List</span>
-                       <span id="reg-ofac" class="text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500">--</span>
+                       <span class="text-zinc-600 dark:text-zinc-400 font-medium">OFAC / SDN List</span>
+                       <span id="reg-ofac" class="text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-300">--</span>
                     </li>
                     <li class="flex justify-between items-center">
-                       <span class="text-zinc-600 font-medium">Gov Contracts (SAM)</span>
-                       <span id="reg-gov" class="text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500">--</span>
+                       <span class="text-zinc-600 dark:text-zinc-400 font-medium">Gov Contracts (SAM)</span>
+                       <span id="reg-gov" class="text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-300">--</span>
                     </li>
                   </ul>
                   <!-- ANALYSIS INJECT -->
@@ -500,7 +591,7 @@
            </div>
 
            <!-- SOURCES FOOTER -->
-           <div id="sec-sources" class="report-section mt-8 pt-8 border-t border-brand-border">
+           <div id="sec-sources" class="report-section mt-8 pt-8 border-t border-brand-border dark:border-zinc-800">
               <h3 class="text-zinc-500 font-bold text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                  Evidence Locker (Sources)
@@ -513,13 +604,13 @@
       </div>
       
       <!-- QA -->
-      <div id="sec-qa" class="mt-8 bg-white border border-brand-border rounded-2xl p-8 text-brand-dark shadow-card">
+      <div id="sec-qa" class="mt-8 bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-2xl p-8 text-brand-dark dark:text-white shadow-card">
          <h3 class="text-xl font-bold mb-4">Forensic Assistant</h3>
          <div class="relative">
-            <input type="text" id="qa-input" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-3 pr-24 text-sm focus:border-brand-primary transition-colors placeholder-zinc-400 text-brand-dark" placeholder="E.g., Based on the reviews, what is the primary customer complaint?" />
-            <button id="qa-btn" class="absolute right-1.5 top-1.5 bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded hover:opacity-90">Ask AI</button>
+            <input type="text" id="qa-input" class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-4 py-3 pr-24 text-sm focus:border-brand-primary dark:focus:border-zinc-500 transition-colors placeholder-zinc-400 text-brand-dark dark:text-white" placeholder="E.g., Based on the reviews, what is the primary customer complaint?" />
+            <button id="qa-btn" class="absolute right-1.5 top-1.5 bg-brand-primary dark:bg-zinc-700 text-white text-xs font-bold px-4 py-2 rounded hover:opacity-90">Ask AI</button>
          </div>
-         <div id="qa-response" class="mt-4 text-sm text-zinc-600 leading-relaxed hidden p-4 bg-zinc-50 rounded border border-zinc-200"></div>
+         <div id="qa-response" class="mt-4 text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed hidden p-4 bg-zinc-50 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700"></div>
       </div>
 
     </div>
@@ -527,24 +618,24 @@
 
   <!-- MODAL: API KEY -->
   <div id="api-modal" class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-     <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all scale-100">
+     <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all scale-100 border border-zinc-200 dark:border-zinc-800">
         <div class="flex justify-between items-center mb-4">
-           <h3 class="font-bold text-lg">Configure Intelligence Feed</h3>
-           <button id="close-api-btn" class="text-zinc-400 hover:text-zinc-900">&times;</button>
+           <h3 class="font-bold text-lg text-brand-dark dark:text-white">Configure Intelligence Feed</h3>
+           <button id="close-api-btn" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white">&times;</button>
         </div>
         
-        <p class="text-sm text-zinc-500 mb-4">Enter your Google Gemini API Key to enable live scraping and forensic analysis.</p>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-4">Enter your Google Gemini API Key to enable live scraping and forensic analysis.</p>
         
         <div class="space-y-4 mb-6">
             <div>
                 <label class="block text-xs font-bold text-zinc-500 uppercase mb-1.5">API Key</label>
-                <input id="api-key-input" type="password" class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black" placeholder="AIza..." />
+                <input id="api-key-input" type="password" class="w-full border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-black dark:text-white" placeholder="AIza..." />
             </div>
             
             <div>
                 <label class="block text-xs font-bold text-zinc-500 uppercase mb-1.5">Reasoning Model</label>
                 <div class="relative">
-                    <select id="model-select" class="w-full appearance-none border border-zinc-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black bg-white">
+                    <select id="model-select" class="w-full appearance-none border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-black dark:text-white">
                         <option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash (Recommended)</option>
                         <option value="gemini-3-pro-preview">Gemini 3.0 Pro Preview (Reasoning Fallback)</option>
                         <option value="gemini-2.5-pro-preview-09-2025">Gemini 2.5 Pro (Complex Reasoning)</option>
@@ -557,8 +648,8 @@
         </div>
 
         <div class="flex justify-end gap-3">
-           <button id="clear-key" class="text-red-600 text-xs font-bold hover:bg-red-50 px-3 py-2 rounded">Clear</button>
-           <button id="save-key" class="bg-black text-white text-xs font-bold px-6 py-2 rounded hover:opacity-80">Save Credentials</button>
+           <button id="clear-key" class="text-red-600 text-xs font-bold hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded">Clear</button>
+           <button id="save-key" class="bg-black dark:bg-white text-white dark:text-black text-xs font-bold px-6 py-2 rounded hover:opacity-80">Save Credentials</button>
         </div>
      </div>
   </div>
@@ -567,11 +658,10 @@
     // --- CORE UTILS ---
     const $ = id => document.getElementById(id);
     
-    const makeLink = (text, url, cls = 'font-bold text-brand-dark hover:underline') => {
+    const makeLink = (text, url, cls = 'font-bold text-brand-dark dark:text-zinc-200 hover:underline') => {
         if (url && url.startsWith('http') && text && text !== '--') {
             return `<a href="${url}" target="_blank" class="${cls} decoration-zinc-400 inline-flex items-center gap-1" title="Verified Source">${text} <svg class="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>`;
         }
-        // If no specific item URL, but text exists, just return styled text
         return `<span class="${cls}">${text || '--'}</span>`;
     };
 
@@ -586,6 +676,39 @@
 
     // --- MAIN APP LOGIC ---
     document.addEventListener('DOMContentLoaded', () => {
+        
+        // Dark Mode Logic
+        const toggleBtn = $('theme-toggle');
+        const sunIcon = $('sun-icon');
+        const moonIcon = $('moon-icon');
+        const html = document.documentElement;
+        
+        const initTheme = () => {
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            } else {
+                html.classList.remove('dark');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            }
+        };
+        initTheme();
+
+        toggleBtn.onclick = () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            }
+        };
         
         // Settings Logic
         $('settings-btn').onclick = () => { 
@@ -646,12 +769,11 @@
 
         $('reverify-btn').onclick = () => runAudit($('h-name').innerText, true);
 
-        // FIX: Selector only gets buttons that are NOT the reverify button
         document.querySelectorAll('.enhance-btn:not(#reverify-btn)').forEach(btn => {
             btn.onclick = function(e) {
                 const section = this.dataset.section;
                 runAudit($('h-name').innerText, true, section, this);
-                e.stopPropagation(); // Stop header click overlap
+                e.stopPropagation(); 
             };
         });
 
@@ -683,9 +805,21 @@
                 $('report-view').classList.add('hidden');
                 $('loader-view').classList.remove('hidden');
 
-                // RESET LOGS
+                // RESET UI
                 const logBox = $('audit-log');
                 logBox.innerHTML = '';
+                const timerEl = $('scan-timer');
+                timerEl.innerText = "00.00s";
+                
+                // Reset Module Bars
+                document.querySelectorAll('.mod-bar').forEach(bar => { bar.style.width = '0%'; bar.parentElement.parentElement.style.opacity = '0.5'; });
+
+                // START TIMER
+                const startScanTime = Date.now();
+                const timerInterval = setInterval(() => {
+                     const elapsed = (Date.now() - startScanTime) / 1000;
+                     timerEl.innerText = elapsed.toFixed(2) + "s";
+                }, 50);
                 
                 // LOGGING UTILS
                 const addLog = (msg, type='info') => {
@@ -700,8 +834,8 @@
                     logBox.scrollTop = logBox.scrollHeight;
                 };
 
-                // STEP SEQUENCE (Startup)
-                const startSteps = [
+                // SIMULATED WORK
+                const steps = [
                     "Initializing secure handshake (TLS 1.3)...",
                     `Resolving entity GUID for '${name}'...`,
                     "Connecting to Global Business Registry...",
@@ -712,37 +846,41 @@
                     "Running sentiment analysis on consumer reviews..."
                 ];
 
-                // RANDOM PROCESSING LOGS (Loop while waiting)
-                const processingSteps = [
-                    "Cross-referencing beneficial ownership...",
-                    "Vectorizing text data for sentiment analysis...",
-                    "Decrypting SSL certificate chain...",
-                    "Analyzing shell company indicators...",
-                    "Verifying registered agent physical address...",
-                    "Checking bankruptcy court records...",
-                    "Validating domain DNS records...",
-                    "Scanning for adverse media...",
-                    "Compiling executive leadership profiles...",
-                    "Detecting known bad actor associations...",
-                    "Triangulating geolocation data...",
-                    "Parsing HTML metadata from corporate site..."
-                ];
-
                 let stepIdx = 0;
+                const moduleOrder = ['mod-sos', 'mod-legal', 'mod-rep', 'mod-dig'];
                 
-                // Start the "Loop"
                 loaderInterval = setInterval(() => {
-                    if (stepIdx < startSteps.length) {
-                        addLog(startSteps[stepIdx]);
+                    // 1. Add Logs
+                    if (stepIdx < steps.length) {
+                        addLog(steps[stepIdx]);
                         stepIdx++;
-                    } else {
-                        // Random "keep alive" log every ~800ms
-                        if(Math.random() > 0.3) {
-                             const randomMsg = processingSteps[Math.floor(Math.random() * processingSteps.length)];
-                             addLog(randomMsg, 'info');
-                        }
+                    } else if(Math.random() > 0.4) {
+                         const randomMsg = [
+                             "Decrypting SSL certificate chain...",
+                             "Analyzing shell company indicators...",
+                             "Verifying registered agent physical address...",
+                             "Checking bankruptcy court records...",
+                             "Validating domain DNS records...",
+                             "Scanning for adverse media...",
+                             "Compiling executive leadership profiles..."
+                         ];
+                         addLog(randomMsg[Math.floor(Math.random() * randomMsg.length)], 'info');
                     }
-                }, 200); // Fast initial scroll, then random updates
+
+                    // 2. Animate Modules randomly
+                    const activeMod = moduleOrder[Math.floor(Math.random() * moduleOrder.length)];
+                    const el = $(activeMod);
+                    if(el) {
+                        el.style.opacity = '1';
+                        const bar = el.querySelector('.mod-bar');
+                        let w = parseInt(bar.style.width || 0);
+                        if(w < 90) bar.style.width = (w + Math.random() * 20) + '%';
+                    }
+
+                }, 600); 
+
+                // Store interval to clear later
+                window.currentScanTimer = timerInterval;
             }
 
             // PROMPT GENERATION
@@ -856,6 +994,7 @@
                 $('loader-view').classList.add('hidden');
             } finally {
                 if(loaderInterval) clearInterval(loaderInterval);
+                if(window.currentScanTimer) clearInterval(window.currentScanTimer);
                 if(btnEl) { btnEl.innerHTML = originalBtnHtml; btnEl.disabled = false; }
                 if(overlay) overlay.remove();
             }
@@ -896,9 +1035,9 @@
             const renderAnalysis = (text) => {
                 if (!text) return '';
                 return `
-                <div class="mt-4 pt-3 border-t border-zinc-100">
+                <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                     <h4 class="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">AI Insight</h4>
-                    <p class="text-sm font-medium italic text-zinc-500 leading-relaxed">${cleanMd(text)}</p>
+                    <p class="text-sm font-medium italic text-zinc-500 dark:text-zinc-400 leading-relaxed">${cleanMd(text)}</p>
                 </div>`;
             };
 
@@ -951,7 +1090,7 @@
 
             // SOS
             html('c-name', makeLink(data.sos.name, data.sos.url));
-            html('c-id', makeLink(data.sos.id, data.sos.url, 'font-mono bg-zinc-100 px-2 py-1 rounded inline-block text-sm hover:underline hover:bg-zinc-200 transition-colors text-zinc-700'));
+            html('c-id', makeLink(data.sos.id, data.sos.url, 'font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded inline-block text-sm hover:underline hover:bg-zinc-200 transition-colors text-zinc-700 dark:text-zinc-300'));
             html('c-state', makeLink(data.sos.state, data.sos.url, 'value-text hover:underline'));
             html('c-date', makeLink(data.sos.date, data.sos.url, 'value-text hover:underline'));
             html('c-agent', makeLink(data.sos.agent, data.sos.url, 'text-sm hover:underline'));
@@ -961,6 +1100,15 @@
                 $('h-founded-container').classList.remove('hidden');
                 $('h-founded').innerText = data.sos.date.substring(0, 4);
             }
+            
+            // MAP INJECTION
+            const mapContainer = $('map-container');
+            if(data.info.location && data.info.location !== '--') {
+                mapContainer.innerHTML = `<iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=${encodeURIComponent(data.info.location)}&t=&z=13&ie=UTF8&iwloc=&output=embed" class="map-frame w-full h-full"></iframe>`;
+                mapContainer.classList.remove('hidden');
+            } else {
+                mapContainer.classList.add('hidden');
+            }
 
             // LEADERSHIP (Card Grid)
             const leadList = $('leadership-list');
@@ -968,17 +1116,16 @@
             if(data.leadership?.executives?.length) {
                 data.leadership.executives.forEach(exec => {
                     leadList.innerHTML += `
-                    <div class="p-3 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">
-                        <div class="font-bold text-brand-dark">${makeLink(exec.name, exec.url, 'hover:underline')}</div>
-                        <div class="text-xs text-zinc-500 font-bold uppercase mb-1">${exec.role || 'Principal'}</div>
-                        ${exec.notes ? `<p class="text-xs text-zinc-600 leading-tight mt-1 line-clamp-2">"${exec.notes}"</p>` : ''}
+                    <div class="p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+                        <div class="font-bold text-brand-dark dark:text-zinc-200">${makeLink(exec.name, exec.url, 'hover:underline')}</div>
+                        <div class="text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase mb-1">${exec.role || 'Principal'}</div>
+                        ${exec.notes ? `<p class="text-xs text-zinc-600 dark:text-zinc-400 leading-tight mt-1 line-clamp-2">"${exec.notes}"</p>` : ''}
                     </div>`;
                 });
             } else { leadList.innerHTML = '<span class="text-zinc-400 italic text-sm col-span-2">No public leadership records located.</span>'; }
             html('l-analysis', renderAnalysis(data.leadership.analysis));
 
             // LITIGATION
-            // Note: Litigation is now an object { cases: [], analysis: "" }
             const litigationCases = data.litigation?.cases || []; // Safely access cases
             const legalRows = $('legal-rows');
             legalRows.innerHTML = '';
@@ -988,11 +1135,11 @@
                 litigationCases.forEach(row => {
                     legalRows.innerHTML += `
                     <tr>
-                        <td><span class="bg-zinc-100 text-zinc-600 text-[10px] px-2 py-1 rounded font-bold uppercase border border-zinc-200">${row.type}</span></td>
-                        <td class="font-mono text-xs">${makeLink(row.case_id, row.url, 'text-blue-600 hover:underline')}</td>
-                        <td class="text-xs font-medium text-zinc-700 truncate max-w-[200px]">${makeLink(row.parties, row.url, 'hover:underline')}</td>
-                        <td class="text-xs text-zinc-500">${row.date}</td>
-                        <td class="text-xs font-bold text-zinc-500">${row.status}</td>
+                        <td><span class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] px-2 py-1 rounded font-bold uppercase border border-zinc-200 dark:border-zinc-700">${row.type}</span></td>
+                        <td class="font-mono text-xs">${makeLink(row.case_id, row.url, 'text-blue-600 dark:text-blue-400 hover:underline')}</td>
+                        <td class="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate max-w-[200px]">${makeLink(row.parties, row.url, 'hover:underline')}</td>
+                        <td class="text-xs text-zinc-500 dark:text-zinc-400">${row.date}</td>
+                        <td class="text-xs font-bold text-zinc-500 dark:text-zinc-400">${row.status}</td>
                     </tr>`;
                 });
             } else { $('legal-empty').classList.remove('hidden'); }
@@ -1001,7 +1148,7 @@
 
             // REPUTATION
             const bbb = data.reputation?.bbb || {};
-            html('bbb-grade', makeLink(bbb.grade, bbb.url, 'hover:underline text-brand-primary'));
+            html('bbb-grade', makeLink(bbb.grade, bbb.url, 'hover:underline text-brand-primary dark:text-white'));
             html('bbb-status', makeLink(bbb.accredited, bbb.url, 'value-text hover:underline'));
             html('bbb-complaints', makeLink(bbb.complaints, bbb.url, 'value-text hover:underline'));
             html('bbb-summary', cleanMd(bbb.summary));
@@ -1015,21 +1162,21 @@
             if(reviews.length) {
                 reviews.forEach(rev => {
                     // Sentiment coloring check
-                    let badgeColor = 'bg-zinc-200 text-zinc-600';
+                    let badgeColor = 'bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300';
                     const rText = (rev.rating || '').toLowerCase();
-                    if(rText.includes('5') || rText.includes('pos') || rText.includes('exc')) badgeColor = 'bg-emerald-100 text-emerald-800';
-                    else if(rText.includes('1') || rText.includes('neg') || rText.includes('bad')) badgeColor = 'bg-red-100 text-red-800';
+                    if(rText.includes('5') || rText.includes('pos') || rText.includes('exc')) badgeColor = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100';
+                    else if(rText.includes('1') || rText.includes('neg') || rText.includes('bad')) badgeColor = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100';
 
                     revList.innerHTML += `
-                    <div class="p-5 hover:bg-zinc-50 transition-colors">
+                    <div class="p-5 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
                        <div class="flex justify-between items-start mb-2">
                           <div class="flex items-center gap-2">
-                             ${makeLink(rev.source, rev.url, 'font-bold text-sm text-brand-dark')}
+                             ${makeLink(rev.source, rev.url, 'font-bold text-sm text-brand-dark dark:text-zinc-200')}
                              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${badgeColor}">${rev.rating}</span>
                           </div>
                           <svg class="w-3 h-3 text-zinc-300" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.8954 13.1216 16 12.017 16H9.01703C7.91246 16 7.01703 16.8954 7.01703 18V21H14.017ZM21.017 21L21.017 18C21.017 16.8954 20.1216 16 19.017 16H16.017C14.9125 16 14.017 16.8954 14.017 18V21H21.017ZM7.01703 14C6.46475 14 6.01703 14.4477 6.01703 15L6.01703 21L2.01703 21L2.01703 15C2.01703 11.3275 3.12084 7.85676 5.15188 5H19.017C19.6535 5 20.227 5.26432 20.6306 5.68567C20.8247 5.40087 20.983 5.1073 21.1025 4.80724C21.4797 3.86126 20.9863 2.78502 20.0035 2.57822C15.9551 1.72649 11.023 2.13011 8.03456 4.3561C4.5463 6.95494 3.1785 10.7043 3.02597 14.3983C3.02023 14.5375 3.01703 14.6786 3.01703 14.8223V22H5.01703V15C5.01703 14.4477 5.46475 14 6.01703 14H7.01703ZM7.01703 7C6.46475 7 6.01703 7.44772 6.01703 8C6.01703 8.55228 6.46475 9 7.01703 9H19.017C19.5693 9 20.017 8.55228 20.017 8C20.017 7.44772 19.5693 7 19.017 7H7.01703Z"></path></svg>
                        </div>
-                       <p class="text-sm text-zinc-600 leading-relaxed line-clamp-3">${rev.text}</p>
+                       <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-3">${rev.text}</p>
                     </div>
                     `;
                 });
@@ -1040,18 +1187,18 @@
             // DIGITAL
             // Create direct link for domain, and use digital source URL for age
             const domainUrl = data.digital?.domain ? (data.digital.domain.startsWith('http') ? data.digital.domain : 'https://' + data.digital.domain) : '#';
-            html('d-domain', makeLink(data.digital?.domain, domainUrl, 'font-mono text-brand-primary truncate font-bold text-sm hover:underline'));
+            html('d-domain', makeLink(data.digital?.domain, domainUrl, 'font-mono text-brand-primary dark:text-zinc-200 truncate font-bold text-sm hover:underline'));
             html('d-age', makeLink(data.digital?.age, data.digital?.url, 'font-medium text-sm hover:underline'));
             html('d-analysis', renderAnalysis(data.digital.analysis));
             
             const techList = $('d-tech'); techList.innerHTML = '';
             (data.digital?.tech || []).forEach(t => {
-                techList.innerHTML += `<span class="text-[10px] bg-zinc-100 border border-zinc-200 px-2 py-1 rounded text-zinc-600 font-medium uppercase">${t}</span>`;
+                techList.innerHTML += `<span class="text-[10px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded text-zinc-600 dark:text-zinc-300 font-medium uppercase">${t}</span>`;
             });
 
             // COMPLIANCE
-            html('reg-ofac', makeLink(data.compliance?.ofac, data.compliance?.url, 'text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500 hover:underline hover:text-zinc-800 cursor-pointer transition-colors'));
-            html('reg-gov', makeLink(data.compliance?.govContracts, data.compliance?.url, 'text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 text-zinc-500 hover:underline hover:text-zinc-800 cursor-pointer transition-colors'));
+            html('reg-ofac', makeLink(data.compliance?.ofac, data.compliance?.url, 'text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-300 hover:underline hover:text-zinc-800 dark:hover:text-white cursor-pointer transition-colors'));
+            html('reg-gov', makeLink(data.compliance?.govContracts, data.compliance?.url, 'text-[10px] font-bold px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-300 hover:underline hover:text-zinc-800 dark:hover:text-white cursor-pointer transition-colors'));
             html('reg-analysis', renderAnalysis(data.compliance.analysis));
 
             // SOURCES
@@ -1065,9 +1212,9 @@
                       // Fail silently, keep default
                   }
                   
-                  srcBox.innerHTML += `<a href="${src.url}" target="_blank" class="block p-4 bg-zinc-50 rounded border border-zinc-200 hover:border-brand-primary hover:bg-white hover:shadow-sm transition-all">
+                  srcBox.innerHTML += `<a href="${src.url}" target="_blank" class="block p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700 hover:border-brand-primary dark:hover:border-zinc-500 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-sm transition-all">
                     <div class="text-xs font-bold text-zinc-400 uppercase mb-1 truncate">${host}</div>
-                    <div class="text-sm font-medium text-brand-dark truncate">${src.title}</div>
+                    <div class="text-sm font-medium text-brand-dark dark:text-zinc-200 truncate">${src.title}</div>
                   </a>`;
                }
             });
