@@ -839,6 +839,9 @@
         </span>
       </div>
       <div id="themeControls" class="flex items-center justify-center gap-2">
+        <button id="dashboardLink" type="button" class="hidden">
+          Dashboard
+        </button>
         <button id="repSettingsToggle" type="button">
           Settings
         </button>
@@ -1786,6 +1789,20 @@
       applyTheme();
       applyGlowClasses();
       updatePaymentToggleUI();
+
+      // Show dashboard link for broker users only
+      if (!isApprovalView) {
+        const dashboardBtn = document.getElementById('dashboardLink');
+        if (dashboardBtn) {
+          dashboardBtn.classList.remove('hidden');
+          dashboardBtn.addEventListener('click', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const accessToken = urlParams.get('access_token');
+            const dashboardUrl = '/broker-dashboard/' + (accessToken ? '?access_token=' + accessToken : '');
+            window.location.href = dashboardUrl;
+          });
+        }
+      }
 
       if (elements.calcAmountSlider && elements.calcAmountInput) {
         syncInputs(elements.calcAmountSlider, elements.calcAmountInput,
