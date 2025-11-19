@@ -221,7 +221,8 @@
           <label for="calcAmount" class="block text-xs font-semibold text-muted">
             Amount You Get ($)
           </label>
-          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000"
+          <!-- CHANGED: step from 1000 to 1 to allow exact values without snapping -->
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1"
                  value="50000"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
@@ -460,8 +461,8 @@
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        minimumFractionDigits: 0, // allows for clean $50,000
+        maximumFractionDigits: 2, // allows for exact $50,000.55 if needed
       }).format(numericValue);
     }
 
