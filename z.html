@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-light accent-mint">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TrustBureau.ai | Payments Offer Calculator</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    /* --- BASE THEMES --- */
+
+    /* Light Theme */
+    html.theme-light {
+      --bg-body: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+      --bg-slider-track: #e2e8f0;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #f1f5f9;
+      --border-primary: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-success: #16a34a;
+      --shadow-color: rgba(0, 0, 0, 0.06);
+    }
+
+    /* Dark Theme (Gray-900) */
+    html.theme-dark {
+      --bg-body: #111827;
+      --bg-card: #1f2937;
+      --bg-card-inner: #111827;
+      --bg-slider-track: #374151;
+      --bg-input: #1f2937;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #374151;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-success: #4ade80;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Black Theme (Pure Black/Deep Navy) */
+    html.theme-black {
+      --bg-body: #020617; /* Deep Navy/Black */
+      --bg-card: #020617;
+      --bg-card-inner: #0f172a;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #0f172a;
+      --border-primary: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --text-success: #4ade80;
+      --shadow-color: rgba(0, 0, 0, 0.5);
+    }
+
+    body { background-color: var(--bg-body); transition: background-color 0.2s; }
+
+    /* --- ACCENT COLORS --- */
+
+    /* 1. Gold (Default/Sutton) */
+    html.accent-gold {
+      --accent-color: #D19B2B;
+      --accent-color-light: #e6b650;
+      --accent-color-dark: #a6781c;
+      --accent-text-inverted: #020617;
+    }
+
+    /* 2. Blue */
+    html.accent-blue {
+      --accent-color: #3b82f6;
+      --accent-color-light: #60a5fa;
+      --accent-color-dark: #2563eb;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 3. Green */
+    html.accent-green {
+      --accent-color: #22c55e;
+      --accent-color-light: #4ade80;
+      --accent-color-dark: #16a34a;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 4. Red */
+    html.accent-red {
+      --accent-color: #ef4444;
+      --accent-color-light: #f87171;
+      --accent-color-dark: #dc2626;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 5. Orange */
+    html.accent-orange {
+      --accent-color: #f97316;
+      --accent-color-light: #fb923c;
+      --accent-color-dark: #ea580c;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 6. Purple */
+    html.accent-purple {
+      --accent-color: #a855f7;
+      --accent-color-light: #c084fc;
+      --accent-color-dark: #9333ea;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 7. Pink */
+    html.accent-pink {
+      --accent-color: #ec4899;
+      --accent-color-light: #f472b6;
+      --accent-color-dark: #db2777;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 8. Teal */
+    html.accent-teal {
+      --accent-color: #14b8a6;
+      --accent-color-light: #2dd4bf;
+      --accent-color-dark: #0d9488;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 9. Indigo */
+    html.accent-indigo {
+      --accent-color: #6366f1;
+      --accent-color-light: #818cf8;
+      --accent-color-dark: #4f46e5;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 10. Gray/Black (Monochrome Accent) */
+    html.accent-gray {
+      --accent-color: #111827; /* In light mode this is black */
+      --accent-color-light: #374151;
+      --accent-color-dark: #000000;
+      --accent-text-inverted: #ffffff;
+    }
+    html.theme-dark.accent-gray, html.theme-black.accent-gray {
+      --accent-color: #f3f4f6;
+      --accent-color-light: #ffffff;
+      --accent-color-dark: #d1d5db;
+      --accent-text-inverted: #000000;
+    }
+
+    /* --- NEW ACCENTS --- */
+
+    /* 11. Mint (Requested) */
+    html.accent-mint {
+      --accent-color: #42D197;
+      --accent-color-light: #74eabc;
+      --accent-color-dark: #2d9668;
+      --accent-text-inverted: #020617; /* Dark text on light green */
+    }
+
+    /* 12. Cyan */
+    html.accent-cyan {
+      --accent-color: #06b6d4;
+      --accent-color-light: #22d3ee;
+      --accent-color-dark: #0891b2;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 13. Lime */
+    html.accent-lime {
+      --accent-color: #84cc16;
+      --accent-color-light: #a3e635;
+      --accent-color-dark: #65a30d;
+      --accent-text-inverted: #020617;
+    }
+
+    /* 14. Fuchsia */
+    html.accent-fuchsia {
+      --accent-color: #d946ef;
+      --accent-color-light: #e879f9;
+      --accent-color-dark: #c026d3;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 15. Sky */
+    html.accent-sky {
+      --accent-color: #0ea5e9;
+      --accent-color-light: #38bdf8;
+      --accent-color-dark: #0284c7;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 16. Yellow */
+    html.accent-yellow {
+      --accent-color: #eab308;
+      --accent-color-light: #facc15;
+      --accent-color-dark: #ca8a04;
+      --accent-text-inverted: #020617;
+    }
+
+    /* 17. Black (New) */
+    html.accent-black {
+      --accent-color: #000000;
+      --accent-color-light: #333333;
+      --accent-color-dark: #000000;
+      --accent-text-inverted: #ffffff;
+    }
+    html.theme-dark.accent-black, html.theme-black.accent-black {
+      --accent-color: #f3f4f6; /* Light gray in dark mode for contrast */
+      --accent-color-light: #ffffff;
+      --accent-color-dark: #d1d5db;
+      --accent-text-inverted: #000000;
+    }
+
+    /* 18. White (New) */
+    html.accent-white {
+      --accent-color: #ffffff;
+      --accent-color-light: #f0f0f0;
+      --accent-color-dark: #e0e0e0;
+      --accent-text-inverted: #000000;
+    }
+    html.theme-dark.accent-white, html.theme-black.accent-white {
+      --accent-color: #1a1a1a; /* Dark gray in dark mode for contrast */
+      --accent-color-light: #333333;
+      --accent-color-dark: #000000;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* --- COMPONENT STYLES --- */
+
+    .card-bg { 
+      background-color: var(--bg-card); 
+      border-color: var(--border-primary); 
+    }
+    
+    .shell {
+      border-color: var(--accent-color);
+      border-width: 3px;
+      box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+    }
+
+    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-muted); }
+    .text-success { color: var(--text-success); }
+    .border-primary { border-color: var(--border-primary); }
+
+    .slider-track { background-color: var(--bg-slider-track); }
+    .slider-thumb { accent-color: var(--accent-color); }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px var(--accent-color-light);
+      outline: none;
+    }
+
+    input[type="date"] {
+      background-color: var(--bg-input);
+      color: var(--text-primary);
+      border-color: var(--border-primary);
+    }
+    ::-webkit-calendar-picker-indicator {
+      filter: invert(0.5);
+      cursor: pointer;
+    }
+    html.theme-light ::-webkit-calendar-picker-indicator {
+      filter: invert(0);
+    }
+
+    .text-hero {
+      color: var(--accent-color);
+    }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-secondary);
+    }
+    .toggle-active {
+      background-color: var(--accent-color);
+      color: var(--accent-text-inverted);
+      font-weight: 700;
+    }
+
+    .button-primary {
+      background-color: var(--accent-color);
+      color: var(--accent-text-inverted);
+      font-weight: 700;
+      border-radius: 0.5rem; 
+      padding: 0.6rem 1.75rem;
+      border: 1px solid var(--accent-color-dark);
+      transition: all 0.2s ease;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-light);
+      box-shadow:
+        0 0 0 1px var(--accent-color),
+        0 0 15px var(--accent-color-light);
+      transform: translateY(-1px) scale(1.01);
+    }
+    .button-primary:disabled {
+      background-color: var(--bg-slider-track);
+      col
