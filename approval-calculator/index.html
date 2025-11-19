@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-light accent-emerald bg-default">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Approval Calculator</title>
+
+  <!-- Outseta Quickstart script -->
+  <script>
+    var o_options = {
+      domain: 'trustbureauai.outseta.com',
+      load: 'auth,nocode'
+    };
+  </script>
+  <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+
+  <!-- Auth Protection -->
+  <script>
+    // Check if this is an approval view (public customer link)
+    const urlParams = new URLSearchParams(window.location.search);
+    const isApprovalView = urlParams.get('view') === 'approval';
+    
+    // Only require login and subscription check for non-approval views (broker/rep view)
+    if (!isApprovalView) {
+      document.addEventListener('DOMContentLoaded', async function() {
+        try {
+          const user = await Outseta.getUser();
+          
+          if (!user) {
+            window.location.href = 'https://trustbureauai.outseta.com/auth';
+            return;
+          }
+
+          let planName = 'Free Trial';
+          let subscriptionStartDate = null;
+
+          if (user.Account && user.Account.CurrentSubscription) {
+            const currentSubscription = user.Account.CurrentSubscription;
+            if (currentSubscription.Plan && currentSubscription.Plan.Name) {
+              planName = currentSubscription.Plan.Name;
+            }
+            if (currentSubscription.StartDate) {
+              subscriptionStartDate = currentSubscription.StartDate;
+            }
+          }
+
+          if (planName === 'Broker Box') {
+            return;
+          }
+
+          if (planName === 'Free Trial' && subscriptionStartDate) {
+            const startDate = new Date(subscriptionStartDate);
+            const trialEndDate = new Date(startDate);
+            trialEndDate.setDate(trialEndDate.getDate() + 3);
+            const today = new Date();
+
+            if (today > trialEndDate) {
+              alert('Your 3-day free trial has expired. Please subscribe to continue using Broker Box.');
+              window.location.href = 'https://trustbureauai.outseta.com/profile?tab=planChange#o-authenticated';
+              return;
+            }
+          }
+
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          window.location.href = 'https://trustbureauai.outseta.com/auth';
+        }
+      });
+    }
+  </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    :root {
+      --accent-color: #10b981;
+      --accent-color-light: #34d399;
+      --accent-color-dark: #047857;
+      --accent-shadow: 0 0 22px rgba(16, 185, 129, 0.6);
+
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+      --bg-slider-track: #e5e7eb;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+
+      --border-primary: #cbd5e1;
+      --text-primary: #020617;
+      --text-secondary: #111827;
+      --text-muted: #4b5563;
+
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Remove number spinners */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    .input-icon {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* ----------------- THEMES ----------------- */
+
+    html.theme-light {
+      color-scheme: light;
+      --bg-body: #eef2f7;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fbff;
+      --bg-slider-track: #e2e8f0;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #111827;
+      --text-muted: #4b5563;
+      --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.12);
+    }
+    html.theme-light body { background-color: var(--bg-body); }
+
+    html.theme-dark {
+      color-scheme: dark;
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1f2937;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #cbd5f5;
+      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.7);
+    }
+    html.theme-dark body { background-color: var(--bg-body); }
+
+    html.theme-black {
+      color-scheme: dark;
+      --bg-body: #000000;
+      --bg-card: #000000;
+      --bg-card-inner: #000000;
+      --bg-slider-track: #111111;
+      --bg-input: #000000;
+      --bg-toggle-inactive: #111111;
+      --border-primary: #171717;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e5e5;
+      --text-muted: #d1d5db;
+      --accent-color: #ffffff;
+      --accent-color-light: #e5e5e5;
+      --accent-color-dark: #ffffff;
+      --accent-shadow: 0 0 18px rgba(255, 255, 255, 0.6);
+      --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.9);
+    }
+    html.theme-black body { background-color: var(--bg-body); }
+
+    /* Fun themes (same as before, kept for brevity) */
+    html.theme-ocean {
+      color-scheme: dark;
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #0f172a;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #0f172a;
+      --border-primary: #0ea5e9;
+      --text-primary: #e0f2fe;
+      --text-secondary: #bae6fd;
+      --text-muted: #7dd3fc;
+      --accent-color: #0ea5e9;
+      --accent-color-light: #38bdf8;
+      --accent-color-dark: #0369a1;
+      --accent-shadow: 0 0 22px rgba(56, 189, 248, 0.7);
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+    }
+    html.theme-ocean body {
+      background:
+        radial-gradient(circle at 0 0, rgba(14, 165, 233, 0.35), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(8, 47, 73, 0.8), #020617);
+    }
+
+    html.theme-forest {
+      color-scheme: dark;
+      --bg-body: #021210;
+      --bg-card: #022c22;
+      --bg-card-inner: #022c22;
+      --bg-slider-track: #064e3b;
+      --bg-input: #022c22;
+      --bg-toggle-inactive: #064e3b;
+      --border-primary: #16a34a;
+      --text-primary: #ecfdf5;
+      --text-secondary: #bbf7d0;
+      --text-muted: #6ee7b7;
+      --accent-color: #22c55e;
+      --accent-color-light: #4ade80;
+      --accent-color-dark: #15803d;
+      --accent-shadow: 0 0 22px rgba(34, 197, 94, 0.7);
+      --shadow-soft: 0 18px 45px rgba(6, 95, 70, 0.8);
+    }
+    html.theme-forest body {
+      background:
+        radial-gradient(circle at 50% 120%, rgba(34, 197, 94, 0.4), #021210 70%);
+    }
+
+    html.theme-sunset {
+      color-scheme: dark;
+      --bg-body: #111827;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #1f2937;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #fb7185;
+      --text-primary: #fef2f2;
+      --text-secondary: #fee2e2;
+      --text-muted: #fecaca;
+      --accent-color: #fb923c;
+      --accent-color-light: #fdba74;
+      --accent-color-dark: #c2410c;
+      --accent-shadow: 0 0 24px rgba(248, 113, 113, 0.7);
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+    }
+    html.theme-sunset body {
+      background:
+        radial-gradient(circle at 0 0, rgba(248, 113, 113, 0.45), transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.45), #111827);
+    }
+
+    html.theme-sky {
+      color-scheme: light;
+      --bg-body: #e0f2fe;
+      --bg-card: #ffffff;
+      --bg-card-inner: #eff6ff;
+      --bg-slider-track: #bfdbfe;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #bae6fd;
+      --border-primary: #bfdbfe;
+      --text-primary: #0f172a;
+      --text-secondary: #111827;
+      --text-muted: #1d4ed8;
+      --accent-color: #0ea5e9;
+      --accent-color-light: #38bdf8;
+      --accent-color-dark: #0369a1;
+      --accent-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+      --shadow-soft: 0 10px 28px rgba(30, 64, 175, 0.23);
+    }
+    html.theme-sky body {
+      background:
+        radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.35), transparent 55%),
+        linear-gradient(to bottom, #eff6ff, #e0f2fe);
+    }
+
+    html.theme-latte {
+      color-scheme: light;
+      --bg-body: #f5f5f4;
+      --bg-card: #ffffff;
+      --bg-card-inner: #fefce8;
+      --bg-slider-track: #e7e5e4;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #e7e5e4;
+      --text-primary: #292524;
+      --text-secondary: #1f2933;
+      --text-muted: #854d0e;
+      --accent-color: #d97706;
+      --accent-color-light: #fbbf24;
+      --accent-color-dark: #92400e;
+      --accent-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
+      --shadow-soft: 0 10px 26px rgba(148, 120, 86, 0.35);
+    }
+    html.theme-latte body {
+      background:
+        radial-gradient(circle at 0 0, rgba(245, 158, 11, 0.25), transparent 55%),
+        linear-gradient(to bottom, #fafaf9, #f5f5f4);
+    }
+
+    html.theme-neon {
+      color-scheme: dark;
+      --bg-body: #020617;
+      --bg-card: rgba(2, 6, 23, 0.96);
+      --bg-card-inner: rgba(15, 23, 42, 0.96);
+      --bg-slider-track: #0f172a;
+      --bg-input: rgba(15, 23, 42, 0.96);
+      --bg-toggle-inactive: #020617;
+      --border-primary: #22d3ee;
+      --text-primary: #e5f2ff;
+      --text-secondary: #f9fafb;
+      --text-muted: #a5b4fc;
+      --accent-color: #22d3ee;
+      --accent-color-light: #38bdf8;
+      --accent-color-dark: #06b6d4;
+      --accent-shadow: 0 0 18px rgba(56, 189, 248, 0.9);
+      --shadow-soft: 0 20px 55px rgba(15, 23, 42, 0.95);
+    }
+    html.theme-neon body {
+      background:
+        radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.5), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.5), #020617);
+    }
+
+    html.theme-unicorn {
+      color-scheme: light;
+      --bg-body: #fdf2ff;
+      --bg-card: #ffffff;
+      --bg-card-inner: #fefce8;
+      --bg-slider-track: #f9a8d4;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #e5e7eb;
+      --border-primary: #f9a8d4;
+      --text-primary: #4a044e;
+      --text-secondary: #701a75;
+      --text-muted: #a21caf;
+      --accent-color: #ec4899;
+      --accent-color-light: #f9a8d4;
+      --accent-color-dark: #be185d;
+      --accent-shadow: 0 0 26px rgba(236, 72, 153, 0.6);
+      --shadow-soft: 0 10px 30px rgba(190, 24, 93, 0.3);
+    }
+    html.theme-unicorn body {
+      background:
+        radial-gradient(circle at 0 0, #f9a8d4, transparent 55%),
+        radial-gradient(circle at 100% 100%, #bfdbfe, #fdf2ff 60%);
+    }
+
+    html.theme-terminal {
+      color-scheme: dark;
+      --bg-body: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020817;
+      --bg-slider-track: #16a34a;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #020817;
+      --border-primary: #22c55e;
+      --text-primary: #d1fae5;
+      --text-secondary: #4ade80;
+      --text-muted: #86efac;
+      --accent-color: #22c55e;
+      --accent-color-light: #4ade80;
+      --accent-color-dark: #15803d;
+      --accent-shadow: 0 0 22px rgba(34, 197, 94, 0.75);
+      --shadow-soft: 0 20px 55px rgba(0, 0, 0, 0.9);
+    }
+    html.theme-terminal body {
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.45), transparent 55%),
+        #020617;
+    }
+
+    html.theme-synthwave {
+      color-scheme: dark;
+      --bg-body: #020617;
+      --bg-card: rgba(10, 10, 26, 0.98);
+      --bg-card-inner: rgba(15, 23, 42, 0.96);
+      --bg-slider-track: #4c1d95;
+      --bg-input: rgba(15, 23, 42, 0.96);
+      --bg-toggle-inactive: #020617;
+      --border-primary: #f472b6;
+      --text-primary: #fdf2ff;
+      --text-secondary: #fce7f3;
+      --text-muted: #e879f9;
+      --accent-color: #fb7185;
+      --accent-color-light: #f9a8d4;
+      --accent-color-dark: #be185d;
+      --accent-shadow: 0 0 24px rgba(236, 72, 153, 0.9);
+      --shadow-soft: 0 22px 60px rgba(15, 23, 42, 0.95);
+    }
+    html.theme-synthwave body {
+      background:
+        radial-gradient(circle at 0 0, rgba(236, 72, 153, 0.55), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.5), #020617);
+    }
+
+    html.theme-laser {
+      color-scheme: dark;
+      --bg-body: #000000;
+      --bg-card: rgba(0, 0, 0, 0.96);
+      --bg-card-inner: rgba(10, 10, 10, 0.96);
+      --bg-slider-track: #f472b6;
+      --bg-input: rgba(0, 0, 0, 0.96);
+      --bg-toggle-inactive: #020617;
+      --border-primary: #22c55e;
+      --text-primary: #f9fafb;
+      --text-secondary: #bbf7d0;
+      --text-muted: #f9a8d4;
+      --accent-color: #22c55e;
+      --accent-color-light: #4ade80;
+      --accent-color-dark: #15803d;
+      --accent-shadow: 0 0 32px rgba(34, 197, 94, 0.9);
+      --shadow-soft: 0 24px 70px rgba(0, 0, 0, 1);
+    }
+    html.theme-laser body {
+      background:
+        radial-gradient(circle at 0 0, rgba(236, 72, 153, 0.8), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(34, 197, 94, 0.8), #000000);
+    }
+
+    html.theme-fiesta {
+      color-scheme: dark;
+      --bg-body: #111827;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --bg-slider-track: #f97316;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #fb923c;
+      --text-primary: #fef9c3;
+      --text-secondary: #ffedd5;
+      --text-muted: #fed7aa;
+      --accent-color: #f97316;
+      --accent-color-light: #fb923c;
+      --accent-color-dark: #c2410c;
+      --accent-shadow: 0 0 30px rgba(249, 115, 22, 0.9);
+      --shadow-soft: 0 24px 60px rgba(127, 29, 29, 0.9);
+    }
+    html.theme-fiesta body {
+      background:
+        conic-gradient(from 200deg at 0 0, #f97316, #ec4899, #facc15, #f97316);
+    }
+
+    html.theme-slime {
+      color-scheme: dark;
+      --bg-body: #022c22;
+      --bg-card: #022c22;
+      --bg-card-inner: #022c22;
+      --bg-slider-track: #22c55e;
+      --bg-input: #022c22;
+      --bg-toggle-inactive: #064e3b;
+      --border-primary: #a3e635;
+      --text-primary: #ecfdf5;
+      --text-secondary: #bbf7d0;
+      --text-muted: #bef264;
+      --accent-color: #a3e635;
+      --accent-color-light: #bef264;
+      --accent-color-dark: #4d7c0f;
+      --accent-shadow: 0 0 30px rgba(190, 242, 100, 0.9);
+      --shadow-soft: 0 24px 60px rgba(4, 120, 87, 0.9);
+    }
+    html.theme-slime body {
+      background:
+        radial-gradient(circle at 0 0, rgba(190, 242, 100, 0.8), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.5), #022c22);
+    }
+
+    /* ----------------- ACCENTS ----------------- */
+
+    html.accent-red      { --accent-color:#ef4444; --accent-color-light:#f97373; --accent-color-dark:#b91c1c; --accent-shadow:0 0 18px rgba(239,68,68,.55);}
+    html.accent-orange   { --accent-color:#f97316; --accent-color-light:#fdba74; --accent-color-dark:#c2410c; --accent-shadow:0 0 18px rgba(249,115,22,.55);}
+    html.accent-yellow   { --accent-color:#eab308; --accent-color-light:#fde047; --accent-color-dark:#a16207; --accent-shadow:0 0 18px rgba(234,179,8,.55);}
+    html.accent-gold     { --accent-color:#f59e0b; --accent-color-light:#fbbf24; --accent-color-dark:#92400e; --accent-shadow:0 0 26px rgba(245,158,11,.75);}
+    html.accent-green    { --accent-color:#22c55e; --accent-color-light:#4ade80; --accent-color-dark:#15803d; --accent-shadow:0 0 18px rgba(34,197,94,.55);}
+    html.accent-blue     { --accent-color:#2563eb; --accent-color-light:#3b82f6; --accent-color-dark:#1d4ed8; --accent-shadow:0 0 18px rgba(37,99,235,.55);}
+    html.accent-indigo   { --accent-color:#4f46e5; --accent-color-light:#6366f1; --accent-color-dark:#3730a3; --accent-shadow:0 0 18px rgba(79,70,229,.55);}
+    html.accent-violet   { --accent-color:#8b5cf6; --accent-color-light:#a855f7; --accent-color-dark:#6d28d9; --accent-shadow:0 0 18px rgba(139,92,246,.55);}
+    html.accent-teal     { --accent-color:#14b8a6; --accent-color-light:#2dd4bf; --accent-color-dark:#0f766e; --accent-shadow:0 0 18px rgba(20,184,166,.55);}
+    html.accent-cyan     { --accent-color:#06b6d4; --accent-color-light:#22d3ee; --accent-color-dark:#0e7490; --accent-shadow:0 0 18px rgba(6,182,212,.55);}
+    html.accent-sky      { --accent-color:#0ea5e9; --accent-color-light:#38bdf8; --accent-color-dark:#0369a1; --accent-shadow:0 0 18px rgba(14,165,233,.55);}
+    html.accent-lime     { --accent-color:#84cc16; --accent-color-light:#a3e635; --accent-color-dark:#4d7c0f; --accent-shadow:0 0 18px rgba(132,204,22,.55);}
+    html.accent-emerald  { --accent-color:#10b981; --accent-color-light:#34d399; --accent-color-dark:#047857; --accent-shadow:0 0 22px rgba(16,185,129,.6);}
+    html.accent-rose     { --accent-color:#f43f5e; --accent-color-light:#fb7185; --accent-color-dark:#be123c; --accent-shadow:0 0 18px rgba(244,63,94,.55);}
+    html.accent-pink     { --accent-color:#ec4899; --accent-color-light:#f472b6; --accent-color-dark:#be185d; --accent-shadow:0 0 18px rgba(236,72,153,.55);}
+    html.accent-slate    { --accent-color:#64748b; --accent-color-light:#94a3b8; --accent-color-dark:#475569; --accent-shadow:0 0 18px rgba(100,116,139,.55);}
+    html.accent-gray     { --accent-color:#6b7280; --accent-color-light:#9ca3af; --accent-color-dark:#374151; --accent-shadow:0 0 18px rgba(107,114,128,.55);}
+    html.accent-brown    { --accent-color:#92400e; --accent-color-light:#fbbf24; --accent-color-dark:#451a03; --accent-shadow:0 0 18px rgba(146,64,14,.55);}
+    html.accent-rainbow  { --accent-color:#ec4899; --accent-color-light:#f97316; --accent-color-dark:#4f46e5; --accent-shadow:0 0 24px rgba(236,72,153,.7);}
+    html.accent-disco    { --accent-color:#a855f7; --accent-color-light:#22d3ee; --accent-color-dark:#be123c; --accent-shadow:0 0 24px rgba(168,85,247,.7);}
+    html.accent-metallic { --accent-color:#9ca3af; --accent-color-light:#e5e7eb; --accent-color-dark:#4b5563; --accent-shadow:0 0 22px rgba(148,163,184,.7);}
+    html.accent-aurora   { --accent-color:#22d3ee; --accent-color-light:#a78bfa; --accent-color-dark:#0ea5e9; --accent-shadow:0 0 22px rgba(34,211,238,.6);}
+    html.accent-fire     { --accent-color:#ef4444; --accent-color-light:#f59e0b; --accent-color-dark:#b91c1c; --accent-shadow:0 0 22px rgba(239,68,68,.65);}
+
+    /* ----------------- BACKGROUND VARIANTS ----------------- */
+
+    html.bg-default body { }
+    html.bg-plain body { background: var(--bg-body); }
+    html.bg-soft body {
+      background:
+        radial-gradient(circle at 0 0, rgba(148,163,184,.28), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(148,163,184,.2), var(--bg-body));
+    }
+    html.bg-loud body {
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,.55), transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(56,189,248,.55), var(--bg-body));
+    }
+    html.bg-grid body {
+      background-color: var(--bg-body);
+      background-image:
+        linear-gradient(to right, rgba(148,163,184,.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148,163,184,.22) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    html.bg-diagonal body {
+      background: linear-gradient(135deg, rgba(59,130,246,.22), rgba(236,72,153,.22)), var(--bg-body);
+    }
+    html.bg-spotlight body {
+      background: radial-gradient(circle at 50% 0, rgba(250,204,21,.45), transparent 65%), var(--bg-body);
+    }
+    html.bg-stripes body {
+      background:
+        repeating-linear-gradient(45deg, rgba(148,163,184,.18) 0 12px, transparent 12px 24px),
+        var(--bg-body);
+    }
+    html.bg-dots body {
+      background-color: var(--bg-body);
+      background-image: radial-gradient(rgba(148,163,184,.25) 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+    html.bg-mesh body {
+      background:
+        radial-gradient(at 20% 10%, rgba(99,102,241,.25), transparent 45%),
+        radial-gradient(at 80% 20%, rgba(14,165,233,.25), transparent 45%),
+        radial-gradient(at 10% 90%, rgba(236,72,153,.25), transparent 45%),
+        var(--bg-body);
+    }
+
+    /* ----------------- SHARED UI ----------------- */
+
+    .card-bg {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-inner-bg {
+      background-color: var(--bg-card-inner);
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-primary);
+    }
+
+    .shell {
+      border-radius: 1rem;
+      border: 1px solid var(--border-primary);
+      box-shadow: var(--shadow-soft);
+      background-color: var(--bg-card);
+    }
+    .shell-glow {
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.03),
+        0 0 0 1px var(--accent-color-light),
+        0 22px 60px rgba(15, 23, 42, 0.28);
+      border-color: var(--accent-color-light);
+    }
+
+    .offer-card {
+      background-color: var(--bg-card);
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-primary);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+    }
+    .offer-card.offer-glow {
+      border-color: var(--accent-color-light);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.02),
+        0 0 0 1px var(--accent-color-light),
+        0 18px 45px rgba(15, 23, 42, 0.26);
+    }
+
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-muted); }
+    .border-primary { border-color: var(--border-primary); }
+
+    .text-hero { color: var(--accent-color); }
+
+    .slider-track {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: .3rem;
+      border-radius: 9999px;
+      background-color: var(--bg-slider-track);
+      outline: none;
+    }
+    .slider-track::-webkit-slider-runnable-track {
+      height: .3rem;
+      border-radius: 9999px;
+      background-color: transparent;
+    }
+    .slider-track::-moz-range-track {
+      height: .3rem;
+      border-radius: 9999px;
+      background-color: transparent;
+    }
+    .slider-track::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 9999px;
+      margin-top: -6px;
+      background: var(--accent-color);
+      border: 2px solid var(--bg-card);
+      cursor: pointer;
+      box-shadow: 0 0 0 1px rgba(15,23,42,0.08);
+    }
+    .slider-track::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 9999px;
+      background: var(--accent-color);
+      border: 2px solid var(--bg-card);
+      cursor: pointer;
+      box-shadow: 0 0 0 1px rgba(15,23,42,0.08);
+    }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+      border-radius: 0.75rem;
+      transition:
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background-color .15s ease,
+        color .15s ease;
+    }
+    .input-field::placeholder {
+      color: var(--text-muted);
+      opacity: .75;
+    }
+    .input-field:focus,
+    .input-field:focus-visible,
+    .input-field:focus-within {
+      border-color: var(--accent-color-light);
+      box-shadow: 0 0 0 2px var(--accent-color-light);
+      outline: none;
+    }
+
+    #toggleContainer {
+      background-color: var(--bg-card-inner);
+      border-radius: 9999px;
+      border: 1px solid var(--border-primary);
+      padding: .15rem;
+      gap: .15rem;
+    }
+    #toggleContainer button {
+      flex: 1 1 0;
+      border-radius: 9999px;
+      border: none;
+      font-size: .8rem;
+      line-height: 1.25rem;
+    }
+    .toggle-inactive {
+      background-color: transparent;
+      color: var(--text-muted);
+    }
+    .toggle-active {
+      background-image: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
+      color: #020617;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+    }
+
+    .button-primary {
+      background-image: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
+      color: #020617;
+      font-weight: 500;
+      border-radius: 9999px;
+      padding: .55rem 1.65rem;
+      border: none;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.24);
+      transition:
+        box-shadow .18s ease,
+        transform .18s ease,
+        filter .18s ease;
+    }
+    .button-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.30);
+      filter: brightness(1.03);
+    }
+    .button-primary:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.26);
+      filter: brightness(.99);
+    }
+    .button-primary:disabled {
+      background-image: none;
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #headerContainer { border-bottom-color: var(--border-primary); }
+
+    #themeControls button {
+      border-radius: 9999px;
+      background-color: rgba(148,163,184,.08);
+      border: 1px solid rgba(148,163,184,.45);
+      font-size: 11px;
+      padding: .35rem .7rem;
+      transition:
+        background-color .15s ease,
+        box-shadow .15s ease,
+        transform .15s ease,
+        border-color .15s ease;
+    }
+    #themeControls button:hover {
+      background-color: rgba(148,163,184,.16);
+      border-color: rgba(148,163,184,.7);
+      box-shadow: 0 4px 10px rgba(15,23,42,.18);
+      transform: translateY(-.5px);
+    }
+
+    button:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--accent-color-light);
+      outline-offset: 2px;
+    }
+
+    /* Offer details typography: NO bold here */
+    .offer-detail-label {
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .offer-detail-value {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+
+  <div id="shell" class="w-full max-w-xl shell text-primary rounded-xl p-4 md:p-6 space-y-4">
+
+    <!-- HEADER -->
+    <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
+      <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
+        <div class="flex items-center justify-center h-10">
+          <img id="customLogoImg" class="h-9 w-auto hidden" alt="Logo" />
+          <!-- Clean shield + check -->
+          <svg
+            id="defaultLogoSvg"
+            class="h-9 w-9 text-hero"
+            viewBox="0 0 32 32"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <!-- Shield uses accent color -->
+            <path
+              d="M16 2.5L6 7v9c0 6.1 4.27 11.46 10 12.9 5.73-1.44 10-6.8 10-12.9v-9L16 2.5z"
+              fill="currentColor"
+            />
+            <!-- White check, no stroke, no black bleed -->
+            <path
+              d="M14.1 19.4l-3.4-3.4a1.1 1.1 0 0 0-1.56 0 1.1 1.1 0 0 0 0 1.56l4.18 4.18a1.1 1.1 0 0 0 1.56 0l6.92-6.92a1.1 1.1 0 0 0-1.56-1.56l-6.14 6.14z"
+              fill="#ffffff"
+            />
+          </svg>
+        </div>
+        <div class="flex flex-col items-center leading-tight mt-1">
+          <span id="companyNameDisplay" class="text-base md:text-lg font-medium text-secondary"></span>
+        </div>
+        <span class="text-xs font-semibold text-muted uppercase tracking-[0.18em] mt-1">
+          Approval Calculator
+        </span>
+      </div>
+      <div id="themeControls" class="flex items-center justify-center gap-2">
+        <button id="repSettingsToggle" type="button">
+          Settings
+        </button>
+        <button id="themePanelToggle" type="button">
+          Theme
+        </button>
+      </div>
+    </div>
+
+    <!-- REP SETTINGS -->
+    <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg rounded-lg p-3 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Rep Settings</span>
+        <span class="text-[11px] text-muted">Shown on client approval view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        <div>
+          <label for="companyNameInput" class="block font-semibold text-muted">Company Name</label>
+          <input id="companyNameInput" type="text"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Your Company" />
+        </div>
+        <div>
+          <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
+          <input id="repNameInput" type="text"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Rep Name" />
+        </div>
+        <div>
+          <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
+          <input id="repEmailInput" type="email"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="rep@example.com" />
+        </div>
+        <div>
+          <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
+          <input id="repPhoneInput" type="tel"
+                 class="mt-1 w-full p-1.5 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="(555) 123-4567" />
+        </div>
+      </div>
+    </div>
+
+    <!-- THEME SETTINGS -->
+    <div id="themePanel" class="w-full mt-3 card-inner-bg rounded-lg p-3 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Theme Settings</span>
+        <span class="text-[11px] text-muted">Affects your view & client view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div>
+            <label for="themeSelector" class="block font-semibold text-muted">Theme</label>
+            <select id="themeSelector"
+                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+              <optgroup label="Clean">
+                <option value="theme-light">Light</option>
+                <option value="theme-dark">Dark</option>
+                <option value="theme-black">Black</option>
+                <option value="theme-auto">Auto (System)</option>
+              </optgroup>
+              <optgroup label="Fun">
+                <option value="theme-ocean">Ocean</option>
+                <option value="theme-forest">Forest</option>
+                <option value="theme-sunset">Sunset</option>
+                <option value="theme-sky">Sky Day</option>
+                <option value="theme-latte">Latte Desk</option>
+              </optgroup>
+              <optgroup label="Really fun">
+                <option value="theme-neon">Neon Grid</option>
+                <option value="theme-unicorn">Unicorn Dream</option>
+                <option value="theme-terminal">Terminal Green</option>
+                <option value="theme-synthwave">Synthwave</option>
+              </optgroup>
+              <optgroup label="Too much fun">
+                <option value="theme-laser">Laser Mode</option>
+                <option value="theme-fiesta">Fiesta</option>
+                <option value="theme-slime">Slime Pop</option>
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label for="accentSelector" class="block font-semibold text-muted">Accent</label>
+            <select id="accentSelector"
+                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+              <option value="accent-emerald">Emerald (Default)</option>
+              <option value="accent-gold">Gold</option>
+              <option value="accent-red">Red</option>
+              <option value="accent-orange">Orange</option>
+              <option value="accent-yellow">Yellow</option>
+              <option value="accent-green">Green</option>
+              <option value="accent-blue">Blue</option>
+              <option value="accent-indigo">Indigo</option>
+              <option value="accent-violet">Violet</option>
+              <option value="accent-teal">Teal</option>
+              <option value="accent-cyan">Cyan</option>
+              <option value="accent-sky">Sky</option>
+              <option value="accent-lime">Lime</option>
+              <option value="accent-rose">Rose</option>
+              <option value="accent-pink">Pink</option>
+              <option value="accent-slate">Slate</option>
+              <option value="accent-gray">Gray</option>
+              <option value="accent-brown">Brown</option>
+              <option value="accent-rainbow">Rainbow</option>
+              <option value="accent-disco">Disco</option>
+              <option value="accent-metallic">Metallic</option>
+              <option value="accent-aurora">Aurora</option>
+              <option value="accent-fire">Fire</option>
+            </select>
+          </div>
+          <div>
+            <label for="backgroundSelector" class="block font-semibold text-muted">Background</label>
+            <select id="backgroundSelector"
+                    class="mt-1 w-full p-1.5 text-xs rounded-lg border border-primary input-field">
+              <option value="bg-default">Theme Default</option>
+              <option value="bg-plain">Plain</option>
+              <option value="bg-soft">Soft Gradient</option>
+              <option value="bg-loud">Loud Gradient</option>
+              <option value="bg-grid">Grid</option>
+              <option value="bg-diagonal">Diagonal</option>
+              <option value="bg-spotlight">Spotlight</option>
+              <option value="bg-stripes">Stripes</option>
+              <option value="bg-dots">Dots</option>
+              <option value="bg-mesh">Mesh</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-2 flex flex-col sm:flex-row gap-3 text-[11px] items-start">
+          <label class="inline-flex items-center gap-2">
+            <input id="mainGlowCheckbox" type="checkbox" class="accent-current">
+            <span class="text-muted">Main offer glow</span>
+          </label>
+          <label class="inline-flex items-center gap-2">
+            <input id="shellGlowCheckbox" type="checkbox" class="accent-current">
+            <span class="text-muted">Glow around whole widget</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALCULATOR -->
+    <div id="calculatorInputs" class="space-y-4 pt-2">
+      <div id="businessNameContainer" class="px-1 mt-2">
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+          Business Name
+        </label>
+        <input id="businessNameInput" type="text"
+               class="mt-1 w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+               placeholder="e.g., Acme Holdings LLC" />
+      </div>
+
+      <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
+        <!-- Amount -->
+        <div id="amountContainer" class="space-y-1">
+          <label class="block text-xs font-semibold text-muted">
+            Amount You Get ($)
+          </label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer mb-2" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-sm">$</span>
+            <input id="calcAmountInput" inputmode="numeric"
+                   class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Factor -->
+        <div id="factorContainer" class="space-y-1">
+          <label class="block text-xs font-semibold text-muted">
+            Factor Rate
+          </label>
+          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-xs">x</span>
+            <input id="calcFactorInput" type="number" step="0.01"
+                   class="w-full p-1.5 pl-7 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Number of Payments -->
+        <div id="termContainer" class="space-y-1">
+          <label class="block text-xs font-semibold text-muted">
+            Number of Payments
+          </label>
+          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="6"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-xs">#</span>
+            <input id="calcTermInput" type="number" step="1"
+                   class="w-full p-1.5 pl-7 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Origination Fee -->
+        <div id="originationContainer" class="space-y-1">
+          <label class="block text-xs font-semibold text-muted">
+            Origination Fee (%)
+          </label>
+          <input id="originationSlider" type="range" min="0" max="10" step="0.1" value="0"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-xs">%</span>
+            <input id="originationInput" type="number" step="0.1" min="0" max="10"
+                   class="w-full p-1.5 pl-7 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <!-- Term Length (display only) -->
+        <div id="termLengthMonthsContainer" class="space-y-1">
+          <label class="block text-xs font-semibold text-muted">
+            Term Length (Months - Display Only)
+          </label>
+          <div class="relative group">
+            <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
+                   class="w-full p-1.5 text-sm border rounded-lg shadow-sm input-field"
+                   placeholder="Auto" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Frequency toggle -->
+      <div id="toggleContainer" class="flex items-center justify-center space-x-2">
+        <button id="toggleDaily" class="text-sm px-4 py-1.5 rounded-lg">Daily</button>
+        <button id="toggleWeekly" class="text-sm px-4 py-1.5 rounded-lg">Weekly</button>
+        <button id="toggleMonthly" class="text-sm px-4 py-1.5 rounded-lg">Monthly</button>
+      </div>
+    </div>
+
+    <!-- OFFER CARD -->
+    <div id="offerCard" class="offer-card mt-4 p-4 md:p-5">
+      <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
+        <h4 class="text-sm font-normal text-secondary">
+          Offer 1 – Your Approved Terms
+        </h4>
+      </div>
+      <div class="text-center py-6">
+        <span id="businessNameDisplay"
+              class="text-sm font-medium text-primary block mb-1 hidden"></span>
+        <span class="text-sm font-medium text-muted block">You Get</span>
+        <span id="summaryAmountOut"
+              class="text-5xl md:text-6xl font-semibold block my-2 text-hero">$50,000</span>
+        <!-- Total Payback line: NOT bold -->
+        <span class="text-base text-secondary block">
+          Total Payback:
+          <span id="summaryPaybackOut" class="text-primary"></span>
+        </span>
+      </div>
+      <div class="flex justify-center items-center border-b border-primary pb-3">
+        <!-- Offer Details heading: NOT bold -->
+        <h5 class="text-sm font-normal text-secondary text-center">
+          Offer Details
+        </h5>
+      </div>
+      <div class="pt-6 pb-4">
+        <div class="text-center mb-6">
+          <div class="offer-detail-label mb-1">Term Length</div>
+          <div id="summaryTermLengthOut" class="text-lg md:text-xl text-primary font-normal"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-y-6 text-center">
+          <div class="space-y-1">
+            <div class="offer-detail-label">Factor Rate</div>
+            <div id="summaryFactorOut" class="offer-detail-value"></div>
+          </div>
+          <div class="space-y-1">
+            <div class="offer-detail-label">Payments</div>
+            <div id="summaryTermOut" class="offer-detail-value"></div>
+          </div>
+          <div class="space-y-1">
+            <div class="offer-detail-label">Total Cost of Funds</div>
+            <div id="summaryCostOut" class="offer-detail-value"></div>
+          </div>
+          <div class="space-y-1">
+            <div id="summaryPaymentLabel" class="offer-detail-label">Daily Payment</div>
+            <div id="summaryPaymentValue" class="offer-detail-value"></div>
+          </div>
+          <div class="space-y-1">
+            <div class="offer-detail-label">Origination Fee (%)</div>
+            <div id="summaryOriginationPercentOut" class="offer-detail-value"></div>
+          </div>
+          <div class="space-y-1">
+            <div class="offer-detail-label">Origination Fee ($)</div>
+            <div id="summaryOriginationAmountOut" class="offer-detail-value"></div>
+          </div>
+        </div>
+      </div>
+      <div id="repContactBlock"
+           class="mt-4 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
+        <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
+        <div id="repNameDisplay" class="font-medium"></div>
+        <div id="repEmailDisplay"></div>
+        <div id="repPhoneDisplay"></div>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL OFFERS -->
+    <div id="savedOffersSection"
+         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+      <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
+        <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
+      </div>
+      <div id="savedOffersContainer"
+           class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div id="buttonContainer" class="pt-4 border-t border-primary mt-4">
+      <div class="relative flex justify-center gap-3 flex-wrap">
+        <button id="addOfferButton" class="button-primary">
+          Add Offer
+        </button>
+        <button id="shareLinkButton" class="button-primary" type="button">
+          Share Approval Link
+        </button>
+      </div>
+      <div id="shareLinkContainer" class="mt-3 hidden">
+        <label class="block text-xs font-semibold text-muted mb-1">Shareable Approval Link</label>
+        <input id="shareLinkOutput" type="text" readonly
+               class="w-full text-xs input-field border border-primary rounded-lg px-2 py-1" />
+        <p class="mt-1 text-[11px] text-muted">
+          Link copied to clipboard (when possible). If not, copy from here.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ------------ ELEMENT LOOKUPS ------------ */
+    const elements = {
+      calcAmountSlider: document.getElementById('calcAmountSlider'),
+      calcFactorSlider: document.getElementById('calcFactorSlider'),
+      calcTermSlider: document.getElementById('calcTermSlider'),
+      calcAmountInput: document.getElementById('calcAmountInput'),
+      calcFactorInput: document.getElementById('calcFactorInput'),
+      calcTermInput: document.getElementById('calcTermInput'),
+      termLengthMonthsInput: document.getElementById('termLengthMonthsInput'),
+      originationSlider: document.getElementById('originationSlider'),
+      originationInput: document.getElementById('originationInput'),
+
+      toggleDaily: document.getElementById('toggleDaily'),
+      toggleWeekly: document.getElementById('toggleWeekly'),
+      toggleMonthly: document.getElementById('toggleMonthly'),
+
+      themeSelector: document.getElementById('themeSelector'),
+      accentSelector: document.getElementById('accentSelector'),
+      backgroundSelector: document.getElementById('backgroundSelector'),
+      mainGlowCheckbox: document.getElementById('mainGlowCheckbox'),
+      shellGlowCheckbox: document.getElementById('shellGlowCheckbox'),
+
+      repSettingsToggle: document.getElementById('repSettingsToggle'),
+      themePanelToggle: document.getElementById('themePanelToggle'),
+      repSettingsPanel: document.getElementById('repSettingsPanel'),
+      themePanel: document.getElementById('themePanel'),
+
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+
+      companyNameInput: document.getElementById('companyNameInput'),
+      companyNameDisplay: document.getElementById('companyNameDisplay'),
+
+      repNameInput: document.getElementById('repNameInput'),
+      repEmailInput: document.getElementById('repEmailInput'),
+      repPhoneInput: document.getElementById('repPhoneInput'),
+      repContactBlock: document.getElementById('repContactBlock'),
+      repNameDisplay: document.getElementById('repNameDisplay'),
+      repEmailDisplay: document.getElementById('repEmailDisplay'),
+      repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+
+      customLogoImg: document.getElementById('customLogoImg'),
+      defaultLogoSvg: document.getElementById('defaultLogoSvg'),
+
+      summaryAmountOut: document.getElementById('summaryAmountOut'),
+      summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+      summaryFactorOut: document.getElementById('summaryFactorOut'),
+      summaryTermOut: document.getElementById('summaryTermOut'),
+      summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+      summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      summaryTermLengthOut: document.getElementById('summaryTermLengthOut'),
+      summaryOriginationPercentOut: document.getElementById('summaryOriginationPercentOut'),
+      summaryOriginationAmountOut: document.getElementById('summaryOriginationAmountOut'),
+
+      addOfferButton: document.getElementById('addOfferButton'),
+      savedOffersSection: document.getElementById('savedOffersSection'),
+      savedOffersContainer: document.getElementById('savedOffersContainer'),
+
+      businessNameContainer: document.getElementById('businessNameContainer'),
+      factorContainer: document.getElementById('factorContainer'),
+      termContainer: document.getElementById('termContainer'),
+      originationContainer: document.getElementById('originationContainer'),
+      termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
+      toggleContainer: document.getElementById('toggleContainer'),
+      themeControls: document.getElementById('themeControls'),
+      buttonContainer: document.getElementById('buttonContainer'),
+      offerCard: document.getElementById('offerCard'),
+      shell: document.getElementById('shell'),
+
+      shareLinkButton: document.getElementById('shareLinkButton'),
+      shareLinkContainer: document.getElementById('shareLinkContainer'),
+      shareLinkOutput: document.getElementById('shareLinkOutput'),
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewMode = urlParams.get('view');
+    const isApprovalView = viewMode === 'approval';
+
+    let paymentFrequency = 'daily';
+    let currentTheme = 'theme-light';
+    let currentAccent = 'accent-emerald';
+    let currentBackground = 'bg-default';
+    let mainGlowEnabled = true;
+    let shellGlowEnabled = false;
+
+    let logoUrl = '';
+    let companyName = '';
+    let amountSliderMax = 1000000;
+    const MAX_ADDITIONAL_OFFERS = 2;
+    let savedOffers = [];
+    let termLengthManualDirty = false;
+    let initialConfig = null;
+
+    /* ------------ BASE64 CONFIG HELPERS (for URL) ------------ */
+    function b64EncodeUnicode(str) {
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+        (_, p1) => String.fromCharCode('0x' + p1)));
+    }
+    function b64DecodeUnicode(str) {
+      return decodeURIComponent(Array.prototype.map.call(atob(str), c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+    }
+    function encodeConfig(config) {
+      try { return b64EncodeUnicode(JSON.stringify(config)); } catch { return ''; }
+    }
+    function decodeConfig(encoded) {
+      try { return JSON.parse(b64DecodeUnicode(encoded)); } catch { return null; }
+    }
+    function getConfigParam(name) {
+      const hash = window.location.hash.startsWith('#')
+        ? window.location.hash.slice(1)
+        : window.location.hash;
+      if (hash) {
+        const h = new URLSearchParams(hash);
+        if (h.has(name)) return h.get(name);
+      }
+      const qs = new URLSearchParams(window.location.search);
+      if (qs.has(name)) return qs.get(name);
+      return null;
+    }
+
+    (function readInitialConfigFromURL() {
+      const encoded = getConfigParam('c');
+      if (!encoded) return;
+      const cfg = decodeConfig(encoded);
+      if (cfg && typeof cfg === 'object') {
+        initialConfig = cfg;
+      }
+    })();
+
+    /* ------------ NUMERIC HELPERS ------------ */
+    function formatCurrency(num) {
+      const numericValue = Number(num);
+      if (isNaN(numericValue)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(numericValue);
+    }
+    function parseFormattedNumber(val) {
+      if (typeof val !== 'string' || !val) return 0;
+      return parseFloat(val.replace(/[\$,]/g, '')) || 0;
+    }
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
+
+    /* ------------ SLIDER FILL ------------ */
+    function updateSliderFill(slider) {
+      if (!slider) return;
+      const min = Number(slider.min || 0);
+      const max = Number(slider.max || 100);
+      const val = Number(slider.value || 0);
+      const percent = (max - min) === 0 ? 0 : ((val - min) * 100) / (max - min);
+      slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${percent}%, var(--bg-slider-track) ${percent}%, var(--bg-slider-track) 100%)`;
+    }
+
+    /* ------------ THEME & GLOW ------------ */
+    function applyTheme() {
+      let themeClass = currentTheme;
+      if (currentTheme === 'theme-auto') {
+        const prefersDark = window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+        themeClass = prefersDark ? 'theme-dark' : 'theme-light';
+      }
+      document.documentElement.className =
+        themeClass + ' ' + currentAccent + ' ' + currentBackground;
+
+      if (!isApprovalView) {
+        try {
+          localStorage.setItem('generic_offer_calc_theme', currentTheme);
+          localStorage.setItem('generic_offer_calc_accent', currentAccent);
+          localStorage.setItem('generic_offer_calc_bg', currentBackground);
+          localStorage.setItem('generic_offer_calc_main_glow', mainGlowEnabled ? '1' : '0');
+          localStorage.setItem('generic_offer_calc_shell_glow', shellGlowEnabled ? '1' : '0');
+        } catch (_) {}
+      }
+
+      updateSliderFill(elements.calcAmountSlider);
+      updateSliderFill(elements.calcFactorSlider);
+      updateSliderFill(elements.calcTermSlider);
+      updateSliderFill(elements.originationSlider);
+
+      applyGlowClasses();
+    }
+
+    function applyGlowClasses() {
+      if (elements.offerCard) {
+        elements.offerCard.classList.toggle('offer-glow', !!mainGlowEnabled);
+      }
+      if (elements.shell) {
+        elements.shell.classList.toggle('shell-glow', !!shellGlowEnabled);
+      }
+    }
+
+    function applyLogo() {
+      if (!elements.customLogoImg || !elements.defaultLogoSvg) return;
+      const url = (logoUrl || '').trim();
+      if (url) {
+        elements.customLogoImg.src = url;
+        elements.customLogoImg.classList.remove('hidden');
+        elements.defaultLogoSvg.classList.add('hidden');
+      } else {
+        elements.customLogoImg.src = '';
+        elements.customLogoImg.classList.add('hidden');
+        elements.defaultLogoSvg.classList.remove('hidden');
+      }
+
+      if (!isApprovalView) {
+        try {
+          if (url) localStorage.setItem('generic_offer_calc_logo_url', url);
+          else localStorage.removeItem('generic_offer_calc_logo_url');
+        } catch (_) {}
+      }
+    }
+
+    function updateBrandDisplay() {
+      const inputVal = elements.companyNameInput
+        ? elements.companyNameInput.value.trim()
+        : '';
+      companyName = inputVal;
+      if (elements.companyNameDisplay) {
+        elements.companyNameDisplay.textContent = companyName || '';
+      }
+      if (!isApprovalView) {
+        try {
+          if (companyName) localStorage.setItem('generic_offer_calc_company', companyName);
+          else localStorage.removeItem('generic_offer_calc_company');
+        } catch (_) {}
+      }
+    }
+
+    function updateRepDisplay() {
+      if (!elements.repContactBlock) return;
+      const name = elements.repNameInput?.value.trim() || '';
+      const email = elements.repEmailInput?.value.trim() || '';
+      const phone = elements.repPhoneInput?.value.trim() || '';
+      const hasAny = name || email || phone;
+      elements.repContactBlock.classList.toggle('hidden', !hasAny);
+      if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+      if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+      if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
+    }
+
+    function updatePaymentToggleUI() {
+      const btns = [
+        { el: elements.toggleDaily, freq: 'daily' },
+        { el: elements.toggleWeekly, freq: 'weekly' },
+        { el: elements.toggleMonthly, freq: 'monthly' },
+      ];
+      btns.forEach(({ el, freq }) => {
+        if (!el) return;
+        el.classList.remove('toggle-active', 'toggle-inactive');
+        el.classList.add(paymentFrequency === freq ? 'toggle-active' : 'toggle-inactive');
+      });
+
+      if (elements.summaryPaymentLabel) {
+        if (paymentFrequency === 'daily') {
+          elements.summaryPaymentLabel.textContent = 'Daily Payment';
+        } else if (paymentFrequency === 'weekly') {
+          elements.summaryPaymentLabel.textContent = 'Weekly Payment';
+        } else {
+          elements.summaryPaymentLabel.textContent = 'Monthly Payment';
+        }
+      }
+    }
+
+    /* ------------ OFFER MATH ------------ */
+    function computeOffer(amount, factor, termPayments, frequency) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+      const paymentsCount = termPayments > 0 ? termPayments : 1;
+      const paymentAmount = totalPayback / paymentsCount;
+
+      let rawMonths;
+      if (frequency === 'weekly') rawMonths = termPayments * (12 / 52);
+      else if (frequency === 'monthly') rawMonths = termPayments;
+      else rawMonths = termPayments * (12 / 250);
+
+      const termLengthMonths = Math.round(rawMonths * 2) / 2;
+
+      return {
+        amount,
+        factor,
+        termPayments,
+        termLengthMonths,
+        totalPayback,
+        totalCost,
+        payment: paymentAmount,
+        frequency,
+      };
+    }
+
+    function getCurrentOffer() {
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
+      const termPayments = parseInt(elements.calcTermInput.value, 10) || 1;
+      return computeOffer(amount, factor, termPayments, paymentFrequency);
+    }
+
+    function renderSavedOffers() {
+      if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+      if (!savedOffers.length) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
+        return;
+      }
+      elements.savedOffersSection.classList.remove('hidden');
+      const html = savedOffers.map((offer, index) => {
+        const labelIndex = index + 2;
+        const paymentLabel =
+          offer.frequency === 'weekly'
+            ? 'Weekly Payment'
+            : offer.frequency === 'monthly'
+              ? 'Monthly Payment'
+              : 'Daily Payment';
+        return `
+          <div class="card-bg rounded-lg border border-primary p-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+            </div>
+            <div class="text-center mt-2">
+              <span class="text-[11px] font-medium text-muted block">You Get</span>
+              <span class="text-2xl font-semibold text-hero block">${formatCurrency(offer.amount)}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-center text-xs mt-2">
+              <div>
+                <span class="text-[11px] font-medium text-muted block">Factor</span>
+                <span class="text-sm font-medium text-primary block">${offer.factor.toFixed(2)}x</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-muted block">Payments</span>
+                <span class="text-sm font-medium text-primary block">${offer.termPayments}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-muted block">Payback</span>
+                <span class="text-sm font-medium text-primary block">${formatCurrency(offer.totalPayback)}</span>
+              </div>
+              <div>
+                <span class="text-[11px] font-medium text-muted block">${paymentLabel}</span>
+                <span class="text-sm font-medium text-primary block">${formatCurrency(offer.payment)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      elements.savedOffersContainer.innerHTML = html;
+    }
+
+    function updateAddOfferButtonState() {
+      if (!elements.addOfferButton) return;
+      elements.addOfferButton.disabled = savedOffers.length >= MAX_ADDITIONAL_OFFERS;
+    }
+
+    function handleAddOffer() {
+      if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
+      savedOffers.push(getCurrentOffer());
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    /* ------------ SYNC SLIDERS & INPUTS ------------ */
+    function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const initialValue = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+      updateSliderFill(slider);
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        if (!isNaN(val) && val > max) {
+          val = max;
+          slider.value = val;
+        }
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        updateSliderFill(slider);
+        callback();
+      });
+
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (!isNaN(val) && val >= min && val <= max) {
+          slider.value = val;
+          updateSliderFill(slider);
+          callback();
+        } else if (input.value === '') {
+          callback();
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        if (isNaN(val) || val < min) val = min;
+        if (val > max) val = max;
+        slider.value = val;
+        input.value = isCurrency ? formatCurrency(val) : String(val);
+        updateSliderFill(slider);
+        callback();
+      });
+    }
+
+    /* ------------ STORAGE ------------ */
+    function loadPreferencesFromStorage() {
+      if (!window.localStorage) return;
+      try {
+        const storedTheme = localStorage.getItem('generic_offer_calc_theme');
+        const storedAccent = localStorage.getItem('generic_offer_calc_accent');
+        const storedBackground = localStorage.getItem('generic_offer_calc_bg');
+        // Load logo from dashboard's localStorage key (base64 data URL)
+        const dashboardLogo = localStorage.getItem('tbLogoDataUrl');
+        const storedLogoUrl = dashboardLogo || localStorage.getItem('generic_offer_calc_logo_url');
+        const storedCompany = localStorage.getItem('generic_offer_calc_company');
+        const storedMainGlow = localStorage.getItem('generic_offer_calc_main_glow');
+        const storedShellGlow = localStorage.getItem('generic_offer_calc_shell_glow');
+
+        if (storedTheme) currentTheme = storedTheme;
+        if (storedAccent) currentAccent = storedAccent;
+        if (storedBackground) currentBackground = storedBackground;
+        if (storedLogoUrl) logoUrl = storedLogoUrl;
+        if (storedCompany) companyName = storedCompany;
+        if (storedMainGlow !== null) mainGlowEnabled = storedMainGlow === '1';
+        if (storedShellGlow !== null) shellGlowEnabled = storedShellGlow === '1';
+      } catch (_) {}
+    }
+
+    /* ------------ URL CONFIG -> STATE ------------ */
+    function applyConfigFromURL() {
+      if (!initialConfig) return;
+      const cfg = initialConfig;
+
+      if (typeof cfg.a === 'number') {
+        elements.calcAmountSlider.value = String(cfg.a);
+      }
+      if (typeof cfg.f === 'number') {
+        elements.calcFactorSlider.value = String(cfg.f);
+      }
+      if (typeof cfg.t === 'number') {
+        elements.calcTermSlider.value = String(cfg.t);
+      }
+      if (typeof cfg.q === 'string') {
+        paymentFrequency = cfg.q;
+      }
+
+      if (typeof cfg.th === 'string') currentTheme = cfg.th;
+      if (typeof cfg.ac === 'string') currentAccent = cfg.ac;
+      if (typeof cfg.bg === 'string') currentBackground = cfg.bg;
+
+      if (typeof cfg.b === 'string' && elements.businessNameInput) {
+        elements.businessNameInput.value = cfg.b;
+      }
+      if (typeof cfg.rn === 'string' && elements.repNameInput) {
+        elements.repNameInput.value = cfg.rn;
+      }
+      if (typeof cfg.re === 'string' && elements.repEmailInput) {
+        elements.repEmailInput.value = cfg.re;
+      }
+      if (typeof cfg.rp === 'string' && elements.repPhoneInput) {
+        elements.repPhoneInput.value = cfg.rp;
+      }
+      if (typeof cfg.cn === 'string') {
+        companyName = cfg.cn;
+        if (elements.companyNameInput) elements.companyNameInput.value = companyName;
+      }
+      if (typeof cfg.lu === 'string') {
+        logoUrl = cfg.lu;
+      }
+
+      if (Array.isArray(cfg.o)) {
+        savedOffers = cfg.o.map(o =>
+          computeOffer(
+            Number(o.a ?? o.amount ?? 0),
+            Number(o.f ?? o.factor ?? 1.1),
+            Number(o.t ?? o.term ?? 3),
+            o.q ?? o.frequency ?? 'daily'
+          )
+        );
+      }
+
+      if (typeof cfg.mg === 'number' || typeof cfg.mg === 'boolean') {
+        mainGlowEnabled = !!cfg.mg;
+      }
+      if (typeof cfg.wg === 'number' || typeof cfg.wg === 'boolean') {
+        shellGlowEnabled = !!cfg.wg;
+      }
+
+      if (isApprovalView && typeof cfg.a === 'number') {
+        setAmountSliderMax(cfg.a);
+      }
+    }
+
+    /* ------------ CALCULATOR ------------ */
+    function runCalculator() {
+      try {
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+        const termPayments = parseInt(elements.calcTermInput.value, 10) || 1;
+
+        const offer = computeOffer(amount, factor, termPayments, paymentFrequency);
+
+        const businessName = elements.businessNameInput?.value.trim() || '';
+        if (elements.businessNameDisplay) {
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
+        }
+
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
+        elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
+        elements.summaryTermOut.textContent = `${offer.termPayments} payments`;
+        elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+        elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+
+        const origPct = parseFloat(elements.originationInput.value) || 0;
+        const origFeeAmount = amount * (origPct / 100);
+        elements.summaryOriginationPercentOut.textContent = `${origPct.toFixed(2)}%`;
+        elements.summaryOriginationAmountOut.textContent = formatCurrency(origFeeAmount);
+
+        let months = offer.termLengthMonths;
+        if (elements.termLengthMonthsInput) {
+          if (!termLengthManualDirty) {
+            const autoRounded = Math.round(months * 2) / 2;
+            elements.termLengthMonthsInput.value =
+              Number.isInteger(autoRounded) ? String(autoRounded) : autoRounded.toFixed(1);
+          }
+          const manualVal = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(manualVal) && manualVal > 0) months = manualVal;
+        }
+        if (months && months > 0) {
+          const rounded = Math.round(months * 2) / 2;
+          elements.summaryTermLengthOut.textContent =
+            `${Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)} months`;
+        } else {
+          elements.summaryTermLengthOut.textContent = '';
+        }
+
+        updateRepDisplay();
+      } catch (e) {
+        console.error('Calculator error:', e);
+      }
+    }
+
+    /* ------------ INITIALIZE ------------ */
+    function initializeCalculator() {
+      if (!isApprovalView) {
+        loadPreferencesFromStorage();
+      }
+
+      applyConfigFromURL();
+
+      if (elements.companyNameInput && companyName) {
+        elements.companyNameInput.value = companyName;
+      }
+      updateBrandDisplay();
+      applyLogo();
+
+      if (elements.themeSelector) elements.themeSelector.value = currentTheme;
+      if (elements.accentSelector) elements.accentSelector.value = currentAccent;
+      if (elements.backgroundSelector) elements.backgroundSelector.value = currentBackground;
+      if (elements.mainGlowCheckbox) elements.mainGlowCheckbox.checked = !!mainGlowEnabled;
+      if (elements.shellGlowCheckbox) elements.shellGlowCheckbox.checked = !!shellGlowEnabled;
+
+      if (!isApprovalView && !initialConfig) {
+        setAmountSliderMax(1000000);
+      }
+
+      applyTheme();
+      applyGlowClasses();
+      updatePaymentToggleUI();
+
+      if (elements.calcAmountSlider && elements.calcAmountInput) {
+        syncInputs(elements.calcAmountSlider, elements.calcAmountInput,
+          true, 5000, amountSliderMax, runCalculator);
+      }
+      if (elements.calcFactorSlider && elements.calcFactorInput) {
+        syncInputs(elements.calcFactorSlider, elements.calcFactorInput,
+          false, 1.05, 1.7, runCalculator);
+        if (isApprovalView) {
+          elements.calcFactorInput.disabled = true;
+          elements.calcFactorSlider.disabled = true;
+        }
+      }
+      if (elements.calcTermSlider && elements.calcTermInput) {
+        syncInputs(elements.calcTermSlider, elements.calcTermInput,
+          false, 1, 528, runCalculator);
+        if (isApprovalView) {
+          elements.calcTermInput.disabled = true;
+          elements.calcTermSlider.disabled = true;
+        }
+      }
+      if (elements.originationSlider && elements.originationInput) {
+        syncInputs(elements.originationSlider, elements.originationInput,
+          false, 0, 10, runCalculator);
+        if (isApprovalView) {
+          elements.originationInput.disabled = true;
+          elements.originationSlider.disabled = true;
+        }
+      }
+
+      if (!isApprovalView && elements.toggleDaily) {
+        elements.toggleDaily.addEventListener('click', () => {
+          paymentFrequency = 'daily';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (!isApprovalView && elements.toggleWeekly) {
+        elements.toggleWeekly.addEventListener('click', () => {
+          paymentFrequency = 'weekly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (!isApprovalView && elements.toggleMonthly) {
+        elements.toggleMonthly.addEventListener('click', () => {
+          paymentFrequency = 'monthly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+
+      if (!isApprovalView && elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (!isApprovalView && elements.termLengthMonthsInput) {
+        elements.termLengthMonthsInput.addEventListener('input', () => {
+          termLengthManualDirty = true;
+          runCalculator();
+        });
+        elements.termLengthMonthsInput.addEventListener('blur', () => {
+          const v = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(v) && v > 0) {
+            const rounded = Math.round(v * 2) / 2;
+            elements.termLengthMonthsInput.value =
+              Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+          }
+          runCalculator();
+        });
+      }
+
+      if (!isApprovalView && elements.repSettingsToggle && elements.repSettingsPanel) {
+        elements.repSettingsToggle.addEventListener('click', () => {
+          elements.repSettingsPanel.classList.toggle('hidden');
+          if (elements.themePanel) elements.themePanel.classList.add('hidden');
+        });
+      }
+      if (!isApprovalView && elements.themePanelToggle && elements.themePanel) {
+        elements.themePanelToggle.addEventListener('click', () => {
+          elements.themePanel.classList.toggle('hidden');
+          if (elements.repSettingsPanel) elements.repSettingsPanel.classList.add('hidden');
+        });
+      }
+
+      if (!isApprovalView && elements.repNameInput) {
+        elements.repNameInput.addEventListener('input', updateRepDisplay);
+      }
+      if (!isApprovalView && elements.repEmailInput) {
+        elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      }
+      if (!isApprovalView && elements.repPhoneInput) {
+        elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+      }
+      if (!isApprovalView && elements.companyNameInput) {
+        elements.companyNameInput.addEventListener('input', updateBrandDisplay);
+      }
+
+      if (!isApprovalView && elements.themeSelector) {
+        elements.themeSelector.addEventListener('change', e => {
+          currentTheme = e.target.value;
+          applyTheme();
+        });
+      }
+      if (!isApprovalView && elements.accentSelector) {
+        elements.accentSelector.addEventListener('change', e => {
+          currentAccent = e.target.value;
+          applyTheme();
+        });
+      }
+      if (!isApprovalView && elements.backgroundSelector) {
+        elements.backgroundSelector.addEventListener('change', e => {
+          currentBackground = e.target.value;
+          applyTheme();
+        });
+      }
+      if (!isApprovalView && elements.mainGlowCheckbox) {
+        elements.mainGlowCheckbox.addEventListener('change', e => {
+          mainGlowEnabled = !!e.target.checked;
+          applyTheme();
+        });
+      }
+      if (!isApprovalView && elements.shellGlowCheckbox) {
+        elements.shellGlowCheckbox.addEventListener('change', e => {
+          shellGlowEnabled = !!e.target.checked;
+          applyTheme();
+        });
+      }
+
+      if (!isApprovalView && elements.addOfferButton) {
+        elements.addOfferButton.addEventListener('click', handleAddOffer);
+      }
+
+      if (!isApprovalView && elements.shareLinkButton) {
+        elements.shareLinkButton.addEventListener('click', async () => {
+          const shareBtn = elements.shareLinkButton;
+          const originalText = shareBtn.textContent || 'Share Approval Link';
+
+          const amount = parseFormattedNumber(elements.calcAmountInput.value);
+          const factor = parseFloat(elements.calcFactorInput.value);
+          const term = parseInt(elements.calcTermInput.value, 10) || 1;
+          const freq = paymentFrequency;
+          const theme = currentTheme;
+          const accent = currentAccent;
+          const background = currentBackground;
+          const businessName = elements.businessNameInput?.value.trim() || '';
+          const repName = elements.repNameInput?.value.trim() || '';
+          const repEmail = elements.repEmailInput?.value.trim() || '';
+          const repPhone = elements.repPhoneInput?.value.trim() || '';
+          const companyNameVal = elements.companyNameInput?.value.trim() || '';
+          const logoUrlVal = logoUrl || ''; // Use the logoUrl variable which is loaded from localStorage
+
+          const offersForUrl = savedOffers.map(o => ({
+            a: o.amount,
+            f: o.factor,
+            t: o.termPayments,
+            q: o.frequency || freq,
+          }));
+
+          const payload = {
+            a: amount,
+            f: factor,
+            t: term,
+            q: freq,
+            th: theme,
+            ac: accent,
+            bg: background,
+            b: businessName,
+            rn: repName,
+            re: repEmail,
+            rp: repPhone,
+            cn: companyNameVal,
+            lu: logoUrlVal,
+            o: offersForUrl,
+            mg: mainGlowEnabled ? 1 : 0,
+            wg: shellGlowEnabled ? 1 : 0,
+          };
+
+          const encoded = encodeConfig(payload);
+          const url = new URL(window.location.href);
+          url.search = new URLSearchParams({ view: 'approval' }).toString();
+          url.hash = 'c=' + encoded;
+          const shareUrl = url.toString();
+
+          if (elements.shareLinkOutput && elements.shareLinkContainer) {
+            elements.shareLinkOutput.value = shareUrl;
+            elements.shareLinkContainer.classList.remove('hidden');
+            elements.shareLinkOutput.focus();
+            elements.shareLinkOutput.select();
+          }
+
+          const setStatus = (msg) => {
+            shareBtn.textContent = msg;
+            setTimeout(() => {
+              shareBtn.textContent = originalText;
+            }, 1600);
+          };
+
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(shareUrl);
+              setStatus('Link copied');
+            } else {
+              throw new Error('Clipboard API not available');
+            }
+          } catch (err) {
+            console.warn('Clipboard error', err);
+            try {
+              const ta = document.createElement('textarea');
+              ta.value = shareUrl;
+              ta.style.position = 'fixed';
+              ta.style.top = '0';
+              ta.style.left = '0';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
+              const ok = document.execCommand('copy');
+              document.body.removeChild(ta);
+              if (ok) {
+                setStatus('Link copied');
+              } else {
+                throw new Error('execCommand copy failed');
+              }
+            } catch {
+              setStatus('Copy failed');
+            }
+          }
+        });
+      }
+
+      if (isApprovalView) {
+        if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
+        if (elements.themePanel) elements.themePanel.style.display = 'none';
+        if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
+        if (elements.themeControls) elements.themeControls.style.display = 'none';
+        if (elements.factorContainer) elements.factorContainer.style.display = 'none';
+        if (elements.termContainer) elements.termContainer.style.display = 'none';
+        if (elements.originationContainer) elements.originationContainer.style.display = 'none';
+        if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
+        if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+      }
+
+      updatePaymentToggleUI();
+      runCalculator();
+      renderSavedOffers();
+      updateAddOfferButtonState();
+      updateRepDisplay();
+    }
+
+    /* React to system dark/light when on Auto */
+    if (window.matchMedia) {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleSystemThemeChange = () => {
+        if (currentTheme === 'theme-auto') applyTheme();
+      };
+      if (mq.addEventListener) mq.addEventListener('change', handleSystemThemeChange);
+      else if (mq.addListener) mq.addListener(handleSystemThemeChange);
+    }
+
+    initializeCalculator();
+  </script>
+</body>
+</html>
