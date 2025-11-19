@@ -281,12 +281,10 @@
           </div>
         </div>
 
-        <!-- MOVED: Number of Payments now above Fee -->
         <div id="termContainer" class="space-y-1">
           <label for="calcTerm" class="block text-xs font-semibold text-muted">
             Number of Payments
           </label>
-          <!-- UPDATED DEFAULT VALUE TO 130 (approx 6 months daily) -->
           <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="130"
                  class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
@@ -301,7 +299,6 @@
           </div>
         </div>
 
-        <!-- MOVED: Term Length Display now above Fee -->
         <div id="termLengthMonthsContainer" class="space-y-1">
           <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">
             Term Length (Months - Display Only)
@@ -313,17 +310,8 @@
           </div>
         </div>
 
-        <!-- MOVED: Fee now below Term -->
-        <div id="feeContainer" class="space-y-1">
-          <label for="calcFee" class="block text-xs font-semibold text-muted">Origination Fee (%)</label>
-          <input id="calcFeeSlider" type="range" min="0" max="10" step="0.5" value="0"
-                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
-          <div class="relative group">
-             <span class="absolute left-3 input-icon text-muted text-sm">%</span>
-            <input id="calcFeeInput" type="number" step="0.1"
-                   class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
-          </div>
-        </div>
+        <!-- Fee Container Removed from here -->
+
       </div>
 
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
@@ -445,6 +433,27 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- Fee Container Moved Here -->
+      <div id="feeContainer" class="mt-4">
+          <button id="toggleFeeBtn" type="button" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Origination Fee
+          </button>
+          
+          <div id="feeInputWrapper" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
+            <label for="calcFee" class="block text-xs font-semibold text-muted">Origination Fee (%)</label>
+            <input id="calcFeeSlider" type="range" min="0" max="10" step="0.5" value="0"
+                   class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+            <div class="relative group mt-1">
+               <span class="absolute left-3 input-icon text-muted text-sm">%</span>
+              <input id="calcFeeInput" type="number" step="0.1"
+                     class="w-full p-1.5 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+            </div>
+          </div>
       </div>
 
       <div id="repContactBlock"
@@ -574,7 +583,12 @@
       themeControls: document.getElementById('themeControls'),
       calculatorInputs: document.getElementById('calculatorInputs'),
       factorContainer: document.getElementById('factorContainer'),
+      
+      // feeContainer is moved but logic preserved via ID
       feeContainer: document.getElementById('feeContainer'),
+      toggleFeeBtn: document.getElementById('toggleFeeBtn'),
+      feeInputWrapper: document.getElementById('feeInputWrapper'),
+
       termContainer: document.getElementById('termContainer'),
       termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
       toggleContainer: document.getElementById('toggleContainer'),
@@ -836,7 +850,8 @@
       const amount = amountParam ? parseFloat(amountParam) : 50000;
       const factor = params.get('factor') || 1.25;
       const term = params.get('term') || 130; 
-      const fee = params.get('fee') || 0;
+      // Use parseFloat to ensure correct type handling for the fee
+      const fee = parseFloat(params.get('fee')) || 0;
       const freq = params.get('freq');
       const paramTheme = params.get('theme');
       const offersParam = params.get('offers');
@@ -863,11 +878,24 @@
         setAmountSliderMax(1000000);
       }
 
+      // IMPORTANT: Set both Slider AND Input value manually
+      // syncInputs() sets up listeners but does not automatically sync on programmatic assignment
       elements.calcAmountInput.value = formatCurrency(amount);
       elements.calcAmountSlider.value = amount;
+
       elements.calcFactorSlider.value = factor;
+      elements.calcFactorInput.value = factor; // manual sync
+
       elements.calcTermSlider.value = term;
+      elements.calcTermInput.value = term; // manual sync
+      
       elements.calcFeeSlider.value = fee;
+      elements.calcFeeInput.value = fee; // manual sync
+      
+      // Auto-expand fee if set and not in approval view
+      if (fee > 0 && !isApprovalView && elements.feeInputWrapper) {
+         elements.feeInputWrapper.classList.remove('hidden');
+      }
 
       if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
       if (elements.repNameInput) elements.repNameInput.value = repNameParam;
@@ -899,6 +927,8 @@
 
       if (isApprovalView) {
         if (elements.factorContainer) elements.factorContainer.style.display = 'none';
+        // Logic update: hide the fee container INPUT, but keep grid result visible if fee > 0
+        // The ID 'feeContainer' refers to the input section we moved
         if (elements.feeContainer) elements.feeContainer.style.display = 'none';
         if (elements.termContainer) elements.termContainer.style.display = 'none';
         if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
@@ -925,11 +955,6 @@
     function generateSchedule(offer) {
       const schedule = [];
       let currentDate = new Date(); // Today
-      if (elements.prepayDateInput && elements.prepayDateInput.value) {
-         // Ensure we sync with "today" or start date logic?
-         // Actually, standard schedule starts 1 period after today.
-         // We'll iterate based on frequency.
-      }
       
       // Reset hours
       currentDate.setHours(0,0,0,0);
@@ -950,8 +975,6 @@
             runningDate.setMonth(runningDate.getMonth() + 1);
          } else {
             // Daily - simple "next day" but skip weekends
-            // If today is Friday, next is Monday (+3). Sat->Mon (+2). Sun->Mon (+1).
-            // Standard: Add 1 day, check if Sat/Sun.
             do {
                runningDate.setDate(runningDate.getDate() + 1);
             } while (runningDate.getDay() === 0 || runningDate.getDay() === 6);
@@ -960,15 +983,9 @@
          paidSoFar += paymentAmount;
          const remainingBalance = totalPayback - paidSoFar;
          
-         // Calculate Discount for this row's date
-         // Logic: (Total Time - Elapsed Time) / Total Time
-         // We can use the iteration index for a perfect linear decay on payment count.
-         // Fraction remaining = (TotalPayments - i) / TotalPayments
-         
          const fractionRemaining = (totalPayments - i) / totalPayments;
          const savings = maxDiscount * fractionRemaining;
          
-         // Payoff = Remaining - Savings
          let payoff = remainingBalance - savings;
          if (payoff < 0) payoff = 0;
 
@@ -1217,6 +1234,12 @@
               : rounded.toFixed(1);
           }
           runCalculator();
+        });
+      }
+
+      if (elements.toggleFeeBtn) {
+        elements.toggleFeeBtn.addEventListener('click', () => {
+          elements.feeInputWrapper.classList.toggle('hidden');
         });
       }
 
