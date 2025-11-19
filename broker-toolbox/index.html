@@ -77,9 +77,8 @@
             console.log('Today:', today);
 
             if (today > trialEndDate) {
-              console.log('Trial expired - redirecting to subscribe');
-              alert('Your 3-day free trial has expired. Please subscribe to continue using Broker Box.');
-              window.location.href = 'https://trustbureauai.outseta.com/profile?tab=planChange#o-authenticated';
+              console.log('Trial expired - locking page');
+              lockPage();
               return;
             } else {
               console.log('Free trial still active');
@@ -89,6 +88,32 @@
         } catch (error) {
           console.error('Error checking subscription:', error);
           window.location.href = 'https://trustbureauai.outseta.com/auth';
+        }
+      }
+
+      function lockPage() {
+        // Hide all tools
+        const toolsGrid = document.querySelector('.tools-grid');
+        if (toolsGrid) {
+          toolsGrid.style.display = 'none';
+        }
+
+        // Create and show trial expired message
+        const pageHeader = document.querySelector('.page-header');
+        if (pageHeader) {
+          const expiredMessage = document.createElement('div');
+          expiredMessage.style.cssText = 'background: white; border-radius: 16px; padding: 48px 32px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05); text-align: center; max-width: 500px; margin: 40px auto;';
+          expiredMessage.innerHTML = `
+            <div style="width: 64px; height: 64px; background: #fee2e2; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+              <svg xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px; color: #dc2626;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2 style="font-size: 24px; font-weight: 600; margin: 0 0 12px; color: #111827;">Trial Expired</h2>
+            <p style="font-size: 16px; color: #6b7280; margin: 0 0 24px; line-height: 1.6;">Your 3-day free trial has expired. Subscribe to Broker Box to continue accessing professional tools.</p>
+            <a href="https://trustbureauai.outseta.com/profile?tab=planChange#o-authenticated" style="display: inline-block; padding: 12px 32px; background: var(--accent-color); color: white; text-decoration: none; border-radius: 999px; font-weight: 500; font-size: 16px;">Subscribe Now</a>
+          `;
+          pageHeader.parentNode.insertBefore(expiredMessage, pageHeader.nextSibling);
         }
       }
     })();
@@ -287,7 +312,7 @@
     </div>
 
     <div class="nav-actions">
-      <a class="secondary-btn" href="broker-dashboard.html">Dashboard</a>
+      <a class="secondary-btn" href="broker-dashboard.html" id="dashboardLink">Dashboard</a>
       <a class="logout-link" href="javascript:Outseta.getUser().then(u => u ? OutsetaAuth.logout() : null)">Log out</a>
     </div>
   </header>
@@ -346,11 +371,11 @@
       const urlParams = window.location.search;
       const hashParams = window.location.hash;
 
-      const pathsToUpdate = ["/approval-calculator"];
+      const pathsToUpdate = ["/approval-calculator", "broker-dashboard.html"];
 
       document.querySelectorAll("a[href]").forEach(link => {
         const href = link.getAttribute("href");
-        if (href && pathsToUpdate.some(path => href.startsWith(path))) {
+        if (href && pathsToUpdate.some(path => href.includes(path))) {
           const cleanHref = href.split('?')[0].split('#')[0];
           link.href = cleanHref + urlParams + hashParams;
         }
