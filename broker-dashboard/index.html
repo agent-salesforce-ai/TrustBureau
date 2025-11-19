@@ -159,30 +159,6 @@
       margin-bottom: 14px;
     }
 
-    /* Color input */
-    .color-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .color-row input[type="color"] {
-      width: 40px;
-      height: 32px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      cursor: pointer;
-    }
-
-    .color-hex {
-      flex: 1;
-      font-size: 13px;
-      padding: 7px 9px;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-    }
-
     /* Logo preview */
     .logo-preview-box {
       width: 100%;
@@ -272,7 +248,7 @@
     </div>
 
     <div class="nav-actions">
-      <a class="primary-btn" href="/broker-toolbox" id="brokerBoxLink">My Broker Box</a>
+      <a class="primary-btn" href="/broker-toolbox">My Broker Box</a>
       <a class="logout-link" href="javascript:OutsetaAuth.logout()">Log out</a>
     </div>
   </header>
@@ -300,7 +276,7 @@
         <h2>Brand your toolbox</h2>
       </div>
       <div class="card-body">
-        <p>Upload your logo and choose an accent color.</p>
+        <p>Upload your logo to personalize your Broker Box tools.</p>
 
         <div class="field">
           <label for="logoInput">Portal logo</label>
@@ -317,14 +293,6 @@
           <div class="pill-small">Stored in this browser for now.</div>
         </div>
 
-        <div class="field">
-          <label for="accentColor">Accent color</label>
-          <div class="color-row">
-            <input id="accentColor" type="color" />
-            <input id="accentHex" class="color-hex" type="text" readonly />
-          </div>
-        </div>
-
       </div>
     </section>
 
@@ -334,27 +302,10 @@
 <script>
   // Simple client-side storage
   (function() {
-    var colorInput = document.getElementById('accentColor');
-    var colorHex   = document.getElementById('accentHex');
     var logoInput  = document.getElementById('logoInput');
     var logoBox    = document.getElementById('logoPreviewBox');
 
-    var STORAGE_COLOR_KEY = 'tbAccentColor';
     var STORAGE_LOGO_KEY  = 'tbLogoDataUrl';
-
-    function setAccentColor(color) {
-      if (!color) return;
-      document.documentElement.style.setProperty('--accent-color', color);
-      colorInput.value = color;
-      colorHex.value = color.toUpperCase();
-      try { localStorage.setItem(STORAGE_COLOR_KEY, color); } catch (e) {}
-    }
-
-    function loadAccentColor() {
-      var saved = null;
-      try { saved = localStorage.getItem(STORAGE_COLOR_KEY); } catch (e) {}
-      setAccentColor(saved || '#10b981');
-    }
 
     function setLogo(dataUrl) {
       logoBox.innerHTML = '';
@@ -383,8 +334,6 @@
       };
       reader.readAsDataURL(file);
     }
-
-    colorInput.addEventListener('input', e => setAccentColor(e.target.value));
 
     // Click to upload
     logoBox.addEventListener('click', function() {
@@ -418,22 +367,7 @@
       if (file) handleFile(file);
     });
 
-    loadAccentColor();
     loadLogo();
-
-    // Update Broker Box link with branding params
-    const brokerBoxLink = document.getElementById('brokerBoxLink');
-    if (brokerBoxLink) {
-      brokerBoxLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        const color = localStorage.getItem(STORAGE_COLOR_KEY) || '#10b981';
-        const logo = localStorage.getItem(STORAGE_LOGO_KEY) || '';
-        const url = new URL('/broker-toolbox', window.location.origin);
-        url.searchParams.set('color', color);
-        if (logo) url.searchParams.set('logo', logo);
-        window.location.href = url.toString();
-      });
-    }
   })();
 </script>
 
