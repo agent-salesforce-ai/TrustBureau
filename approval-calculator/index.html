@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Approval Calculator</title>
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../favicon.png" />
+
   <!-- Outseta Quickstart script -->
   <script>
     var o_options = {
@@ -852,7 +855,6 @@
               <optgroup label="Clean">
                 <option value="theme-light">Light</option>
                 <option value="theme-dark">Dark</option>
-                <option value="theme-black">Black</option>
                 <option value="theme-auto">Auto (System)</option>
               </optgroup>
               <optgroup label="Fun">
@@ -1326,14 +1328,18 @@
     function applyLogo() {
       if (!elements.customLogoImg || !elements.defaultLogoSvg) return;
       const url = (logoUrl || '').trim();
+      console.log('applyLogo called with logoUrl:', logoUrl);
+      console.log('Logo URL trimmed:', url);
       if (url) {
         elements.customLogoImg.src = url;
         elements.customLogoImg.classList.remove('hidden');
         elements.defaultLogoSvg.classList.add('hidden');
+        console.log('Custom logo shown');
       } else {
         elements.customLogoImg.src = '';
         elements.customLogoImg.classList.add('hidden');
         elements.defaultLogoSvg.classList.remove('hidden');
+        console.log('Default logo shown');
       }
 
       if (!isApprovalView) {
@@ -1541,6 +1547,9 @@
         const storedCompany = localStorage.getItem('generic_offer_calc_company');
         const storedMainGlow = localStorage.getItem('generic_offer_calc_main_glow');
         const storedShellGlow = localStorage.getItem('generic_offer_calc_shell_glow');
+
+        console.log('Dashboard logo from localStorage:', dashboardLogo ? 'Found' : 'Not found');
+        console.log('Final stored logo URL:', storedLogoUrl ? 'Found' : 'Not found');
 
         if (storedTheme) currentTheme = storedTheme;
         if (storedAccent) currentAccent = storedAccent;
