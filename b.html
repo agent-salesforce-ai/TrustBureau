@@ -111,7 +111,7 @@
     }
     html.theme-black body { background-color: var(--bg-body); }
 
-    /* Fun themes (kept, but all readable) */
+    /* Fun themes (same as before, kept for brevity) */
     html.theme-ocean {
       color-scheme: dark;
       --bg-body: #020617;
@@ -690,10 +690,24 @@
       <div class="flex flex-col items-center justify-center flex-shrink-0 gap-1">
         <div class="flex items-center justify-center h-10">
           <img id="customLogoImg" class="h-9 w-auto hidden" alt="Logo" />
-          <!-- TrustBureau-style shield in accent color -->
-          <svg id="defaultLogoSvg" class="h-9 w-9 text-hero" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path fill="currentColor" d="M16 3L6 7.2v8.4c0 6.4 4.6 12.2 10 13.4 5.4-1.2 10-7 10-13.4V7.2L16 3z"/>
-            <path d="M12.5 16.5l3 3 6-7" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Clean shield + check -->
+          <svg
+            id="defaultLogoSvg"
+            class="h-9 w-9 text-hero"
+            viewBox="0 0 32 32"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <!-- Shield uses accent color -->
+            <path
+              d="M16 2.5L6 7v9c0 6.1 4.27 11.46 10 12.9 5.73-1.44 10-6.8 10-12.9v-9L16 2.5z"
+              fill="currentColor"
+            />
+            <!-- White check, no stroke, no black bleed -->
+            <path
+              d="M14.1 19.4l-3.4-3.4a1.1 1.1 0 0 0-1.56 0 1.1 1.1 0 0 0 0 1.56l4.18 4.18a1.1 1.1 0 0 0 1.56 0l6.92-6.92a1.1 1.1 0 0 0-1.56-1.56l-6.14 6.14z"
+              fill="#ffffff"
+            />
           </svg>
         </div>
         <div class="flex flex-col items-center leading-tight mt-1">
@@ -945,7 +959,7 @@
     <!-- OFFER CARD -->
     <div id="offerCard" class="offer-card mt-4 p-4 md:p-5">
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
-        <h4 class="text-sm font-semibold text-secondary">
+        <h4 class="text-sm font-normal text-secondary">
           Offer 1 – Your Approved Terms
         </h4>
       </div>
@@ -955,13 +969,17 @@
         <span class="text-sm font-medium text-muted block">You Get</span>
         <span id="summaryAmountOut"
               class="text-5xl md:text-6xl font-semibold block my-2 text-hero">$50,000</span>
-        <span class="text-base font-medium text-secondary block">
+        <!-- Total Payback line: NOT bold -->
+        <span class="text-base text-secondary block">
           Total Payback:
-          <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
+          <span id="summaryPaybackOut" class="text-primary"></span>
         </span>
       </div>
       <div class="flex justify-center items-center border-b border-primary pb-3">
-        <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
+        <!-- Offer Details heading: NOT bold -->
+        <h5 class="text-sm font-normal text-secondary text-center">
+          Offer Details
+        </h5>
       </div>
       <div class="pt-6 pb-4">
         <div class="text-center mb-6">
@@ -982,7 +1000,7 @@
             <div id="summaryCostOut" class="offer-detail-value"></div>
           </div>
           <div class="space-y-1">
-            <div class="offer-detail-label">Est. Payment</div>
+            <div id="summaryPaymentLabel" class="offer-detail-label">Daily Payment</div>
             <div id="summaryPaymentValue" class="offer-detail-value"></div>
           </div>
           <div class="space-y-1">
@@ -1086,6 +1104,7 @@
       summaryFactorOut: document.getElementById('summaryFactorOut'),
       summaryTermOut: document.getElementById('summaryTermOut'),
       summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
       summaryPaymentValue: document.getElementById('summaryPaymentValue'),
       summaryTermLengthOut: document.getElementById('summaryTermLengthOut'),
       summaryOriginationPercentOut: document.getElementById('summaryOriginationPercentOut'),
@@ -1298,6 +1317,16 @@
         el.classList.remove('toggle-active', 'toggle-inactive');
         el.classList.add(paymentFrequency === freq ? 'toggle-active' : 'toggle-inactive');
       });
+
+      if (elements.summaryPaymentLabel) {
+        if (paymentFrequency === 'daily') {
+          elements.summaryPaymentLabel.textContent = 'Daily Payment';
+        } else if (paymentFrequency === 'weekly') {
+          elements.summaryPaymentLabel.textContent = 'Weekly Payment';
+        } else {
+          elements.summaryPaymentLabel.textContent = 'Monthly Payment';
+        }
+      }
     }
 
     /* ------------ OFFER MATH ------------ */
@@ -1545,7 +1574,6 @@
         elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
         elements.summaryTermOut.textContent = `${offer.termPayments} payments`;
         elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
-
         elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
 
         const origPct = parseFloat(elements.originationInput.value) || 0;
