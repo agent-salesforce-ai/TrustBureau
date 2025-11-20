@@ -148,6 +148,7 @@
       --text-primary: #020617;
       --text-secondary: #111827;
       --text-muted: #4b5563;
+      --text-success: #16a34a;
 
       --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.14);
     }
@@ -192,6 +193,7 @@
       --text-primary: #0f172a;
       --text-secondary: #111827;
       --text-muted: #4b5563;
+      --text-success: #16a34a;
       --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.12);
     }
     html.theme-light body { background-color: var(--bg-body); }
@@ -208,6 +210,7 @@
       --text-primary: #f9fafb;
       --text-secondary: #e5e7eb;
       --text-muted: #cbd5f5;
+      --text-success: #4ade80;
       --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.7);
     }
     html.theme-dark body { background-color: var(--bg-body); }
@@ -224,6 +227,7 @@
       --text-primary: #f9fafb;
       --text-secondary: #e5e5e5;
       --text-muted: #d1d5db;
+      --text-success: #4ade80;
       --accent-color: #ffffff;
       --accent-color-light: #e5e5e5;
       --accent-color-dark: #ffffff;
@@ -636,6 +640,7 @@
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
     .text-muted { color: var(--text-muted); }
+    .text-success { color: var(--text-success); }
     .border-primary { border-color: var(--border-primary); }
 
     .text-hero { color: var(--accent-color); }
@@ -799,6 +804,33 @@
       font-size: 0.9rem;
       color: var(--text-primary);
       font-weight: 400;
+    }
+
+    /* Amortization modal styles */
+    .amort-table {
+      border-collapse: collapse;
+    }
+    .amort-table thead {
+      background-color: var(--bg-card-inner);
+      border-bottom: 2px solid var(--border-primary);
+    }
+    .amort-table th {
+      padding: 0.75rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .amort-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-primary);
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+    .amort-table tbody tr:hover {
+      background-color: var(--bg-card-inner);
     }
   </style>
 </head>
@@ -1127,6 +1159,56 @@
           </div>
         </div>
       </div>
+      <!-- Prepay Discount Section -->
+      <div id="prepaySection" class="mt-4 pt-4 border-t border-primary">
+        <button id="togglePrepay" type="button" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Calculate Prepayment Discount
+        </button>
+
+        <div id="prepayContainer" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
+          <div class="flex justify-between items-center mb-2 pb-2 border-b border-primary">
+            <span class="text-xs font-semibold text-secondary">Prepayment Discount</span>
+            <span id="prepayPercentDisplay" class="text-xs font-bold text-hero">0%</span>
+          </div>
+
+          <!-- Rep View: Slider -->
+          <div id="prepaySliderContainer" class="pt-2">
+             <input id="prepaySlider" type="range" min="0" max="25" step="1" value="0"
+                    class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-4" />
+             <p class="text-xs text-muted text-center italic">Adjust max discount policy (Rep View)</p>
+          </div>
+
+          <!-- Client View: Date Picker -->
+          <div id="prepayDateContainer" class="hidden mb-4 pt-2">
+            <label class="block text-xs font-semibold text-muted mb-1 text-center">Select Payoff Date</label>
+            <input id="prepayDateInput" type="date"
+                   class="w-full p-2 text-sm rounded-lg border border-primary input-field text-center" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-center border-t border-primary pt-3">
+            <div>
+              <span class="text-xs font-semibold text-muted block uppercase tracking-wider">Savings</span>
+              <span id="prepaySavingsDisplay" class="text-sm font-bold text-success">$0.00</span>
+            </div>
+            <div>
+              <span class="text-xs font-semibold text-muted block uppercase tracking-wider">New Payoff</span>
+              <span id="prepayTotalDisplay" class="text-sm font-bold text-primary">$0.00</span>
+            </div>
+          </div>
+
+          <!-- Amortization Button (Client View Only, if Discount > 0) -->
+          <div id="amortizationBtnContainer" class="mt-4 text-center hidden">
+            <button id="viewAmortizationBtn" type="button"
+                    class="text-xs font-semibold text-hero underline hover:text-primary transition-colors">
+              View Amortization Schedule
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div id="repContactBlock"
            class="mt-4 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
         <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
@@ -1163,6 +1245,40 @@
         <p class="mt-1 text-[11px] text-muted">
           Link copied to clipboard (when possible). If not, copy from here.
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AMORTIZATION MODAL -->
+  <div id="amortizationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm p-4">
+    <div class="card-bg w-full max-w-2xl max-h-[85vh] rounded-xl shadow-2xl flex flex-col border border-primary">
+      <div class="p-4 border-b border-primary flex justify-between items-center rounded-t-xl" style="background-color: var(--bg-card-inner);">
+        <h3 class="font-semibold text-lg text-primary">Amortization Schedule</h3>
+        <button id="closeAmortizationBtn" class="text-muted hover:text-primary transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="overflow-auto p-0 flex-1">
+         <table class="w-full text-left amort-table">
+           <thead class="sticky top-0 z-10 shadow-sm">
+             <tr>
+               <th>#</th>
+               <th>Date</th>
+               <th>Payment</th>
+               <th>Balance</th>
+               <th>Prepay Savings</th>
+               <th>Payoff Amount</th>
+             </tr>
+           </thead>
+           <tbody id="amortizationTableBody">
+             <!-- JS injected rows -->
+           </tbody>
+         </table>
+      </div>
+      <div class="p-3 border-t border-primary text-center text-xs text-muted rounded-b-xl" style="background-color: var(--bg-card-inner);">
+        * Schedule is an estimate. Actual payoff dates and amounts may vary based on banking holidays and clear dates.
       </div>
     </div>
   </div>
@@ -1250,6 +1366,23 @@
       shareLinkButton: document.getElementById('shareLinkButton'),
       shareLinkContainer: document.getElementById('shareLinkContainer'),
       shareLinkOutput: document.getElementById('shareLinkOutput'),
+
+      prepaySection: document.getElementById('prepaySection'),
+      togglePrepay: document.getElementById('togglePrepay'),
+      prepayContainer: document.getElementById('prepayContainer'),
+      prepaySliderContainer: document.getElementById('prepaySliderContainer'),
+      prepaySlider: document.getElementById('prepaySlider'),
+      prepayDateContainer: document.getElementById('prepayDateContainer'),
+      prepayDateInput: document.getElementById('prepayDateInput'),
+      prepayPercentDisplay: document.getElementById('prepayPercentDisplay'),
+      prepaySavingsDisplay: document.getElementById('prepaySavingsDisplay'),
+      prepayTotalDisplay: document.getElementById('prepayTotalDisplay'),
+
+      amortizationBtnContainer: document.getElementById('amortizationBtnContainer'),
+      viewAmortizationBtn: document.getElementById('viewAmortizationBtn'),
+      amortizationModal: document.getElementById('amortizationModal'),
+      closeAmortizationBtn: document.getElementById('closeAmortizationBtn'),
+      amortizationTableBody: document.getElementById('amortizationTableBody'),
     };
 
     // Use the urlParams and isApprovalView already declared in the auth section above
@@ -1269,6 +1402,7 @@
     let savedOffers = [];
     let termLengthManualDirty = false;
     let initialConfig = null;
+    let prepayDiscountPercent = 0;
 
     /* ------------ BASE64 CONFIG HELPERS (for URL) ------------ */
     function b64EncodeUnicode(str) {
@@ -1700,6 +1834,10 @@
       if (typeof cfg.wg === 'number' || typeof cfg.wg === 'boolean') {
         shellGlowEnabled = !!cfg.wg;
       }
+      if (typeof cfg.pp === 'number') {
+        prepayDiscountPercent = cfg.pp;
+        if (elements.prepaySlider) elements.prepaySlider.value = prepayDiscountPercent;
+      }
 
       if (isApprovalView && typeof cfg.a === 'number') {
         setAmountSliderMax(cfg.a);
@@ -1757,9 +1895,147 @@
         }
 
         updateRepDisplay();
+        calculatePrepay(offer);
       } catch (e) {
         console.error('Calculator error:', e);
       }
+    }
+
+    /* ------------ PREPAYMENT FUNCTIONS ------------ */
+    function generateSchedule(offer) {
+      const schedule = [];
+      let currentDate = new Date();
+      currentDate.setHours(0,0,0,0);
+
+      const totalPayments = offer.termPayments;
+      const paymentAmount = offer.payment;
+      let remainingBalance = offer.totalPayback;
+
+      for (let i = 1; i <= totalPayments; i++) {
+        const payment = Math.min(paymentAmount, remainingBalance);
+        remainingBalance -= payment;
+        if (remainingBalance < 0) remainingBalance = 0;
+
+        schedule.push({
+          num: i,
+          date: new Date(currentDate),
+          payment: payment,
+          balance: remainingBalance
+        });
+
+        if (offer.frequency === 'weekly') {
+          currentDate.setDate(currentDate.getDate() + 7);
+        } else if (offer.frequency === 'monthly') {
+          currentDate.setMonth(currentDate.getMonth() + 1);
+        } else {
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+
+      return schedule;
+    }
+
+    function renderAmortizationSchedule(offer) {
+      const schedule = generateSchedule(offer);
+      const totalPayback = offer.totalPayback;
+      const maxSavings = totalPayback * (prepayDiscountPercent / 100);
+
+      const rows = schedule.map(row => {
+        const dateStr = row.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const fractionRemaining = row.balance / totalPayback;
+        const savings = maxSavings * fractionRemaining;
+        const payoff = row.balance - savings;
+
+        return `
+          <tr>
+            <td class="font-mono text-xs text-muted">${row.num}</td>
+            <td>${dateStr}</td>
+            <td>${formatCurrency(row.payment)}</td>
+            <td>${formatCurrency(row.balance)}</td>
+            <td class="text-success font-medium">${formatCurrency(savings)}</td>
+            <td class="font-semibold text-primary">${formatCurrency(payoff)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      elements.amortizationTableBody.innerHTML = rows;
+    }
+
+    function calculatePrepay(offer) {
+      if (isApprovalView) {
+        if (prepayDiscountPercent > 0) {
+           if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.remove('hidden');
+        } else {
+           if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.add('hidden');
+        }
+      }
+
+      if (isApprovalView && prepayDiscountPercent === 0) {
+        if (elements.prepaySection) elements.prepaySection.classList.add('hidden');
+        return;
+      }
+      if (elements.prepaySection) elements.prepaySection.classList.remove('hidden');
+
+      if (!elements.prepayContainer || elements.prepayContainer.classList.contains('hidden')) return;
+
+      const totalPayback = offer.totalPayback;
+      let savings = 0;
+
+      if (isApprovalView) {
+        const dateVal = elements.prepayDateInput.value;
+        if (!dateVal) {
+           const today = new Date().toISOString().split('T')[0];
+           elements.prepayDateInput.value = today;
+        }
+
+        const startDate = new Date();
+        startDate.setHours(0,0,0,0);
+
+        let termDays = 0;
+        if (offer.frequency === 'weekly') {
+           termDays = offer.termPayments * 7;
+        } else if (offer.frequency === 'monthly') {
+           termDays = offer.termPayments * 30.44;
+        } else {
+           termDays = offer.termPayments * 1.42;
+        }
+
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + Math.ceil(termDays));
+
+        elements.prepayDateInput.min = startDate.toISOString().split('T')[0];
+        elements.prepayDateInput.max = endDate.toISOString().split('T')[0];
+
+        let selectedDate = new Date(elements.prepayDateInput.value);
+        selectedDate.setHours(0,0,0,0);
+
+        if (selectedDate < startDate) selectedDate = startDate;
+        if (selectedDate > endDate) selectedDate = endDate;
+
+        const totalTime = endDate.getTime() - startDate.getTime();
+        const remainingTime = endDate.getTime() - selectedDate.getTime();
+        let fractionRemaining = 0;
+        if (totalTime > 0) {
+          fractionRemaining = remainingTime / totalTime;
+        }
+        if (fractionRemaining < 0) fractionRemaining = 0;
+        if (fractionRemaining > 1) fractionRemaining = 1;
+
+        const maxPotentialSavings = totalPayback * (prepayDiscountPercent / 100);
+        savings = maxPotentialSavings * fractionRemaining;
+
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}% Max`;
+
+      } else {
+        const maxSavings = totalPayback * (prepayDiscountPercent / 100);
+        savings = maxSavings;
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}%`;
+      }
+
+      const newPayoff = totalPayback - savings;
+
+      if (elements.prepaySavingsDisplay) elements.prepaySavingsDisplay.textContent = formatCurrency(savings);
+      if (elements.prepayTotalDisplay) elements.prepayTotalDisplay.textContent = formatCurrency(newPayoff);
     }
 
     /* ------------ INITIALIZE ------------ */
@@ -1936,6 +2212,40 @@
         elements.addOfferButton.addEventListener('click', handleAddOffer);
       }
 
+      if (!isApprovalView && elements.togglePrepay) {
+        elements.togglePrepay.addEventListener('click', () => {
+          elements.prepayContainer.classList.toggle('hidden');
+          runCalculator();
+        });
+      }
+      if (!isApprovalView && elements.prepaySlider) {
+        elements.prepaySlider.addEventListener('input', (e) => {
+          prepayDiscountPercent = parseInt(e.target.value, 10);
+          runCalculator();
+        });
+      }
+      if (elements.prepayDateInput) {
+        elements.prepayDateInput.addEventListener('change', () => {
+          runCalculator();
+        });
+      }
+
+      if (elements.viewAmortizationBtn) {
+        elements.viewAmortizationBtn.addEventListener('click', () => {
+          const amount = parseFormattedNumber(elements.calcAmountInput.value);
+          const factor = parseFloat(elements.calcFactorInput.value) || 1.1;
+          const termPayments = parseInt(elements.calcTermInput.value, 10) || 1;
+          const currentOffer = computeOffer(amount, factor, termPayments, paymentFrequency);
+          renderAmortizationSchedule(currentOffer);
+          elements.amortizationModal.classList.remove('hidden');
+        });
+      }
+      if (elements.closeAmortizationBtn) {
+        elements.closeAmortizationBtn.addEventListener('click', () => {
+          elements.amortizationModal.classList.add('hidden');
+        });
+      }
+
       if (!isApprovalView && elements.shareLinkButton) {
         elements.shareLinkButton.addEventListener('click', async () => {
           const shareBtn = elements.shareLinkButton;
@@ -1979,6 +2289,7 @@
             o: offersForUrl,
             mg: mainGlowEnabled ? 1 : 0,
             wg: shellGlowEnabled ? 1 : 0,
+            pp: prepayDiscountPercent,
           };
 
           const encoded = encodeConfig(payload);
@@ -2045,6 +2356,16 @@
         if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
         if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
         if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+
+        if (elements.prepaySliderContainer) elements.prepaySliderContainer.style.display = 'none';
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.remove('hidden');
+      } else {
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.add('hidden');
+      }
+
+      if (elements.prepayDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        elements.prepayDateInput.value = today;
       }
 
       updatePaymentToggleUI();
