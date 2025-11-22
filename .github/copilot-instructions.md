@@ -4,6 +4,15 @@
 
 TrustBureau.ai is a client-side web application that provides AI verification standards and business verification reports. While the HTML files are statically hosted (no server-side rendering), the site features dynamic functionality through JavaScript that makes API calls to external services for live AI-powered business verification and reporting.
 
+## Getting Started
+
+This project requires no build setup or installation. To work on the project:
+
+1. Clone the repository
+2. Open any HTML file directly in a web browser (or use a simple HTTP server like `python -m http.server`)
+3. Make changes to HTML files and refresh the browser to see updates
+4. All dependencies are loaded via CDN, so no `npm install` or build step is needed
+
 ## Project Structure
 
 - `index.html` - Main landing page for TrustBureau.ai
@@ -12,6 +21,7 @@ TrustBureau.ai is a client-side web application that provides AI verification st
 - `share.html` - Share functionality for reports
 - `test.html` - Testing/demo page
 - `CNAME` - Custom domain configuration for GitHub Pages (trustbureau.ai)
+- `.github/copilot-instructions.md` - This file, providing guidance for Copilot
 
 ## Technology Stack
 
@@ -111,3 +121,28 @@ When asked to:
 - Ensure mobile responsiveness
 - Keep page load times fast by avoiding unnecessary assets
 - Maintain accessibility standards (WCAG 2.1)
+
+## Security Considerations
+
+- **Never commit API keys or secrets**: API keys should be managed client-side or through environment variables
+- **Validate user input**: Always sanitize and validate any user input before processing
+- **External API calls**: When making calls to Google Gemini API or OpenCorporates API, ensure proper error handling
+- **HTTPS only**: The site should always be served over HTTPS (GitHub Pages handles this automatically)
+- **No sensitive data storage**: Do not store sensitive business information in localStorage or cookies without encryption
+
+## Common Pitfalls to Avoid
+
+- **Don't add build tools**: The project is intentionally simple with no build process. Avoid adding webpack, npm scripts, or other build tooling
+- **Don't use custom CSS files**: Use Tailwind utility classes instead of creating separate CSS files
+- **Don't break mobile responsiveness**: Always test on mobile viewports when making layout changes
+- **Don't use server-side features**: This is a client-side only application - no Node.js server, no SSR
+- **Don't remove CDN links**: All dependencies are loaded from CDNs. Don't try to install them locally
+- **Don't modify CNAME**: The CNAME file is critical for the custom domain - only change if explicitly requested
+
+## Architecture Decisions
+
+- **Client-side only**: All processing happens in the browser to keep the architecture simple
+- **CDN dependencies**: Using CDNs reduces complexity and keeps the project dependency-free
+- **No backend**: Business verification is done through direct API calls to third-party services
+- **Static deployment**: GitHub Pages deployment keeps hosting costs at zero
+- **Progressive enhancement**: The site should work with JavaScript disabled for basic content viewing
