@@ -114,6 +114,7 @@
                 radial-gradient(ellipse 60% 40% at 80% 50%, rgba(219, 39, 119, 0.05), transparent), /* Pink-ish */
                 #ffffff;
             transition: background 0.5s ease;
+            position: relative; /* Ensure absolute children position correctly */
         }
 
         .dark .hero-bg {
@@ -123,6 +124,40 @@
                 radial-gradient(ellipse 60% 40% at 80% 50%, rgba(255, 0, 255, 0.08), transparent),
                 radial-gradient(ellipse 50% 30% at 20% 80%, rgba(0, 255, 157, 0.05), transparent),
                 #050507;
+        }
+
+        /* Exposed Brick Pattern */
+        .hero-brick-pattern {
+            position: absolute;
+            inset: 0;
+            z-index: 0; /* Sit right above the background color */
+            pointer-events: none;
+        }
+
+        .hero-brick-pattern::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            /* Light Mode Brick: Reddish/Brown tones */
+            background-image: 
+                linear-gradient(335deg, rgba(168, 93, 50, 0.2) 0%, rgba(180, 100, 55, 0.2) 50%, rgba(195, 110, 60, 0.2) 100%),
+                repeating-linear-gradient(0deg, transparent 0, transparent 20px, rgba(139, 69, 19, 0.1) 20px, rgba(139, 69, 19, 0.1) 22px, transparent 22px, transparent 42px),
+                repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(139, 69, 19, 0.1) 40px, rgba(139, 69, 19, 0.1) 42px, transparent 42px, transparent 82px);
+            background-size: 100% 100%, 84px 42px, 84px 42px;
+            background-position: 0 0, 0 0, 0 21px;
+            opacity: 0.4; /* Visible in light mode */
+            mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
+        }
+
+        .dark .hero-brick-pattern::before {
+            /* Dark Mode Brick: Subtle dark tones */
+            background-image: 
+                linear-gradient(335deg, rgba(50, 25, 15, 0.2) 0%, rgba(60, 30, 20, 0.2) 50%, rgba(70, 35, 25, 0.2) 100%),
+                repeating-linear-gradient(0deg, transparent 0, transparent 20px, rgba(0, 0, 0, 0.3) 20px, rgba(0, 0, 0, 0.3) 22px, transparent 22px, transparent 42px),
+                repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0, 0, 0, 0.3) 40px, rgba(0, 0, 0, 0.3) 42px, transparent 42px, transparent 82px);
+            mix-blend-mode: overlay;
+            opacity: 0.3;
         }
 
         /* Glass morphism */
@@ -173,12 +208,9 @@
             text-shadow: 0 0 20px rgba(255, 0, 255, 0.5), 0 0 40px rgba(255, 0, 255, 0.2);
         }
         
+        /* Updated: Green glows in ALL modes */
         .text-glow-green {
-            text-shadow: none;
-        }
-
-        .dark .text-glow-green {
-            text-shadow: 0 0 20px rgba(0, 255, 157, 0.5), 0 0 40px rgba(0, 255, 157, 0.2);
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.6), 0 0 40px rgba(0, 255, 157, 0.3);
         }
 
         /* Button glow effect */
@@ -302,13 +334,15 @@
         /* FAQ accordion */
         .faq-answer {
             max-height: 0;
+            opacity: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out, padding 0.3s ease;
         }
         
         .faq-item.open .faq-answer {
-            max-height: 300px;
-            padding-top: 1rem;
+            opacity: 1;
+            padding-top: 1.25rem; /* pb-5 equivalent */
+            padding-bottom: 1.25rem;
         }
         
         .faq-item.open .faq-icon {
@@ -333,11 +367,6 @@
                 0 0 5px rgba(0, 234, 255, 0.8),
                 0 0 10px rgba(0, 234, 255, 0.5),
                 0 0 20px rgba(0, 234, 255, 0.3);
-        }
-
-        /* MAGIC FIX: Invert black-bg image to white-bg in light mode, correct hue back to green */
-        html:not(.dark) .light-invert {
-            filter: invert(1) hue-rotate(180deg);
         }
     </style>
 </head>
@@ -378,7 +407,7 @@
                     </div>
                     
                     <span class="font-display text-4xl tracking-[0.15em] text-dark-900 dark:text-white pt-1 transition-colors">
-                        CAP<span class="text-brand-green dark:text-neon-green drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(0,255,157,0.5)]">TAP</span>
+                        CAP<span class="text-brand-green dark:text-neon-green text-glow-green">TAP</span>
                     </span>
                 </a>
 
@@ -428,8 +457,11 @@
 
     <!-- Hero Section -->
     <header class="hero-bg relative min-h-screen flex items-center pt-20">
+        <!-- Exposed Brick Pattern -->
+        <div class="hero-brick-pattern"></div>
+
         <!-- Animated background elements -->
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
             <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-cyan/10 dark:bg-neon-cyan/10 rounded-full blur-[150px] animate-glow-pulse"></div>
             <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-pink/5 dark:bg-neon-magenta/10 rounded-full blur-[120px] animate-glow-pulse" style="animation-delay: 1s;"></div>
             <div class="absolute top-1/2 right-1/3 w-64 h-64 bg-brand-green/10 dark:bg-neon-green/5 rounded-full blur-[100px] animate-glow-pulse" style="animation-delay: 0.5s;"></div>
@@ -449,7 +481,7 @@
                     
                     <h1 class="font-display text-6xl sm:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] text-dark-900 dark:text-white transition-colors">
                         <span class="text-brand-cyan dark:text-neon-cyan dark:text-glow-cyan">LIQUIDITY</span><br>
-                        ON <span class="text-brand-green dark:text-neon-green dark:text-glow-green">TAP</span>
+                        ON <span class="text-brand-green dark:text-neon-green text-glow-green">TAP</span>
                     </h1>
                     
                     <p class="text-lg sm:text-xl text-gray-700 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed transition-colors">
@@ -488,23 +520,49 @@
                 </div>
 
                 <!-- Hero Visual -->
-                <div class="relative flex justify-center items-center order-first lg:order-last">
-                    <div class="relative animate-float">
-                        <!-- Glow effects -->
-                        <div class="absolute -inset-4 bg-gradient-to-r from-brand-cyan/20 dark:from-neon-cyan/20 via-brand-pink/20 dark:via-neon-magenta/20 to-brand-green/20 dark:to-neon-green/20 blur-2xl opacity-60"></div>
+                <div class="relative flex justify-center items-end order-first lg:order-last pb-12">
+                    <!-- Sidewalk Sign Container -->
+                    <div class="relative z-10 group">
                         
-                        <!-- Sign frame -->
-                        <div class="relative bg-white dark:glass p-3 rounded-2xl shadow-2xl">
-                            <!-- Applied light-invert class for Light Mode fix -->
-                            <img src="https://i.imgur.com/IbvbNqN.png" alt="CapTap Neon Logo" class="w-full max-w-md rounded-xl light-invert">
+                        <!-- The Board (A-Frame) -->
+                        <!-- Changed border color for light mode from border-gray-800 to border-gray-200 -->
+                        <div class="relative z-20 bg-white dark:bg-dark-800 border-[16px] border-gray-200 dark:border-neutral-900 rounded-xl shadow-2xl p-2 transition-transform duration-500 transform origin-top hover:scale-[1.02] hover:-rotate-1 cursor-default">
                             
-                            <!-- Glass reflection -->
-                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent rounded-2xl pointer-events-none"></div>
+                            <!-- Hinge/Handle Detail at Top -->
+                            <!-- Changed bg color for light mode from bg-gray-800 to bg-gray-200 -->
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-200 dark:bg-neutral-900 rounded-t-lg flex items-center justify-center gap-8">
+                                <div class="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600"></div>
+                                <div class="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600"></div>
+                            </div>
+
+                            <!-- Inner Content Area -->
+                            <div class="relative overflow-hidden rounded-lg bg-white dark:bg-dark-900">
+                                <!-- Light Theme Image -->
+                                <img src="https://i.imgur.com/5VqYaTY.jpeg" alt="CapTap Light Logo" class="w-full max-w-md block dark:hidden">
+                                
+                                <!-- Dark Theme Image -->
+                                <img src="https://i.imgur.com/GQ5irAT.jpeg" alt="CapTap Dark Logo" class="w-full max-w-md hidden dark:block">
+                                
+                                <!-- Glass reflection overlay (subtle) -->
+                                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none"></div>
+                            </div>
                         </div>
+
+                        <!-- Legs (Back legs visible in perspective) -->
+                        <!-- Changed bg color for light mode -->
+                        <div class="absolute top-8 -right-4 w-4 h-full bg-gray-300 dark:bg-neutral-800 rounded-r-lg -z-10 transform skew-y-12 origin-top-left"></div>
                         
-                        <!-- Decorative wires -->
-                        <div class="absolute -top-16 left-1/3 w-px h-16 bg-gradient-to-b from-transparent to-gray-400 dark:to-gray-700 transition-colors"></div>
-                        <div class="absolute -top-16 right-1/3 w-px h-16 bg-gradient-to-b from-transparent to-gray-400 dark:to-gray-700 transition-colors"></div>
+                        <!-- Feet/Legs (Front) -->
+                        <!-- Changed bg color for light mode -->
+                        <div class="absolute -bottom-12 left-6 w-4 h-16 bg-gray-200 dark:bg-neutral-900 rounded-b-lg -z-10"></div>
+                        <div class="absolute -bottom-12 right-6 w-4 h-16 bg-gray-200 dark:bg-neutral-900 rounded-b-lg -z-10"></div>
+
+                        <!-- Ground Shadow -->
+                        <div class="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[120%] h-8 bg-black/20 dark:bg-black/50 blur-lg rounded-[100%]"></div>
+                        
+                        <!-- Decorative wires (restored) -->
+                        <div class="absolute -top-32 left-1/3 w-px h-32 bg-gradient-to-b from-transparent to-gray-400 dark:to-gray-700 transition-colors -z-20"></div>
+                        <div class="absolute -top-32 right-1/3 w-px h-32 bg-gradient-to-b from-transparent to-gray-400 dark:to-gray-700 transition-colors -z-20"></div>
                     </div>
                 </div>
             </div>
@@ -708,7 +766,7 @@
     <section id="qualify" class="py-24 lg:py-32 relative transition-colors">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="reveal text-center mb-12">
-                <span class="text-brand-cyan dark:text-neon-green text-sm font-semibold tracking-widest uppercase">Quick Check</span>
+                <span class="text-brand-green dark:text-neon-green text-sm font-semibold tracking-widest uppercase">Quick Check</span>
                 <h2 class="font-display text-5xl sm:text-6xl text-dark-900 dark:text-white mt-3 transition-colors">Do You Qualify?</h2>
                 <p class="text-gray-600 dark:text-gray-400 mt-4 transition-colors">Answer 4 questions to see if you're eligible.</p>
             </div>
@@ -796,6 +854,252 @@
                             </a>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials (Stories) -->
+    <section id="testimonials" class="py-24 lg:py-32 bg-gray-50 dark:bg-dark-800 relative overflow-hidden transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal text-center mb-16">
+                <span class="text-brand-pink dark:text-neon-magenta text-sm font-semibold tracking-widest uppercase">Success Stories</span>
+                <h2 class="font-display text-5xl sm:text-6xl text-dark-900 dark:text-white mt-3 transition-colors">Happy Hour Reviews</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="reveal testimonial-card glass p-8 rounded-xl relative" style="transition-delay: 0.1s;">
+                    <div class="absolute top-6 right-6 text-cyan-200 dark:text-neon-cyan/20">
+                        <i class="fa-solid fa-quote-right text-4xl"></i>
+                    </div>
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed transition-colors">
+                        "Applied Monday morning, had cash in my account Tuesday. Used it to buy inventory for the holiday rush. Best business decision I made all year."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-brand-cyan dark:from-neon-cyan to-brand-pink dark:to-neon-magenta flex items-center justify-center font-bold text-white shadow-lg">
+                            MR
+                        </div>
+                        <div>
+                            <p class="font-semibold text-dark-900 dark:text-white transition-colors">Marcus R.</p>
+                            <p class="text-sm text-gray-500">Retail Store Owner, Brooklyn</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="reveal testimonial-card glass p-8 rounded-xl relative" style="transition-delay: 0.2s;">
+                    <div class="absolute top-6 right-6 text-fuchsia-200 dark:text-neon-magenta/20">
+                        <i class="fa-solid fa-quote-right text-4xl"></i>
+                    </div>
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed transition-colors">
+                        "Banks kept turning me down because of my credit. CapTap looked at my actual revenue and got me $85K to expand my kitchen. Third location opening next month."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 dark:from-neon-green to-brand-cyan dark:to-neon-cyan flex items-center justify-center font-bold text-white shadow-lg">
+                            SL
+                        </div>
+                        <div>
+                            <p class="font-semibold text-dark-900 dark:text-white transition-colors">Sofia L.</p>
+                            <p class="text-sm text-gray-500">Restaurant Owner, Queens</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="reveal testimonial-card glass p-8 rounded-xl relative" style="transition-delay: 0.3s;">
+                    <div class="absolute top-6 right-6 text-emerald-200 dark:text-neon-green/20">
+                        <i class="fa-solid fa-quote-right text-4xl"></i>
+                    </div>
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                        <i class="fa-solid fa-star text-amber-400 dark:text-neon-yellow text-sm"></i>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed transition-colors">
+                        "This is my third round with CapTap. The process gets faster every time. My rep actually remembers my business. That matters."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-brand-pink dark:from-neon-magenta to-amber-500 dark:to-neon-yellow flex items-center justify-center font-bold text-white shadow-lg">
+                            DK
+                        </div>
+                        <div>
+                            <p class="font-semibold text-dark-900 dark:text-white transition-colors">David K.</p>
+                            <p class="text-sm text-gray-500">Auto Shop Owner, Bronx</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 lg:py-32 relative transition-colors">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal text-center mb-16">
+                <span class="text-brand-cyan dark:text-neon-cyan text-sm font-semibold tracking-widest uppercase">FAQ</span>
+                <h2 class="font-display text-5xl sm:text-6xl text-dark-900 dark:text-white mt-3 transition-colors">Common Questions</h2>
+            </div>
+
+            <div class="space-y-4">
+                <!-- FAQ 1 -->
+                <div class="reveal faq-item glass rounded-xl overflow-hidden" style="transition-delay: 0.1s;">
+                    <button class="faq-trigger w-full px-6 py-5 flex items-center justify-between text-left">
+                        <span class="text-dark-900 dark:text-white font-medium pr-4 transition-colors">What is a Merchant Cash Advance?</span>
+                        <i class="faq-icon fa-solid fa-plus text-brand-cyan dark:text-neon-cyan transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-gray-600 dark:text-gray-400 transition-colors">
+                        An MCA is an advance on your future sales. You receive a lump sum and repay through a small percentage of your daily credit card or bank deposits. It's not a loan—it's a purchase of your future receivables, which means more flexible qualification.
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="reveal faq-item glass rounded-xl overflow-hidden" style="transition-delay: 0.15s;">
+                    <button class="faq-trigger w-full px-6 py-5 flex items-center justify-between text-left">
+                        <span class="text-dark-900 dark:text-white font-medium pr-4 transition-colors">What credit score do I need?</span>
+                        <i class="faq-icon fa-solid fa-plus text-brand-cyan dark:text-neon-cyan transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-gray-600 dark:text-gray-400 transition-colors">
+                        We don't have a minimum credit score requirement. We focus primarily on your business revenue and cash flow. Even business owners with credit challenges can qualify if they have strong, consistent deposits.
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="reveal faq-item glass rounded-xl overflow-hidden" style="transition-delay: 0.2s;">
+                    <button class="faq-trigger w-full px-6 py-5 flex items-center justify-between text-left">
+                        <span class="text-dark-900 dark:text-white font-medium pr-4 transition-colors">How fast can I get funded?</span>
+                        <i class="faq-icon fa-solid fa-plus text-brand-cyan dark:text-neon-cyan transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-gray-600 dark:text-gray-400 transition-colors">
+                        Most applications are reviewed within 3 hours during business days. Once approved and you sign the agreement, funds are typically wired to your account within 24 hours—often same day.
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="reveal faq-item glass rounded-xl overflow-hidden" style="transition-delay: 0.25s;">
+                    <button class="faq-trigger w-full px-6 py-5 flex items-center justify-between text-left">
+                        <span class="text-dark-900 dark:text-white font-medium pr-4 transition-colors">What documents do I need?</span>
+                        <i class="faq-icon fa-solid fa-plus text-brand-cyan dark:text-neon-cyan transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-gray-600 dark:text-gray-400 transition-colors">
+                        Just 3 months of business bank statements and a valid ID. That's it. No tax returns, no business plans, no financial projections required.
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="reveal faq-item glass rounded-xl overflow-hidden" style="transition-delay: 0.3s;">
+                    <button class="faq-trigger w-full px-6 py-5 flex items-center justify-between text-left">
+                        <span class="text-dark-900 dark:text-white font-medium pr-4 transition-colors">Will this affect my credit score?</span>
+                        <i class="faq-icon fa-solid fa-plus text-brand-cyan dark:text-neon-cyan transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-gray-600 dark:text-gray-400 transition-colors">
+                        Checking your eligibility involves only a soft credit inquiry, which does not impact your score. A hard inquiry only occurs if you accept an offer and proceed with funding.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Application Form -->
+    <section id="apply" class="py-24 lg:py-32 bg-gray-50 dark:bg-dark-800 relative overflow-hidden transition-colors">
+        <!-- Background glow -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-cyan/5 dark:bg-neon-cyan/10 rounded-full blur-[200px] pointer-events-none"></div>
+
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="reveal glass p-8 sm:p-12 rounded-2xl border-t-2 border-brand-cyan dark:border-neon-cyan shadow-2xl relative overflow-hidden">
+                <!-- Decorative -->
+                <div class="absolute -top-10 -right-10 font-display text-[200px] text-dark-900/5 dark:text-white/[0.02] leading-none pointer-events-none select-none transition-colors">$</div>
+
+                <div class="text-center mb-10 relative">
+                    <h2 class="font-display text-4xl sm:text-5xl text-dark-900 dark:text-white mb-3 transition-colors">Open Your Tab</h2>
+                    <p class="text-gray-600 dark:text-gray-400 transition-colors">Get a free quote in minutes. No hard credit pull.</p>
+                </div>
+
+                <form id="lead-form" class="space-y-6" novalidate>
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-wider">Business Name *</label>
+                            <input type="text" name="business" required class="w-full px-4 py-3.5 rounded-lg input-dark placeholder-gray-500 dark:placeholder-gray-600 focus:outline-none focus:border-brand-cyan dark:focus:border-neon-cyan transition-colors" placeholder="Your Business LLC">
+                            <p class="error-msg text-red-400 text-xs hidden">Required</p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-wider">Monthly Revenue *</label>
+                            <select name="revenue" required class="w-full px-4 py-3.5 rounded-lg input-dark focus:outline-none focus:border-brand-cyan dark:focus:border-neon-cyan transition-colors">
+                                <option value="">Select range...</option>
+                                <option value="15k-30k">$15,000 - $30,000</option>
+                                <option value="30k-50k">$30,000 - $50,000</option>
+                                <option value="50k-100k">$50,000 - $100,000</option>
+                                <option value="100k+">$100,000+</option>
+                            </select>
+                            <p class="error-msg text-red-400 text-xs hidden">Required</p>
+                        </div>
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-wider">Owner Name *</label>
+                            <input type="text" name="owner" required class="w-full px-4 py-3.5 rounded-lg input-dark placeholder-gray-500 dark:placeholder-gray-600 focus:outline-none focus:border-brand-cyan dark:focus:border-neon-cyan transition-colors" placeholder="John Smith">
+                            <p class="error-msg text-red-400 text-xs hidden">Required</p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-wider">Phone *</label>
+                            <input type="tel" name="phone" required class="w-full px-4 py-3.5 rounded-lg input-dark placeholder-gray-500 dark:placeholder-gray-600 focus:outline-none focus:border-brand-cyan dark:focus:border-neon-cyan transition-colors" placeholder="(555) 000-0000">
+                            <p class="error-msg text-red-400 text-xs hidden">Valid phone required</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-wider">Email *</label>
+                        <input type="email" name="email" required class="w-full px-4 py-3.5 rounded-lg input-dark placeholder-gray-500 dark:placeholder-gray-600 focus:outline-none focus:border-brand-cyan dark:focus:border-neon-cyan transition-colors" placeholder="you@business.com">
+                        <p class="error-msg text-red-400 text-xs hidden">Valid email required</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-wider">How much do you need?</label>
+                        <select name="amount" class="w-full px-4 py-3.5 rounded-lg input-dark focus:outline-none focus:border-brand-cyan dark:focus:border-neon-cyan transition-colors">
+                            <option value="10k-50k">$10,000 - $50,000</option>
+                            <option value="50k-150k" selected>$50,000 - $150,000</option>
+                            <option value="150k-500k">$150,000 - $500,000</option>
+                            <option value="500k+">$500,000+</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="w-full bg-brand-cyan dark:bg-neon-cyan text-white dark:text-dark-900 font-bold text-lg py-4 rounded-lg hover:bg-white transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.3)] dark:hover:shadow-[0_0_30px_rgba(0,234,255,0.3)] flex items-center justify-center gap-3">
+                        <span>Check Eligibility</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    
+                    <p class="text-center text-xs text-gray-600 dark:text-gray-500 flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-lock text-brand-cyan dark:text-neon-green"></i>
+                        256-bit SSL Encryption. No hard credit pull.
+                    </p>
+                </form>
+
+                <!-- Success Message -->
+                <div id="success-message" class="hidden text-center py-8">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-cyan-100 dark:bg-neon-green/20 flex items-center justify-center">
+                        <i class="fa-solid fa-check text-3xl text-brand-cyan dark:text-neon-green"></i>
+                    </div>
+                    <h3 class="font-display text-3xl text-dark-900 dark:text-white mb-3 transition-colors">Application Received!</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-2 transition-colors">A funding specialist will contact you within the hour.</p>
+                    <p class="text-sm text-gray-500 mb-8">Check your email for confirmation.</p>
+                    <button onclick="resetForm()" class="text-brand-cyan dark:text-neon-cyan hover:text-dark-900 dark:hover:text-white text-sm font-semibold underline underline-offset-4 transition-colors">Submit Another Application</button>
                 </div>
             </div>
         </div>
@@ -898,7 +1202,7 @@
         const mobileThemeToggleBtn = document.getElementById('mobile-theme-toggle');
         const htmlElement = document.documentElement;
 
-        // Check local storage or system preference
+        // Check local storage only (Default to Light Mode)
         if (localStorage.theme === 'dark') {
             htmlElement.classList.add('dark');
         } else {
@@ -1019,19 +1323,31 @@
             });
         });
 
-        // FAQ Accordion
+        // FAQ Accordion (Smoother JS Implementation)
         const faqTriggers = document.querySelectorAll('.faq-trigger');
         faqTriggers.forEach(trigger => {
             trigger.addEventListener('click', () => {
                 const item = trigger.closest('.faq-item');
+                const answer = item.querySelector('.faq-answer');
                 const isOpen = item.classList.contains('open');
                 
-                // Close all others
-                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                // Close all others smoothly
+                document.querySelectorAll('.faq-item').forEach(i => {
+                    if (i !== item && i.classList.contains('open')) {
+                        i.classList.remove('open');
+                        const otherAnswer = i.querySelector('.faq-answer');
+                        if(otherAnswer) otherAnswer.style.maxHeight = null;
+                    }
+                });
                 
                 // Toggle current
                 if (!isOpen) {
                     item.classList.add('open');
+                    // Calculate exact height for smooth animation
+                    answer.style.maxHeight = answer.scrollHeight + 40 + "px"; // +40 for padding buffer
+                } else {
+                    item.classList.remove('open');
+                    answer.style.maxHeight = null;
                 }
             });
         });
