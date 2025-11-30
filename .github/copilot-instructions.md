@@ -22,15 +22,33 @@ TrustBureau.ai is a client-side web application that provides AI verification st
 - **Fonts**: Google Fonts (Inter, Plus Jakarta Sans)
 - **Hosting**: GitHub Pages (static file hosting)
 - **No build process**: Files are served directly without compilation or bundling
+- **Dark Mode**: Supported in search.html and share.html via Tailwind's class-based dark mode (`darkMode: 'class'`)
 
 ## Brand Guidelines
 
 When making changes to the UI, use these brand colors:
-- Primary Green: `#00C09A` (brand-green)
-- Dark: `#1A1A1A` (brand-dark)
-- Gray: `#666666` (brand-gray)
-- Light: `#F8F9FA` (brand-light)
-- Border: `#E5E7EB` (brand-border)
+- Primary Green: `#00C09A` (brand-green) - **Consistent across all files**
+- Light: `#F8F9FA` (brand-light) - **Consistent across all files**
+- Border: `#E5E7EB` (brand-border) - **Consistent across all files**
+
+**Note:** There are currently inconsistencies in dark and gray color values across files:
+- **index.html**: 
+  - Dark: `#1A1A1A` (brand-dark)
+  - Gray: `#666666` (brand-gray)
+- **report.html & test.html**: 
+  - Dark: `#101418` (brand-dark)
+  - Gray: `#6B7280` (brand-gray)
+- **search.html & share.html**: 
+  - Dark: `#0F172A` (brand.dark - nested structure)
+  - Gray: `#64748B` (brand.gray - nested structure)
+  - These files also include dark mode support
+
+**When making changes:**
+- For index.html: Use `#1A1A1A` (brand-dark) and `#666666` (brand-gray)
+- For report.html and test.html: Use `#101418` (brand-dark) and `#6B7280` (brand-gray)
+- For search.html and share.html: Use `#0F172A` (brand.dark) and `#64748B` (brand.gray) with nested color structure
+- Maintain consistency within each file's existing color scheme
+- If standardizing colors across all files, prefer the values from index.html as the canonical brand colors
 
 Typography:
 - Headings: Plus Jakarta Sans (weights: 600, 700, 800)
@@ -44,6 +62,10 @@ Typography:
 2. **Responsive Design**: Always ensure mobile-first responsive design using Tailwind's responsive prefixes
 3. **CDN Dependencies**: The site uses CDN-hosted libraries (Tailwind CSS, Alpine.js) - avoid introducing build dependencies unless absolutely necessary
 4. **Accessibility**: Maintain ARIA labels and semantic HTML for screen readers
+5. **Color Structure**: Be aware that files use different Tailwind color configuration structures:
+   - **Flat structure** (index.html, report.html, test.html): `'brand-green': '#00C09A'`
+   - **Nested structure** (search.html, share.html): `brand: { green: '#00C09A' }`
+   - When editing, maintain the existing structure of each file
 
 ### Code Style
 
