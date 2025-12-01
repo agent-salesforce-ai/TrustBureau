@@ -21,7 +21,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
   
-  <!-- PDF Library Removed -->
+  <!-- PDF Generation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body { font-family: 'Inter', sans-serif; font-size: 14px; }
@@ -62,7 +63,63 @@
     html.accent-yellow { --accent-color: #eab308; --accent-color-light: #facc15; --accent-color-dark: #ca8a04; --accent-text-inverted: #020617; }
     html.accent-black { --accent-color: #000000; --accent-color-light: #333333; --accent-color-dark: #000000; --accent-text-inverted: #ffffff; }
     html.theme-dark.accent-black, html.theme-black.accent-black { --accent-color: #f3f4f6; --accent-color-light: #ffffff; --accent-color-dark: #d1d5db; --accent-text-inverted: #000000; }
-    /* White Theme Removed */
+
+    /* --- CUSTOM SLIDER STYLING (Updated for Fill Effect) --- */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent; /* Handled by JS for fill */
+      cursor: pointer;
+      height: 6px;
+      border-radius: 999px;
+    }
+    input[type=range]:focus { outline: none; }
+    
+    /* Webkit (Chrome, Safari) */
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: transparent; /* Important: Transparent to let input bg show */
+      border-radius: 999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px; /* (track height / 2) - (thumb height / 2) -> 3 - 9 = -6 */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border: 2px solid var(--bg-card);
+      transition: transform 0.1s;
+    }
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.2);
+    }
+
+    /* Firefox */
+    input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: transparent;
+      border-radius: 999px;
+    }
+    input[type=range]::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border: 2px solid var(--bg-card);
+      border-radius: 50%;
+      background: var(--accent-color);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.1s;
+    }
+    input[type=range]:active::-moz-range-thumb {
+        transform: scale(1.2);
+    }
 
     /* --- COMPONENT STYLES --- */
     .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
@@ -298,6 +355,7 @@
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
         <div id="amountContainer" class="space-y-1">
           <label id="amountLabel" for="calcAmount" class="block text-xs font-semibold text-muted">Amount You Get ($)</label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1" value="50000" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
             <span class="absolute left-3 input-icon text-muted text-sm">$</span>
             <input id="calcAmountInput" inputmode="numeric" class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
@@ -351,6 +409,11 @@
         <span class="text-xs font-semibold text-muted block">You Get</span>
         <span id="summaryAmountOut" class="text-5xl font-bold block my-2 text-hero leading-tight">$50,000</span>
         
+        <!-- SAVINGS PILL -->
+        <div id="savingsPill" class="hidden mb-2 inline-block bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+            You save <span id="savingsValue">$0</span> in repayment!
+        </div>
+
         <!-- Donut Chart -->
         <div class="my-4">
             <div id="offerDonutChart" class="chart-wrapper" title="Principal vs Cost">
@@ -545,9 +608,104 @@
     </div>
   </div>
 
+  <!-- AMORTIZATION MODAL -->
+  <div id="amortizationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm p-4">
+    <div class="card-bg w-full max-w-2xl max-h-[85vh] rounded-xl shadow-2xl flex flex-col border border-primary">
+      <div class="p-4 border-b border-primary flex justify-between items-center" style="background-color: var(--bg-card-inner)">
+        <h3 class="font-semibold text-lg text-primary">Amortization Schedule</h3>
+        <button id="closeAmortizationBtn" class="text-muted hover:text-primary transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="overflow-auto p-0 flex-1">
+         <table class="w-full text-left amort-table">
+           <thead class="sticky top-0 z-10 shadow-sm"><tr><th>#</th><th>Date</th><th>Payment</th><th>Balance</th><th>Prepay Savings</th><th>Payoff Amount</th></tr></thead>
+           <tbody id="amortizationTableBody"></tbody>
+         </table>
+      </div>
+      <div class="p-3 border-t border-primary text-center text-xs text-muted rounded-b-xl" style="background-color: var(--bg-card-inner)">
+        * Schedule is an estimate. Actual payoff dates and amounts may vary based on banking holidays and clear dates.
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCEPT MODAL -->
+  <div id="acceptModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 hidden backdrop-blur-sm p-4">
+      <div id="acceptModalContent" class="card-bg w-full max-w-sm rounded-xl shadow-2xl p-6 text-center border border-primary relative overflow-hidden">
+          <!-- SUCCESS STATE (Initially Hidden) -->
+          <div id="acceptSuccess" class="hidden">
+             <div class="mb-4 flex justify-center">
+                  <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+              </div>
+              <h3 class="text-xl font-bold text-primary mb-2">Offer Accepted!</h3>
+              <p class="text-sm text-muted mb-6">Please send the downloaded agreement to your specialist to finalize funding.</p>
+              <button id="closeAcceptBtn" class="w-full button-primary text-sm">Close</button>
+          </div>
+
+          <!-- SIGNATURE FORM (Default) -->
+          <div id="acceptForm">
+              <h3 class="text-lg font-bold text-primary mb-1">Accept Offer</h3>
+              <p class="text-xs text-muted mb-4">Please confirm your acceptance below.</p>
+              
+              <div class="text-left mb-4">
+                  <label class="text-xs font-semibold text-muted block mb-1">Authorized Signer Name</label>
+                  <input id="signerName" type="text" class="w-full p-2 text-sm border rounded input-field" placeholder="Full Name" />
+              </div>
+              
+              <div class="flex items-start gap-2 text-left mb-6">
+                  <input id="digitalSignCheck" type="checkbox" class="mt-1 rounded border-gray-300 text-accent focus:ring-accent" />
+                  <label for="digitalSignCheck" class="text-xs text-secondary leading-snug">
+                      I agree to the terms presented and understand this is a preliminary approval subject to final underwriting.
+                  </label>
+              </div>
+
+              <div class="flex gap-2">
+                  <button id="cancelAcceptBtn" class="flex-1 py-2 border border-primary rounded text-xs font-semibold text-muted hover:bg-gray-100">Cancel</button>
+                  <button id="confirmAcceptBtn" class="flex-1 button-primary text-sm py-2 disabled:opacity-50" disabled>Confirm & Sign</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- HIDDEN PDF TEMPLATE -->
+  <div id="pdfTemplate" style="display:none;">
+    <div style="padding: 40px; font-family: sans-serif; color: #333;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+            <h1 style="margin: 0; color: #000;">Term Sheet Agreement</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Generated by TrustBureau.ai</p>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <h3 style="background: #f4f4f4; padding: 10px; margin-bottom: 10px;">Business Information</h3>
+            <p><strong>Business Name:</strong> <span id="pdfBusinessName"></span></p>
+            <p><strong>Date:</strong> <span id="pdfDate"></span></p>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <h3 style="background: #f4f4f4; padding: 10px; margin-bottom: 10px;">Approved Terms</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Funding Amount:</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;"><span id="pdfAmount"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Factor Rate:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span id="pdfFactor"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Total Payback:</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;"><span id="pdfPayback"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Term:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span id="pdfTerm"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Payment Frequency:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span id="pdfFreq"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Payment Amount:</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;"><span id="pdfPayment"></span></td></tr>
+            </table>
+        </div>
+        <div style="margin-top: 50px; border-top: 2px solid #333; padding-top: 10px;">
+            <p><strong>Digitally Signed By:</strong> <span id="pdfSigner"></span></p>
+            <p style="font-size: 10px; color: #999;">Timestamp: <span id="pdfTimestamp"></span></p>
+        </div>
+    </div>
+  </div>
+
   <script>
     const elements = {
+      calcAmountSlider: document.getElementById('calcAmountSlider'),
       amountLabel: document.getElementById('amountLabel'),
+      calcFactorSlider: document.getElementById('calcFactorSlider'),
+      calcFeeSlider: document.getElementById('calcFeeSlider'),
+      calcTermSlider: document.getElementById('calcTermSlider'),
       calcAmountInput: document.getElementById('calcAmountInput'),
       calcFactorInput: document.getElementById('calcFactorInput'),
       calcFeeInput: document.getElementById('calcFeeInput'),
@@ -642,6 +800,17 @@
       
       acceptContainer: document.getElementById('acceptContainer'),
       acceptOfferBtn: document.getElementById('acceptOfferBtn'),
+      acceptModal: document.getElementById('acceptModal'),
+      closeAcceptBtn: document.getElementById('closeAcceptBtn'),
+      acceptForm: document.getElementById('acceptForm'),
+      acceptSuccess: document.getElementById('acceptSuccess'),
+      signerName: document.getElementById('signerName'),
+      digitalSignCheck: document.getElementById('digitalSignCheck'),
+      cancelAcceptBtn: document.getElementById('cancelAcceptBtn'),
+      confirmAcceptBtn: document.getElementById('confirmAcceptBtn'),
+      
+      // PDF Elements
+      pdfTemplate: document.getElementById('pdfTemplate'),
     };
 
     let paymentFrequency = 'daily';
@@ -750,6 +919,9 @@
 
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
     }
 
     function formatCurrency(num) {
@@ -782,10 +954,10 @@
     }
 
     function getCurrentOffer() {
-      const amount = parseFormattedNumber(elements.calcAmountInput.value);
-      const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
-      const termPayments = parseInt(elements.calcTermInput.value) || 1;
-      const fee = parseFloat(elements.calcFeeInput.value) || 0;
+      const amount = elements.calcAmountInput ? parseFormattedNumber(elements.calcAmountInput.value) : 0;
+      const factor = elements.calcFactorInput ? parseFloat(elements.calcFactorInput.value) || 1.05 : 1.05;
+      const termPayments = elements.calcTermInput ? parseInt(elements.calcTermInput.value) || 1 : 1;
+      const fee = elements.calcFeeInput ? parseFloat(elements.calcFeeInput.value) || 0 : 0;
       return computeOffer(amount, factor, termPayments, paymentFrequency, fee);
     }
 
@@ -838,29 +1010,83 @@
       updateAddOfferButtonState();
     }
 
-    // Simplified input listeners (no slider sync)
-    function setupInputs() {
-        // Amount
-        if(elements.calcAmountInput) {
-            elements.calcAmountInput.addEventListener('input', runCalculator);
-            elements.calcAmountInput.addEventListener('blur', () => {
-                let val = parseFormattedNumber(elements.calcAmountInput.value);
-                if (isNaN(val)) val = 0;
-                elements.calcAmountInput.value = formatCurrency(val);
-                runCalculator();
-            });
-        }
-        // Factor
-        if(elements.calcFactorInput) elements.calcFactorInput.addEventListener('input', runCalculator);
-        // Term
-        if(elements.calcTermInput) elements.calcTermInput.addEventListener('input', runCalculator);
-        // Fee
-        if(elements.calcFeeInput) elements.calcFeeInput.addEventListener('input', runCalculator);
+    // --- NEW: Slider Fill Logic ---
+    function updateSliderFill(slider) {
+        if (!slider) return;
+        const min = parseFloat(slider.min) || 0;
+        const max = parseFloat(slider.max) || 100;
+        const val = parseFloat(slider.value) || 0;
+        const percentage = ((val - min) / (max - min)) * 100;
         
-        // Prepay Percent Input (Rep View)
-        if(elements.prepayPercentInput) {
-            elements.prepayPercentInput.addEventListener('input', (e) => {
+        // Linear Gradient: Accent color up to the thumb, track color after
+        slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${percentage}%, var(--bg-slider-track) ${percentage}%, var(--bg-slider-track) 100%)`;
+    }
+
+    function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const isAmountSlider = (slider === elements.calcAmountSlider);
+      const getMax = () => (isAmountSlider ? amountSliderMax : max);
+      const initialValue = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+      
+      // Initialize fill
+      updateSliderFill(slider);
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        const cap = getMax();
+        if (!isNaN(val) && val > cap) { val = cap; slider.value = val; }
+        input.value = isCurrency ? formatCurrency(val) : val;
+        updateSliderFill(slider); // Update fill on move
+        callback();
+      });
+
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
+        if (!isNaN(val) && val >= min && val <= cap) { 
+            slider.value = val; 
+            updateSliderFill(slider); // Update fill on text input
+            callback(); 
+        } else if (input.value === '') { callback(); }
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
+        if (isNaN(val) || val < min) val = min;
+        if (val > cap) val = cap;
+        slider.value = val;
+        input.value = isCurrency ? formatCurrency(val) : val.toString();
+        updateSliderFill(slider); // Ensure sync on blur
+        callback();
+      });
+    }
+
+    // Simplified input listeners (no slider sync for non-amount fields)
+    function setupInputs() {
+        // Amount is handled by syncInputs above
+        
+        // Factor (Has Slider)
+        if(elements.calcFactorSlider && elements.calcFactorInput) {
+             syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
+        }
+        
+        // Term (Has Slider)
+        if(elements.calcTermSlider && elements.calcTermInput) {
+             syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 3, 528, runCalculator);
+        }
+        
+        // Fee (Has Slider)
+        if(elements.calcFeeSlider && elements.calcFeeInput) {
+             syncInputs(elements.calcFeeSlider, elements.calcFeeInput, false, 0, 10, runCalculator);
+        }
+        
+        // Prepay Percent Input (Rep View) - Not a slider anymore in main logic, but if prepaySlider exists:
+        if(elements.prepaySlider) {
+            updateSliderFill(elements.prepaySlider);
+            elements.prepaySlider.addEventListener('input', (e) => {
                 prepayDiscountPercent = parseInt(e.target.value, 10) || 0;
+                updateSliderFill(e.target);
                 runCalculator();
             });
         }
@@ -869,6 +1095,13 @@
     function applyTheme() {
       document.documentElement.className = `${currentBaseTheme} ${currentAccentClass}`;
       try { localStorage.setItem('theme', currentBaseTheme); } catch (e) {}
+      
+      // Re-apply fills when theme changes to catch new colors
+      if(elements.calcAmountSlider) updateSliderFill(elements.calcAmountSlider);
+      if(elements.calcFactorSlider) updateSliderFill(elements.calcFactorSlider);
+      if(elements.calcTermSlider) updateSliderFill(elements.calcTermSlider);
+      if(elements.calcFeeSlider) updateSliderFill(elements.calcFeeSlider);
+      if(elements.prepaySlider) updateSliderFill(elements.prepaySlider);
     }
 
     function updateRepDisplay() {
@@ -961,10 +1194,13 @@
         setAmountSliderMax(1000000);
       }
 
-      elements.calcAmountInput.value = formatCurrency(amount);
-      elements.calcFactorInput.value = factor; 
-      elements.calcTermInput.value = term; 
-      elements.calcFeeInput.value = fee; 
+      if(elements.calcAmountInput) elements.calcAmountInput.value = formatCurrency(amount);
+      // IMPORTANT: Set slider value too so they are in sync on load
+      if (elements.calcAmountSlider) elements.calcAmountSlider.value = amount;
+      
+      if(elements.calcFactorInput) elements.calcFactorInput.value = factor; 
+      if(elements.calcTermInput) elements.calcTermInput.value = term; 
+      if(elements.calcFeeInput) elements.calcFeeInput.value = fee; 
       
       if (fee > 0 && !isApprovalView && elements.feeInputWrapper) elements.feeInputWrapper.classList.remove('hidden');
 
@@ -1101,10 +1337,10 @@
 
     function runCalculator() {
       try {
-        const amount = parseFormattedNumber(elements.calcAmountInput.value);
-        const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
-        const termPayments = parseInt(elements.calcTermInput.value) || 1; 
-        const fee = parseFloat(elements.calcFeeInput.value) || 0;
+        const amount = elements.calcAmountInput ? parseFormattedNumber(elements.calcAmountInput.value) : 0;
+        const factor = elements.calcFactorInput ? parseFloat(elements.calcFactorInput.value) || 1.05 : 1.05;
+        const termPayments = elements.calcTermInput ? parseInt(elements.calcTermInput.value) || 1 : 1;
+        const fee = elements.calcFeeInput ? parseFloat(elements.calcFeeInput.value) || 0 : 0;
         const offer = computeOffer(amount, factor, termPayments, paymentFrequency, fee);
         const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
         if (elements.businessNameDisplay) {
@@ -1141,6 +1377,8 @@
             }
         }
         
+        // Savings pill logic removed
+
         if (offer.feePercent <= 0 && isApprovalView) {
            if (elements.feeGridItem) elements.feeGridItem.classList.add('hidden');
            if (elements.netGridItem) elements.netGridItem.classList.add('hidden');
@@ -1186,6 +1424,10 @@
 
       if (elements.themeSelector) { elements.themeSelector.value = currentBaseTheme; }
 
+      // Important: syncInputs reinstated for Amount. 
+      // Note: setupInputs() now handles Factor/Term/Fee syncing including the new fill logic.
+      if (elements.calcAmountSlider && elements.calcAmountInput) { syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator); }
+      
       setupInputs();
 
       if (elements.toggleDaily) { elements.toggleDaily.addEventListener('click', () => { paymentFrequency = 'daily'; updatePaymentToggleUI(); runCalculator(); }); }
@@ -1333,18 +1575,18 @@
                             </td>
                             <td width="50%" style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">
                                 <div style="color: #64748b; font-size: 11px; font-weight: 500;">Cost of Funds</div>
-                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${fCost}</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${formatCurrency(off.totalCost)}</div>
                             </td>
                         </tr>
                         <!-- Row 3 (Fee/Net) -->
                          <tr>
                             <td width="50%" style="padding: 12px; text-align: center; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
                                 <div style="color: #64748b; font-size: 11px; font-weight: 500;">Origination Fee</div>
-                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${fFee}</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${formatCurrency(off.feeAmount)}</div>
                             </td>
                             <td width="50%" style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">
                                 <div style="color: #64748b; font-size: 11px; font-weight: 500;">Net Proceeds</div>
-                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${fNet}</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${formatCurrency(off.netProceeds)}</div>
                             </td>
                         </tr>
                     </table>
