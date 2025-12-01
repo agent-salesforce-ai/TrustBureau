@@ -341,7 +341,7 @@
         
         .faq-item.open .faq-answer {
             opacity: 1;
-            padding-top: 1.25rem; /* pb-5 equivalent */
+            padding-top: 1.25rem;
             padding-bottom: 1.25rem;
         }
         
@@ -349,16 +349,6 @@
             transform: rotate(45deg);
         }
 
-        /* Floating particles effect */
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(0, 234, 255, 0.3);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        
         /* Custom Neon Logo Class for Replacement */
         .neon-logo-text {
             font-family: 'Bebas Neue', sans-serif;
@@ -377,7 +367,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <!-- Logo -->
-                <a href="#" class="flex items-center gap-4 group">
+                <a href="#" class="flex items-center gap-4 group relative z-50">
                     <!-- Neon Bottlecap Logo -->
                     <div class="relative w-12 h-12 flex items-center justify-center">
                         <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible">
@@ -412,7 +402,7 @@
                 </a>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-8">
+                <div class="hidden md:flex items-center gap-8 relative z-50">
                     <a href="#process" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan text-sm font-medium tracking-wide transition-colors">Process</a>
                     <a href="#qualify" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan text-sm font-medium tracking-wide transition-colors">Qualify</a>
                     <a href="#testimonials" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan text-sm font-medium tracking-wide transition-colors">Stories</a>
@@ -420,17 +410,17 @@
                     <a href="#faq" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan text-sm font-medium tracking-wide transition-colors">FAQ</a>
                     
                     <!-- Theme Toggle -->
-                    <button id="theme-toggle" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan transition-colors" aria-label="Toggle Dark Mode">
-                        <i class="fa-solid fa-moon hidden dark:inline-block"></i>
-                        <i class="fa-solid fa-sun inline-block dark:hidden"></i>
+                    <button id="theme-toggle" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan transition-colors focus:outline-none" aria-label="Toggle Theme">
+                        <i class="fa-solid fa-sun inline-block" id="icon-light"></i>
+                        <i class="fa-solid fa-moon hidden" id="icon-dark"></i>
                     </button>
 
                     <a href="#apply" class="btn-glow relative bg-white dark:bg-dark-700 hover:bg-gray-100 dark:hover:bg-dark-600 text-dark-900 dark:text-neon-cyan border border-gray-200 dark:border-neon-cyan/30 px-6 py-2.5 rounded text-sm font-semibold tracking-wide transition-all shadow-md dark:shadow-none">
                         Get Funded
                     </a>
                 </div>
-
-                <!-- Mobile Menu Button -->
+                
+                <!-- Mobile Toggle -->
                 <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-400 hover:text-dark-900 dark:hover:text-white" aria-label="Toggle menu">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
@@ -446,10 +436,10 @@
                 <a href="#partners" class="block py-3 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-white/5">Partners</a>
                 <a href="#faq" class="block py-3 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-white/5">FAQ</a>
                 <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-white/5">
-                    <span class="text-gray-700 dark:text-gray-300 font-medium">Dark Mode</span>
+                    <span class="text-gray-700 dark:text-gray-300 font-medium">Theme</span>
                     <button id="mobile-theme-toggle" class="text-gray-700 dark:text-gray-400 hover:text-brand-cyan dark:hover:text-neon-cyan transition-colors">
-                        <i class="fa-solid fa-moon hidden dark:inline-block"></i>
-                        <i class="fa-solid fa-sun inline-block dark:hidden"></i>
+                        <i class="fa-solid fa-sun inline-block" id="mobile-icon-light"></i>
+                        <i class="fa-solid fa-moon hidden" id="mobile-icon-dark"></i>
                     </button>
                 </div>
                 <a href="#apply" class="block w-full text-center bg-brand-cyan dark:bg-neon-cyan text-white dark:text-dark-900 font-bold py-3 rounded mt-4 shadow-lg dark:shadow-[0_0_20px_rgba(0,234,255,0.3)]">Get Funded</a>
@@ -458,7 +448,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <header class="hero-bg relative min-h-screen flex items-center pt-20">
+    <header class="hero-bg relative min-h-screen flex items-center pt-20 overflow-hidden">
         <!-- Exposed Brick Pattern -->
         <div class="hero-brick-pattern"></div>
 
@@ -472,7 +462,7 @@
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
             <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 <!-- Hero Content -->
-                <div class="space-y-8 text-center lg:text-left">
+                <div class="space-y-8 text-center lg:text-left relative z-20">
                     <div class="inline-flex items-center gap-3 px-4 py-2 glass-light rounded-full border border-gray-200 dark:border-white/5">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green dark:bg-neon-green opacity-75"></span>
@@ -481,11 +471,12 @@
                         <span class="text-brand-green dark:text-neon-green text-xs font-semibold tracking-widest uppercase">Funding Available Now</span>
                     </div>
                     
+                    <!-- Standard Headline -->
                     <h1 class="font-display text-6xl sm:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] text-dark-900 dark:text-white transition-colors">
                         <span class="text-brand-cyan dark:text-neon-cyan dark:text-glow-cyan">LIQUIDITY</span><br>
                         ON <span class="text-brand-green dark:text-neon-green text-glow-green">TAP</span>
                     </h1>
-                    
+
                     <p class="text-lg sm:text-xl text-gray-700 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed transition-colors">
                         Merchant Cash Advances served straight up. <span class="text-dark-900 dark:text-white font-bold">$10K–$2M in 24 hours.</span> No credit score obsession. Just your revenue.
                     </p>
@@ -522,19 +513,18 @@
                 </div>
 
                 <!-- Hero Visual -->
-                <div class="relative flex justify-center items-end order-first lg:order-last pb-12">
+                <div class="relative flex justify-center items-end order-first lg:order-last pb-12 z-10 h-full">
                     <!-- Sidewalk Sign Container -->
-                    <div class="relative z-10 group">
+                    <div class="relative z-20 group origin-bottom">
                         
                         <!-- The Board (A-Frame) -->
-                        <!-- Changed border color for light mode from border-gray-800 to border-gray-200 -->
-                        <div class="relative z-20 bg-white dark:bg-dark-800 border-[16px] border-gray-200 dark:border-neutral-900 rounded-xl shadow-2xl p-2 transition-transform duration-500 transform origin-top hover:scale-[1.02] hover:-rotate-1 cursor-default">
+                        <!-- Updated: Light mode is now White (border-gray-200) -->
+                        <div class="relative z-20 bg-white dark:bg-dark-800 border-[16px] border-gray-200 dark:border-neutral-900 rounded-xl shadow-2xl p-2 transition-transform duration-500 transform origin-top hover:scale-[1.02] hover:-rotate-1 cursor-default dark:bbq:border-stone-800 dark:bbq:bg-stone-900 dark:bbq:shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                             
-                            <!-- Hinge/Handle Detail at Top -->
-                            <!-- Changed bg color for light mode from bg-gray-800 to bg-gray-200 -->
-                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-200 dark:bg-neutral-900 rounded-t-lg flex items-center justify-center gap-8">
-                                <div class="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600"></div>
-                                <div class="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600"></div>
+                            <!-- Hinge Detail -->
+                            <!-- Updated: Light mode hinge is White (bg-gray-200) -->
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-200 dark:bg-neutral-900 rounded-t-lg flex items-center justify-center gap-8 dark:bbq:bg-stone-800">
+                                <!-- Removed camera-like dots -->
                             </div>
 
                             <!-- Inner Content Area -->
@@ -545,29 +535,42 @@
                                 <!-- Dark Theme Image -->
                                 <img src="https://i.imgur.com/GQ5irAT.jpeg" alt="CapTap Dark Logo" class="w-full max-w-md hidden dark:block">
                                 
-                                <!-- Glass reflection overlay (subtle) -->
+                                <!-- Bottlecap Logo & Text on Image -->
+                                <div class="absolute top-6 left-6 z-10 flex items-center gap-3">
+                                    <!-- Logo Icon -->
+                                    <div class="w-12 h-12 flex items-center justify-center">
+                                        <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible">
+                                            <!-- Dashed Outer Ring -->
+                                            <circle cx="50" cy="50" r="46" fill="none" stroke="#00ff9d" stroke-width="4" stroke-dasharray="10 6" stroke-linecap="round" class="stroke-emerald-600 dark:stroke-[#00ff9d] drop-shadow-none dark:drop-shadow-[0_0_5px_rgba(0,255,157,0.6)] transition-all duration-300 group-hover:stroke-cyan-600 dark:group-hover:stroke-neon-cyan dark:group-hover:drop-shadow-[0_0_8px_rgba(0,234,255,0.6)] dark:bbq:stroke-amber-500 dark:bbq:drop-shadow-[0_0_5px_rgba(245,158,11,0.8)]" />
+                                            <!-- Solid Inner Ring -->
+                                            <circle cx="50" cy="50" r="36" fill="none" stroke="#00ff9d" stroke-width="1.5" class="stroke-emerald-600 dark:stroke-[#00ff9d] drop-shadow-none dark:drop-shadow-[0_0_3px_rgba(0,255,157,0.6)] transition-all duration-300 group-hover:stroke-cyan-600 dark:group-hover:stroke-neon-cyan dark:bbq:stroke-amber-400" />
+                                            <!-- Dollar Sign -->
+                                            <text x="50" y="72" text-anchor="middle" fill="#00ff9d" font-family="Bebas Neue, sans-serif" font-size="55" class="fill-emerald-600 dark:fill-[#00ff9d] drop-shadow-none dark:drop-shadow-[0_0_5px_rgba(0,255,157,0.8)] transition-all duration-300 group-hover:fill-cyan-600 dark:group-hover:fill-neon-cyan dark:bbq:fill-amber-400">$</text>
+                                        </svg>
+                                    </div>
+                                    
+                                    <!-- Logo Text -->
+                                    <span class="font-display text-3xl tracking-[0.15em] text-gray-900 dark:text-white pt-1 transition-colors dark:bbq:text-amber-100 dark:party:text-neon-cyan dark:party:drop-shadow-[0_0_5px_rgba(0,234,255,0.8)]">
+                                        CAP<span class="text-brand-green dark:text-neon-green text-glow-green dark:bbq:text-amber-500 dark:bbq:text-glow-none dark:bbq:drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] dark:party:text-neon-magenta">TAP</span>
+                                    </span>
+                                </div>
+
                                 <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none"></div>
                             </div>
                         </div>
 
-                        <!-- Legs (Back legs visible in perspective) -->
-                        <!-- Changed bg color for light mode -->
+                        <!-- Legs -->
+                        <!-- Updated: Light mode legs are White (bg-gray-300 for shadow, bg-gray-200 for front) -->
                         <div class="absolute top-8 -right-4 w-4 h-full bg-gray-300 dark:bg-neutral-800 rounded-r-lg -z-10 transform skew-y-12 origin-top-left"></div>
-                        
-                        <!-- Feet/Legs (Front) -->
-                        <!-- Changed bg color for light mode -->
                         <div class="absolute -bottom-12 left-6 w-4 h-16 bg-gray-200 dark:bg-neutral-900 rounded-b-lg -z-10"></div>
                         <div class="absolute -bottom-12 right-6 w-4 h-16 bg-gray-200 dark:bg-neutral-900 rounded-b-lg -z-10"></div>
-
-                        <!-- Ground Shadow -->
-                        <div class="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[120%] h-8 bg-black/20 dark:bg-black/50 blur-lg rounded-[100%]"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Scroll indicator -->
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 dark:text-gray-600">
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 dark:text-gray-600 z-20">
             <span class="text-xs uppercase tracking-widest">Scroll</span>
             <div class="w-px h-8 bg-gradient-to-b from-gray-500 dark:from-gray-600 to-transparent animate-pulse"></div>
         </div>
@@ -764,77 +767,77 @@
     <section id="qualify" class="py-24 lg:py-32 relative transition-colors">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="reveal text-center mb-12">
-                <span class="text-brand-green dark:text-neon-green text-sm font-semibold tracking-widest uppercase">Quick Check</span>
+                <span class="text-brand-cyan dark:text-neon-green text-sm font-semibold tracking-widest uppercase">Quick Check</span>
                 <h2 class="font-display text-5xl sm:text-6xl text-dark-900 dark:text-white mt-3 transition-colors">Do You Qualify?</h2>
                 <p class="text-gray-600 dark:text-gray-400 mt-4 transition-colors">Answer 4 questions to see if you're eligible.</p>
             </div>
 
-            <div class="reveal glass p-8 sm:p-12 rounded-2xl">
+            <div class="reveal glass p-8 sm:p-12 rounded-2xl border border-gray-200 dark:border-white/10 shadow-xl">
                 <div id="qualify-quiz">
                     <!-- Question 1 -->
                     <div class="quiz-step" data-step="1">
-                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2">Question 1 of 4</p>
-                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors">How long have you been in business?</h3>
+                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2 font-bold">Question 1 of 4</p>
+                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors font-bold">How long have you been in business?</h3>
                         <div class="grid sm:grid-cols-2 gap-4">
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="new" data-next="2">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">Less than 6 months</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="new" data-next="2">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">Less than 6 months</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="established" data-next="2">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">6+ months</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="established" data-next="2">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">6+ months</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Question 2 -->
                     <div class="quiz-step hidden" data-step="2">
-                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2">Question 2 of 4</p>
-                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors">What's your average monthly revenue?</h3>
+                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2 font-bold">Question 2 of 4</p>
+                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors font-bold">What's your average monthly revenue?</h3>
                         <div class="grid sm:grid-cols-2 gap-4">
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="under15k" data-next="3">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">Under $15,000</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="under15k" data-next="3">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">Under $15,000</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="15k-50k" data-next="3">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$15,000 - $50,000</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="15k-50k" data-next="3">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$15,000 - $50,000</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="50k-100k" data-next="3">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$50,000 - $100,000</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="50k-100k" data-next="3">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$50,000 - $100,000</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="100k+" data-next="3">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$100,000+</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="100k+" data-next="3">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$100,000+</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Question 3 -->
                     <div class="quiz-step hidden" data-step="3">
-                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2">Question 3 of 4</p>
-                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors">Do you have a business bank account?</h3>
+                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2 font-bold">Question 3 of 4</p>
+                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors font-bold">Do you have a business bank account?</h3>
                         <div class="grid sm:grid-cols-2 gap-4">
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="yes" data-next="4">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">Yes</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="yes" data-next="4">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">Yes</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="no" data-next="4">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">No</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="no" data-next="4">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">No</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Question 4 -->
                     <div class="quiz-step hidden" data-step="4">
-                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2">Question 4 of 4</p>
-                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors">How much funding do you need?</h3>
+                        <p class="text-sm text-brand-cyan dark:text-neon-cyan uppercase tracking-widest mb-2 font-bold">Question 4 of 4</p>
+                        <h3 class="text-2xl text-dark-900 dark:text-white mb-6 transition-colors font-bold">How much funding do you need?</h3>
                         <div class="grid sm:grid-cols-2 gap-4">
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="10k-50k" data-next="result">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$10,000 - $50,000</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="10k-50k" data-next="result">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$10,000 - $50,000</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="50k-150k" data-next="result">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$50,000 - $150,000</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="50k-150k" data-next="result">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$50,000 - $150,000</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="150k-500k" data-next="result">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$150,000 - $500,000</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="150k-500k" data-next="result">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$150,000 - $500,000</span>
                             </button>
-                            <button class="quiz-option p-5 glass-light rounded-xl text-left hover:border-brand-cyan/50 dark:hover:border-neon-cyan/50 transition-all" data-value="500k+" data-next="result">
-                                <span class="text-gray-700 dark:text-white font-medium transition-colors">$500,000+</span>
+                            <button class="quiz-option p-6 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 rounded-xl text-left hover:border-brand-cyan dark:hover:border-neon-cyan hover:bg-gray-50 dark:hover:bg-white/10 transition-all shadow-sm group" data-value="500k+" data-next="result">
+                                <span class="text-gray-900 dark:text-white font-bold text-lg block group-hover:text-brand-cyan dark:group-hover:text-neon-cyan transition-colors">$500,000+</span>
                             </button>
                         </div>
                     </div>
@@ -857,7 +860,7 @@
         </div>
     </section>
 
-    <!-- Testimonials (Stories) -->
+    <!-- Testimonials -->
     <section id="testimonials" class="py-24 lg:py-32 bg-gray-50 dark:bg-dark-800 relative overflow-hidden transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="reveal text-center mb-16">
