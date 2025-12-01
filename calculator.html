@@ -5,80 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>TrustBureau.ai | Payments Offer Calculator</title>
 
-  <!-- PWA & Mobile Meta Tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TrustBureau">
-  <meta name="theme-color" content="#ffffff">
+  <!-- PWA / Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#42D197" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="TrustBureau" />
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="https://placehold.co/180x180/42D197/ffffff?text=TB" />
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22%23D19B2B%22/><path d=%22M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z%22 fill=%22black%22/></svg>">
 
-  <!-- Favicon: White Shield with Black Checkmark -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z' fill='white' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z' fill='black'/%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='white'/%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z' fill='white' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z' fill='black'/%3E%3C/svg%3E">
-
-  <!-- Tailwind & Fonts -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+  
+  <!-- PDF Generation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; font-size: 14px; }
 
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
     input[type=number] { -moz-appearance: textfield; }
 
     .input-icon { top: 50%; transform: translateY(-50%); }
 
     /* --- BASE THEMES --- */
-    html.theme-light {
-      --bg-body: #ffffff;
-      --bg-card: #ffffff;
-      --bg-card-inner: #f9fafb;
-      --bg-slider-track: #e2e8f0;
-      --bg-input: #ffffff;
-      --bg-toggle-inactive: #f1f5f9;
-      --border-primary: #e2e8f0;
-      --text-primary: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #64748b;
-      --text-success: #16a34a;
-      --shadow-color: rgba(0, 0, 0, 0.06);
-      --chart-secondary: #cbd5e1;
-    }
-    html.theme-dark {
-      --bg-body: #111827;
-      --bg-card: #1f2937;
-      --bg-card-inner: #111827;
-      --bg-slider-track: #374151;
-      --bg-input: #1f2937;
-      --bg-toggle-inactive: #111827;
-      --border-primary: #374151;
-      --text-primary: #f9fafb;
-      --text-secondary: #e5e7eb;
-      --text-muted: #9ca3af;
-      --text-success: #4ade80;
-      --shadow-color: rgba(0, 0, 0, 0.3);
-      --chart-secondary: #4b5563;
-    }
-    html.theme-black {
-      --bg-body: #020617;
-      --bg-card: #020617;
-      --bg-card-inner: #0f172a;
-      --bg-slider-track: #1e293b;
-      --bg-input: #020617;
-      --bg-toggle-inactive: #0f172a;
-      --border-primary: #1e293b;
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-muted: #64748b;
-      --text-success: #4ade80;
-      --shadow-color: rgba(0, 0, 0, 0.5);
-      --chart-secondary: #334155;
-    }
+    html.theme-light { --bg-body: #ffffff; --bg-card: #ffffff; --bg-card-inner: #f9fafb; --bg-slider-track: #e2e8f0; --bg-input: #ffffff; --bg-toggle-inactive: #f1f5f9; --border-primary: #e2e8f0; --text-primary: #0f172a; --text-secondary: #334155; --text-muted: #64748b; --text-success: #16a34a; --shadow-color: rgba(0, 0, 0, 0.06); }
+    html.theme-dark { --bg-body: #111827; --bg-card: #1f2937; --bg-card-inner: #111827; --bg-slider-track: #374151; --bg-input: #1f2937; --bg-toggle-inactive: #111827; --border-primary: #374151; --text-primary: #f9fafb; --text-secondary: #e5e7eb; --text-muted: #9ca3af; --text-success: #4ade80; --shadow-color: rgba(0, 0, 0, 0.3); }
+    html.theme-black { --bg-body: #020617; --bg-card: #020617; --bg-card-inner: #0f172a; --bg-slider-track: #1e293b; --bg-input: #020617; --bg-toggle-inactive: #0f172a; --border-primary: #1e293b; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-muted: #64748b; --text-success: #4ade80; --shadow-color: rgba(0, 0, 0, 0.5); }
 
     body { background-color: var(--bg-body); transition: background-color 0.2s; }
 
     /* --- ACCENT COLORS --- */
-    html.accent-mint { --accent-color: #42D197; --accent-color-light: #74eabc; --accent-color-dark: #2d9668; --accent-text-inverted: #ffffff; }
     html.accent-gold { --accent-color: #D19B2B; --accent-color-light: #e6b650; --accent-color-dark: #a6781c; --accent-text-inverted: #020617; }
     html.accent-blue { --accent-color: #3b82f6; --accent-color-light: #60a5fa; --accent-color-dark: #2563eb; --accent-text-inverted: #ffffff; }
     html.accent-green { --accent-color: #22c55e; --accent-color-light: #4ade80; --accent-color-dark: #16a34a; --accent-text-inverted: #ffffff; }
@@ -88,6 +53,9 @@
     html.accent-pink { --accent-color: #ec4899; --accent-color-light: #f472b6; --accent-color-dark: #db2777; --accent-text-inverted: #ffffff; }
     html.accent-teal { --accent-color: #14b8a6; --accent-color-light: #2dd4bf; --accent-color-dark: #0d9488; --accent-text-inverted: #ffffff; }
     html.accent-indigo { --accent-color: #6366f1; --accent-color-light: #818cf8; --accent-color-dark: #4f46e5; --accent-text-inverted: #ffffff; }
+    html.accent-gray { --accent-color: #111827; --accent-color-light: #374151; --accent-color-dark: #000000; --accent-text-inverted: #ffffff; }
+    html.theme-dark.accent-gray, html.theme-black.accent-gray { --accent-color: #f3f4f6; --accent-color-light: #ffffff; --accent-color-dark: #d1d5db; --accent-text-inverted: #000000; }
+    html.accent-mint { --accent-color: #42D197; --accent-color-light: #74eabc; --accent-color-dark: #2d9668; --accent-text-inverted: #ffffff; }
     html.accent-cyan { --accent-color: #06b6d4; --accent-color-light: #22d3ee; --accent-color-dark: #0891b2; --accent-text-inverted: #ffffff; }
     html.accent-lime { --accent-color: #84cc16; --accent-color-light: #a3e635; --accent-color-dark: #65a30d; --accent-text-inverted: #020617; }
     html.accent-fuchsia { --accent-color: #d946ef; --accent-color-light: #e879f9; --accent-color-dark: #c026d3; --accent-text-inverted: #ffffff; }
@@ -97,16 +65,10 @@
     html.theme-dark.accent-black, html.theme-black.accent-black { --accent-color: #f3f4f6; --accent-color-light: #ffffff; --accent-color-dark: #d1d5db; --accent-text-inverted: #000000; }
     html.accent-white { --accent-color: #ffffff; --accent-color-light: #f0f0f0; --accent-color-dark: #e0e0e0; --accent-text-inverted: #000000; }
     html.theme-dark.accent-white, html.theme-black.accent-white { --accent-color: #1a1a1a; --accent-color-light: #333333; --accent-color-dark: #000000; --accent-text-inverted: #ffffff; }
-    html.accent-gray { --accent-color: #111827; --accent-color-light: #374151; --accent-color-dark: #000000; --accent-text-inverted: #ffffff; }
-    html.theme-dark.accent-gray, html.theme-black.accent-gray { --accent-color: #f3f4f6; --accent-color-light: #ffffff; --accent-color-dark: #d1d5db; --accent-text-inverted: #000000; }
 
     /* --- COMPONENT STYLES --- */
     .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
-    .shell {
-      border-color: var(--accent-color);
-      border-width: 3px;
-      box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
-    }
+    .shell { border-color: var(--accent-color); border-width: 3px; box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color); }
     .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
     .text-primary { color: var(--text-primary); }
     .text-secondary { color: var(--text-secondary); }
@@ -115,279 +77,264 @@
     .border-primary { border-color: var(--border-primary); }
     .slider-track { background-color: var(--bg-slider-track); }
     .slider-thumb { accent-color: var(--accent-color); }
-    .input-field {
-      background-color: var(--bg-input);
-      border-color: var(--border-primary);
-      color: var(--text-primary);
-    }
-    .input-field:focus, .input-field:focus-within {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 1px var(--accent-color-light);
-      outline: none;
-    }
-    input[type="date"] {
-      background-color: var(--bg-input);
-      color: var(--text-primary);
-      border-color: var(--border-primary);
-    }
+    .input-field { background-color: var(--bg-input); border-color: var(--border-primary); color: var(--text-primary); }
+    .input-field:focus, .input-field:focus-within { border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color-light); outline: none; }
+    input[type="date"] { background-color: var(--bg-input); color: var(--text-primary); border-color: var(--border-primary); }
     ::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
     html.theme-light ::-webkit-calendar-picker-indicator { filter: invert(0); }
     .text-hero { color: var(--accent-color); }
     .toggle-inactive { background-color: var(--bg-toggle-inactive); color: var(--text-secondary); }
     .toggle-active { background-color: var(--accent-color); color: var(--accent-text-inverted); font-weight: 700; }
-    .button-primary {
-      background-color: var(--accent-color);
-      color: var(--accent-text-inverted);
-      font-weight: 700;
-      border-radius: 0.5rem; 
-      padding: 0.6rem 1.75rem;
-      border: 1px solid var(--accent-color-dark);
-      transition: all 0.2s ease;
-    }
-    .button-primary:hover {
-      background-color: var(--accent-color-light);
-      box-shadow: 0 0 0 1px var(--accent-color), 0 0 15px var(--accent-color-light);
-      transform: translateY(-1px) scale(1.01);
-    }
-    .button-primary:disabled {
-      background-color: var(--bg-slider-track);
-      color: var(--text-muted);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-      border-color: transparent;
-    }
-    .color-swatch {
-      width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
-      border: 2px solid transparent; transition: transform 0.1s; display: inline-block;
-    }
+    .button-primary { background-color: var(--accent-color); color: var(--accent-text-inverted); font-weight: 700; border-radius: 0.5rem; padding: 0.5rem 1.5rem; border: 1px solid var(--accent-color-dark); transition: all 0.2s ease; font-size: 0.8rem; }
+    .button-primary:hover { background-color: var(--accent-color-light); box-shadow: 0 0 0 1px var(--accent-color), 0 0 15px var(--accent-color-light); transform: translateY(-1px) scale(1.01); }
+    .button-primary:disabled { background-color: var(--bg-slider-track); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; border-color: transparent; }
+    .color-swatch { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; display: inline-block; }
     .color-swatch:hover { transform: scale(1.1); }
     .color-swatch.selected { border-color: var(--text-primary); box-shadow: 0 0 0 2px var(--bg-card); }
-    .amort-table th {
-      background-color: var(--bg-slider-track); color: var(--text-secondary);
-      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
-      padding: 0.75rem 0.5rem; font-weight: 600;
+    
+    /* Reduced font size for table */
+    .amort-table th { 
+        background-color: var(--bg-slider-track); 
+        color: var(--text-secondary); 
+        font-size: 0.65rem; 
+        text-transform: uppercase; 
+        letter-spacing: 0.05em; 
+        padding: 0.6rem 0.4rem; 
+        font-weight: 700; 
+        border-bottom: 2px solid var(--accent-color); /* Added brand border */
+        text-align: right; /* Right align header by default */
     }
-    .amort-table td {
-      border-bottom: 1px solid var(--border-primary); color: var(--text-primary);
-      font-size: 0.8rem; padding: 0.6rem 0.5rem;
+    .amort-table th:first-child, .amort-table th:nth-child(2) {
+        text-align: left; /* Left align index and date */
+    }
+    .amort-table td { 
+        border-bottom: 1px solid var(--border-primary); 
+        color: var(--text-primary); 
+        font-size: 0.75rem; 
+        padding: 0.5rem 0.4rem; 
+        text-align: right; /* Right align numbers */
+    }
+    .amort-table td:first-child, .amort-table td:nth-child(2) {
+        text-align: left; /* Left align index and date */
     }
     .amort-table tr:last-child td { border-bottom: none; }
 
-    /* --- CHART & TOOLTIP STYLES --- */
-    .donut-container {
-      position: relative;
-      width: 100px; height: 100px;
-      border-radius: 50%;
-      background: conic-gradient(var(--accent-color) 0% 80%, var(--chart-secondary) 80% 100%);
-      display: flex; justify-content: center; align-items: center;
-      margin: 0 auto;
-    }
-    .donut-inner {
-      width: 70px; height: 70px;
-      background-color: var(--bg-card);
-      border-radius: 50%;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-    }
-    .tooltip-icon {
-      display: inline-flex; justify-content: center; align-items: center;
-      width: 14px; height: 14px; border-radius: 50%;
-      background-color: var(--text-muted); color: var(--bg-card);
-      font-size: 10px; font-weight: bold; cursor: help;
-      margin-left: 4px; vertical-align: middle;
-    }
-    .tooltip-wrapper { position: relative; display: inline-block; }
-    .tooltip-content {
-      visibility: hidden; opacity: 0;
-      position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
-      width: 200px; background-color: #334155; color: #fff;
-      text-align: center; border-radius: 6px; padding: 8px;
-      font-size: 0.75rem; font-weight: normal; z-index: 50;
-      transition: opacity 0.2s; pointer-events: none;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    .tooltip-wrapper:hover .tooltip-content { visibility: visible; opacity: 1; }
-    .tooltip-arrow {
-      position: absolute; top: 100%; left: 50%; margin-left: -5px;
-      border-width: 5px; border-style: solid;
-      border-color: #334155 transparent transparent transparent;
-    }
+    /* Donut Chart (Slightly Larger) */
+    .donut-chart { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-color) 0% 0%, var(--bg-slider-track) 0% 100%); position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+    .donut-hole { width: 80%; height: 80%; background-color: var(--bg-card); border-radius: 50%; position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; }
 
-    /* --- PRINT STYLES --- */
+    /* Tooltips */
+    .tooltip-container { position: relative; display: inline-block; cursor: help; }
+    .tooltip-text { visibility: hidden; width: 180px; background-color: var(--text-primary); color: var(--bg-card); text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 50; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; font-weight: normal; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.2; }
+    .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--text-primary) transparent transparent transparent; }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    /* Print */
     @media print {
-      body { background: white; color: black; -webkit-print-color-adjust: exact; }
-      .shell { border: none; box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
-      #calculatorInputs, #themeControls, #buttonContainer, #repSettingsPanel, 
-      #feeContainer button, #prepaySection button, #headerPoweredBy, 
-      .tooltip-icon { display: none !important; }
-      #offerCard { border: 1px solid #ddd; box-shadow: none; break-inside: avoid; }
-      #headerContainer { justify-content: center !important; border-bottom: 2px solid #000; margin-bottom: 20px; }
-      #headerTitle { font-size: 24px; font-weight: bold; color: black; }
-      .text-hero { color: black !important; }
-      .donut-container { border: 1px solid #eee; }
-      .card-inner-bg { background-color: #fff; border: 1px solid #eee; }
-      /* Ensure inputs display values as text */
-      input { border: none; background: transparent; padding: 0; margin: 0; }
+        body { background-color: #fff; color: #000; }
+        .shell { border: none; box-shadow: none; max-width: 100%; width: 100%; }
+        #calculatorInputs, #themeControls, #buttonContainer, #repSettingsToggle, #savedOffersSection, #togglePrepay, #toggleFeeBtn, #installContainer, #acceptContainer, #repSettingsPanel, #shareMenuBtn { display: none !important; }
+        #offerCard { border: 1px solid #ccc; box-shadow: none; }
+        .text-hero { color: #000 !important; }
+        #headerContainer { border-bottom: 2px solid #000; }
     }
+    
+    #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200">
+<body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200 no-select">
+  
+  <canvas id="confettiCanvas"></canvas>
 
   <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
 
     <!-- HEADER -->
     <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
-      <div class="flex flex-col items-center justify-center flex-shrink-0">
+      <div class="flex flex-col items-center justify-center flex-shrink-0 relative w-full">
+        
+        <!-- PWA Install Button -->
+        <div id="installContainer" class="absolute right-0 top-0 hidden">
+            <button id="installBtn" class="text-[10px] uppercase tracking-wide font-bold bg-slate-800 dark:bg-slate-200 text-white dark:text-black px-3 py-1.5 rounded-full shadow hover:scale-105 transition flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Install
+            </button>
+        </div>
+
         <div id="headerLogoWrapper" class="flex items-center justify-center mb-2">
-            <!-- Image is hidden by default -->
             <img id="headerLogo" src="" alt="Company Logo" class="h-16 w-auto object-contain hidden" />
-            <!-- Placeholder Icon (Accent Color Shield with Transparent Check) -->
             <svg id="placeholderIcon" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-hero" viewBox="0 0 24 24" fill="currentColor">
-               <path fill-rule="evenodd" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" clip-rule="evenodd"/>
+               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
             </svg>
         </div>
         <h1 id="headerTitle" class="text-primary text-xl mt-0 text-center font-normal tracking-wide">TrustBureau.ai</h1>
         <span id="headerPoweredBy" class="text-xs font-semibold text-muted uppercase tracking-widest mt-1 hidden">powered by TrustBureau.ai</span>
       </div>
-      <div id="themeControls" class="flex items-center justify-center">
+      
+      <!-- THEME CONTROLS (Rep Only) -->
+      <div id="themeControls" class="flex items-center justify-center gap-3">
         <button id="repSettingsToggle" type="button"
                 class="px-2 py-1 text-xs rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 016 0z" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 016 0z" /></svg>
           Settings
         </button>
+      </div>
+    </div>
+
+    <!-- REP SETTINGS PANEL -->
+    <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Rep Settings</span>
+        <span class="text-xs text-muted">Shown on client approval view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        <!-- THEME SELECTION -->
+        <div>
+           <label class="block font-semibold text-muted mb-1">Base Theme</label>
+           <div class="flex space-x-2">
+              <button type="button" onclick="setBaseTheme('theme-light')" class="flex-1 py-1.5 border border-primary rounded text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition">Light</button>
+              <button type="button" onclick="setBaseTheme('theme-dark')" class="flex-1 py-1.5 border border-primary rounded text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition">Dark</button>
+              <button type="button" onclick="setBaseTheme('theme-black')" class="flex-1 py-1.5 border border-primary rounded text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition">Black</button>
+           </div>
+        </div>
+        <!-- ACCENT SELECTION -->
+        <div>
+           <label class="block font-semibold text-muted mb-1">Accent Color</label>
+           <div class="flex flex-wrap gap-2 p-1">
+              <div onclick="setAccent('accent-gold')" class="color-swatch" style="background-color: #D19B2B;" title="Gold"></div>
+              <div onclick="setAccent('accent-blue')" class="color-swatch" style="background-color: #3b82f6;" title="Blue"></div>
+              <div onclick="setAccent('accent-green')" class="color-swatch" style="background-color: #22c55e;" title="Green"></div>
+              <div onclick="setAccent('accent-red')" class="color-swatch" style="background-color: #ef4444;" title="Red"></div>
+              <div onclick="setAccent('accent-orange')" class="color-swatch" style="background-color: #f97316;" title="Orange"></div>
+              <div onclick="setAccent('accent-purple')" class="color-swatch" style="background-color: #a855f7;" title="Purple"></div>
+              <div onclick="setAccent('accent-pink')" class="color-swatch" style="background-color: #ec4899;" title="Pink"></div>
+              <div onclick="setAccent('accent-teal')" class="color-swatch" style="background-color: #14b8a6;" title="Teal"></div>
+              <div onclick="setAccent('accent-indigo')" class="color-swatch" style="background-color: #6366f1;" title="Indigo"></div>
+              <div onclick="setAccent('accent-gray')" class="color-swatch" style="background-color: #6b7280;" title="Gray"></div>
+              <div onclick="setAccent('accent-mint')" class="color-swatch" style="background-color: #42D197;" title="Mint"></div>
+              <div onclick="setAccent('accent-cyan')" class="color-swatch" style="background-color: #06b6d4;" title="Cyan"></div>
+              <div onclick="setAccent('accent-lime')" class="color-swatch" style="background-color: #84cc16;" title="Lime"></div>
+              <div onclick="setAccent('accent-fuchsia')" class="color-swatch" style="background-color: #d946ef;" title="Fuchsia"></div>
+              <div onclick="setAccent('accent-sky')" class="color-swatch" style="background-color: #0ea5e9;" title="Sky"></div>
+              <div onclick="setAccent('accent-yellow')" class="color-swatch" style="background-color: #eab308;" title="Yellow"></div>
+              <div onclick="setAccent('accent-black')" class="color-swatch" style="background-color: #000000;" title="Black"></div>
+              <div onclick="setAccent('accent-white')" class="color-swatch" style="background-color: #ffffff; border: 1px solid #e0e0e0;" title="White"></div>
+           </div>
+        </div>
+        <hr class="border-primary my-2"/>
+        <!-- Branding Inputs -->
+        <div>
+          <label for="companyNameInput" class="block font-semibold text-muted">Company Name</label>
+          <input id="companyNameInput" type="text" class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field" placeholder="TrustBureau.ai (Default)" />
+        </div>
+        <div>
+          <label for="companyLogoInput" class="block font-semibold text-muted">Company Logo URL</label>
+          <input id="companyLogoInput" type="url" class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field" placeholder="https://example.com/logo.png" />
+        </div>
+        <hr class="border-primary my-2"/>
+        <!-- Rep Info -->
+        <div>
+          <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
+          <input id="repNameInput" type="text" class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field" placeholder="Rep Name" />
+        </div>
+        <div>
+          <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
+          <input id="repEmailInput" type="email" class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field" placeholder="rep@example.com" />
+        </div>
+        <div>
+          <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
+          <input id="repPhoneInput" type="tel" class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field" placeholder="(555) 123-4567" />
+        </div>
       </div>
     </div>
 
     <!-- OFFER CALCULATOR -->
     <div id="calculatorInputs" class="space-y-4 pt-2">
       <div id="businessNameContainer" class="px-1 mt-2">
-        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
-          Business Name
-        </label>
-        <input id="businessNameInput" type="text"
-               class="mt-1 w-full p-2 text-sm border rounded-lg shadow-sm input-field"
-               placeholder="e.g., Acme Holdings LLC" />
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">Business Name</label>
+        <input id="businessNameInput" type="text" class="mt-1 w-full p-2 text-sm border rounded-lg shadow-sm input-field" placeholder="e.g., Acme Holdings LLC" />
       </div>
 
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
         <div id="amountContainer" class="space-y-1">
-          <label for="calcAmount" class="block text-xs font-semibold text-muted">
-            Amount You Get ($)
-          </label>
-          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1"
-                 value="50000"
-                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
+          <label id="amountLabel" for="calcAmount" class="block text-xs font-semibold text-muted">Amount You Get ($)</label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1" value="50000" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
           <div class="relative group">
             <span class="absolute left-3 input-icon text-muted text-sm">$</span>
-            <input id="calcAmountInput" inputmode="numeric"
-                   class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+            <input id="calcAmountInput" inputmode="numeric" class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="factorContainer" class="space-y-1">
           <label for="calcFactor" class="block text-xs font-semibold text-muted">
-            Factor Rate
-            <div class="tooltip-wrapper">
-              <span class="tooltip-icon">i</span>
-              <div class="tooltip-content">
-                The multiplier applied to the amount you receive. E.g., 1.25x on $10k means paying back $12.5k.
-                <div class="tooltip-arrow"></div>
-              </div>
-            </div>
+             Factor Rate
+             <div class="tooltip-container ml-1 inline-flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class="tooltip-text">The multiplier used to determine the total repayment amount based on the advance amount.</span>
+             </div>
           </label>
-          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25"
-                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-4 w-4 absolute left-3 input-icon text-muted"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M6 18 18 6M6 6l12 12" />
-            </svg>
-            <input id="calcFactorInput" type="number" step="0.01"
-                   class="w-full p-2 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            <input id="calcFactorInput" type="number" step="0.01" class="w-full p-2 pl-9 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="termContainer" class="space-y-1">
-          <label for="calcTerm" class="block text-xs font-semibold text-muted">
-            Number of Payments
-          </label>
-          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="130"
-                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <label for="calcTerm" class="block text-xs font-semibold text-muted">Number of Payments</label>
+          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="130" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
           <div class="relative group">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-3 w-3 absolute left-3 input-icon text-muted"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
-            </svg>
-            <input id="calcTermInput" type="number" step="1"
-                   class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" /></svg>
+            <input id="calcTermInput" type="number" step="1" class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
           </div>
         </div>
 
         <div id="termLengthMonthsContainer" class="space-y-1">
-          <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">
-            Term Length (Display Override)
-          </label>
+          <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">Term Length (Display Override)</label>
           <div class="relative group">
-            <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
-                   class="w-full p-2 text-sm border rounded-lg shadow-sm input-field"
-                   placeholder="Auto" />
+            <input id="termLengthMonthsInput" type="number" step="0.5" min="1" class="w-full p-2 text-sm border rounded-lg shadow-sm input-field" placeholder="Auto" />
           </div>
         </div>
       </div>
 
       <div id="toggleContainer" class="flex items-center justify-center space-x-2">
-        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
-          Daily
-        </button>
-        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
-          Weekly
-        </button>
-        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
-          Monthly
-        </button>
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Daily</button>
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Weekly</button>
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">Monthly</button>
       </div>
     </div>
 
     <!-- OFFER 1 CARD -->
-    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
+    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary relative">
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
         <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
       </div>
-      
-      <!-- Top Summary Section with Donut Chart -->
-      <div class="flex flex-col items-center justify-center py-6 gap-6">
-        <div class="text-center">
-          <span id="businessNameDisplay"
-                class="text-sm font-semibold text-primary block mb-1 hidden"></span>
-          <span class="text-xs font-semibold text-muted block">You Get</span>
-          <span id="summaryAmountOut"
-                class="text-5xl font-bold block my-2 text-hero leading-tight">$50,000</span>
-          <span class="text-sm font-medium text-secondary block">
-            Total Payback:
-            <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
-          </span>
-        </div>
+      <div class="text-center py-6">
+        <span id="businessNameDisplay" class="text-sm font-semibold text-primary block mb-1 hidden"></span>
+        <span class="text-xs font-semibold text-muted block">You Get</span>
+        <span id="summaryAmountOut" class="text-5xl font-bold block my-2 text-hero leading-tight">$50,000</span>
         
-        <!-- VISUAL BREAKDOWN (DONUT CHART) -->
-        <div class="flex flex-col items-center">
-           <div id="donutChart" class="donut-container">
-             <div class="donut-inner">
-               <span class="text-[10px] text-muted font-semibold">Cost</span>
-               <span id="donutPercent" class="text-xs font-bold text-primary">$12,500</span>
-             </div>
-           </div>
-           <span class="text-[10px] text-muted mt-2">Breakdown</span>
+        <!-- SAVINGS PILL -->
+        <div id="savingsPill" class="hidden mb-2 inline-block bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+            You save <span id="savingsValue">$0</span> in repayment!
         </div>
-      </div>
 
+        <!-- Donut Chart -->
+        <div class="my-4">
+            <div id="offerDonutChart" class="donut-chart" title="Principal vs Cost">
+                <div class="donut-hole">
+                    <span class="text-[10px] text-muted">Payback</span>
+                    <!-- Removed font-bold -->
+                    <span id="chartPayback" class="text-xs font-normal text-primary"></span>
+                </div>
+            </div>
+            <div class="flex justify-center gap-3 mt-2 text-[10px]">
+                <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-[var(--accent-color)] mr-1"></span> Principal</div>
+                <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-[var(--bg-slider-track)] mr-1"></span> Cost</div>
+            </div>
+        </div>
+
+        <span class="text-sm font-medium text-secondary block hidden">Total Payback: <span id="summaryPaybackOut" class="font-semibold text-primary"></span></span>
+      </div>
       <div class="flex justify-center items-center border-b border-primary pb-2">
         <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
       </div>
@@ -395,70 +342,32 @@
       <!-- TABLE LAYOUT -->
       <div class="mt-6 border border-primary rounded-lg overflow-hidden">
         <div class="divide-y divide-primary">
-           <!-- Row 1: Term Info -->
+           <!-- Row 1 -->
            <div class="grid grid-cols-2 divide-x divide-primary bg-card-inner-bg/50">
-             <div class="p-3 text-center">
-               <span class="text-xs font-medium text-muted block">Term Length</span>
-               <span id="summaryTermLengthOut" class="text-xs font-normal text-primary block mt-1"></span>
-             </div>
-             <div class="p-3 text-center">
-               <span class="text-xs font-medium text-muted block">Payments</span>
-               <span id="summaryTermOut" class="text-xs font-normal text-primary block mt-1"></span>
-             </div>
+             <div class="p-3 text-center"><span class="text-xs font-medium text-muted block">Term Length</span><span id="summaryTermLengthOut" class="text-xs font-normal text-primary block mt-1"></span></div>
+             <div class="p-3 text-center"><span class="text-xs font-medium text-muted block">Payments</span><span id="summaryTermOut" class="text-xs font-normal text-primary block mt-1"></span></div>
            </div>
-           
-           <!-- Row 2: Rates & Cost -->
+           <!-- Row 2 -->
            <div class="grid grid-cols-2 divide-x divide-primary bg-card-inner-bg/50">
              <div class="p-3 text-center">
-               <span class="text-xs font-medium text-muted block">
-                 Factor Rate
-                 <div class="tooltip-wrapper">
-                   <span class="tooltip-icon">i</span>
-                   <div class="tooltip-content">
-                     Your buy rate. 1.30 means you pay back $1.30 for every $1.00 borrowed.
-                     <div class="tooltip-arrow"></div>
-                   </div>
-                 </div>
+               <span class="text-xs font-medium text-muted block flex items-center justify-center gap-1">Factor Rate
+                   <div class="tooltip-container"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="tooltip-text">The total cost multiplier.</span></div>
                </span>
                <span id="summaryFactorOut" class="text-xs font-normal text-primary block mt-1"></span>
              </div>
-             <div class="p-3 text-center">
-               <span class="text-xs font-medium text-muted block">
-                 Total Cost of Funds
-                 <div class="tooltip-wrapper">
-                   <span class="tooltip-icon">i</span>
-                   <div class="tooltip-content">
-                     The total amount of interest/fees you will pay over the life of the advance.
-                     <div class="tooltip-arrow"></div>
-                   </div>
-                 </div>
-               </span>
-               <span id="summaryCostOut" class="text-xs font-normal text-primary block mt-1"></span>
-             </div>
+             <div class="p-3 text-center"><span class="text-xs font-medium text-muted block">Total Cost of Funds</span><span id="summaryCostOut" class="text-xs font-normal text-primary block mt-1"></span></div>
            </div>
-           
-           <!-- Row 3: Fee & Net -->
+           <!-- Row 3 -->
            <div id="detailsRowFee" class="grid grid-cols-2 divide-x divide-primary bg-card-inner-bg/50">
              <div id="feeGridItem" class="p-3 text-center">
-               <span class="text-xs font-medium text-muted block">
-                 Origination Fee
-                 <div class="tooltip-wrapper">
-                   <span class="tooltip-icon">i</span>
-                   <div class="tooltip-content">
-                     A one-time processing fee deducted from the funded amount at closing.
-                     <div class="tooltip-arrow"></div>
-                   </div>
-                 </div>
+               <span class="text-xs font-medium text-muted block flex items-center justify-center gap-1">Origination Fee
+                   <div class="tooltip-container"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="tooltip-text">A one-time fee deducted before funding.</span></div>
                </span>
                <span id="summaryFeeOut" class="text-xs font-normal text-primary block mt-1"></span>
              </div>
-             <div id="netGridItem" class="p-3 text-center">
-               <span class="text-xs font-medium text-muted block">Net Proceeds</span>
-               <span id="summaryNetOut" class="text-xs font-normal text-primary block mt-1"></span>
-             </div>
+             <div id="netGridItem" class="p-3 text-center"><span class="text-xs font-medium text-muted block">Net Proceeds</span><span id="summaryNetOut" class="text-xs font-normal text-primary block mt-1"></span></div>
            </div>
-           
-           <!-- Footer: Payment -->
+           <!-- Footer -->
            <div class="p-4 text-center bg-slider-track/20">
              <span id="summaryPaymentLabel" class="text-xs font-medium text-muted block">Est. Daily Payment</span>
              <span id="summaryPaymentValue" class="text-xs font-normal text-primary block mt-1"></span>
@@ -466,22 +375,26 @@
         </div>
       </div>
 
+      <!-- Accept Button (Client) -->
+      <div id="acceptContainer" class="mt-6 hidden">
+          <button id="acceptOfferBtn" class="w-full button-primary text-sm uppercase tracking-wider py-3 shadow-lg flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+              Accept This Offer
+          </button>
+      </div>
+
       <!-- Fee Container -->
       <div id="feeContainer" class="mt-4 pt-4 border-t border-primary">
           <button id="toggleFeeBtn" type="button" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Add Origination Fee
           </button>
           <div id="feeInputWrapper" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
             <label for="calcFee" class="block text-xs font-semibold text-muted">Origination Fee (%)</label>
-            <input id="calcFeeSlider" type="range" min="0" max="10" step="0.5" value="0"
-                   class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+            <input id="calcFeeSlider" type="range" min="0" max="10" step="0.5" value="0" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
             <div class="relative group mt-1">
                <span class="absolute left-3 input-icon text-muted text-sm">%</span>
-              <input id="calcFeeInput" type="number" step="0.1"
-                     class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+              <input id="calcFeeInput" type="number" step="0.1" class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
             </div>
           </div>
       </div>
@@ -489,49 +402,28 @@
       <!-- Prepay Discount Section -->
       <div id="prepaySection" class="mt-4 pt-4 border-t border-primary">
         <button id="togglePrepay" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           Calculate Prepayment Discount
         </button>
-
         <div id="prepayContainer" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
           <div class="flex justify-between items-center mb-2 pb-2 border-b border-primary">
             <span class="text-xs font-semibold text-secondary">Prepayment Discount</span>
             <span id="prepayPercentDisplay" class="text-xs font-bold text-hero">0%</span>
           </div>
-
-          <!-- Rep View: Slider -->
           <div id="prepaySliderContainer" class="pt-2">
-             <input id="prepaySlider" type="range" min="0" max="25" step="1" value="0"
-                    class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-4" />
+             <input id="prepaySlider" type="range" min="0" max="25" step="1" value="0" class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-4" />
              <p class="text-xs text-muted text-center italic">Adjust max discount policy (Rep View)</p>
           </div>
-
-          <!-- Client View: Date Picker -->
           <div id="prepayDateContainer" class="hidden mb-4 pt-2">
             <label class="block text-xs font-semibold text-muted mb-1 text-center">Select Payoff Date</label>
-            <input id="prepayDateInput" type="date"
-                   class="w-full p-2 text-sm rounded-lg border border-primary input-field text-center" />
+            <input id="prepayDateInput" type="date" class="w-full p-2 text-sm rounded-lg border border-primary input-field text-center" />
           </div>
-
           <div class="grid grid-cols-2 gap-4 text-center border-t border-primary pt-3">
-            <div>
-              <span class="text-xs font-semibold text-muted block uppercase tracking-wider">Savings</span>
-              <span id="prepaySavingsDisplay" class="text-sm font-bold text-success">$0.00</span>
-            </div>
-            <div>
-              <span class="text-xs font-semibold text-muted block uppercase tracking-wider">New Payoff</span>
-              <span id="prepayTotalDisplay" class="text-sm font-bold text-primary">$0.00</span>
-            </div>
+            <div><span class="text-xs font-semibold text-muted block uppercase tracking-wider">Savings</span><span id="prepaySavingsDisplay" class="text-sm font-bold text-success">$0.00</span></div>
+            <div><span class="text-xs font-semibold text-muted block uppercase tracking-wider">New Payoff</span><span id="prepayTotalDisplay" class="text-sm font-bold text-primary">$0.00</span></div>
           </div>
-
-          <!-- Amortization Button -->
           <div id="amortizationBtnContainer" class="mt-4 text-center hidden">
-            <button id="viewAmortizationBtn" type="button"
-                    class="text-xs font-semibold text-hero underline hover:text-primary transition-colors">
-              View Amortization Schedule
-            </button>
+            <button id="viewAmortizationBtn" type="button" class="text-xs font-semibold text-hero underline hover:text-primary transition-colors">View Amortization Schedule</button>
           </div>
         </div>
       </div>
@@ -553,73 +445,164 @@
     </div>
 
     <!-- BUTTONS -->
-    <div id="buttonContainer" class="pt-4 border-t border-primary space-y-3">
-      <!-- Sales Tools Row -->
-      <div class="">
-        <button id="copyEmailButton" class="w-full px-4 py-2 rounded-lg border border-primary text-secondary hover:bg-slider-track transition-colors flex items-center justify-center gap-2 text-xs font-semibold">
-           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-             <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-           </svg>
-           Copy Email Script
-        </button>
-      </div>
-
-      <!-- Action Row -->
+    <div id="buttonContainer" class="pt-4 border-t border-primary">
       <div class="relative flex justify-center gap-3 flex-wrap">
         <button id="addOfferButton" class="button-primary flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
           Add Offer
         </button>
-        <button id="shareLinkButton" class="button-primary flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
-          </svg>
-          Share Link
+        <!-- Consolidated Share Button -->
+        <button id="shareMenuBtn" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/></svg>
+          Share Offer
         </button>
       </div>
     </div>
 
   </div>
 
+  <!-- SHARE OPTIONS MODAL -->
+  <div id="shareModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 hidden backdrop-blur-sm p-4 transition-opacity">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 rounded-xl shadow-2xl p-5 border border-gray-100 dark:border-slate-800 relative transform transition-all scale-100">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Share Offer</h3>
+        <button id="closeShareBtn" class="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-gray-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+      </div>
+
+      <!-- Buttons Stack -->
+      <div class="space-y-3">
+        
+        <!-- Button 1: Copy URL (Light Style) -->
+        <button id="modalCopyLinkBtn" class="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-lg flex items-center justify-between hover:border-blue-400 hover:shadow-sm transition-all duration-200 group bg-white dark:bg-slate-800">
+           <div class="flex items-center gap-3">
+              <div class="h-8 w-8 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                 </svg>
+              </div>
+              <span class="text-sm font-semibold text-slate-900 dark:text-white text-left">Copy Approval Link</span>
+           </div>
+           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">URL</span>
+        </button>
+
+        <!-- Button 2: Copy Text (Dark/High-Contrast Style) -->
+        <button id="modalCopyTextBtn" class="w-full p-3 bg-slate-900 dark:bg-slate-700 border border-slate-900 dark:border-slate-600 rounded-lg flex items-center justify-between hover:bg-slate-800 dark:hover:bg-slate-600 hover:shadow-md transition-all duration-200 group">
+           <div class="flex items-center gap-3">
+              <div class="h-8 w-8 rounded-full bg-green-100/10 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                 </svg>
+              </div>
+              <span class="text-sm font-semibold text-white text-left">Copy Proposal Text</span>
+           </div>
+           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email/SMS</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
   <!-- AMORTIZATION MODAL -->
   <div id="amortizationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm p-4">
     <div class="card-bg w-full max-w-2xl max-h-[85vh] rounded-xl shadow-2xl flex flex-col border border-primary">
-      <div class="p-4 border-b border-primary flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-t-xl">
+      <div class="p-4 border-b border-primary flex justify-between items-center" style="background-color: var(--bg-card-inner)">
         <h3 class="font-semibold text-lg text-primary">Amortization Schedule</h3>
         <button id="closeAmortizationBtn" class="text-muted hover:text-primary transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
       <div class="overflow-auto p-0 flex-1">
          <table class="w-full text-left amort-table">
-           <thead class="sticky top-0 z-10 shadow-sm">
-             <tr>
-               <th>#</th>
-               <th>Date</th>
-               <th>Payment</th>
-               <th>Balance</th>
-               <th>Prepay Savings</th>
-               <th>Payoff Amount</th>
-             </tr>
-           </thead>
-           <tbody id="amortizationTableBody">
-             <!-- JS injected rows -->
-           </tbody>
+           <thead class="sticky top-0 z-10 shadow-sm"><tr><th>#</th><th>Date</th><th>Payment</th><th>Balance</th><th>Prepay Savings</th><th>Payoff Amount</th></tr></thead>
+           <tbody id="amortizationTableBody"></tbody>
          </table>
       </div>
-      <div class="p-3 border-t border-primary text-center text-xs text-muted bg-slate-50 dark:bg-slate-900 rounded-b-xl">
+      <div class="p-3 border-t border-primary text-center text-xs text-muted rounded-b-xl" style="background-color: var(--bg-card-inner)">
         * Schedule is an estimate. Actual payoff dates and amounts may vary based on banking holidays and clear dates.
       </div>
+    </div>
+  </div>
+
+  <!-- ACCEPT MODAL -->
+  <div id="acceptModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 hidden backdrop-blur-sm p-4">
+      <div id="acceptModalContent" class="card-bg w-full max-w-sm rounded-xl shadow-2xl p-6 text-center border border-primary relative overflow-hidden">
+          <!-- SUCCESS STATE (Initially Hidden) -->
+          <div id="acceptSuccess" class="hidden">
+             <div class="mb-4 flex justify-center">
+                  <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+              </div>
+              <h3 class="text-xl font-bold text-primary mb-2">Offer Accepted!</h3>
+              <p class="text-sm text-muted mb-6">Please send the downloaded agreement to your specialist to finalize funding.</p>
+              <button id="closeAcceptBtn" class="w-full button-primary text-sm">Close</button>
+          </div>
+
+          <!-- SIGNATURE FORM (Default) -->
+          <div id="acceptForm">
+              <h3 class="text-lg font-bold text-primary mb-1">Accept Offer</h3>
+              <p class="text-xs text-muted mb-4">Please confirm your acceptance below.</p>
+              
+              <div class="text-left mb-4">
+                  <label class="text-xs font-semibold text-muted block mb-1">Authorized Signer Name</label>
+                  <input id="signerName" type="text" class="w-full p-2 text-sm border rounded input-field" placeholder="Full Name" />
+              </div>
+              
+              <div class="flex items-start gap-2 text-left mb-6">
+                  <input id="digitalSignCheck" type="checkbox" class="mt-1 rounded border-gray-300 text-accent focus:ring-accent" />
+                  <label for="digitalSignCheck" class="text-xs text-secondary leading-snug">
+                      I agree to the terms presented and understand this is a preliminary approval subject to final underwriting.
+                  </label>
+              </div>
+
+              <div class="flex gap-2">
+                  <button id="cancelAcceptBtn" class="flex-1 py-2 border border-primary rounded text-xs font-semibold text-muted hover:bg-gray-100">Cancel</button>
+                  <button id="confirmAcceptBtn" class="flex-1 button-primary text-sm py-2 disabled:opacity-50" disabled>Confirm & Sign</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- HIDDEN PDF TEMPLATE -->
+  <div id="pdfTemplate" style="display:none;">
+    <div style="padding: 40px; font-family: sans-serif; color: #333;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+            <h1 style="margin: 0; color: #000;">Term Sheet Agreement</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Generated by TrustBureau.ai</p>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <h3 style="background: #f4f4f4; padding: 10px; margin-bottom: 10px;">Business Information</h3>
+            <p><strong>Business Name:</strong> <span id="pdfBusinessName"></span></p>
+            <p><strong>Date:</strong> <span id="pdfDate"></span></p>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <h3 style="background: #f4f4f4; padding: 10px; margin-bottom: 10px;">Approved Terms</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Funding Amount:</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;"><span id="pdfAmount"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Factor Rate:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span id="pdfFactor"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Total Payback:</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;"><span id="pdfPayback"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Term:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span id="pdfTerm"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Payment Frequency:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span id="pdfFreq"></span></td></tr>
+                <tr><td style="padding: 8px; border-bottom: 1px solid #eee;">Payment Amount:</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;"><span id="pdfPayment"></span></td></tr>
+            </table>
+        </div>
+        <div style="margin-top: 50px; border-top: 2px solid #333; padding-top: 10px;">
+            <p><strong>Digitally Signed By:</strong> <span id="pdfSigner"></span></p>
+            <p style="font-size: 10px; color: #999;">Timestamp: <span id="pdfTimestamp"></span></p>
+        </div>
     </div>
   </div>
 
   <script>
     const elements = {
       calcAmountSlider: document.getElementById('calcAmountSlider'),
+      amountLabel: document.getElementById('amountLabel'),
       calcFactorSlider: document.getElementById('calcFactorSlider'),
       calcFeeSlider: document.getElementById('calcFeeSlider'),
       calcTermSlider: document.getElementById('calcTermSlider'),
@@ -633,9 +616,16 @@
       toggleWeekly: document.getElementById('toggleWeekly'),
       toggleMonthly: document.getElementById('toggleMonthly'),
 
-      shareLinkButton: document.getElementById('shareLinkButton'),
+      shareMenuBtn: document.getElementById('shareMenuBtn'),
       addOfferButton: document.getElementById('addOfferButton'),
-      copyEmailButton: document.getElementById('copyEmailButton'),
+      // copyProposalBtn removed
+      // resetBtn removed
+      
+      // Share Modal Elements
+      shareModal: document.getElementById('shareModal'),
+      closeShareBtn: document.getElementById('closeShareBtn'),
+      modalCopyLinkBtn: document.getElementById('modalCopyLinkBtn'),
+      modalCopyTextBtn: document.getElementById('modalCopyTextBtn'),
 
       summaryAmountOut: document.getElementById('summaryAmountOut'),
       summaryPaybackOut: document.getElementById('summaryPaybackOut'),
@@ -650,6 +640,11 @@
       feeGridItem: document.getElementById('feeGridItem'),
       netGridItem: document.getElementById('netGridItem'),
       detailsRowFee: document.getElementById('detailsRowFee'),
+      
+      chartPayback: document.getElementById('chartPayback'),
+      offerDonutChart: document.getElementById('offerDonutChart'),
+      savingsPill: document.getElementById('savingsPill'),
+      savingsValue: document.getElementById('savingsValue'),
 
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
@@ -677,16 +672,13 @@
       themeControls: document.getElementById('themeControls'),
       calculatorInputs: document.getElementById('calculatorInputs'),
       factorContainer: document.getElementById('factorContainer'),
-      
       feeContainer: document.getElementById('feeContainer'),
       toggleFeeBtn: document.getElementById('toggleFeeBtn'),
       feeInputWrapper: document.getElementById('feeInputWrapper'),
-
       termContainer: document.getElementById('termContainer'),
       termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
       toggleContainer: document.getElementById('toggleContainer'),
       buttonContainer: document.getElementById('buttonContainer'),
-
       savedOffersSection: document.getElementById('savedOffersSection'),
       savedOffersContainer: document.getElementById('savedOffersContainer'),
 
@@ -706,15 +698,30 @@
       amortizationModal: document.getElementById('amortizationModal'),
       closeAmortizationBtn: document.getElementById('closeAmortizationBtn'),
       amortizationTableBody: document.getElementById('amortizationTableBody'),
+
+      installContainer: document.getElementById('installContainer'),
+      installBtn: document.getElementById('installBtn'),
       
-      donutChart: document.getElementById('donutChart'),
-      donutPercent: document.getElementById('donutPercent')
+      acceptContainer: document.getElementById('acceptContainer'),
+      acceptOfferBtn: document.getElementById('acceptOfferBtn'),
+      acceptModal: document.getElementById('acceptModal'),
+      closeAcceptBtn: document.getElementById('closeAcceptBtn'),
+      acceptForm: document.getElementById('acceptForm'),
+      acceptSuccess: document.getElementById('acceptSuccess'),
+      signerName: document.getElementById('signerName'),
+      digitalSignCheck: document.getElementById('digitalSignCheck'),
+      cancelAcceptBtn: document.getElementById('cancelAcceptBtn'),
+      confirmAcceptBtn: document.getElementById('confirmAcceptBtn'),
+      
+      // PDF Elements
+      pdfTemplate: document.getElementById('pdfTemplate'),
     };
 
     let paymentFrequency = 'daily';
     let currentBaseTheme = 'theme-light';
     let currentAccentClass = 'accent-mint';
     let amountSliderMax = 1000000;
+    let originalMaxAmount = 0; 
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
@@ -723,6 +730,69 @@
     
     const DEFAULT_COMPANY_NAME = "TrustBureau.ai";
     const DEFAULT_LOGO_URL = "";
+
+    // Confetti Logic
+    function fireConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const pieces = [];
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+        for (let i = 0; i < 100; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 10 + 5,
+                h: Math.random() * 10 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vy: Math.random() * 2 + 2,
+                vx: Math.random() * 2 - 1
+            });
+        }
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            pieces.forEach(p => {
+                p.y += p.vy;
+                p.x += p.vx;
+                if (p.y < canvas.height) active = true;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+            });
+            if (active) requestAnimationFrame(update);
+            else ctx.clearRect(0,0, canvas.width, canvas.height);
+        }
+        update();
+    }
+
+    // Number Animation Logic
+    function animateValue(obj, start, end, duration) {
+      if (!obj) return;
+      let startTimestamp = null;
+      // Extract number from currency string (remove $ and ,)
+      const parseVal = (v) => parseFloat(String(v).replace(/[^0-9.]/g, ''));
+      const startVal = parseVal(start);
+      const endVal = parseVal(end);
+      
+      if (isNaN(startVal) || isNaN(endVal)) {
+          obj.textContent = end;
+          return;
+      }
+
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const current = startVal + (endVal - startVal) * progress;
+        obj.textContent = formatCurrency(current);
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+            obj.textContent = formatCurrency(endVal); // Ensure exact end value
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
 
     function setBaseTheme(themeName) {
       document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-black');
@@ -740,6 +810,17 @@
        document.documentElement.classList.add(accentName);
        applyTheme();
     }
+    
+    // Helper to get actual hex color of accent
+    function getAccentHex() {
+        // Create dummy element to read variable
+        const temp = document.createElement('div');
+        temp.style.color = 'var(--accent-color)';
+        document.body.appendChild(temp);
+        const color = getComputedStyle(temp).color;
+        document.body.removeChild(temp);
+        return color; 
+    }
 
     function setAmountSliderMax(cap) {
       amountSliderMax = cap;
@@ -749,9 +830,7 @@
     function formatCurrency(num) {
       const n = Number(num);
       if (isNaN(n)) return '$0';
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2,
-      }).format(n);
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n);
     }
 
     function parseFormattedNumber(val) {
@@ -766,22 +845,15 @@
       const paymentAmount = totalPayback / paymentsCount;
       const feeAmount = amount * (feePercent / 100);
       const netProceeds = amount - feeAmount;
-
       let rawMonths;
-      if (frequency === 'weekly') rawMonths = termPayments * (12 / 52);
-      else if (frequency === 'monthly') rawMonths = termPayments;
-      else rawMonths = termPayments * (12 / 250);
-      
+      if (frequency === 'weekly') { rawMonths = termPayments * (12 / 52); } 
+      else if (frequency === 'monthly') { rawMonths = termPayments; } 
+      else { rawMonths = termPayments * (12 / 250); }
       const termLengthMonths = Math.round(rawMonths * 2) / 2;
       let paymentLabel = 'Est. Daily Payment';
       if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
       if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
-
-      return {
-        amount, factor, feePercent, feeAmount, netProceeds, termMonths: termPayments,
-        termLengthMonths, totalPayback, totalCost, payment: paymentAmount,
-        paymentLabel, frequency,
-      };
+      return { amount, factor, feePercent, feeAmount, netProceeds, termMonths: termPayments, termLengthMonths, totalPayback, totalCost, payment: paymentAmount, paymentLabel, frequency };
     }
 
     function getCurrentOffer() {
@@ -794,19 +866,19 @@
 
     function renderSavedOffers() {
       if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
-      if (savedOffers.length === 0) {
+      const used = savedOffers.length;
+      if (used === 0) {
         elements.savedOffersSection.classList.add('hidden');
         elements.savedOffersContainer.innerHTML = '';
         return;
       }
       elements.savedOffersSection.classList.remove('hidden');
-
       const cardsHtml = savedOffers.map((offer, index) => {
         const labelIndex = index + 2;
         return `
           <div class="card-bg rounded-lg border border-primary overflow-hidden">
-            <div class="p-3 border-b border-primary flex justify-center items-center">
-                <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+            <div class="p-3 border-b border-primary flex justify-center items-center" style="background-color: var(--accent-color)">
+                <span class="text-xs font-bold" style="color: var(--accent-text-inverted)">Offer ${labelIndex}</span>
             </div>
             <div class="p-4 text-center border-b border-primary">
                 <span class="text-[10px] font-semibold text-muted uppercase tracking-wide">You Get</span>
@@ -814,28 +886,15 @@
             </div>
             <div class="divide-y divide-primary text-xs">
                 <div class="grid grid-cols-2 divide-x divide-primary">
-                    <div class="p-2 text-center">
-                        <span class="text-[10px] text-muted block">Factor</span>
-                        <span class="font-medium text-primary">${offer.factor.toFixed(2)}x</span>
-                    </div>
-                    <div class="p-2 text-center">
-                        <span class="text-[10px] text-muted block">Term</span>
-                        <span class="font-medium text-primary">${offer.termMonths}</span>
-                    </div>
+                    <div class="p-2 text-center"><span class="text-[10px] text-muted block">Factor</span><span class="font-medium text-primary">${offer.factor.toFixed(2)}x</span></div>
+                    <div class="p-2 text-center"><span class="text-[10px] text-muted block">Term</span><span class="font-medium text-primary">${offer.termMonths}</span></div>
                 </div>
                  <div class="grid grid-cols-2 divide-x divide-primary">
-                    <div class="p-2 text-center">
-                        <span class="text-[10px] text-muted block">Payback</span>
-                        <span class="font-medium text-primary">${formatCurrency(offer.totalPayback)}</span>
-                    </div>
-                    <div class="p-2 text-center">
-                        <span class="text-[10px] text-muted block">${offer.frequency === 'weekly' ? 'Weekly' : 'Daily'}</span>
-                        <span class="font-medium text-primary">${formatCurrency(offer.payment)}</span>
-                    </div>
+                    <div class="p-2 text-center"><span class="text-[10px] text-muted block">Payback</span><span class="font-medium text-primary">${formatCurrency(offer.totalPayback)}</span></div>
+                    <div class="p-2 text-center"><span class="text-[10px] text-muted block">${offer.frequency === 'weekly' ? 'Weekly' : 'Daily'}</span><span class="font-medium text-primary">${formatCurrency(offer.payment)}</span></div>
                 </div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
       elements.savedOffersContainer.innerHTML = cardsHtml;
     }
@@ -871,7 +930,7 @@
       input.addEventListener('input', () => {
         let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
         const cap = getMax();
-        if (!isNaN(val) && val >= min && val <= cap) { slider.value = val; callback(); }
+        if (!isNaN(val) && val >= min && val <= cap) { slider.value = val; callback(); } 
         else if (input.value === '') { callback(); }
       });
 
@@ -897,8 +956,8 @@
       const email = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
       const phone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
       const hasAny = name || email || phone;
-      if (hasAny) elements.repContactBlock.classList.remove('hidden');
-      else elements.repContactBlock.classList.add('hidden');
+      if (hasAny) { elements.repContactBlock.classList.remove('hidden'); } 
+      else { elements.repContactBlock.classList.add('hidden'); }
       if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
       if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
       if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
@@ -933,8 +992,11 @@
       toggles.forEach((toggle, index) => {
         if (!toggle) return;
         toggle.classList.remove('toggle-active', 'toggle-inactive');
-        if (paymentFrequency === frequencies[index]) toggle.classList.add('toggle-active');
-        else toggle.classList.add('toggle-inactive');
+        if (paymentFrequency === frequencies[index]) {
+          toggle.classList.add('toggle-active');
+        } else {
+          toggle.classList.add('toggle-inactive');
+        }
       });
     }
 
@@ -947,7 +1009,8 @@
       const fee = parseFloat(params.get('fee')) || 0;
       const freq = params.get('freq');
       const paramTheme = params.get('theme');
-      const paramAccent = params.get('accent');
+      const paramAccent = params.get('accent'); 
+      
       const offersParam = params.get('offers');
       const businessNameParam = params.get('businessName') || '';
       const repNameParam = params.get('repName') || '';
@@ -962,23 +1025,32 @@
         if (elements.prepaySlider) elements.prepaySlider.value = prepayDiscountPercent;
       }
 
-      isApprovalView = (params.get('view') === 'approval');
+      const viewMode = params.get('view');
+      isApprovalView = (viewMode === 'approval');
+
       if(paramTheme) currentBaseTheme = paramTheme;
       if(paramAccent) currentAccentClass = paramAccent;
       applyTheme();
 
-      setAmountSliderMax(isApprovalView ? amount : 1000000);
+      if (isApprovalView) {
+        setAmountSliderMax(amount);
+        originalMaxAmount = amount; 
+        if (elements.amountLabel) elements.amountLabel.textContent = `Adjust Amount (Approved Max: ${formatCurrency(amount)})`;
+      } else {
+        setAmountSliderMax(1000000);
+      }
 
       elements.calcAmountInput.value = formatCurrency(amount);
       elements.calcAmountSlider.value = amount;
       elements.calcFactorSlider.value = factor;
-      elements.calcFactorInput.value = factor;
+      elements.calcFactorInput.value = factor; 
       elements.calcTermSlider.value = term;
-      elements.calcTermInput.value = term;
+      elements.calcTermInput.value = term; 
       elements.calcFeeSlider.value = fee;
-      elements.calcFeeInput.value = fee;
+      elements.calcFeeInput.value = fee; 
       
       if (fee > 0 && !isApprovalView && elements.feeInputWrapper) elements.feeInputWrapper.classList.remove('hidden');
+
       if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
       if (elements.repNameInput) elements.repNameInput.value = repNameParam;
       if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
@@ -987,6 +1059,7 @@
       if (elements.companyLogoInput) elements.companyLogoInput.value = cLogoParam;
 
       updateBranding();
+
       paymentFrequency = freq || 'daily';
       savedOffers = [];
       if (offersParam) {
@@ -1018,10 +1091,9 @@
         if (elements.themeControls) elements.themeControls.style.display = 'none';
         if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
-        
-        // Hide Sales Tools in Client View (optional, currently hiding entire container)
         if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
-
+        if (elements.installContainer) elements.installContainer.style.display = 'none';
+        if (elements.acceptContainer) elements.acceptContainer.classList.remove('hidden');
         if (elements.prepaySliderContainer) elements.prepaySliderContainer.style.display = 'none';
         if (elements.prepayDateContainer) elements.prepayDateContainer.classList.remove('hidden');
         elements.headerContainer.classList.remove('justify-between');
@@ -1033,7 +1105,7 @@
 
     function generateSchedule(offer) {
       const schedule = [];
-      let currentDate = new Date();
+      let currentDate = new Date(); 
       currentDate.setHours(0,0,0,0);
       const totalPayments = offer.termMonths;
       const paymentAmount = offer.payment;
@@ -1041,13 +1113,11 @@
       const maxDiscount = totalPayback * (prepayDiscountPercent / 100);
       let runningDate = new Date(currentDate);
       let paidSoFar = 0;
-
       for (let i = 1; i <= totalPayments; i++) {
-         if (offer.frequency === 'weekly') runningDate.setDate(runningDate.getDate() + 7);
-         else if (offer.frequency === 'monthly') runningDate.setMonth(runningDate.getMonth() + 1);
+         if (offer.frequency === 'weekly') { runningDate.setDate(runningDate.getDate() + 7); } 
+         else if (offer.frequency === 'monthly') { runningDate.setMonth(runningDate.getMonth() + 1); } 
          else {
-            do { runningDate.setDate(runningDate.getDate() + 1); } 
-            while (runningDate.getDay() === 0 || runningDate.getDay() === 6);
+            do { runningDate.setDate(runningDate.getDate() + 1); } while (runningDate.getDay() === 0 || runningDate.getDay() === 6);
          }
          paidSoFar += paymentAmount;
          const remainingBalance = totalPayback - paidSoFar;
@@ -1055,12 +1125,7 @@
          const savings = maxDiscount * fractionRemaining;
          let payoff = remainingBalance - savings;
          if (payoff < 0) payoff = 0;
-
-         schedule.push({
-            num: i, date: new Date(runningDate), payment: paymentAmount,
-            balance: remainingBalance < 0.01 ? 0 : remainingBalance,
-            savings: savings, payoff: payoff
-         });
+         schedule.push({ num: i, date: new Date(runningDate), payment: paymentAmount, balance: remainingBalance < 0.01 ? 0 : remainingBalance, savings: savings, payoff: payoff });
       }
       return schedule;
     }
@@ -1069,62 +1134,42 @@
        if (!elements.amortizationTableBody) return;
        const schedule = generateSchedule(offer);
        const rows = schedule.map(row => {
-          return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-              <td class="font-mono text-xs text-muted">${row.num}</td>
-              <td>${row.date.toLocaleDateString()}</td>
-              <td>${formatCurrency(row.payment)}</td>
-              <td>${formatCurrency(row.balance)}</td>
-              <td class="text-success font-medium">${formatCurrency(row.savings)}</td>
-              <td class="font-semibold text-primary">${formatCurrency(row.payoff)}</td>
-            </tr>`;
+          const dateStr = row.date.toLocaleDateString();
+          return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"><td class="font-mono text-xs text-muted">${row.num}</td><td>${dateStr}</td><td>${formatCurrency(row.payment)}</td><td>${formatCurrency(row.balance)}</td><td class="text-success font-medium">${formatCurrency(row.savings)}</td><td class="font-semibold text-primary">${formatCurrency(row.payoff)}</td></tr>`;
        }).join('');
        elements.amortizationTableBody.innerHTML = rows;
     }
 
     function calculatePrepay(offer) {
       if (isApprovalView) {
-        if (prepayDiscountPercent > 0) elements.amortizationBtnContainer.classList.remove('hidden');
-        else elements.amortizationBtnContainer.classList.add('hidden');
+        if (prepayDiscountPercent > 0) { if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.remove('hidden'); } 
+        else { if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.add('hidden'); }
       }
-      if (isApprovalView && prepayDiscountPercent === 0) {
-        elements.prepaySection.classList.add('hidden');
-        return;
-      }
-      elements.prepaySection.classList.remove('hidden');
+      if (isApprovalView && prepayDiscountPercent === 0) { if (elements.prepaySection) elements.prepaySection.classList.add('hidden'); return; }
+      if (elements.prepaySection) elements.prepaySection.classList.remove('hidden');
       if (!elements.prepayContainer || elements.prepayContainer.classList.contains('hidden')) return;
-
       const totalPayback = offer.totalPayback;
       let savings = 0;
-
       if (isApprovalView) {
         const dateVal = elements.prepayDateInput.value;
-        if (!dateVal) {
-           const today = new Date().toISOString().split('T')[0];
-           elements.prepayDateInput.value = today;
-        }
+        if (!dateVal) { const today = new Date().toISOString().split('T')[0]; elements.prepayDateInput.value = today; }
         const startDate = new Date(); startDate.setHours(0,0,0,0);
         let termDays = 0;
-        if (offer.frequency === 'weekly') termDays = offer.termMonths * 7;
-        else if (offer.frequency === 'monthly') termDays = offer.termMonths * 30.44;
-        else termDays = offer.termMonths * 1.42; 
-
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + Math.ceil(termDays));
+        if (offer.frequency === 'weekly') { termDays = offer.termMonths * 7; } 
+        else if (offer.frequency === 'monthly') { termDays = offer.termMonths * 30.44; } 
+        else { termDays = offer.termMonths * 1.42; }
+        const endDate = new Date(startDate); endDate.setDate(endDate.getDate() + Math.ceil(termDays));
         elements.prepayDateInput.min = startDate.toISOString().split('T')[0];
         elements.prepayDateInput.max = endDate.toISOString().split('T')[0];
-
-        let selectedDate = new Date(elements.prepayDateInput.value);
-        selectedDate.setHours(0,0,0,0);
+        let selectedDate = new Date(elements.prepayDateInput.value); selectedDate.setHours(0,0,0,0);
         if (selectedDate < startDate) selectedDate = startDate;
         if (selectedDate > endDate) selectedDate = endDate;
-
         const totalTime = endDate.getTime() - startDate.getTime();
         const remainingTime = endDate.getTime() - selectedDate.getTime();
         let fractionRemaining = 0;
-        if (totalTime > 0) fractionRemaining = remainingTime / totalTime;
+        if (totalTime > 0) { fractionRemaining = remainingTime / totalTime; }
         if (fractionRemaining < 0) fractionRemaining = 0;
         if (fractionRemaining > 1) fractionRemaining = 1;
-
         const maxPotentialSavings = totalPayback * (prepayDiscountPercent / 100);
         savings = maxPotentialSavings * fractionRemaining;
         elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}% Max`;
@@ -1144,19 +1189,20 @@
         const termPayments = parseInt(elements.calcTermInput.value) || 1; 
         const fee = parseFloat(elements.calcFeeInput.value) || 0;
         const offer = computeOffer(amount, factor, termPayments, paymentFrequency, fee);
-
         const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
         if (elements.businessNameDisplay) {
-          if (businessName) {
-            elements.businessNameDisplay.textContent = businessName;
-            elements.businessNameDisplay.classList.remove('hidden');
-          } else {
-            elements.businessNameDisplay.textContent = '';
-            elements.businessNameDisplay.classList.add('hidden');
-          }
+          if (businessName) { elements.businessNameDisplay.textContent = businessName; elements.businessNameDisplay.classList.remove('hidden'); } 
+          else { elements.businessNameDisplay.textContent = ''; elements.businessNameDisplay.classList.add('hidden'); }
         }
 
-        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        // Animate main number if changed significantly
+        const currentDisplayVal = parseFormattedNumber(elements.summaryAmountOut.textContent);
+        if (Math.abs(currentDisplayVal - offer.amount) > 5) {
+             animateValue(elements.summaryAmountOut, elements.summaryAmountOut.textContent, offer.amount, 500);
+        } else {
+             elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        }
+
         elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
         elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
         elements.summaryTermOut.textContent = `${offer.termMonths} payments`;
@@ -1166,16 +1212,20 @@
         elements.summaryFeeOut.textContent = formatCurrency(offer.feeAmount);
         elements.summaryNetOut.textContent = formatCurrency(offer.netProceeds);
         
-        // Donut Chart Update
-        if(elements.donutChart) {
-           const costPct = (offer.totalCost / offer.totalPayback) * 100;
-           const principalPct = 100 - costPct;
-           // The gradient starts with Accent (Principal) then switches to Gray (Cost)
-           elements.donutChart.style.background = `conic-gradient(var(--accent-color) 0% ${principalPct}%, var(--chart-secondary) ${principalPct}% 100%)`;
-           // CHANGED: Now displays Amount instead of Percent
-           elements.donutPercent.textContent = formatCurrency(offer.totalCost);
+        if (elements.chartPayback) elements.chartPayback.textContent = formatCurrency(offer.totalPayback);
+        if (elements.offerDonutChart) {
+            const principalPct = (offer.amount / offer.totalPayback) * 100;
+            elements.offerDonutChart.style.background = `conic-gradient(var(--accent-color) 0% ${principalPct}%, var(--bg-slider-track) ${principalPct}% 100%)`;
         }
-
+        
+        if (isApprovalView && originalMaxAmount > 0 && elements.savingsPill) {
+            const maxCost = originalMaxAmount * offer.factor;
+            const currentCost = offer.totalPayback;
+            const savings = (maxCost - currentCost); 
+            if (savings > 100) { elements.savingsPill.classList.remove('hidden'); elements.savingsValue.textContent = formatCurrency(savings); } 
+            else { elements.savingsPill.classList.add('hidden'); }
+        }
+        
         if (offer.feePercent <= 0 && isApprovalView) {
            if (elements.feeGridItem) elements.feeGridItem.classList.add('hidden');
            if (elements.netGridItem) elements.netGridItem.classList.add('hidden');
@@ -1194,15 +1244,13 @@
               elements.termLengthMonthsInput.value = Number.isInteger(autoRounded) ? autoRounded.toString() : autoRounded.toFixed(1);
             }
             const manualVal = parseFloat(elements.termLengthMonthsInput.value);
-            if (!isNaN(manualVal) && manualVal > 0) months = manualVal;
+            if (!isNaN(manualVal) && manualVal > 0) { months = manualVal; }
           }
           if (months && months > 0) {
             const rounded = Math.round(months * 2) / 2;
             const display = Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1);
             elements.summaryTermLengthOut.textContent = `${display} months`;
-          } else {
-            elements.summaryTermLengthOut.textContent = '';
-          }
+          } else { elements.summaryTermLengthOut.textContent = ''; }
         }
         calculatePrepay(offer);
         updateRepDisplay();
@@ -1210,19 +1258,29 @@
     }
 
     function initializeCalculator() {
+      if ('serviceWorker' in navigator) {
+         window.addEventListener('load', () => {
+           navigator.serviceWorker.register('./service-worker.js')
+             .then(reg => console.log('Service Worker Registered'))
+             .catch(err => console.log('Service Worker Failed', err));
+         });
+      }
+
       initializeFromURL();
       applyTheme();
-      if (elements.themeSelector) elements.themeSelector.value = currentTheme;
-      if (elements.calcAmountSlider && elements.calcAmountInput) syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
-      if (elements.calcFactorSlider && elements.calcFactorInput) syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
-      if (elements.calcFeeSlider && elements.calcFeeInput) syncInputs(elements.calcFeeSlider, elements.calcFeeInput, false, 0, 10, runCalculator);
-      if (elements.calcTermSlider && elements.calcTermInput) syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
 
-      if (elements.toggleDaily) elements.toggleDaily.addEventListener('click', () => { paymentFrequency = 'daily'; updatePaymentToggleUI(); runCalculator(); });
-      if (elements.toggleWeekly) elements.toggleWeekly.addEventListener('click', () => { paymentFrequency = 'weekly'; updatePaymentToggleUI(); runCalculator(); });
-      if (elements.toggleMonthly) elements.toggleMonthly.addEventListener('click', () => { paymentFrequency = 'monthly'; updatePaymentToggleUI(); runCalculator(); });
+      if (elements.themeSelector) { elements.themeSelector.value = currentBaseTheme; }
 
-      if (elements.businessNameInput) elements.businessNameInput.addEventListener('input', runCalculator);
+      if (elements.calcAmountSlider && elements.calcAmountInput) { syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator); }
+      if (elements.calcFactorSlider && elements.calcFactorInput) { syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator); }
+      if (elements.calcFeeSlider && elements.calcFeeInput) { syncInputs(elements.calcFeeSlider, elements.calcFeeInput, false, 0, 10, runCalculator); }
+      if (elements.calcTermSlider && elements.calcTermInput) { syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator); }
+
+      if (elements.toggleDaily) { elements.toggleDaily.addEventListener('click', () => { paymentFrequency = 'daily'; updatePaymentToggleUI(); runCalculator(); }); }
+      if (elements.toggleWeekly) { elements.toggleWeekly.addEventListener('click', () => { paymentFrequency = 'weekly'; updatePaymentToggleUI(); runCalculator(); }); }
+      if (elements.toggleMonthly) { elements.toggleMonthly.addEventListener('click', () => { paymentFrequency = 'monthly'; updatePaymentToggleUI(); runCalculator(); }); }
+
+      if (elements.businessNameInput) { elements.businessNameInput.addEventListener('input', runCalculator); }
 
       if (elements.termLengthMonthsInput) {
         elements.termLengthMonthsInput.addEventListener('input', () => { termLengthManualDirty = true; runCalculator(); });
@@ -1236,171 +1294,169 @@
         });
       }
 
-      if (elements.toggleFeeBtn) elements.toggleFeeBtn.addEventListener('click', () => elements.feeInputWrapper.classList.toggle('hidden'));
-      if (elements.togglePrepay) elements.togglePrepay.addEventListener('click', () => { elements.prepayContainer.classList.toggle('hidden'); runCalculator(); });
-      if (elements.prepaySlider) elements.prepaySlider.addEventListener('input', (e) => { prepayDiscountPercent = parseInt(e.target.value, 10); runCalculator(); });
-      if (elements.prepayDateInput) elements.prepayDateInput.addEventListener('change', () => runCalculator());
+      if (elements.toggleFeeBtn) { elements.toggleFeeBtn.addEventListener('click', () => { elements.feeInputWrapper.classList.toggle('hidden'); }); }
+      if (elements.togglePrepay) { elements.togglePrepay.addEventListener('click', () => { elements.prepayContainer.classList.toggle('hidden'); runCalculator(); }); }
+      if (elements.prepaySlider) { elements.prepaySlider.addEventListener('input', (e) => { prepayDiscountPercent = parseInt(e.target.value, 10); runCalculator(); }); }
+      if (elements.prepayDateInput) { elements.prepayDateInput.addEventListener('change', () => { runCalculator(); }); }
 
-      if (elements.viewAmortizationBtn) elements.viewAmortizationBtn.addEventListener('click', () => { renderAmortizationSchedule(getCurrentOffer()); elements.amortizationModal.classList.remove('hidden'); });
-      if (elements.closeAmortizationBtn) elements.closeAmortizationBtn.addEventListener('click', () => elements.amortizationModal.classList.add('hidden'));
+      if (elements.viewAmortizationBtn) { elements.viewAmortizationBtn.addEventListener('click', () => { const currentOffer = getCurrentOffer(); renderAmortizationSchedule(currentOffer); elements.amortizationModal.classList.remove('hidden'); }); }
+      if (elements.closeAmortizationBtn) { elements.closeAmortizationBtn.addEventListener('click', () => { elements.amortizationModal.classList.add('hidden'); }); }
 
-      if (elements.repSettingsToggle && elements.repSettingsPanel) elements.repSettingsToggle.addEventListener('click', () => elements.repSettingsPanel.classList.toggle('hidden'));
+      if (elements.repSettingsToggle && elements.repSettingsPanel) { elements.repSettingsToggle.addEventListener('click', () => { elements.repSettingsPanel.classList.toggle('hidden'); }); }
       if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
       if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
       if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
       if (elements.companyNameInput) elements.companyNameInput.addEventListener('input', updateBranding);
       if (elements.companyLogoInput) elements.companyLogoInput.addEventListener('input', updateBranding);
 
-      if (elements.addOfferButton) elements.addOfferButton.addEventListener('click', handleAddOffer);
-
-      // --- NEW: Copy Email Function with HTML Table ---
-      if (elements.copyEmailButton) {
-        elements.copyEmailButton.addEventListener('click', async () => {
-          const offer = getCurrentOffer();
-          const businessName = elements.businessNameInput.value || "Business Owner";
-          const repName = elements.repNameInput.value || "Your Funding Specialist";
-          const repPhone = elements.repPhoneInput.value || "";
-          const repEmail = elements.repEmailInput.value || "";
-
-          // 1. Plain Text Version (Fallback)
-          const plainText = `Hi ${businessName},
-
-Great news! Based on our conversation, I've secured the following approval for your business:
-
-Approval Amount: ${formatCurrency(offer.amount)}
-Term: ${offer.termMonths} Payments (${offer.termLengthMonths} Months)
-Payment: ${formatCurrency(offer.payment)} / ${offer.frequency}
-Net Funding: ${formatCurrency(offer.netProceeds)}
-
-This offer is available immediately. Let me know if you'd like me to send over the agreement.
-
-Best,
-${repName}
-${repPhone}
-${repEmail}`;
-
-          // 2. HTML Version (Styled Table)
-          const htmlContent = `
-            <div style="font-family: sans-serif; font-size: 14px; color: #1e293b; line-height: 1.5;">
-              <p>Hi ${businessName},</p>
-              <p>Great news! Based on our conversation, I've secured the following approval for your business:</p>
-              
-              <div style="max-width: 400px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin: 20px 0;">
-                
-                <!-- Card Header -->
-                <div style="background-color: #fff; padding: 16px; border-bottom: 1px solid #e2e8f0; text-align: center;">
-                   <div style="font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: 0.05em;">You Get</div>
-                   <div style="font-size: 36px; font-weight: 800; color: #0f172a; margin: 4px 0;">${formatCurrency(offer.amount)}</div>
-                   <div style="font-size: 13px; color: #334155;">Total Payback: <strong>${formatCurrency(offer.totalPayback)}</strong></div>
-                </div>
-
-                <!-- Card Details -->
-                <div style="padding: 16px;">
-                  <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                      <td style="padding: 8px 0; color: #64748b; font-size: 13px;">Term Length</td>
-                      <td style="padding: 8px 0; color: #0f172a; font-weight: 600; text-align: right; font-size: 13px;">${offer.termLengthMonths} Months</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 8px 0; color: #64748b; font-size: 13px;">Payments</td>
-                      <td style="padding: 8px 0; color: #0f172a; font-weight: 600; text-align: right; font-size: 13px;">${offer.termMonths}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 8px 0; color: #64748b; font-size: 13px;">Factor Rate</td>
-                      <td style="padding: 8px 0; color: #0f172a; font-weight: 600; text-align: right; font-size: 13px;">${offer.factor.toFixed(2)}x</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 8px 0; color: #64748b; font-size: 13px;">Frequency</td>
-                      <td style="padding: 8px 0; color: #0f172a; font-weight: 600; text-align: right; font-size: 13px; text-transform: capitalize;">${offer.frequency}</td>
-                    </tr>
-                    <tr style="border-top: 1px solid #e2e8f0;">
-                      <td style="padding: 12px 0 0; color: #64748b; font-size: 13px;"><strong>Payment</strong></td>
-                      <td style="padding: 12px 0 0; color: #0f172a; font-weight: 700; text-align: right; font-size: 14px;">${formatCurrency(offer.payment)}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-
-              <p>This offer is available immediately. Let me know if you'd like me to send over the agreement.</p>
-              
-              <p style="margin-top: 24px;">
-                Best,<br>
-                <strong>${repName}</strong><br>
-                ${repPhone}<br>
-                ${repEmail}
-              </p>
-            </div>
-          `;
-
-          try {
-            const typeHtml = "text/html";
-            const typeText = "text/plain";
-            const blobHtml = new Blob([htmlContent], { type: typeHtml });
-            const blobText = new Blob([plainText], { type: typeText });
-            const data = [new ClipboardItem({ [typeHtml]: blobHtml, [typeText]: blobText })];
-
-            await navigator.clipboard.write(data);
-            const originalText = elements.copyEmailButton.innerText;
-            elements.copyEmailButton.innerText = "Copied!";
-            setTimeout(() => elements.copyEmailButton.innerText = originalText, 2000);
-          } catch (err) {
-            console.error('Failed to copy HTML:', err);
-            // Fallback
-            navigator.clipboard.writeText(plainText).then(() => {
-                const originalText = elements.copyEmailButton.innerText;
-                elements.copyEmailButton.innerText = "Copied Text!";
-                setTimeout(() => elements.copyEmailButton.innerText = originalText, 2000);
-            });
-          }
-        });
-      }
-
-      if (elements.shareLinkButton) {
-        elements.shareLinkButton.addEventListener('click', () => {
-          const shareBtn = elements.shareLinkButton;
-          const originalText = shareBtn.innerText;
-          const amount = parseFormattedNumber(elements.calcAmountInput.value);
-          const factor = parseFloat(elements.calcFactorInput.value);
-          const term = parseInt(elements.calcTermInput.value) || 1;
-          const fee = parseFloat(elements.calcFeeInput.value) || 0;
-          const freq = paymentFrequency;
-          const theme = currentBaseTheme;
-          const accent = currentAccentClass;
-          
-          const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
-          const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
-          const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
-          const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
-          const cName = elements.companyNameInput.value;
-          const cLogo = elements.companyLogoInput.value;
-
-          const offersForUrl = savedOffers.map((offer) => ({
-            a: offer.amount, f: offer.factor, t: offer.termMonths, q: offer.frequency || freq, fee: offer.feePercent || 0,
-          }));
-
-          const url = new URL(window.location.href);
-          const params = new URLSearchParams({
-            amount, factor, term, fee, freq, theme, accent, businessName, repName, repEmail, repPhone, cName, cLogo,
-            prepay: prepayDiscountPercent, offers: JSON.stringify(offersForUrl), view: 'approval',
+      if (elements.addOfferButton) { elements.addOfferButton.addEventListener('click', handleAddOffer); }
+      
+      // --- SHARE MENU TOGGLING ---
+      if (elements.shareMenuBtn) {
+          elements.shareMenuBtn.addEventListener('click', () => {
+              if(elements.shareModal) elements.shareModal.classList.remove('hidden');
           });
-          url.search = params.toString();
+      }
+      
+      if (elements.closeShareBtn) {
+          elements.closeShareBtn.addEventListener('click', () => {
+              if(elements.shareModal) elements.shareModal.classList.add('hidden');
+          });
+      }
+      
+      // COPY LINK ACTION (IN MODAL)
+      if (elements.modalCopyLinkBtn) {
+          elements.modalCopyLinkBtn.addEventListener('click', () => {
+              const off = getCurrentOffer();
+              // Reconstruct URL parameters
+              const amount = parseFormattedNumber(elements.calcAmountInput.value);
+              const factor = parseFloat(elements.calcFactorInput.value);
+              const term = parseInt(elements.calcTermInput.value) || 1;
+              const fee = parseFloat(elements.calcFeeInput.value) || 0;
+              const freq = paymentFrequency;
+              const theme = currentBaseTheme;
+              const accent = currentAccentClass;
+              const businessName = elements.businessNameInput.value.trim();
+              const repName = elements.repNameInput.value.trim();
+              const repEmail = elements.repEmailInput.value.trim();
+              const repPhone = elements.repPhoneInput.value.trim();
+              const cName = elements.companyNameInput.value;
+              const cLogo = elements.companyLogoInput.value;
+              const offersForUrl = savedOffers.map((offer) => ({ a: offer.amount, f: offer.factor, t: offer.termMonths, q: offer.frequency || freq, fee: offer.feePercent || 0 }));
+              const url = new URL(window.location.href);
+              const params = new URLSearchParams({ amount, factor, term, fee, freq, theme, accent, businessName, repName, repEmail, repPhone, cName, cLogo, prepay: prepayDiscountPercent, offers: JSON.stringify(offersForUrl), view: 'approval' });
+              url.search = params.toString();
+              
+              const linkToCopy = url.toString();
+              
+              // Use standard copy for Text/URL
+              const ta = document.createElement('textarea');
+              ta.value = linkToCopy;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              
+              const originalHTML = elements.modalCopyLinkBtn.innerHTML;
+              elements.modalCopyLinkBtn.innerHTML = `<span class="text-green-600 font-bold flex items-center gap-2 mx-auto">Copied!</span>`;
+              setTimeout(() => {
+                  elements.modalCopyLinkBtn.innerHTML = originalHTML;
+                  elements.shareModal.classList.add('hidden');
+              }, 1000);
+          });
+      }
+      
+      // COPY PROPOSAL TEXT ACTION (IN MODAL) - Uses Helper Function
+      if (elements.modalCopyTextBtn) {
+          elements.modalCopyTextBtn.addEventListener('click', () => {
+             const off = getCurrentOffer();
+             const accentColor = getAccentHex();
+             const fAmount = formatCurrency(off.amount);
+             const fPayback = formatCurrency(off.totalPayback);
+             const fPayment = formatCurrency(off.payment);
+             const fFreq = off.frequency.charAt(0).toUpperCase() + off.frequency.slice(1);
+             const fCost = formatCurrency(off.totalCost);
+             const fFee = formatCurrency(off.feeAmount);
+             const fNet = formatCurrency(off.netProceeds);
+             
+             const htmlContent = `
+                <div style="font-family: 'Inter', Helvetica, Arial, sans-serif; max-width: 400px; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+                    <!-- Header -->
+                    <div style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0; color: #334155; font-weight: 600; font-size: 14px;">
+                        Your Approved Terms
+                    </div>
+                    
+                    <!-- Hero -->
+                    <div style="padding: 24px 16px; text-align: center;">
+                        <div style="color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">You Get</div>
+                        <div style="font-size: 48px; font-weight: 700; color: ${accentColor}; line-height: 1.2; margin: 8px 0;">${fAmount}</div>
+                        <div style="color: #334155; font-size: 14px;">
+                            Total Payback: <span style="font-weight: 600;">${fPayback}</span>
+                        </div>
+                    </div>
 
-          const textArea = document.createElement('textarea');
-          textArea.value = url.toString();
-          textArea.style.position = 'fixed'; textArea.style.top = '0'; textArea.style.left = '0';
-          document.body.appendChild(textArea);
-          textArea.focus(); textArea.select();
+                    <!-- Details Header -->
+                    <div style="padding: 8px; text-align: center; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; background-color: #f9fafb; color: #334155; font-size: 12px; font-weight: 600;">
+                        Offer Details
+                    </div>
 
-          try {
-            document.execCommand('copy');
-            shareBtn.innerText = 'Copied!';
-            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
-          } catch (errFallback) {
-            shareBtn.innerText = 'Error';
-            setTimeout(() => { shareBtn.innerText = originalText; }, 2000);
-          }
-          document.body.removeChild(textArea);
-        });
+                    <!-- Grid (Table) -->
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <!-- Row 1 -->
+                        <tr>
+                            <td width="50%" style="padding: 12px; text-align: center; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+                                <div style="color: #64748b; font-size: 11px; font-weight: 500;">Term Length</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${off.termLengthMonths} months</div>
+                            </td>
+                            <td width="50%" style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">
+                                <div style="color: #64748b; font-size: 11px; font-weight: 500;">Payments</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${off.termMonths}</div>
+                            </td>
+                        </tr>
+                        <!-- Row 2 -->
+                        <tr>
+                            <td width="50%" style="padding: 12px; text-align: center; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+                                <div style="color: #64748b; font-size: 11px; font-weight: 500;">Factor Rate</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${off.factor.toFixed(2)}x</div>
+                            </td>
+                            <td width="50%" style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">
+                                <div style="color: #64748b; font-size: 11px; font-weight: 500;">Cost of Funds</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${fCost}</div>
+                            </td>
+                        </tr>
+                        <!-- Row 3 (Fee/Net) -->
+                         <tr>
+                            <td width="50%" style="padding: 12px; text-align: center; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+                                <div style="color: #64748b; font-size: 11px; font-weight: 500;">Origination Fee</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${fFee}</div>
+                            </td>
+                            <td width="50%" style="padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">
+                                <div style="color: #64748b; font-size: 11px; font-weight: 500;">Net Proceeds</div>
+                                <div style="color: #0f172a; font-size: 14px; margin-top: 4px;">${fNet}</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Footer Payment -->
+                    <div style="padding: 16px; text-align: center; background-color: #f1f5f9;">
+                        <div style="color: #64748b; font-size: 12px; font-weight: 600;">Est. ${fFreq} Payment</div>
+                        <div style="color: #0f172a; font-size: 16px; font-weight: 400; margin-top: 4px;">${fPayment}</div>
+                    </div>
+                </div>`;
+             
+             const textContent = `Approval: ${fAmount} | Payback: ${fPayback} | Payment: ${fPayment} (${fFreq}) | Term: ${off.termMonths}`;
+             
+             const success = copyRichTextToClipboard(htmlContent, textContent);
+             
+             if (success) {
+                 const originalHTML = elements.modalCopyTextBtn.innerHTML;
+                 elements.modalCopyTextBtn.innerHTML = `<span class="text-green-600 font-bold flex items-center gap-2 mx-auto">Copied!</span>`;
+                 setTimeout(() => {
+                      elements.modalCopyTextBtn.innerHTML = originalHTML;
+                      elements.shareModal.classList.add('hidden');
+                 }, 1000);
+             }
+          });
       }
 
       if (elements.prepayDateInput) {
@@ -1412,6 +1468,143 @@ ${repEmail}`;
       runCalculator();
       renderSavedOffers();
       updateAddOfferButtonState();
+    }
+
+    // Install Logic
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (elements.installContainer && !isApprovalView) {
+          elements.installContainer.classList.remove('hidden');
+      }
+    });
+
+    if (elements.installBtn) {
+      elements.installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        elements.installContainer.classList.add('hidden');
+      });
+    }
+    
+    // Accept Modal Logic & Validation
+    if (elements.acceptOfferBtn) {
+        elements.acceptOfferBtn.addEventListener('click', () => {
+            if (elements.acceptModal) {
+                elements.acceptModal.classList.remove('hidden');
+                // Reset form state
+                elements.acceptForm.classList.remove('hidden');
+                elements.acceptSuccess.classList.add('hidden');
+                elements.signerName.value = '';
+                elements.digitalSignCheck.checked = false;
+                elements.confirmAcceptBtn.disabled = true;
+            }
+        });
+    }
+    
+    // Validation for Signature
+    function checkSignature() {
+        if(elements.signerName.value.trim().length > 0 && elements.digitalSignCheck.checked) {
+            elements.confirmAcceptBtn.disabled = false;
+        } else {
+            elements.confirmAcceptBtn.disabled = true;
+        }
+    }
+    
+    if(elements.signerName) elements.signerName.addEventListener('input', checkSignature);
+    if(elements.digitalSignCheck) elements.digitalSignCheck.addEventListener('change', checkSignature);
+    
+    if(elements.confirmAcceptBtn) {
+        elements.confirmAcceptBtn.addEventListener('click', () => {
+             fireConfetti();
+             elements.acceptForm.classList.add('hidden');
+             elements.acceptSuccess.classList.remove('hidden');
+             
+             // PDF GENERATION LOGIC
+             const off = getCurrentOffer();
+             const businessName = elements.businessNameDisplay.innerText || "Valued Merchant";
+             const signer = elements.signerName.value;
+             const date = new Date().toLocaleDateString();
+             const timestamp = new Date().toLocaleString();
+             
+             // Populate hidden template
+             document.getElementById('pdfBusinessName').innerText = businessName;
+             document.getElementById('pdfDate').innerText = date;
+             document.getElementById('pdfAmount').innerText = formatCurrency(off.amount);
+             document.getElementById('pdfFactor').innerText = off.factor.toFixed(2);
+             document.getElementById('pdfPayback').innerText = formatCurrency(off.totalPayback);
+             document.getElementById('pdfTerm').innerText = off.termMonths + " Payments";
+             document.getElementById('pdfFreq').innerText = off.frequency.charAt(0).toUpperCase() + off.frequency.slice(1);
+             document.getElementById('pdfPayment').innerText = formatCurrency(off.payment);
+             document.getElementById('pdfSigner').innerText = signer;
+             document.getElementById('pdfTimestamp').innerText = timestamp;
+             
+             const element = document.getElementById('pdfTemplate');
+             element.style.display = 'block'; // temporarily show to render
+             
+             const opt = {
+               margin: 0.5,
+               filename: 'TrustBureau_Offer_Accepted.pdf',
+               image: { type: 'jpeg', quality: 0.98 },
+               html2canvas: { scale: 2 },
+               jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+             };
+             
+             html2pdf().set(opt).from(element).save().then(() => {
+                 element.style.display = 'none'; // hide again
+             });
+        });
+    }
+    
+    if(elements.cancelAcceptBtn) {
+        elements.cancelAcceptBtn.addEventListener('click', () => {
+             elements.acceptModal.classList.add('hidden');
+        });
+    }
+    
+    if (elements.closeAcceptBtn) {
+        elements.closeAcceptBtn.addEventListener('click', () => {
+            if (elements.acceptModal) elements.acceptModal.classList.add('hidden');
+        });
+    }
+
+    // Helper function for Robust Rich Text Copy
+    function copyRichTextToClipboard(htmlContent, plainTextContent) {
+        // 1. Create a dummy element to ensure selection exists (required for execCommand)
+        const dummy = document.createElement('div');
+        dummy.setAttribute('contentEditable', true);
+        dummy.innerHTML = htmlContent;
+        dummy.style.position = 'fixed';
+        dummy.style.left = '-9999px';
+        dummy.style.top = '0';
+        document.body.appendChild(dummy);
+        
+        // 2. Select the dummy content
+        const range = document.createRange();
+        range.selectNodeContents(dummy);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // 3. Intercept the copy event to force specific data types
+        const handler = (e) => {
+            e.preventDefault();
+            e.clipboardData.setData('text/html', htmlContent);
+            e.clipboardData.setData('text/plain', plainTextContent);
+        };
+        
+        document.addEventListener('copy', handler);
+        const successful = document.execCommand('copy');
+        document.removeEventListener('copy', handler);
+        
+        // 4. Cleanup
+        document.body.removeChild(dummy);
+        selection.removeAllRanges();
+        
+        return successful;
     }
 
     initializeCalculator();
