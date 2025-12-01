@@ -970,10 +970,20 @@
         return;
       }
       elements.savedOffersSection.classList.remove('hidden');
+      
+      // Generate Button HTML only if in Approval View
+      const acceptBtnHTML = isApprovalView ? `
+        <div class="p-3 border-t border-primary bg-slate-50 dark:bg-slate-800/50 mt-auto">
+             <button class="accept-additional-offer w-full button-primary text-xs uppercase tracking-wider py-2 shadow-sm flex items-center justify-center gap-2 transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  Accept Offer
+             </button>
+        </div>` : '';
+
       const cardsHtml = savedOffers.map((offer, index) => {
         const labelIndex = index + 2;
         return `
-          <div class="card-bg rounded-lg border border-primary overflow-hidden">
+          <div class="card-bg rounded-lg border border-primary overflow-hidden flex flex-col h-full">
             <div class="p-3 border-b border-primary flex justify-center items-center" style="background-color: var(--accent-color)">
                 <span class="text-xs font-bold" style="color: var(--accent-text-inverted)">Offer ${labelIndex}</span>
             </div>
@@ -981,7 +991,7 @@
                 <span class="text-[10px] font-semibold text-muted uppercase tracking-wide">You Get</span>
                 <span class="text-3xl font-bold text-hero mt-1 block">${formatCurrency(offer.amount)}</span>
             </div>
-            <div class="divide-y divide-primary text-xs">
+            <div class="divide-y divide-primary text-xs flex-1">
                 <div class="grid grid-cols-2 divide-x divide-primary">
                     <div class="p-2 text-center"><span class="text-[10px] text-muted block">Factor</span><span class="font-medium text-primary">${offer.factor.toFixed(2)}x</span></div>
                     <div class="p-2 text-center"><span class="text-[10px] text-muted block">Term</span><span class="font-medium text-primary">${offer.termMonths}</span></div>
@@ -991,9 +1001,29 @@
                     <div class="p-2 text-center"><span class="text-[10px] text-muted block">${offer.frequency === 'weekly' ? 'Weekly' : 'Daily'}</span><span class="font-medium text-primary">${formatCurrency(offer.payment)}</span></div>
                 </div>
             </div>
+            ${acceptBtnHTML}
           </div>`;
       }).join('');
+      
       elements.savedOffersContainer.innerHTML = cardsHtml;
+      
+      // Attach Event Listeners for new buttons (Client View Only)
+      if (isApprovalView) {
+          const btns = elements.savedOffersContainer.querySelectorAll('.accept-additional-offer');
+          btns.forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                   fireConfetti();
+                   const b = e.currentTarget;
+                   // Update button state to show acceptance
+                   b.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Accepted! (Contact Rep)`;
+                   b.disabled = true;
+                   // Force green style
+                   b.style.backgroundColor = '#16a34a';
+                   b.style.borderColor = '#16a34a';
+                   b.style.color = '#ffffff';
+              });
+          });
+      }
     }
 
     function updateAddOfferButtonState() {
