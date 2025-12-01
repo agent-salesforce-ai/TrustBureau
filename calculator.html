@@ -877,10 +877,10 @@
     }
 
     // Number Animation Logic
+    // Removed usage to prevent lag on slider drag
     function animateValue(obj, start, end, duration) {
       if (!obj) return;
       let startTimestamp = null;
-      // Extract number from currency string (remove $ and ,)
       const parseVal = (v) => parseFloat(String(v).replace(/[^0-9.]/g, ''));
       const startVal = parseVal(start);
       const endVal = parseVal(end);
@@ -898,7 +898,7 @@
         if (progress < 1) {
           window.requestAnimationFrame(step);
         } else {
-            obj.textContent = formatCurrency(endVal); // Ensure exact end value
+            obj.textContent = formatCurrency(endVal); 
         }
       };
       window.requestAnimationFrame(step);
@@ -1402,13 +1402,8 @@
           else { elements.businessNameDisplay.textContent = ''; elements.businessNameDisplay.classList.add('hidden'); }
         }
 
-        // Animate main number if changed significantly
-        const currentDisplayVal = parseFormattedNumber(elements.summaryAmountOut.textContent);
-        if (Math.abs(currentDisplayVal - offer.amount) > 5) {
-             animateValue(elements.summaryAmountOut, elements.summaryAmountOut.textContent, offer.amount, 500);
-        } else {
-             elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
-        }
+        // UPDATED: Removed animation logic for instant updates
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
 
         elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
         elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
