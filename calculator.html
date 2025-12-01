@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-light accent-mint">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>TrustBureau.ai | Payments Offer Calculator</title>
+
+  <!-- PWA / Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#42D197" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="TrustBureau" />
+  
+  <!-- Apple Touch Icon (Placeholder) -->
+  <link rel="apple-touch-icon" href="https://placehold.co/180x180/42D197/ffffff?text=TB" />
+  <!-- Favicon (Data URI for immediate icon) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    /* Prevent text selection on app-like interface */
+    .no-select {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    /* --- BASE THEMES --- */
+
+    /* Light Theme */
+    html.theme-light {
+      --bg-body: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+      --bg-slider-track: #e2e8f0;
+      --bg-input: #ffffff;
+      --bg-toggle-inactive: #f1f5f9;
+      --border-primary: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-success: #16a34a;
+      --shadow-color: rgba(0, 0, 0, 0.06);
+    }
+
+    /* Dark Theme (Gray-900) */
+    html.theme-dark {
+      --bg-body: #111827;
+      --bg-card: #1f2937;
+      --bg-card-inner: #111827;
+      --bg-slider-track: #374151;
+      --bg-input: #1f2937;
+      --bg-toggle-inactive: #111827;
+      --border-primary: #374151;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-success: #4ade80;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Black Theme (Pure Black/Deep Navy) */
+    html.theme-black {
+      --bg-body: #020617; /* Deep Navy/Black */
+      --bg-card: #020617;
+      --bg-card-inner: #0f172a;
+      --bg-slider-track: #1e293b;
+      --bg-input: #020617;
+      --bg-toggle-inactive: #0f172a;
+      --border-primary: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --text-success: #4ade80;
+      --shadow-color: rgba(0, 0, 0, 0.5);
+    }
+
+    body { background-color: var(--bg-body); transition: background-color 0.2s; }
+
+
+    /* --- ACCENT COLORS --- */
+
+    /* 1. Gold (Default/Sutton) */
+    html.accent-gold {
+      --accent-color: #D19B2B;
+      --accent-color-light: #e6b650;
+      --accent-color-dark: #a6781c;
+      --accent-text-inverted: #020617;
+    }
+
+    /* 2. Blue */
+    html.accent-blue {
+      --accent-color: #3b82f6;
+      --accent-color-light: #60a5fa;
+      --accent-color-dark: #2563eb;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 3. Green */
+    html.accent-green {
+      --accent-color: #22c55e;
+      --accent-color-light: #4ade80;
+      --accent-color-dark: #16a34a;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 4. Red */
+    html.accent-red {
+      --accent-color: #ef4444;
+      --accent-color-light: #f87171;
+      --accent-color-dark: #dc2626;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 5. Orange */
+    html.accent-orange {
+      --accent-color: #f97316;
+      --accent-color-light: #fb923c;
+      --accent-color-dark: #ea580c;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 6. Purple */
+    html.accent-purple {
+      --accent-color: #a855f7;
+      --accent-color-light: #c084fc;
+      --accent-color-dark: #9333ea;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 7. Pink */
+    html.accent-pink {
+      --accent-color: #ec4899;
+      --accent-color-light: #f472b6;
+      --accent-color-dark: #db2777;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 8. Teal */
+    html.accent-teal {
+      --accent-color: #14b8a6;
+      --accent-color-light: #2dd4bf;
+      --accent-color-dark: #0d9488;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 9. Indigo */
+    html.accent-indigo {
+      --accent-color: #6366f1;
+      --accent-color-light: #818cf8;
+      --accent-color-dark: #4f46e5;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 10. Gray/Black (Monochrome Accent) */
+    html.accent-gray {
+      --accent-color: #111827; /* In light mode this is black */
+      --accent-color-light: #374151;
+      --accent-color-dark: #000000;
+      --accent-text-inverted: #ffffff;
+    }
+    html.theme-dark.accent-gray, html.theme-black.accent-gray {
+      --accent-color: #f3f4f6;
+      --accent-color-light: #ffffff;
+      --accent-color-dark: #d1d5db;
+      --accent-text-inverted: #000000;
+    }
+
+    /* --- NEW ACCENTS --- */
+
+    /* 11. Mint (Requested) */
+    html.accent-mint {
+      --accent-color: #42D197;
+      --accent-color-light: #74eabc;
+      --accent-color-dark: #2d9668;
+      --accent-text-inverted: #ffffff; /* CHANGED TO WHITE */
+    }
+
+    /* 12. Cyan */
+    html.accent-cyan {
+      --accent-color: #06b6d4;
+      --accent-color-light: #22d3ee;
+      --accent-color-dark: #0891b2;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 13. Lime */
+    html.accent-lime {
+      --accent-color: #84cc16;
+      --accent-color-light: #a3e635;
+      --accent-color-dark: #65a30d;
+      --accent-text-inverted: #020617;
+    }
+
+    /* 14. Fuchsia */
+    html.accent-fuchsia {
+      --accent-color: #d946ef;
+      --accent-color-light: #e879f9;
+      --accent-color-dark: #c026d3;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 15. Sky */
+    html.accent-sky {
+      --accent-color: #0ea5e9;
+      --accent-color-light: #38bdf8;
+      --accent-color-dark: #0284c7;
+      --accent-text-inverted: #ffffff;
+    }
+
+    /* 16. Yellow */
+    html.accent-yellow {
+      --accent-color: #eab308;
+      --accent-color-light: #facc15;
+      --accent-color-dark: #ca8a04;
+      --accent-text-inverted: #020617;
+    }
+
+    /* 17. Black (New) */
+    html.accent-black {
+      --accent-color: #000000;
+      --accent-color-light: #333333;
+      --accent-color-dark: #000000;
+      --accent-text-inverted: #ffffff;
+    }
+    html.theme-dark.accent-black, html.theme-black.accent-black {
+      --accent-color: #f3f4f6; /* Light gray in dark mode for contrast */
+      --accent-color-light: #ffffff;
+      --accent-color-dark: #d1d5db;
+      --accent-text-inverted: #000000;
+    }
+
+    /* 18. White (New) */
+    html.accent-white {
+      --accent-color: #ffffff;
+      --accent-color-light: #f0f0f0;
+      --accent-color-dark: #e0e0e0;
+      --accent-text-inverted: #000000;
+    }
+    html.theme-dark.accent-white, html.theme-black.accent-white {
+      --accent-color: #1a1a1a; /* Dark gray in dark mode for contrast */
+      --accent-color-light: #333333;
+      --accent-color-dark: #000000;
+      --accent-text-inverted: #ffffff;
+    }
+
+
+    /* --- COMPONENT STYLES --- */
+
+    .card-bg { 
+      background-color: var(--bg-card); 
+      border-color: var(--border-primary); 
+    }
+    
+    /* Shell border mimics accent color */
+    .shell {
+      border-color: var(--accent-color);
+      border-width: 3px; /* INCREASED BORDER THICKNESS */
+      box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+    }
+
+    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-muted); }
+    .text-success { color: var(--text-success); }
+    .border-primary { border-color: var(--border-primary); }
+
+    .slider-track { background-color: var(--bg-slider-track); }
+    .slider-thumb { accent-color: var(--accent-color); }
+
+    .input-field {
+      background-color: var(--bg-input);
+      border-color: var(--border-primary);
+      color: var(--text-primary);
+    }
+    .input-field:focus,
+    .input-field:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px var(--accent-color-light);
+      outline: none;
+    }
+
+    input[type="date"] {
+      background-color: var(--bg-input);
+      color: var(--text-primary);
+      border-color: var(--border-primary);
+    }
+    ::-webkit-calendar-picker-indicator {
+      filter: invert(0.5);
+      cursor: pointer;
+    }
+    html.theme-light ::-webkit-calendar-picker-indicator {
+      filter: invert(0);
+    }
+
+    .text-hero {
+      color: var(--accent-color);
+    }
+
+    .toggle-inactive {
+      background-color: var(--bg-toggle-inactive);
+      color: var(--text-secondary);
+    }
+    .toggle-active {
+      background-color: var(--accent-color);
+      color: var(--accent-text-inverted);
+      font-weight: 700;
+    }
+
+    .button-primary {
+      background-color: var(--accent-color);
+      color: var(--accent-text-inverted); /* Uses dynamic inverted color */
+      font-weight: 700;
+      border-radius: 0.5rem; 
+      padding: 0.6rem 1.75rem;
+      border: 1px solid var(--accent-color-dark);
+      transition: all 0.2s ease;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-light);
+      box-shadow:
+        0 0 0 1px var(--accent-color),
+        0 0 15px var(--accent-color-light); /* Glow effect */
+      transform: translateY(-1px) scale(1.01);
+    }
+    .button-primary:disabled {
+      background-color: var(--bg-slider-track);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      border-color: transparent;
+    }
+
+    /* Color Swatches */
+    .color-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.1s;
+      display: inline-block;
+    }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.selected {
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 2px var(--bg-card);
+    }
+
+    /* Table Styles */
+    .amort-table th {
+      background-color: var(--bg-slider-track);
+      color: var(--text-secondary);
+      font-size: 0.75rem; /* Fixed size from 0.7rem */
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 0.5rem;
+      font-weight: 600;
+    }
+    .amort-table td {
+      border-bottom: 1px solid var(--border-primary);
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      padding: 0.6rem 0.5rem;
+    }
+    .amort-table tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200 no-select">
+
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
+
+    <!-- HEADER -->
+    <div id="headerContainer" class="pb-3 border-b border-primary flex flex-col items-center gap-3">
+      <div class="flex flex-col items-center justify-center flex-shrink-0">
+        <!-- Placeholder/Dynamic Logo logic -->
+        <div id="headerLogoWrapper" class="flex items-center justify-center mb-2">
+            <!-- Image is hidden by default -->
+            <img id="headerLogo" src="" alt="Company Logo" class="h-16 w-auto object-contain hidden" />
+            <!-- Placeholder Icon (accent color) -->
+            <svg id="placeholderIcon" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-hero" viewBox="0 0 24 24" fill="currentColor">
+               <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <!-- Dynamic Title -->
+        <h1 id="headerTitle" class="text-primary text-xl mt-0 text-center font-normal tracking-wide">TrustBureau.ai</h1>
+        <!-- Powered By Text -->
+        <span id="headerPoweredBy" class="text-xs font-semibold text-muted uppercase tracking-widest mt-1 hidden">powered by TrustBureau.ai</span>
+      </div>
+      <div id="themeControls" class="flex items-center justify-center">
+        <button id="repSettingsToggle" type="button"
+                class="px-2 py-1 text-xs rounded-lg border border-primary text-muted hover:text-primary hover:border-primary flex items-center gap-1 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 016 0z" />
+          </svg>
+          Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- REP SETTINGS PANEL -->
+    <div id="repSettingsPanel"
+         class="w-full mt-3 card-inner-bg border border-primary rounded-lg p-3 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-secondary">Rep Settings</span>
+        <span class="text-xs text-muted">Shown on client approval view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-2 text-xs">
+        
+        <!-- THEME SELECTION -->
+        <div>
+           <label class="block font-semibold text-muted mb-1">Base Theme</label>
+           <div class="flex space-x-2">
+              <button type="button" onclick="setBaseTheme('theme-light')" class="flex-1 py-1.5 border border-primary rounded text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition">Light</button>
+              <button type="button" onclick="setBaseTheme('theme-dark')" class="flex-1 py-1.5 border border-primary rounded text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition">Dark</button>
+              <button type="button" onclick="setBaseTheme('theme-black')" class="flex-1 py-1.5 border border-primary rounded text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition">Black</button>
+           </div>
+        </div>
+
+        <!-- ACCENT SELECTION -->
+        <div>
+           <label class="block font-semibold text-muted mb-1">Accent Color</label>
+           <div class="flex flex-wrap gap-2 p-1">
+              <div onclick="setAccent('accent-gold')" class="color-swatch" style="background-color: #D19B2B;" title="Gold"></div>
+              <div onclick="setAccent('accent-blue')" class="color-swatch" style="background-color: #3b82f6;" title="Blue"></div>
+              <div onclick="setAccent('accent-green')" class="color-swatch" style="background-color: #22c55e;" title="Green"></div>
+              <div onclick="setAccent('accent-red')" class="color-swatch" style="background-color: #ef4444;" title="Red"></div>
+              <div onclick="setAccent('accent-orange')" class="color-swatch" style="background-color: #f97316;" title="Orange"></div>
+              <div onclick="setAccent('accent-purple')" class="color-swatch" style="background-color: #a855f7;" title="Purple"></div>
+              <div onclick="setAccent('accent-pink')" class="color-swatch" style="background-color: #ec4899;" title="Pink"></div>
+              <div onclick="setAccent('accent-teal')" class="color-swatch" style="background-color: #14b8a6;" title="Teal"></div>
+              <div onclick="setAccent('accent-indigo')" class="color-swatch" style="background-color: #6366f1;" title="Indigo"></div>
+              <div onclick="setAccent('accent-gray')" class="color-swatch" style="background-color: #6b7280;" title="Gray"></div>
+              
+              <!-- NEW ACCENTS -->
+              <div onclick="setAccent('accent-mint')" class="color-swatch" style="background-color: #42D197;" title="Mint"></div>
+              <div onclick="setAccent('accent-cyan')" class="color-swatch" style="background-color: #06b6d4;" title="Cyan"></div>
+              <div onclick="setAccent('accent-lime')" class="color-swatch" style="background-color: #84cc16;" title="Lime"></div>
+              <div onclick="setAccent('accent-fuchsia')" class="color-swatch" style="background-color: #d946ef;" title="Fuchsia"></div>
+              <div onclick="setAccent('accent-sky')" class="color-swatch" style="background-color: #0ea5e9;" title="Sky"></div>
+              <div onclick="setAccent('accent-yellow')" class="color-swatch" style="background-color: #eab308;" title="Yellow"></div>
+              <div onclick="setAccent('accent-black')" class="color-swatch" style="background-color: #000000;" title="Black"></div>
+              <div onclick="setAccent('accent-white')" class="color-swatch" style="background-color: #ffffff; border: 1px solid #e0e0e0;" title="White"></div>
+           </div>
+        </div>
+
+        <hr class="border-primary my-2"/>
+
+        <!-- Branding Inputs -->
+        <div>
+          <label for="companyNameInput" class="block font-semibold text-muted">Company Name</label>
+          <input id="companyNameInput" type="text"
+                 class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="TrustBureau.ai (Default)" />
+        </div>
+        <div>
+          <label for="companyLogoInput" class="block font-semibold text-muted">Company Logo URL</label>
+          <input id="companyLogoInput" type="url"
+                 class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="https://example.com/logo.png" />
+        </div>
+
+        <hr class="border-primary my-2"/>
+
+        <!-- Rep Info -->
+        <div>
+          <label for="repNameInput" class="block font-semibold text-muted">Your Name</label>
+          <input id="repNameInput" type="text"
+                 class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="Rep Name" />
+        </div>
+        <div>
+          <label for="repEmailInput" class="block font-semibold text-muted">Your Email</label>
+          <input id="repEmailInput" type="email"
+                 class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="rep@example.com" />
+        </div>
+        <div>
+          <label for="repPhoneInput" class="block font-semibold text-muted">Your Phone</label>
+          <input id="repPhoneInput" type="tel"
+                 class="mt-1 w-full p-2 text-xs border rounded-lg shadow-sm input-field"
+                 placeholder="(555) 123-4567" />
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFER CALCULATOR -->
+    <div id="calculatorInputs" class="space-y-4 pt-2">
+      <div id="businessNameContainer" class="px-1 mt-2">
+        <label for="businessNameInput" class="block text-xs font-semibold text-muted">
+          Business Name
+        </label>
+        <input id="businessNameInput" type="text"
+               class="mt-1 w-full p-2 text-sm border rounded-lg shadow-sm input-field"
+               placeholder="e.g., Acme Holdings LLC" />
+      </div>
+
+      <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
+        <div id="amountContainer" class="space-y-1">
+          <label for="calcAmount" class="block text-xs font-semibold text-muted">
+            Amount You Get ($)
+          </label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1"
+                 value="50000"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-2" />
+          <div class="relative group">
+            <span class="absolute left-3 input-icon text-muted text-sm">$</span>
+            <input id="calcAmountInput" inputmode="numeric"
+                   class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <div id="factorContainer" class="space-y-1">
+          <label for="calcFactor" class="block text-xs font-semibold text-muted">Factor Rate</label>
+          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <div class="relative group">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12" />
+            </svg>
+            <input id="calcFactorInput" type="number" step="0.01"
+                   class="w-full p-2 pl-9 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <div id="termContainer" class="space-y-1">
+          <label for="calcTerm" class="block text-xs font-semibold text-muted">
+            Number of Payments
+          </label>
+          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="130"
+                 class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+          <div class="relative group">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-3 w-3 absolute left-3 input-icon text-muted"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            </svg>
+            <input id="calcTermInput" type="number" step="1"
+                   class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+          </div>
+        </div>
+
+        <div id="termLengthMonthsContainer" class="space-y-1">
+          <label for="termLengthMonthsInput" class="block text-xs font-semibold text-muted">
+            Term Length (Display Override)
+          </label>
+          <div class="relative group">
+            <input id="termLengthMonthsInput" type="number" step="0.5" min="1"
+                   class="w-full p-2 text-sm border rounded-lg shadow-sm input-field"
+                   placeholder="Auto" />
+          </div>
+        </div>
+      </div>
+
+      <div id="toggleContainer" class="flex items-center justify-center space-x-2">
+        <button id="toggleDaily" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Daily
+        </button>
+        <button id="toggleWeekly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Weekly
+        </button>
+        <button id="toggleMonthly" class="text-sm font-semibold px-4 py-1.5 rounded-lg">
+          Monthly
+        </button>
+      </div>
+    </div>
+
+    <!-- OFFER 1 CARD -->
+    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
+      <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
+        <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
+      </div>
+      <div class="text-center py-6">
+        <span id="businessNameDisplay"
+              class="text-sm font-semibold text-primary block mb-1 hidden"></span>
+        <span class="text-xs font-semibold text-muted block">You Get</span>
+        <!-- FIXED: Increased font size to 5xl -->
+        <span id="summaryAmountOut"
+              class="text-5xl font-bold block my-2 text-hero leading-tight">$50,000</span>
+        <span class="text-sm font-medium text-secondary block">
+          Total Payback:
+          <span id="summaryPaybackOut" class="font-semibold text-primary"></span>
+        </span>
+      </div>
+      <div class="flex justify-center items-center border-b border-primary pb-2">
+        <h5 class="text-sm font-semibold text-secondary text-center">Offer Details</h5>
+      </div>
+      
+      <!-- NEW ORGANIZED TABLE LAYOUT -->
+      <div class="mt-6 border border-primary rounded-lg overflow-hidden">
+        <div class="divide-y divide-primary">
+           
+           <!-- Row 1: Term Info -->
+           <div class="grid grid-cols-2 divide-x divide-primary bg-card-inner-bg/50">
+             <div class="p-3 text-center">
+               <span class="text-xs font-medium text-muted block">Term Length</span>
+               <span id="summaryTermLengthOut" class="text-xs font-normal text-primary block mt-1"></span>
+             </div>
+             <div class="p-3 text-center">
+               <span class="text-xs font-medium text-muted block">Payments</span>
+               <span id="summaryTermOut" class="text-xs font-normal text-primary block mt-1"></span>
+             </div>
+           </div>
+           
+           <!-- Row 2: Rates & Cost -->
+           <div class="grid grid-cols-2 divide-x divide-primary bg-card-inner-bg/50">
+             <div class="p-3 text-center">
+               <span class="text-xs font-medium text-muted block">Factor Rate</span>
+               <span id="summaryFactorOut" class="text-xs font-normal text-primary block mt-1"></span>
+             </div>
+             <div class="p-3 text-center">
+               <span class="text-xs font-medium text-muted block">Total Cost of Funds</span>
+               <span id="summaryCostOut" class="text-xs font-normal text-primary block mt-1"></span>
+             </div>
+           </div>
+           
+           <!-- Row 3: Fee & Net (ID Added for Hiding) -->
+           <div id="detailsRowFee" class="grid grid-cols-2 divide-x divide-primary bg-card-inner-bg/50">
+             <div id="feeGridItem" class="p-3 text-center">
+               <span class="text-xs font-medium text-muted block">Origination Fee</span>
+               <span id="summaryFeeOut" class="text-xs font-normal text-primary block mt-1"></span>
+             </div>
+             <div id="netGridItem" class="p-3 text-center">
+               <span class="text-xs font-medium text-muted block">Net Proceeds</span>
+               <span id="summaryNetOut" class="text-xs font-normal text-primary block mt-1"></span>
+             </div>
+           </div>
+           
+           <!-- Footer: Payment -->
+           <div class="p-4 text-center bg-slider-track/20">
+             <span id="summaryPaymentLabel" class="text-xs font-medium text-muted block">Est. Daily Payment</span>
+             <span id="summaryPaymentValue" class="text-xs font-normal text-primary block mt-1"></span>
+           </div>
+        </div>
+      </div>
+
+      <!-- Fee Container Moved Here (Above Prepay) -->
+      <div id="feeContainer" class="mt-4 pt-4 border-t border-primary">
+          <button id="toggleFeeBtn" type="button" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
+             <!-- CHANGED ICON TO $ (Same path as Prepay) -->
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Add Origination Fee
+          </button>
+          
+          <div id="feeInputWrapper" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
+            <label for="calcFee" class="block text-xs font-semibold text-muted">Origination Fee (%)</label>
+            <input id="calcFeeSlider" type="range" min="0" max="10" step="0.5" value="0"
+                   class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb" />
+            <div class="relative group mt-1">
+               <span class="absolute left-3 input-icon text-muted text-sm">%</span>
+              <input id="calcFeeInput" type="number" step="0.1"
+                     class="w-full p-2 pl-8 text-sm border rounded-lg shadow-sm input-field" />
+            </div>
+          </div>
+      </div>
+
+      <!-- Prepay Discount Section -->
+      <div id="prepaySection" class="mt-4 pt-4 border-t border-primary">
+        <button id="togglePrepay" class="w-full text-xs font-semibold text-muted hover:text-primary flex items-center justify-center gap-1 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Calculate Prepayment Discount
+        </button>
+
+        <div id="prepayContainer" class="hidden mt-4 card-inner-bg p-4 rounded-lg border border-primary">
+          <div class="flex justify-between items-center mb-2 pb-2 border-b border-primary">
+            <span class="text-xs font-semibold text-secondary">Prepayment Discount</span>
+            <span id="prepayPercentDisplay" class="text-xs font-bold text-hero">0%</span>
+          </div>
+
+          <!-- Rep View: Slider -->
+          <div id="prepaySliderContainer" class="pt-2">
+             <input id="prepaySlider" type="range" min="0" max="25" step="1" value="0"
+                    class="w-full h-1.5 slider-track rounded-lg cursor-pointer slider-thumb mb-4" />
+             <p class="text-xs text-muted text-center italic">Adjust max discount policy (Rep View)</p>
+          </div>
+
+          <!-- Client View: Date Picker -->
+          <div id="prepayDateContainer" class="hidden mb-4 pt-2">
+            <label class="block text-xs font-semibold text-muted mb-1 text-center">Select Payoff Date</label>
+            <input id="prepayDateInput" type="date"
+                   class="w-full p-2 text-sm rounded-lg border border-primary input-field text-center" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-center border-t border-primary pt-3">
+            <div>
+              <span class="text-xs font-semibold text-muted block uppercase tracking-wider">Savings</span>
+              <span id="prepaySavingsDisplay" class="text-sm font-bold text-success">$0.00</span>
+            </div>
+            <div>
+              <span class="text-xs font-semibold text-muted block uppercase tracking-wider">New Payoff</span>
+              <span id="prepayTotalDisplay" class="text-sm font-bold text-primary">$0.00</span>
+            </div>
+          </div>
+
+          <!-- Amortization Button (Client View Only, if Discount > 0) -->
+          <div id="amortizationBtnContainer" class="mt-4 text-center hidden">
+            <button id="viewAmortizationBtn" type="button"
+                    class="text-xs font-semibold text-hero underline hover:text-primary transition-colors">
+              View Amortization Schedule
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="repContactBlock"
+           class="mt-6 pt-3 border-t border-primary text-xs text-secondary text-center hidden">
+        <div class="font-semibold text-muted mb-1">Your Funding Specialist</div>
+        <div id="repNameDisplay" class="font-medium"></div>
+        <div id="repEmailDisplay"></div>
+        <div id="repPhoneDisplay"></div>
+      </div>
+    </div>
+
+    <!-- STATIC ADDITIONAL OFFERS -->
+    <div id="savedOffersSection"
+         class="card-bg mt-4 p-4 rounded-lg shadow-md border border-primary hidden">
+      <div class="flex justify-between items-center border-b border-primary pb-2 mb-4">
+        <h5 class="text-sm font-semibold text-secondary">Additional Offers</h5>
+      </div>
+      <div id="savedOffersContainer"
+           class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div id="buttonContainer" class="pt-4 border-t border-primary">
+      <div class="relative flex justify-center gap-3 flex-wrap">
+        <button id="addOfferButton" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v16m8-8H4" />
+          </svg>
+          Add Offer
+        </button>
+        <button id="shareLinkButton" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/>
+          </svg>
+          Share Approval Link
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AMORTIZATION MODAL -->
+  <div id="amortizationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm p-4">
+    <div class="card-bg w-full max-w-2xl max-h-[85vh] rounded-xl shadow-2xl flex flex-col border border-primary">
+      <div class="p-4 border-b border-primary flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-t-xl">
+        <h3 class="font-semibold text-lg text-primary">Amortization Schedule</h3>
+        <button id="closeAmortizationBtn" class="text-muted hover:text-primary transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="overflow-auto p-0 flex-1">
+         <table class="w-full text-left amort-table">
+           <thead class="sticky top-0 z-10 shadow-sm">
+             <tr>
+               <th>#</th>
+               <th>Date</th>
+               <th>Payment</th>
+               <th>Balance</th>
+               <th>Prepay Savings</th>
+               <th>Payoff Amount</th>
+             </tr>
+           </thead>
+           <tbody id="amortizationTableBody">
+             <!-- JS injected rows -->
+           </tbody>
+         </table>
+      </div>
+      <div class="p-3 border-t border-primary text-center text-xs text-muted bg-slate-50 dark:bg-slate-900 rounded-b-xl">
+        * Schedule is an estimate. Actual payoff dates and amounts may vary based on banking holidays and clear dates.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const elements = {
+      calcAmountSlider: document.getElementById('calcAmountSlider'),
+      calcFactorSlider: document.getElementById('calcFactorSlider'),
+      calcFeeSlider: document.getElementById('calcFeeSlider'),
+      calcTermSlider: document.getElementById('calcTermSlider'),
+      calcAmountInput: document.getElementById('calcAmountInput'),
+      calcFactorInput: document.getElementById('calcFactorInput'),
+      calcFeeInput: document.getElementById('calcFeeInput'),
+      calcTermInput: document.getElementById('calcTermInput'),
+      termLengthMonthsInput: document.getElementById('termLengthMonthsInput'),
+
+      toggleDaily: document.getElementById('toggleDaily'),
+      toggleWeekly: document.getElementById('toggleWeekly'),
+      toggleMonthly: document.getElementById('toggleMonthly'),
+
+      // themeSelector no longer needed but referenced in ID
+      shareLinkButton: document.getElementById('shareLinkButton'),
+      addOfferButton: document.getElementById('addOfferButton'),
+
+      summaryAmountOut: document.getElementById('summaryAmountOut'),
+      summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+      summaryFactorOut: document.getElementById('summaryFactorOut'),
+      summaryTermOut: document.getElementById('summaryTermOut'),
+      summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+      summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      summaryFeeOut: document.getElementById('summaryFeeOut'),
+      summaryNetOut: document.getElementById('summaryNetOut'),
+      summaryTermLengthOut: document.getElementById('summaryTermLengthOut'),
+      feeGridItem: document.getElementById('feeGridItem'),
+      netGridItem: document.getElementById('netGridItem'),
+      detailsRowFee: document.getElementById('detailsRowFee'), // ADDED REFERENCE
+
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      businessNameContainer: document.getElementById('businessNameContainer'),
+
+      repSettingsToggle: document.getElementById('repSettingsToggle'),
+      repSettingsPanel: document.getElementById('repSettingsPanel'),
+      repNameInput: document.getElementById('repNameInput'),
+      repEmailInput: document.getElementById('repEmailInput'),
+      repPhoneInput: document.getElementById('repPhoneInput'),
+      repContactBlock: document.getElementById('repContactBlock'),
+      repNameDisplay: document.getElementById('repNameDisplay'),
+      repEmailDisplay: document.getElementById('repEmailDisplay'),
+      repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+      
+      // New branding inputs
+      companyNameInput: document.getElementById('companyNameInput'),
+      companyLogoInput: document.getElementById('companyLogoInput'),
+      headerTitle: document.getElementById('headerTitle'),
+      headerLogo: document.getElementById('headerLogo'),
+      placeholderIcon: document.getElementById('placeholderIcon'),
+      headerLogoWrapper: document.getElementById('headerLogoWrapper'),
+      headerPoweredBy: document.getElementById('headerPoweredBy'),
+
+      headerContainer: document.getElementById('headerContainer'),
+      themeControls: document.getElementById('themeControls'),
+      calculatorInputs: document.getElementById('calculatorInputs'),
+      factorContainer: document.getElementById('factorContainer'),
+      
+      // feeContainer is moved but logic preserved via ID
+      feeContainer: document.getElementById('feeContainer'),
+      toggleFeeBtn: document.getElementById('toggleFeeBtn'),
+      feeInputWrapper: document.getElementById('feeInputWrapper'),
+
+      termContainer: document.getElementById('termContainer'),
+      termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
+      toggleContainer: document.getElementById('toggleContainer'),
+      buttonContainer: document.getElementById('buttonContainer'),
+
+      savedOffersSection: document.getElementById('savedOffersSection'),
+      savedOffersContainer: document.getElementById('savedOffersContainer'),
+
+      prepaySection: document.getElementById('prepaySection'),
+      togglePrepay: document.getElementById('togglePrepay'),
+      prepayContainer: document.getElementById('prepayContainer'),
+      prepaySliderContainer: document.getElementById('prepaySliderContainer'),
+      prepaySlider: document.getElementById('prepaySlider'),
+      prepayDateContainer: document.getElementById('prepayDateContainer'),
+      prepayDateInput: document.getElementById('prepayDateInput'),
+      prepayPercentDisplay: document.getElementById('prepayPercentDisplay'),
+      prepaySavingsDisplay: document.getElementById('prepaySavingsDisplay'),
+      prepayTotalDisplay: document.getElementById('prepayTotalDisplay'),
+
+      amortizationBtnContainer: document.getElementById('amortizationBtnContainer'),
+      viewAmortizationBtn: document.getElementById('viewAmortizationBtn'),
+      amortizationModal: document.getElementById('amortizationModal'),
+      closeAmortizationBtn: document.getElementById('closeAmortizationBtn'),
+      amortizationTableBody: document.getElementById('amortizationTableBody'),
+    };
+
+    let paymentFrequency = 'daily';
+    // Default to theme-light (corporate)
+    let currentBaseTheme = 'theme-light';
+    let currentAccentClass = 'accent-mint';
+    let amountSliderMax = 1000000;
+    const MAX_ADDITIONAL_OFFERS = 2;
+    let savedOffers = [];
+    let isApprovalView = false;
+    let termLengthManualDirty = false;
+    let prepayDiscountPercent = 0;
+    
+    // Default branding values (empty = unbranded)
+    const DEFAULT_COMPANY_NAME = "TrustBureau.ai";
+    const DEFAULT_LOGO_URL = "";
+
+    function setBaseTheme(themeName) {
+      // Removing existing theme classes
+      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-black');
+      // Add new theme
+      currentBaseTheme = themeName;
+      document.documentElement.classList.add(themeName);
+      
+      applyTheme();
+    }
+
+    function setAccent(accentName) {
+       // Removing existing accent classes (regex or list)
+       const classes = document.documentElement.classList;
+       for (let i = classes.length - 1; i >= 0; i--) {
+           if (classes[i].startsWith('accent-')) {
+               classes.remove(classes[i]);
+           }
+       }
+       currentAccentClass = accentName;
+       document.documentElement.classList.add(accentName);
+       
+       applyTheme();
+    }
+
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
+
+    function formatCurrency(num) {
+      const n = Number(num);
+      if (isNaN(n)) return '$0';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(n);
+    }
+
+    function parseFormattedNumber(val) {
+      if (typeof val !== 'string' || !val) return 0;
+      return parseFloat(val.replace(/[\$,]/g, '')) || 0;
+    }
+
+    function computeOffer(amount, factor, termPayments, frequency, feePercent) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+
+      const paymentsCount = termPayments > 0 ? termPayments : 1;
+      const paymentAmount = totalPayback / paymentsCount;
+      
+      const feeAmount = amount * (feePercent / 100);
+      const netProceeds = amount - feeAmount;
+
+      let rawMonths;
+      if (frequency === 'weekly') {
+        rawMonths = termPayments * (12 / 52);
+      } else if (frequency === 'monthly') {
+        rawMonths = termPayments;
+      } else {
+        rawMonths = termPayments * (12 / 250);
+      }
+      const termLengthMonths = Math.round(rawMonths * 2) / 2;
+
+      let paymentLabel = 'Est. Daily Payment';
+      if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
+      if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
+
+      return {
+        amount,
+        factor,
+        feePercent,
+        feeAmount,
+        netProceeds,
+        termMonths: termPayments,
+        termLengthMonths,
+        totalPayback,
+        totalCost,
+        payment: paymentAmount,
+        paymentLabel,
+        frequency,
+      };
+    }
+
+    function getCurrentOffer() {
+      const amount = parseFormattedNumber(elements.calcAmountInput.value);
+      const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
+      const termPayments = parseInt(elements.calcTermInput.value) || 1;
+      const fee = parseFloat(elements.calcFeeInput.value) || 0;
+      return computeOffer(amount, factor, termPayments, paymentFrequency, fee);
+    }
+
+    function renderSavedOffers() {
+      if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+
+      const used = savedOffers.length;
+      if (used === 0) {
+        elements.savedOffersSection.classList.add('hidden');
+        elements.savedOffersContainer.innerHTML = '';
+        return;
+      }
+
+      elements.savedOffersSection.classList.remove('hidden');
+
+      const cardsHtml = savedOffers.map((offer, index) => {
+        const labelIndex = index + 2;
+        // Updated Structure to Match New Table Layout
+        return `
+          <div class="card-bg rounded-lg border border-primary overflow-hidden">
+            <div class="p-3 border-b border-primary flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <span class="text-xs font-semibold text-secondary">Offer ${labelIndex}</span>
+            </div>
+            <div class="p-4 text-center border-b border-primary">
+                <span class="text-[10px] font-semibold text-muted uppercase tracking-wide">You Get</span>
+                <span class="text-3xl font-bold text-hero mt-1 block">${formatCurrency(offer.amount)}</span>
+            </div>
+            <div class="divide-y divide-primary text-xs">
+                <div class="grid grid-cols-2 divide-x divide-primary">
+                    <div class="p-2 text-center">
+                        <span class="text-[10px] text-muted block">Factor</span>
+                        <span class="font-medium text-primary">${offer.factor.toFixed(2)}x</span>
+                    </div>
+                    <div class="p-2 text-center">
+                        <span class="text-[10px] text-muted block">Term</span>
+                        <span class="font-medium text-primary">${offer.termMonths}</span>
+                    </div>
+                </div>
+                 <div class="grid grid-cols-2 divide-x divide-primary">
+                    <div class="p-2 text-center">
+                        <span class="text-[10px] text-muted block">Payback</span>
+                        <span class="font-medium text-primary">${formatCurrency(offer.totalPayback)}</span>
+                    </div>
+                    <div class="p-2 text-center">
+                        <span class="text-[10px] text-muted block">${offer.frequency === 'weekly' ? 'Weekly' : 'Daily'}</span>
+                        <span class="font-medium text-primary">${formatCurrency(offer.payment)}</span>
+                    </div>
+                </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      elements.savedOffersContainer.innerHTML = cardsHtml;
+    }
+
+    function updateAddOfferButtonState() {
+      if (!elements.addOfferButton) return;
+      const remaining = MAX_ADDITIONAL_OFFERS - savedOffers.length;
+      elements.addOfferButton.disabled = remaining <= 0;
+    }
+
+    function handleAddOffer() {
+      if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return;
+      const offer = getCurrentOffer();
+      savedOffers.push({ ...offer });
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const isAmountSlider = (slider === elements.calcAmountSlider);
+      const getMax = () => (isAmountSlider ? amountSliderMax : max);
+
+      const initialValue = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+
+      slider.addEventListener('input', () => {
+        let val = parseFloat(slider.value);
+        const cap = getMax();
+        if (!isNaN(val) && val > cap) {
+          val = cap;
+          slider.value = val;
+        }
+        input.value = isCurrency ? formatCurrency(val) : val;
+        callback();
+      });
+
+      input.addEventListener('input', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
+        if (!isNaN(val) && val >= min && val <= cap) {
+          slider.value = val;
+          callback();
+        } else if (input.value === '') {
+          callback();
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value);
+        const cap = getMax();
+        if (isNaN(val) || val < min) val = min;
+        if (val > cap) val = cap;
+        slider.value = val;
+        input.value = isCurrency ? formatCurrency(val) : val.toString();
+        callback();
+      });
+    }
+
+    function applyTheme() {
+      document.documentElement.className = `${currentBaseTheme} ${currentAccentClass}`;
+      try {
+        localStorage.setItem('theme', currentBaseTheme);
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    function updateRepDisplay() {
+      if (!elements.repContactBlock) return;
+      const name = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+      const email = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+      const phone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+
+      const hasAny = name || email || phone;
+
+      if (hasAny) {
+        elements.repContactBlock.classList.remove('hidden');
+      } else {
+        elements.repContactBlock.classList.add('hidden');
+      }
+
+      if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+      if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+      if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
+    }
+    
+    // NEW: Function to update branding from settings inputs
+    function updateBranding() {
+       const cName = elements.companyNameInput.value.trim();
+       const cLogo = elements.companyLogoInput.value.trim();
+       
+       if (cName) {
+          elements.headerTitle.textContent = cName;
+          elements.headerTitle.classList.remove('hidden');
+          elements.headerPoweredBy.classList.remove('hidden');
+       } else {
+          elements.headerTitle.textContent = DEFAULT_COMPANY_NAME;
+          elements.headerTitle.classList.remove('hidden');
+          elements.headerPoweredBy.classList.add('hidden');
+       }
+       
+       if (cLogo) {
+         elements.headerLogo.src = cLogo;
+         elements.headerLogo.classList.remove('hidden');
+         elements.placeholderIcon.classList.add('hidden');
+       } else {
+         elements.headerLogo.src = "";
+         elements.headerLogo.classList.add('hidden');
+         elements.placeholderIcon.classList.remove('hidden');
+       }
+    }
+
+    function updatePaymentToggleUI() {
+      const toggles = [elements.toggleDaily, elements.toggleWeekly, elements.toggleMonthly];
+      const frequencies = ['daily', 'weekly', 'monthly'];
+      toggles.forEach((toggle, index) => {
+        if (!toggle) return;
+        toggle.classList.remove('toggle-active', 'toggle-inactive');
+        if (paymentFrequency === frequencies[index]) {
+          toggle.classList.add('toggle-active');
+        } else {
+          toggle.classList.add('toggle-inactive');
+        }
+      });
+    }
+
+    function initializeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+
+      const amountParam = params.get('amount');
+      const amount = amountParam ? parseFloat(amountParam) : 50000;
+      const factor = params.get('factor') || 1.25;
+      const term = params.get('term') || 130; 
+      // Use parseFloat to ensure correct type handling for the fee
+      const fee = parseFloat(params.get('fee')) || 0;
+      const freq = params.get('freq');
+      const paramTheme = params.get('theme');
+      const paramAccent = params.get('accent'); // Get accent from URL
+      
+      const offersParam = params.get('offers');
+      const businessNameParam = params.get('businessName') || '';
+      const repNameParam = params.get('repName') || '';
+      const repEmailParam = params.get('repEmail') || '';
+      const repPhoneParam = params.get('repPhone') || '';
+      const prepayParam = params.get('prepay');
+      const cNameParam = params.get('cName') || '';
+      const cLogoParam = params.get('cLogo') || '';
+
+      if (prepayParam) {
+        prepayDiscountPercent = parseInt(prepayParam, 10);
+        if (elements.prepaySlider) elements.prepaySlider.value = prepayDiscountPercent;
+      }
+
+      const viewMode = params.get('view');
+
+      isApprovalView = (viewMode === 'approval');
+
+      if(paramTheme) currentBaseTheme = paramTheme;
+      if(paramAccent) currentAccentClass = paramAccent;
+      
+      applyTheme(); // Use updated applyTheme which sets classes
+
+      if (isApprovalView) {
+        setAmountSliderMax(amount);
+      } else {
+        setAmountSliderMax(1000000);
+      }
+
+      // IMPORTANT: Set both Slider AND Input value manually
+      // syncInputs() sets up listeners but does not automatically sync on programmatic assignment
+      elements.calcAmountInput.value = formatCurrency(amount);
+      elements.calcAmountSlider.value = amount;
+
+      elements.calcFactorSlider.value = factor;
+      elements.calcFactorInput.value = factor; // manual sync
+
+      elements.calcTermSlider.value = term;
+      elements.calcTermInput.value = term; // manual sync
+      
+      elements.calcFeeSlider.value = fee;
+      elements.calcFeeInput.value = fee; // manual sync
+      
+      // Auto-expand fee if set and not in approval view
+      if (fee > 0 && !isApprovalView && elements.feeInputWrapper) {
+         elements.feeInputWrapper.classList.remove('hidden');
+      }
+
+      if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+      if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+      if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+      if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
+      if (elements.companyNameInput) elements.companyNameInput.value = cNameParam;
+      if (elements.companyLogoInput) elements.companyLogoInput.value = cLogoParam;
+
+      updateBranding();
+
+      paymentFrequency = freq || 'daily';
+
+      savedOffers = [];
+      if (offersParam) {
+        try {
+          const rawOffers = JSON.parse(offersParam);
+          if (Array.isArray(rawOffers)) {
+            savedOffers = rawOffers.map((raw) => {
+              const a = Number(raw.a ?? raw.amount ?? 0);
+              const f = Number(raw.f ?? raw.factor ?? 1.1);
+              const tRaw = raw.t ?? raw.term ?? 3;
+              const t = parseInt(tRaw, 10);
+              const termPayments = Number.isNaN(t) ? 1 : t;
+              const q = raw.q ?? raw.frequency ?? 'daily';
+              const fe = Number(raw.fee ?? 0);
+              return computeOffer(a, f, termPayments, q, fe);
+            });
+          }
+        } catch (err) {
+          console.error('Error parsing offers from URL', err);
+        }
+      }
+
+      if (isApprovalView) {
+        if (elements.factorContainer) elements.factorContainer.style.display = 'none';
+        // Logic update: hide the fee container INPUT, but keep grid result visible if fee > 0
+        // The ID 'feeContainer' refers to the input section we moved
+        if (elements.feeContainer) elements.feeContainer.style.display = 'none';
+        if (elements.termContainer) elements.termContainer.style.display = 'none';
+        if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
+        if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
+
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+        if (elements.businessNameInput) elements.businessNameInput.disabled = true;
+
+        if (elements.themeControls) elements.themeControls.style.display = 'none';
+        if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
+        if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
+        if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
+
+        if (elements.prepaySliderContainer) elements.prepaySliderContainer.style.display = 'none';
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.remove('hidden');
+
+        elements.headerContainer.classList.remove('justify-between');
+        elements.headerContainer.classList.add('justify-center');
+      } else {
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.add('hidden');
+      }
+    }
+
+    function generateSchedule(offer) {
+      const schedule = [];
+      let currentDate = new Date(); // Today
+      
+      // Reset hours
+      currentDate.setHours(0,0,0,0);
+
+      const totalPayments = offer.termMonths;
+      const paymentAmount = offer.payment;
+      const totalPayback = offer.totalPayback;
+      const maxDiscount = totalPayback * (prepayDiscountPercent / 100);
+
+      let runningDate = new Date(currentDate);
+      let paidSoFar = 0;
+
+      for (let i = 1; i <= totalPayments; i++) {
+         // Increment Date
+         if (offer.frequency === 'weekly') {
+            runningDate.setDate(runningDate.getDate() + 7);
+         } else if (offer.frequency === 'monthly') {
+            runningDate.setMonth(runningDate.getMonth() + 1);
+         } else {
+            // Daily - simple "next day" but skip weekends
+            do {
+               runningDate.setDate(runningDate.getDate() + 1);
+            } while (runningDate.getDay() === 0 || runningDate.getDay() === 6);
+         }
+         
+         paidSoFar += paymentAmount;
+         const remainingBalance = totalPayback - paidSoFar;
+         
+         const fractionRemaining = (totalPayments - i) / totalPayments;
+         const savings = maxDiscount * fractionRemaining;
+         
+         let payoff = remainingBalance - savings;
+         if (payoff < 0) payoff = 0;
+
+         schedule.push({
+            num: i,
+            date: new Date(runningDate), // Clone date
+            payment: paymentAmount,
+            balance: remainingBalance < 0.01 ? 0 : remainingBalance,
+            savings: savings,
+            payoff: payoff
+         });
+      }
+      return schedule;
+    }
+
+    function renderAmortizationSchedule(offer) {
+       if (!elements.amortizationTableBody) return;
+       const schedule = generateSchedule(offer);
+       
+       const rows = schedule.map(row => {
+          const dateStr = row.date.toLocaleDateString();
+          return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <td class="font-mono text-xs text-muted">${row.num}</td>
+              <td>${dateStr}</td>
+              <td>${formatCurrency(row.payment)}</td>
+              <td>${formatCurrency(row.balance)}</td>
+              <td class="text-success font-medium">${formatCurrency(row.savings)}</td>
+              <td class="font-semibold text-primary">${formatCurrency(row.payoff)}</td>
+            </tr>
+          `;
+       }).join('');
+       
+       elements.amortizationTableBody.innerHTML = rows;
+    }
+
+    function calculatePrepay(offer) {
+      if (isApprovalView) {
+        // Toggle visibility of "View Schedule" button based on prepay percent
+        if (prepayDiscountPercent > 0) {
+           if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.remove('hidden');
+        } else {
+           if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.add('hidden');
+        }
+      }
+
+      if (isApprovalView && prepayDiscountPercent === 0) {
+        if (elements.prepaySection) elements.prepaySection.classList.add('hidden');
+        return;
+      }
+      if (elements.prepaySection) elements.prepaySection.classList.remove('hidden');
+
+      if (!elements.prepayContainer || elements.prepayContainer.classList.contains('hidden')) return;
+
+      const totalPayback = offer.totalPayback;
+      let savings = 0;
+
+      if (isApprovalView) {
+        // --- CLIENT SIDE (DATE BASED) ---
+        const dateVal = elements.prepayDateInput.value;
+        if (!dateVal) {
+           const today = new Date().toISOString().split('T')[0];
+           elements.prepayDateInput.value = today;
+        }
+
+        const startDate = new Date();
+        startDate.setHours(0,0,0,0);
+
+        let termDays = 0;
+        if (offer.frequency === 'weekly') {
+           termDays = offer.termMonths * 7;
+        } else if (offer.frequency === 'monthly') {
+           termDays = offer.termMonths * 30.44;
+        } else {
+           termDays = offer.termMonths * 1.42; 
+        }
+
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + Math.ceil(termDays));
+
+        elements.prepayDateInput.min = startDate.toISOString().split('T')[0];
+        elements.prepayDateInput.max = endDate.toISOString().split('T')[0];
+
+        let selectedDate = new Date(elements.prepayDateInput.value);
+        selectedDate.setHours(0,0,0,0);
+
+        if (selectedDate < startDate) selectedDate = startDate;
+        if (selectedDate > endDate) selectedDate = endDate;
+
+        const totalTime = endDate.getTime() - startDate.getTime();
+        const remainingTime = endDate.getTime() - selectedDate.getTime();
+        let fractionRemaining = 0;
+        if (totalTime > 0) {
+          fractionRemaining = remainingTime / totalTime;
+        }
+        if (fractionRemaining < 0) fractionRemaining = 0;
+        if (fractionRemaining > 1) fractionRemaining = 1;
+
+        const maxPotentialSavings = totalPayback * (prepayDiscountPercent / 100);
+        savings = maxPotentialSavings * fractionRemaining;
+
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}% Max`;
+
+      } else {
+        savings = totalPayback * (prepayDiscountPercent / 100);
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}%`;
+      }
+
+      const newPayoff = totalPayback - savings;
+
+      elements.prepaySavingsDisplay.textContent = formatCurrency(savings);
+      elements.prepayTotalDisplay.textContent = formatCurrency(newPayoff);
+    }
+
+    function runCalculator() {
+      try {
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value) || 1.05;
+        const termPayments = parseInt(elements.calcTermInput.value) || 1; 
+        const fee = parseFloat(elements.calcFeeInput.value) || 0;
+
+        const offer = computeOffer(amount, factor, termPayments, paymentFrequency, fee);
+
+        const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+        if (elements.businessNameDisplay) {
+          if (businessName) {
+            elements.businessNameDisplay.textContent = businessName;
+            elements.businessNameDisplay.classList.remove('hidden');
+          } else {
+            elements.businessNameDisplay.textContent = '';
+            elements.businessNameDisplay.classList.add('hidden');
+          }
+        }
+
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback);
+        elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
+        elements.summaryTermOut.textContent = `${offer.termMonths} payments`;
+        elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+        elements.summaryPaymentLabel.textContent = offer.paymentLabel;
+        elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+        elements.summaryFeeOut.textContent = formatCurrency(offer.feeAmount);
+        elements.summaryNetOut.textContent = formatCurrency(offer.netProceeds);
+        
+        // --- NEW LOGIC FOR TABLE ROW HIDING ---
+        if (offer.feePercent <= 0 && isApprovalView) {
+           if (elements.feeGridItem) elements.feeGridItem.classList.add('hidden');
+           if (elements.netGridItem) elements.netGridItem.classList.add('hidden');
+           if (elements.detailsRowFee) elements.detailsRowFee.classList.add('hidden');
+        } else {
+           if (elements.feeGridItem) elements.feeGridItem.classList.remove('hidden');
+           if (elements.netGridItem) elements.netGridItem.classList.remove('hidden');
+           if (elements.detailsRowFee) elements.detailsRowFee.classList.remove('hidden');
+        }
+
+        if (elements.summaryTermLengthOut) {
+          let months = offer.termLengthMonths;
+
+          if (elements.termLengthMonthsInput) {
+            if (!termLengthManualDirty) {
+              const autoRounded = Math.round(months * 2) / 2;
+              elements.termLengthMonthsInput.value = Number.isInteger(autoRounded)
+                ? autoRounded.toString()
+                : autoRounded.toFixed(1);
+            }
+
+            const manualVal = parseFloat(elements.termLengthMonthsInput.value);
+            if (!isNaN(manualVal) && manualVal > 0) {
+              months = manualVal;
+            }
+          }
+
+          if (months && months > 0) {
+            const rounded = Math.round(months * 2) / 2;
+            const display = Number.isInteger(rounded)
+              ? rounded.toString()
+              : rounded.toFixed(1);
+            elements.summaryTermLengthOut.textContent = `${display} months`;
+          } else {
+            elements.summaryTermLengthOut.textContent = '';
+          }
+        }
+
+        calculatePrepay(offer);
+        updateRepDisplay();
+      } catch (e) {
+        console.error('Calculator error:', e);
+      }
+    }
+
+    function initializeCalculator() {
+      // SW Registration for PWA Support
+      if ('serviceWorker' in navigator) {
+         window.addEventListener('load', () => {
+           navigator.serviceWorker.register('./service-worker.js')
+             .then(reg => console.log('Service Worker Registered'))
+             .catch(err => console.log('Service Worker Failed', err));
+         });
+      }
+
+      initializeFromURL();
+      applyTheme();
+
+      if (elements.themeSelector) {
+        elements.themeSelector.value = currentTheme;
+      }
+
+      if (elements.calcAmountSlider && elements.calcAmountInput) {
+        syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator);
+      }
+      if (elements.calcFactorSlider && elements.calcFactorInput) {
+        syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator);
+      }
+      if (elements.calcFeeSlider && elements.calcFeeInput) {
+        syncInputs(elements.calcFeeSlider, elements.calcFeeInput, false, 0, 10, runCalculator);
+      }
+      if (elements.calcTermSlider && elements.calcTermInput) {
+        syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 1, 528, runCalculator);
+      }
+
+      if (elements.toggleDaily) {
+        elements.toggleDaily.addEventListener('click', () => {
+          paymentFrequency = 'daily';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleWeekly) {
+        elements.toggleWeekly.addEventListener('click', () => {
+          paymentFrequency = 'weekly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+      if (elements.toggleMonthly) {
+        elements.toggleMonthly.addEventListener('click', () => {
+          paymentFrequency = 'monthly';
+          updatePaymentToggleUI();
+          runCalculator();
+        });
+      }
+
+      if (elements.businessNameInput) {
+        elements.businessNameInput.addEventListener('input', runCalculator);
+      }
+
+      if (elements.termLengthMonthsInput) {
+        elements.termLengthMonthsInput.addEventListener('input', () => {
+          termLengthManualDirty = true;
+          runCalculator();
+        });
+        elements.termLengthMonthsInput.addEventListener('blur', () => {
+          const v = parseFloat(elements.termLengthMonthsInput.value);
+          if (!isNaN(v) && v > 0) {
+            const rounded = Math.round(v * 2) / 2;
+            elements.termLengthMonthsInput.value = Number.isInteger(rounded)
+              ? rounded.toString()
+              : rounded.toFixed(1);
+          }
+          runCalculator();
+        });
+      }
+
+      if (elements.toggleFeeBtn) {
+        elements.toggleFeeBtn.addEventListener('click', () => {
+          elements.feeInputWrapper.classList.toggle('hidden');
+        });
+      }
+
+      if (elements.togglePrepay) {
+        elements.togglePrepay.addEventListener('click', () => {
+          elements.prepayContainer.classList.toggle('hidden');
+          runCalculator(); 
+        });
+      }
+      if (elements.prepaySlider) {
+        elements.prepaySlider.addEventListener('input', (e) => {
+          prepayDiscountPercent = parseInt(e.target.value, 10);
+          runCalculator();
+        });
+      }
+      if (elements.prepayDateInput) {
+        elements.prepayDateInput.addEventListener('change', () => {
+          runCalculator();
+        });
+      }
+
+      // Amortization Listeners
+      if (elements.viewAmortizationBtn) {
+        elements.viewAmortizationBtn.addEventListener('click', () => {
+          const currentOffer = getCurrentOffer();
+          renderAmortizationSchedule(currentOffer);
+          elements.amortizationModal.classList.remove('hidden');
+        });
+      }
+      if (elements.closeAmortizationBtn) {
+        elements.closeAmortizationBtn.addEventListener('click', () => {
+          elements.amortizationModal.classList.add('hidden');
+        });
+      }
+
+      if (elements.repSettingsToggle && elements.repSettingsPanel) {
+        elements.repSettingsToggle.addEventListener('click', () => {
+          elements.repSettingsPanel.classList.toggle('hidden');
+        });
+      }
+      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+      if (elements.companyNameInput) elements.companyNameInput.addEventListener('input', updateBranding);
+      if (elements.companyLogoInput) elements.companyLogoInput.addEventListener('input', updateBranding);
+
+      if (elements.addOfferButton) {
+        elements.addOfferButton.addEventListener('click', handleAddOffer);
+      }
+
+      if (elements.shareLinkButton) {
+        elements.shareLinkButton.addEventListener('click', () => {
+          const shareBtn = elements.shareLinkButton;
+          const originalText = shareBtn.innerText;
+
+          const amount = parseFormattedNumber(elements.calcAmountInput.value);
+          const factor = parseFloat(elements.calcFactorInput.value);
+          const term = parseInt(elements.calcTermInput.value) || 1;
+          const fee = parseFloat(elements.calcFeeInput.value) || 0;
+          const freq = paymentFrequency;
+          const theme = currentBaseTheme; // Use tracked theme
+          const accent = currentAccentClass; // Use tracked accent
+          
+          const businessName = elements.businessNameInput
+            ? elements.businessNameInput.value.trim()
+            : '';
+          const repName = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+          const repEmail = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+          const repPhone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+          const cName = elements.companyNameInput.value;
+          const cLogo = elements.companyLogoInput.value;
+
+
+          const offersForUrl = savedOffers.map((offer) => ({
+            a: offer.amount,
+            f: offer.factor,
+            t: offer.termMonths,
+            q: offer.frequency || freq,
+            fee: offer.feePercent || 0,
+          }));
+
+          const url = new URL(window.location.href);
+          const params = new URLSearchParams({
+            amount,
+            factor,
+            term,
+            fee,
+            freq,
+            theme,
+            accent,
+            businessName,
+            repName,
+            repEmail,
+            repPhone,
+            cName,
+            cLogo,
+            prepay: prepayDiscountPercent,
+            offers: JSON.stringify(offersForUrl),
+            view: 'approval',
+          });
+          url.search = params.toString();
+
+          const textArea = document.createElement('textarea');
+          textArea.value = url.toString();
+          textArea.style.position = 'fixed';
+          textArea.style.top = '0';
+          textArea.style.left = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+
+          try {
+            document.execCommand('copy');
+            shareBtn.innerText = 'Copied!';
+            setTimeout(() => {
+              shareBtn.innerText = originalText;
+            }, 2000);
+          } catch (errFallback) {
+            console.error('Fallback copy failed:', errFallback);
+            shareBtn.innerText = 'Error';
+            setTimeout(() => {
+              shareBtn.innerText = originalText;
+            }, 2000);
+          }
+          document.body.removeChild(textArea);
+        });
+      }
+
+      if (elements.prepayDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        elements.prepayDateInput.value = today;
+      }
+
+      updatePaymentToggleUI();
+      runCalculator();
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    initializeCalculator();
+  </script>
+</body>
+</html>
