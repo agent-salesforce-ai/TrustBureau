@@ -14,7 +14,7 @@
   
   <!-- Apple Touch Icon (Placeholder) -->
   <link rel="apple-touch-icon" href="https://placehold.co/180x180/42D197/ffffff?text=TB" />
-  <!-- Favicon (Data URI for immediate icon) - Updated to Gold (#D19B2B) Shield with Black Check -->
+  <!-- Favicon (Data URI for immediate icon) - Gold Shield -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22%23D19B2B%22/><path d=%22M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z%22 fill=%22black%22/></svg>">
 
   <!-- Tailwind -->
@@ -456,7 +456,7 @@
             max-width: 100%;
             width: 100%;
         }
-        #calculatorInputs, #themeControls, #buttonContainer, #repSettingsToggle, #savedOffersSection, #togglePrepay, #toggleFeeBtn {
+        #calculatorInputs, #themeControls, #buttonContainer, #repSettingsToggle, #savedOffersSection, #togglePrepay, #toggleFeeBtn, #installContainer, #acceptContainer {
             display: none !important;
         }
         #offerCard {
@@ -470,9 +470,22 @@
             border-bottom: 2px solid #000;
         }
     }
+    
+    /* Confetti Canvas */
+    #confettiCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200 no-select">
+  
+  <canvas id="confettiCanvas"></canvas>
 
   <div class="w-full max-w-xl card-bg shell text-primary rounded-xl shadow-lg p-4 md:p-6 space-y-4 border">
 
@@ -614,7 +627,7 @@
 
       <div class="card-inner-bg p-4 rounded-xl shadow-inner space-y-4">
         <div id="amountContainer" class="space-y-1">
-          <label for="calcAmount" class="block text-xs font-semibold text-muted">
+          <label id="amountLabel" for="calcAmount" class="block text-xs font-semibold text-muted">
             Amount You Get ($)
           </label>
           <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1"
@@ -693,7 +706,7 @@
     </div>
 
     <!-- OFFER 1 CARD -->
-    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary">
+    <div id="offerCard" class="card-bg p-4 rounded-lg shadow-md border border-primary relative">
       <div class="flex justify-center items-center border-b border-primary pb-3 pt-3">
         <h4 class="text-sm font-semibold text-secondary">Offer 1 – Your Approved Terms</h4>
       </div>
@@ -705,6 +718,11 @@
         <span id="summaryAmountOut"
               class="text-5xl font-bold block my-2 text-hero leading-tight">$50,000</span>
         
+        <!-- SAVINGS PILL (Hidden unless amount is adjusted) -->
+        <div id="savingsPill" class="hidden mb-2 inline-block bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+            You save <span id="savingsValue">$0</span> in repayment!
+        </div>
+
         <!-- NEW: Donut Chart -->
         <div class="my-4">
             <div id="offerDonutChart" class="donut-chart" title="Principal vs Cost">
@@ -786,6 +804,16 @@
              <span id="summaryPaymentValue" class="text-xs font-normal text-primary block mt-1"></span>
            </div>
         </div>
+      </div>
+
+      <!-- Accept Button (Visible Only in Approval View) -->
+      <div id="acceptContainer" class="mt-6 hidden">
+          <button id="acceptOfferBtn" class="w-full button-primary text-sm uppercase tracking-wider py-3 shadow-lg flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              Accept This Offer
+          </button>
       </div>
 
       <!-- Fee Container Moved Here (Above Prepay) -->
@@ -937,9 +965,24 @@
     </div>
   </div>
 
+  <!-- ACCEPT MODAL -->
+  <div id="acceptModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 hidden backdrop-blur-sm p-4">
+      <div class="card-bg w-full max-w-sm rounded-xl shadow-2xl p-6 text-center border border-primary relative overflow-hidden">
+          <div class="mb-4 flex justify-center">
+              <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              </div>
+          </div>
+          <h3 class="text-xl font-bold text-primary mb-2">Offer Accepted!</h3>
+          <p class="text-sm text-muted mb-6">Your funding specialist has been notified. Check your email for next steps.</p>
+          <button id="closeAcceptBtn" class="w-full button-primary text-sm">Close</button>
+      </div>
+  </div>
+
   <script>
     const elements = {
       calcAmountSlider: document.getElementById('calcAmountSlider'),
+      amountLabel: document.getElementById('amountLabel'),
       calcFactorSlider: document.getElementById('calcFactorSlider'),
       calcFeeSlider: document.getElementById('calcFeeSlider'),
       calcTermSlider: document.getElementById('calcTermSlider'),
@@ -974,6 +1017,8 @@
       // Chart
       chartPayback: document.getElementById('chartPayback'),
       offerDonutChart: document.getElementById('offerDonutChart'),
+      savingsPill: document.getElementById('savingsPill'),
+      savingsValue: document.getElementById('savingsValue'),
 
       businessNameInput: document.getElementById('businessNameInput'),
       businessNameDisplay: document.getElementById('businessNameDisplay'),
@@ -1032,6 +1077,16 @@
       amortizationModal: document.getElementById('amortizationModal'),
       closeAmortizationBtn: document.getElementById('closeAmortizationBtn'),
       amortizationTableBody: document.getElementById('amortizationTableBody'),
+
+      // PWA Elements
+      installContainer: document.getElementById('installContainer'),
+      installBtn: document.getElementById('installBtn'),
+      
+      // Accept Elements
+      acceptContainer: document.getElementById('acceptContainer'),
+      acceptOfferBtn: document.getElementById('acceptOfferBtn'),
+      acceptModal: document.getElementById('acceptModal'),
+      closeAcceptBtn: document.getElementById('closeAcceptBtn'),
     };
 
     let paymentFrequency = 'daily';
@@ -1039,6 +1094,8 @@
     let currentBaseTheme = 'theme-light';
     let currentAccentClass = 'accent-mint';
     let amountSliderMax = 1000000;
+    // Track original max approval amount for savings calc
+    let originalMaxAmount = 0; 
     const MAX_ADDITIONAL_OFFERS = 2;
     let savedOffers = [];
     let isApprovalView = false;
@@ -1048,6 +1105,44 @@
     // Default branding values (empty = unbranded)
     const DEFAULT_COMPANY_NAME = "TrustBureau.ai";
     const DEFAULT_LOGO_URL = "";
+
+    // Confetti Logic
+    function fireConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const pieces = [];
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+        
+        for (let i = 0; i < 100; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 10 + 5,
+                h: Math.random() * 10 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vy: Math.random() * 2 + 2,
+                vx: Math.random() * 2 - 1
+            });
+        }
+        
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            pieces.forEach(p => {
+                p.y += p.vy;
+                p.x += p.vx;
+                if (p.y < canvas.height) active = true;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+            });
+            if (active) requestAnimationFrame(update);
+            else ctx.clearRect(0,0, canvas.width, canvas.height);
+        }
+        update();
+    }
 
     function setBaseTheme(themeName) {
       // Removing existing theme classes
@@ -1357,6 +1452,8 @@
 
       if (isApprovalView) {
         setAmountSliderMax(amount);
+        originalMaxAmount = amount; // Track approved max
+        if (elements.amountLabel) elements.amountLabel.textContent = `Adjust Amount (Approved Max: ${formatCurrency(amount)})`;
       } else {
         setAmountSliderMax(1000000);
       }
@@ -1428,6 +1525,12 @@
         if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
         if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
         if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
+        
+        // Hide Install Button in Approval View
+        if (elements.installContainer) elements.installContainer.style.display = 'none';
+        
+        // Show Accept Button
+        if (elements.acceptContainer) elements.acceptContainer.classList.remove('hidden');
 
         if (elements.prepaySliderContainer) elements.prepaySliderContainer.style.display = 'none';
         if (elements.prepayDateContainer) elements.prepayDateContainer.classList.remove('hidden');
@@ -1625,6 +1728,20 @@
             elements.offerDonutChart.style.background = `conic-gradient(var(--accent-color) 0% ${principalPct}%, var(--bg-slider-track) ${principalPct}% 100%)`;
         }
         
+        // --- NEW SAVINGS CALC ---
+        if (isApprovalView && originalMaxAmount > 0 && elements.savingsPill) {
+            const maxCost = originalMaxAmount * offer.factor; // Cost at full approval
+            const currentCost = offer.totalPayback;
+            const savings = (maxCost - currentCost); // Total difference in Payback
+            
+            if (savings > 100) { // Only show if substantial
+                elements.savingsPill.classList.remove('hidden');
+                elements.savingsValue.textContent = formatCurrency(savings);
+            } else {
+                elements.savingsPill.classList.add('hidden');
+            }
+        }
+        
         // --- NEW LOGIC FOR TABLE ROW HIDING ---
         if (offer.feePercent <= 0 && isApprovalView) {
            if (elements.feeGridItem) elements.feeGridItem.classList.add('hidden');
@@ -1671,21 +1788,13 @@
       }
     }
 
+    // ADDED: Missing initializeCalculator function restored
     function initializeCalculator() {
-      // SW Registration for PWA Support
-      if ('serviceWorker' in navigator) {
-         window.addEventListener('load', () => {
-           navigator.serviceWorker.register('./service-worker.js')
-             .then(reg => console.log('Service Worker Registered'))
-             .catch(err => console.log('Service Worker Failed', err));
-         });
-      }
-
       initializeFromURL();
       applyTheme();
 
       if (elements.themeSelector) {
-        elements.themeSelector.value = currentTheme;
+        elements.themeSelector.value = currentBaseTheme; // Corrected to use currentBaseTheme
       }
 
       if (elements.calcAmountSlider && elements.calcAmountInput) {
@@ -1897,20 +2006,21 @@
 
     // Install Button Logic
     let deferredPrompt;
-    const installContainer = document.getElementById('installContainer');
-    const installBtn = document.getElementById('installBtn');
-
+    
     window.addEventListener('beforeinstallprompt', (e) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
       deferredPrompt = e;
       // Update UI notify the user they can install the PWA
-      if (installContainer) installContainer.classList.remove('hidden');
+      // ONLY show if NOT in approval view
+      if (elements.installContainer && !isApprovalView) {
+          elements.installContainer.classList.remove('hidden');
+      }
     });
 
-    if (installBtn) {
-      installBtn.addEventListener('click', async () => {
+    if (elements.installBtn) {
+      elements.installBtn.addEventListener('click', async () => {
         if (!deferredPrompt) return;
         // Show the install prompt
         deferredPrompt.prompt();
@@ -1920,8 +2030,22 @@
         // We've used the prompt, and can't use it again, throw it away
         deferredPrompt = null;
         // Hide the install button
-        installContainer.classList.add('hidden');
+        elements.installContainer.classList.add('hidden');
       });
+    }
+    
+    // Accept Modal Logic
+    if (elements.acceptOfferBtn) {
+        elements.acceptOfferBtn.addEventListener('click', () => {
+            fireConfetti();
+            if (elements.acceptModal) elements.acceptModal.classList.remove('hidden');
+        });
+    }
+    
+    if (elements.closeAcceptBtn) {
+        elements.closeAcceptBtn.addEventListener('click', () => {
+            if (elements.acceptModal) elements.acceptModal.classList.add('hidden');
+        });
     }
 
     initializeCalculator();
