@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-light accent-mint">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>TrustBureau.ai | Payments Offer Calculator</title>
+
+  <!-- PWA / Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#42D197" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="TrustBureau" />
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="https://placehold.co/180x180/42D197/ffffff?text=TB" />
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22%2342D197%22/><path d=%22M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z%22 fill=%22white%22/></svg>">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- PDF Generation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    body, input, button, select, textarea, * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; font-weight: 400; } body { font-size: 14px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .input-icon { top: 50%; transform: translateY(-50%); }
+
+    /* --- BASE THEMES --- */
+    html.theme-light { 
+      --bg-body: #ffffff; 
+      --bg-card: #ffffff; 
+      --bg-card-inner: #f8fafc; 
+      --bg-input: #ffffff; 
+      --bg-toggle-inactive: #f1f5f9; 
+      --border-primary: #e2e8f0; 
+      --text-primary: #0f172a; 
+      --text-secondary: #334155; 
+      --text-muted: #94a3b8; 
+      --text-success: #16a34a; 
+      --text-warning: #d97706;
+      --text-danger: #dc2626;
+      --shadow-color: rgba(0, 0, 0, 0.05); 
+      --bg-slider-track: #e2e8f0; 
+    }
+    html.theme-dark { --bg-body: #0f172a; --bg-card: #1e293b; --bg-card-inner: #0f172a; --bg-input: #1e293b; --bg-toggle-inactive: #0f172a; --border-primary: #334155; --text-primary: #f8fafc; --text-secondary: #e2e8f0; --text-muted: #94a3b8; --text-success: #4ade80; --text-warning: #fbbf24; --text-danger: #f87171; --shadow-color: rgba(0, 0, 0, 0.4); --bg-slider-track: #334155; }
+    html.theme-black { --bg-body: #000000; --bg-card: #0a0a0a; --bg-card-inner: #000000; --bg-input: #0a0a0a; --bg-toggle-inactive: #000000; --border-primary: #262626; --text-primary: #f5f5f5; --text-secondary: #d4d4d4; --text-muted: #737373; --text-success: #4ade80; --text-warning: #fbbf24; --text-danger: #f87171; --shadow-color: rgba(0, 0, 0, 0.8); --bg-slider-track: #262626; }
+
+    body { background-color: var(--bg-body); transition: background-color 0.3s ease; }
+
+    /* --- ACCENT COLORS --- */
+    html.accent-gold { --accent-color: #D19B2B; --accent-color-light: #e6b650; --accent-color-dark: #a6781c; --accent-text-inverted: #020617; }
+    html.accent-blue { --accent-color: #3b82f6; --accent-color-light: #60a5fa; --accent-color-dark: #2563eb; --accent-text-inverted: #ffffff; }
+    html.accent-green { --accent-color: #22c55e; --accent-color-light: #4ade80; --accent-color-dark: #16a34a; --accent-text-inverted: #ffffff; }
+    html.accent-red { --accent-color: #ef4444; --accent-color-light: #f87171; --accent-color-dark: #dc2626; --accent-text-inverted: #ffffff; }
+    html.accent-orange { --accent-color: #f97316; --accent-color-light: #fb923c; --accent-color-dark: #ea580c; --accent-text-inverted: #ffffff; }
+    html.accent-purple { --accent-color: #a855f7; --accent-color-light: #c084fc; --accent-color-dark: #9333ea; --accent-text-inverted: #ffffff; }
+    html.accent-pink { --accent-color: #ec4899; --accent-color-light: #f472b6; --accent-color-dark: #db2777; --accent-text-inverted: #ffffff; }
+    html.accent-teal { --accent-color: #14b8a6; --accent-color-light: #2dd4bf; --accent-color-dark: #0d9488; --accent-text-inverted: #ffffff; }
+    html.accent-indigo { --accent-color: #6366f1; --accent-color-light: #818cf8; --accent-color-dark: #4f46e5; --accent-text-inverted: #ffffff; }
+    html.accent-gray { --accent-color: #111827; --accent-color-light: #374151; --accent-color-dark: #000000; --accent-text-inverted: #ffffff; }
+    html.theme-dark.accent-gray, html.theme-black.accent-gray { --accent-color: #f3f4f6; --accent-color-light: #ffffff; --accent-color-dark: #d1d5db; --accent-text-inverted: #000000; }
+    html.accent-mint { --accent-color: #42D197; --accent-color-light: #74eabc; --accent-color-dark: #2d9668; --accent-text-inverted: #ffffff; }
+    html.accent-cyan { --accent-color: #06b6d4; --accent-color-light: #22d3ee; --accent-color-dark: #0891b2; --accent-text-inverted: #ffffff; }
+    html.accent-lime { --accent-color: #84cc16; --accent-color-light: #a3e635; --accent-color-dark: #65a30d; --accent-text-inverted: #020617; }
+    html.accent-fuchsia { --accent-color: #d946ef; --accent-color-light: #e879f9; --accent-color-dark: #c026d3; --accent-text-inverted: #ffffff; }
+    html.accent-sky { --accent-color: #0ea5e9; --accent-color-light: #38bdf8; --accent-color-dark: #0284c7; --accent-text-inverted: #ffffff; }
+    html.accent-yellow { --accent-color: #eab308; --accent-color-light: #facc15; --accent-color-dark: #ca8a04; --accent-text-inverted: #020617; }
+    html.accent-black { --accent-color: #000000; --accent-color-light: #333333; --accent-color-dark: #000000; --accent-text-inverted: #ffffff; }
+    html.theme-dark.accent-black, html.theme-black.accent-black { --accent-color: #f3f4f6; --accent-color-light: #ffffff; --accent-color-dark: #d1d5db; --accent-text-inverted: #000000; }
+
+    /* --- CUSTOM SLIDER STYLING --- */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+      cursor: pointer;
+      height: 6px;
+      border-radius: 999px;
+    }
+    input[type=range]:focus { outline: none; }
+    
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: transparent;
+      border-radius: 999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -7px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border: 3px solid var(--bg-card);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type=range]:hover::-webkit-slider-thumb {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.15);
+    }
+
+    input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: transparent;
+      border-radius: 999px;
+    }
+    input[type=range]::-moz-range-thumb {
+      height: 20px;
+      width: 20px;
+      border: 3px solid var(--bg-card);
+      border-radius: 50%;
+      background: var(--accent-color);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease;
+    }
+    input[type=range]:hover::-moz-range-thumb {
+      transform: scale(1.1);
+    }
+
+    /* --- COMPONENT STYLES --- */
+    .card-bg { background-color: var(--bg-card); border-color: var(--border-primary); }
+    .shell { 
+        border-color: var(--accent-color); 
+        border-width: 4px;
+        box-shadow: 0 0 20px -5px var(--accent-color), 0 25px 50px -12px var(--shadow-color); 
+    }
+    .card-inner-bg { background-color: var(--bg-card-inner); border: 1px solid var(--border-primary); }
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-secondary); }
+    .text-success { color: var(--text-success); }
+    .text-warning { color: var(--text-warning); }
+    .text-danger { color: var(--text-danger); }
+    .border-primary { border-color: var(--border-primary); }
+    
+    .input-field { 
+        background-color: var(--bg-input); 
+        border-color: var(--border-primary); 
+        color: var(--text-primary); 
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus, .input-field:focus-within { 
+        border-color: var(--accent-color); 
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent); 
+        outline: none; 
+    }
+    input[type="date"] { background-color: var(--bg-input); color: var(--text-primary); border-color: var(--border-primary); }
+    ::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+    html.theme-light ::-webkit-calendar-picker-indicator { filter: invert(0); }
+    .text-hero { color: var(--accent-color); }
+    
+    /* Modernized Toggle */
+    .toggle-group {
+        display: inline-flex;
+        background: transparent; border: 1px solid var(--border-primary);
+        border-radius: 12px;
+        padding: 4px;
+        gap: 4px;
+    }
+    .toggle-btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+    .toggle-btn:hover:not(.toggle-active) {
+        color: var(--text-secondary);
+        background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+    }
+    .toggle-btn.toggle-active {
+        background: var(--accent-color);
+        color: var(--accent-text-inverted);
+        box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-color) 40%, transparent);
+    }
+    
+    .button-primary { 
+        background-color: var(--accent-color); 
+        color: var(--accent-text-inverted); 
+        font-weight: 500; 
+        border-radius: 10px; 
+        padding: 12px 24px; 
+        border: none;
+        transition: all 0.2s ease; 
+        font-size: 13px;
+        box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-color) 30%, transparent);
+    }
+    .button-primary:hover { 
+        background-color: var(--accent-color-light); 
+        box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-color) 40%, transparent);
+        transform: translateY(-1px); 
+    }
+    .button-primary:active {
+        transform: translateY(0);
+    }
+    .button-primary:disabled { 
+        background-color: var(--bg-slider-track); 
+        color: var(--text-secondary); 
+        cursor: not-allowed; 
+        transform: none; 
+        box-shadow: none; 
+    }
+    
+    .button-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+        font-weight: 500;
+        border-radius: 10px;
+        padding: 10px 20px;
+        border: 1px solid var(--border-primary);
+        transition: all 0.2s ease;
+        font-size: 13px;
+    }
+    .button-secondary:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+        background: color-mix(in srgb, var(--accent-color) 5%, transparent);
+    }
+    
+    .color-swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s ease; display: inline-block; }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected { border-color: var(--text-primary); box-shadow: 0 0 0 3px var(--bg-card); }
+    
+    /* Table styles */
+    .amort-table th { 
+        background-color: var(--bg-slider-track); 
+        color: var(--text-secondary); 
+        font-size: 0.65rem; 
+        text-transform: uppercase; 
+        letter-spacing: 0.05em; 
+        padding: 0.75rem 0.5rem; 
+        font-weight: 500; 
+        border-bottom: 2px solid var(--accent-color);
+        text-align: right;
+    }
+    .amort-table th:first-child, .amort-table th:nth-child(2) { text-align: left; }
+    .amort-table td { 
+        border-bottom: 1px solid var(--border-primary); 
+        color: var(--text-primary); 
+        font-size: 0.75rem; 
+        padding: 0.6rem 0.5rem; 
+        text-align: right;
+    }
+    .amort-table td:first-child, .amort-table td:nth-child(2) { text-align: left; }
+    .amort-table tr:last-child td { border-bottom: none; }
+    .amort-table tr:hover { background: color-mix(in srgb, var(--accent-color) 5%, transparent); }
+
+    /* Donut Chart */
+    .chart-wrapper {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .chart-text {
+        position: absolute;
+        text-align: center;
+        z-index: 10;
+    }
+    .circular-chart {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .circle-bg {
+        fill: none;
+        stroke: var(--bg-slider-track);
+        stroke-width: 2.5;
+    }
+    .circle {
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke: var(--accent-color);
+        transition: stroke-dasharray 0.6s ease-out;
+    }
+
+    /* Tooltips */
+    .tooltip-container { position: relative; display: inline-block; cursor: help; }
+    .tooltip-text { visibility: hidden; width: 200px; background-color: var(--text-primary); color: var(--bg-card); text-align: center; border-radius: 8px; padding: 10px; position: absolute; z-index: 50; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; box-shadow: 0 4px 12px rgba(0,0,0,0.15); line-height: 1.4; }
+    .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: var(--text-primary) transparent transparent transparent; }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    /* Validation Warning */
+    .validation-warning {
+        background: color-mix(in srgb, var(--text-warning) 10%, transparent);
+        border: 1px solid var(--text-warning);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--text-warning);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .validation-warning.danger {
+        background: color-mix(in srgb, var(--text-danger) 10%, transparent);
+        border-color: var(--text-danger);
+        color: var(--text-danger);
+    }
+    
+    /* Expiration Timer */
+    .expiration-banner {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 15%, transparent), color-mix(in srgb, var(--accent-color) 5%, transparent));
+        border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
+        border-radius: 12px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .expiration-banner.urgent {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--text-danger) 15%, transparent), color-mix(in srgb, var(--text-danger) 5%, transparent));
+        border-color: var(--text-danger);
+    }
+    .timer-digit {
+        background: var(--bg-card);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-weight: 500;
+        font-size: 16px;
+        min-width: 40px;
+        text-align: center;
+        box-shadow: 0 2px 4px var(--shadow-color);
+    }
+    
+    /* Comparison Bar */
+    .comparison-bar-track {
+        height: 8px;
+        background: transparent; border: 1px solid var(--border-primary);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .comparison-bar-fill {
+        height: 100%;
+        background: var(--accent-color);
+        border-radius: 4px;
+        transition: width 0.4s ease;
+    }
+    
+    /* Badge */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .badge-success {
+        background: #ffffff;
+        color: #16a34a;
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .badge-accent {
+        background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+        color: var(--accent-color);
+    }
+    
+    /* APR Highlight */
+    .apr-display {
+        background: linear-gradient(135deg, var(--bg-card-inner), var(--bg-card));
+        border: 1px solid var(--border-primary);
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    /* Print */
+    @media print {
+        body { background-color: #fff; color: #000; }
+        .shell { border: none; box-shadow: none; max-width: 100%; width: 100%; }
+        #calculatorInputs, #themeControls, #buttonContainer, #repSettingsToggle, #savedOffersSection, #togglePrepay, #toggleFeeBtn, #installContainer, #acceptContainer, #repSettingsPanel, #shareMenuBtn, #expirationBanner { display: none !important; }
+        #offerCard { border: 1px solid #ccc; box-shadow: none; }
+        .text-hero { color: #000 !important; }
+        #headerContainer { border-bottom: 2px solid #000; }
+    }
+    
+    #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+    
+    /* QR Code Container */
+    #qrCodeContainer canvas, #qrCodeContainer img {
+        border-radius: 8px;
+    }
+    
+    /* FONT WEIGHT OVERRIDES - Reduce boldness globally */
+    .font-medium { font-weight: 400; }
+    #summaryAmountOut { font-weight: 600 !important; }
+    h1, h2, h3, h4, h5, h6 { font-weight: 500; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 transition-colors duration-200 no-select">
+  
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="w-full max-w-xl card-bg shell text-primary rounded-2xl shadow-lg p-5 md:p-6 space-y-5 border">
+
+    <!-- HEADER -->
+    <div id="headerContainer" class="pb-4 border-b border-primary flex flex-col items-center gap-3">
+      <div class="flex flex-col items-center justify-center flex-shrink-0 relative w-full">
+        
+        <!-- PWA Install Button -->
+        <div id="installContainer" class="absolute right-0 top-0 hidden">
+            <button id="installBtn" class="text-[10px] uppercase tracking-wide font-medium bg-slate-800 dark:bg-slate-200 text-white dark:text-black px-3 py-1.5 rounded-full shadow hover:scale-105 transition flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Install
+            </button>
+        </div>
+
+        <div id="headerLogoWrapper" class="flex items-center justify-center mb-2">
+            <img id="headerLogo" src="" alt="Company Logo" class="h-16 w-auto object-contain hidden" />
+            <svg id="placeholderIcon" xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-hero" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+            </svg>
+        </div>
+        <h1 id="headerTitle" class="text-primary text-xl mt-0 text-center font-medium tracking-tight">TrustBureau.ai</h1>
+        <span id="headerPoweredBy" class="text-[10px] font-medium text-muted uppercase tracking-widest mt-1 hidden">powered by TrustBureau.ai</span>
+      </div>
+      
+      <!-- THEME CONTROLS (Rep Only) -->
+      <div id="themeControls" class="flex items-center justify-center gap-3">
+        <button id="repSettingsToggle" type="button"
+                class="button-secondary flex items-center gap-2 text-xs py-2 px-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 016 0z" /></svg>
+          Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- EXPIRATION TIMER (Client View) -->
+    <div id="expirationBanner" class="expiration-banner hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="text-sm font-medium text-secondary">Offer expires in</span>
+        <div class="flex items-center gap-1">
+            <span id="timerHours" class="timer-digit text-primary">00</span>
+            <span class="text-muted font-medium">:</span>
+            <span id="timerMinutes" class="timer-digit text-primary">00</span>
+            <span class="text-muted font-medium">:</span>
+            <span id="timerSeconds" class="timer-digit text-primary">00</span>
+        </div>
+    </div>
+
+    <!-- REP SETTINGS PANEL -->
+    <div id="repSettingsPanel" class="w-full mt-3 card-inner-bg border border-primary rounded-xl p-4 hidden">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-medium text-primary">Rep Settings</span>
+        <span class="text-[10px] text-muted uppercase tracking-wider">Customize offer view</span>
+      </div>
+      <div class="grid grid-cols-1 gap-3 text-xs">
+        <!-- THEME SELECTION -->
+        <div>
+           <label class="block font-medium text-muted mb-2">Base Theme</label>
+           <div class="flex gap-2">
+              <button type="button" onclick="setBaseTheme('theme-light')" class="flex-1 py-2 border border-primary rounded-lg text-center hover:border-accent transition text-sm">Light</button>
+              <button type="button" onclick="setBaseTheme('theme-dark')" class="flex-1 py-2 border border-primary rounded-lg text-center hover:border-accent transition text-sm">Dark</button>
+              <button type="button" onclick="setBaseTheme('theme-black')" class="flex-1 py-2 border border-primary rounded-lg text-center hover:border-accent transition text-sm">Black</button>
+           </div>
+        </div>
+        <!-- ACCENT SELECTION -->
+        <div>
+           <label class="block font-medium text-muted mb-2">Accent Color</label>
+           <div class="flex flex-wrap gap-2">
+              <div onclick="setAccent('accent-mint')" class="color-swatch" style="background-color: #42D197;" title="Mint"></div>
+              <div onclick="setAccent('accent-blue')" class="color-swatch" style="background-color: #3b82f6;" title="Blue"></div>
+              <div onclick="setAccent('accent-green')" class="color-swatch" style="background-color: #22c55e;" title="Green"></div>
+              <div onclick="setAccent('accent-gold')" class="color-swatch" style="background-color: #D19B2B;" title="Gold"></div>
+              <div onclick="setAccent('accent-orange')" class="color-swatch" style="background-color: #f97316;" title="Orange"></div>
+              <div onclick="setAccent('accent-red')" class="color-swatch" style="background-color: #ef4444;" title="Red"></div>
+              <div onclick="setAccent('accent-purple')" class="color-swatch" style="background-color: #a855f7;" title="Purple"></div>
+              <div onclick="setAccent('accent-pink')" class="color-swatch" style="background-color: #ec4899;" title="Pink"></div>
+              <div onclick="setAccent('accent-teal')" class="color-swatch" style="background-color: #14b8a6;" title="Teal"></div>
+              <div onclick="setAccent('accent-indigo')" class="color-swatch" style="background-color: #6366f1;" title="Indigo"></div>
+              <div onclick="setAccent('accent-cyan')" class="color-swatch" style="background-color: #06b6d4;" title="Cyan"></div>
+              <div onclick="setAccent('accent-sky')" class="color-swatch" style="background-color: #0ea5e9;" title="Sky"></div>
+           </div>
+        </div>
+        <hr class="border-primary my-2"/>
+        
+        <!-- Branding Inputs -->
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="companyNameInput" class="block font-medium text-muted mb-1">Company Name</label>
+              <input id="companyNameInput" type="text" class="w-full p-2.5 text-sm border rounded-lg input-field" placeholder="TrustBureau.ai" />
+            </div>
+            <div>
+              <label for="companyLogoInput" class="block font-medium text-muted mb-1">Logo URL</label>
+              <input id="companyLogoInput" type="url" class="w-full p-2.5 text-sm border rounded-lg input-field" placeholder="https://..." />
+            </div>
+        </div>
+        
+        <hr class="border-primary my-2"/>
+        
+        <!-- Expiration Settings -->
+        <div>
+          <label class="block font-medium text-muted mb-1">Offer Expiration (Hours)</label>
+          <div class="flex items-center gap-2">
+              <input id="expirationHoursInput" type="number" min="0" max="168" value="48" class="w-24 p-2.5 text-sm border rounded-lg input-field" />
+              <span class="text-muted text-xs">0 = No expiration</span>
+          </div>
+        </div>
+        
+        <hr class="border-primary my-2"/>
+        
+        <!-- Commission Calculator -->
+        <div class="card-inner-bg border border-primary rounded-lg p-3">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-medium text-secondary flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-hero" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Commission Calculator
+                </span>
+                <span class="badge badge-accent">Rep Only</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-muted text-[10px] uppercase tracking-wider mb-1">Commission %</label>
+                    <input id="commissionPercentInput" type="number" step="0.5" min="0" max="20" value="0" class="w-full p-2 text-sm border rounded-lg input-field" />
+                </div>
+                <div>
+                    <label class="block text-muted text-[10px] uppercase tracking-wider mb-1">Your Earnings</label>
+                    <div id="commissionEarningsDisplay" class="w-full p-2 text-sm font-medium text-success bg-transparent">$0.00</div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="border-primary my-2"/>
+        
+        <!-- Rep Info -->
+        <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label for="repNameInput" class="block font-medium text-muted mb-1">Your Name</label>
+              <input id="repNameInput" type="text" class="w-full p-2.5 text-sm border rounded-lg input-field" placeholder="Name" />
+            </div>
+            <div>
+              <label for="repEmailInput" class="block font-medium text-muted mb-1">Email</label>
+              <input id="repEmailInput" type="email" class="w-full p-2.5 text-sm border rounded-lg input-field" placeholder="email" />
+            </div>
+            <div>
+              <label for="repPhoneInput" class="block font-medium text-muted mb-1">Phone</label>
+              <input id="repPhoneInput" type="tel" class="w-full p-2.5 text-sm border rounded-lg input-field" placeholder="phone" />
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFER CALCULATOR -->
+    <div id="calculatorInputs" class="space-y-4 pt-2">
+      <div id="businessNameContainer" class="px-1">
+        <label for="businessNameInput" class="block text-xs font-medium text-muted mb-1">Business Name</label>
+        <input id="businessNameInput" type="text" class="w-full p-3 text-sm border rounded-xl shadow-sm input-field" placeholder="e.g., Acme Holdings LLC" />
+      </div>
+
+      <div class="card-inner-bg p-4 rounded-xl space-y-4">
+        <div id="amountContainer" class="space-y-2">
+          <label id="amountLabel" for="calcAmount" class="block text-xs font-medium text-muted">Funding Amount</label>
+          <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000" class="w-full h-1.5 rounded-lg cursor-pointer mb-2" />
+          <div class="relative">
+            <span class="absolute left-3 input-icon text-muted text-sm font-medium">$</span>
+            <input id="calcAmountInput" inputmode="numeric" class="w-full p-3 pl-8 text-sm border rounded-xl shadow-sm input-field font-medium" />
+          </div>
+          <div id="amountValidation" class="hidden"></div>
+        </div>
+
+        <div id="factorContainer" class="space-y-2">
+          <label for="calcFactor" class="block text-xs font-medium text-muted flex items-center gap-1">
+             Factor Rate
+             <div class="tooltip-container">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class="tooltip-text">The multiplier used to determine the total repayment amount. Lower factors mean less cost.</span>
+             </div>
+          </label>
+          <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25" class="w-full h-1.5 rounded-lg cursor-pointer mb-2" />
+          <div class="relative">
+            <span class="absolute left-3 input-icon text-muted text-sm font-medium">×</span>
+            <input id="calcFactorInput" type="number" step="0.01" class="w-full p-3 pl-8 text-sm border rounded-xl shadow-sm input-field font-medium" />
+          </div>
+          <div id="factorValidation" class="hidden"></div>
+        </div>
+
+        <div id="termContainer" class="space-y-2">
+          <label for="calcTerm" class="block text-xs font-medium text-muted">Number of Payments</label>
+          <input id="calcTermSlider" type="range" min="3" max="528" step="1" value="130" class="w-full h-1.5 rounded-lg cursor-pointer mb-2" />
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 input-icon text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" /></svg>
+            <input id="calcTermInput" type="number" step="1" class="w-full p-3 pl-10 text-sm border rounded-xl shadow-sm input-field font-medium" />
+          </div>
+        </div>
+
+        <div id="termLengthMonthsContainer" class="space-y-1">
+          <label for="termLengthMonthsInput" class="block text-xs font-medium text-muted">Term Length Override (Months)</label>
+          <input id="termLengthMonthsInput" type="number" step="0.5" min="1" class="w-full p-3 text-sm border rounded-xl shadow-sm input-field" placeholder="Auto-calculated" />
+        </div>
+      </div>
+
+      <div id="toggleContainer" class="flex items-center justify-center">
+        <div class="toggle-group">
+            <button id="toggleDaily" class="toggle-btn">Daily</button>
+            <button id="toggleWeekly" class="toggle-btn">Weekly</button>
+            <button id="toggleMonthly" class="toggle-btn">Monthly</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFER 1 CARD -->
+    <div id="offerCard" class="card-bg p-5 rounded-xl shadow-md border border-primary relative">
+      <div class="flex justify-center items-center border-b border-primary pb-3 pt-2">
+        <h4 class="text-sm font-medium text-secondary uppercase tracking-wider">Your Approved Terms</h4>
+      </div>
+      <div class="text-center py-6">
+        <span id="businessNameDisplay" class="text-sm font-medium text-primary block mb-2 hidden"></span>
+        <span class="text-[11px] font-medium text-muted block uppercase tracking-widest">You Get</span>
+        <span id="summaryAmountOut" class="text-5xl font-semibold block my-3 text-hero leading-tight tracking-tight">$50,000</span>
+        
+        <!-- Donut Chart - ENLARGED -->
+        <div class="my-5">
+            <div id="offerDonutChart" class="chart-wrapper" title="Principal vs Cost">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="circlePath" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="chart-text">
+                    <span class="text-[10px] text-muted block uppercase tracking-wider">Payback</span>
+                    <span id="chartPayback" class="text-base font-medium text-primary block"></span>
+                </div>
+            </div>
+            <div class="flex justify-center gap-4 mt-3 text-[11px]">
+                <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-[var(--accent-color)] mr-1.5"></span> Principal</div>
+                <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-[var(--bg-slider-track)] mr-1.5"></span> Cost</div>
+            </div>
+        </div>
+      </div>
+      
+      <!-- APR Display -->
+      <div id="aprDisplaySection" class="apr-display mb-4">
+          <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="text-xs font-medium text-muted uppercase tracking-wider">Estimated APR</span>
+              <div class="tooltip-container">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span class="tooltip-text">The Annual Percentage Rate shows the yearly cost of the advance. Higher APRs mean more expensive financing. This is an estimate based on the term and factor rate.</span>
+              </div>
+          </div>
+          <span id="aprValueDisplay" class="text-2xl font-medium text-hero">0%</span>
+      </div>
+      
+      <div class="flex justify-center items-center border-b border-primary pb-2">
+        <h5 class="text-xs font-medium text-muted uppercase tracking-wider">Offer Details</h5>
+      </div>
+      
+      <!-- TABLE LAYOUT -->
+      <div class="mt-4 border border-primary rounded-xl overflow-hidden">
+        <div class="divide-y divide-primary">
+           <!-- Row 1 -->
+           <div class="grid grid-cols-2 divide-x divide-primary">
+             <div class="p-3 text-center"><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Term Length</span><span id="summaryTermLengthOut" class="text-sm font-medium text-primary block mt-1"></span></div>
+             <div class="p-3 text-center"><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Payments</span><span id="summaryTermOut" class="text-sm font-medium text-primary block mt-1"></span></div>
+           </div>
+           <!-- Row 2 -->
+           <div class="grid grid-cols-2 divide-x divide-primary">
+             <div class="p-3 text-center">
+               <span class="text-[10px] font-medium text-muted block uppercase tracking-wider flex items-center justify-center gap-1">Factor Rate
+                   <div class="tooltip-container"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="tooltip-text">The total cost multiplier applied to the funding amount.</span></div>
+               </span>
+               <span id="summaryFactorOut" class="text-sm font-medium text-primary block mt-1"></span>
+             </div>
+             <div class="p-3 text-center"><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Total Cost</span><span id="summaryCostOut" class="text-sm font-medium text-primary block mt-1"></span></div>
+           </div>
+           <!-- Row 3 -->
+           <div id="detailsRowFee" class="grid grid-cols-2 divide-x divide-primary">
+             <div id="feeGridItem" class="p-3 text-center">
+               <span class="text-[10px] font-medium text-muted block uppercase tracking-wider flex items-center justify-center gap-1">Origination Fee
+                   <div class="tooltip-container"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="tooltip-text">A one-time fee deducted before funding.</span></div>
+               </span>
+               <span id="summaryFeeOut" class="text-sm font-medium text-primary block mt-1"></span>
+             </div>
+             <div id="netGridItem" class="p-3 text-center"><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Net Proceeds</span><span id="summaryNetOut" class="text-sm font-medium text-primary block mt-1"></span></div>
+           </div>
+           <!-- Footer -->
+           <div class="p-4 text-center" style="background: var(--bg-card-inner)">
+             <span id="summaryPaymentLabel" class="text-[10px] font-medium text-muted block uppercase tracking-wider">Est. Daily Payment</span>
+             <span id="summaryPaymentValue" class="text-lg font-medium text-primary block mt-1"></span>
+           </div>
+        </div>
+      </div>
+
+      <!-- Accept Button (Client) -->
+      <div id="acceptContainer" class="mt-5 hidden">
+          <button id="acceptOfferBtn" class="w-full button-primary text-sm uppercase tracking-wider py-3.5 shadow-lg flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+              Accept This Offer
+          </button>
+      </div>
+
+      <!-- Fee Container -->
+      <div id="feeContainer" class="mt-4 pt-4 border-t border-primary">
+          <button id="toggleFeeBtn" type="button" class="w-full text-xs font-medium text-muted hover:text-hero flex items-center justify-center gap-2 transition-colors py-2">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+            Add Origination Fee
+          </button>
+          <div id="feeInputWrapper" class="hidden mt-4 card-inner-bg p-4 rounded-xl border border-primary">
+            <label for="calcFee" class="block text-xs font-medium text-muted mb-2">Origination Fee (%)</label>
+            <input id="calcFeeSlider" type="range" min="0" max="10" step="0.5" value="0" class="w-full h-1.5 rounded-lg cursor-pointer mb-2" />
+            <div class="relative mt-1">
+               <span class="absolute left-3 input-icon text-muted text-sm font-medium">%</span>
+              <input id="calcFeeInput" type="number" step="0.1" class="w-full p-3 pl-8 text-sm border rounded-xl shadow-sm input-field font-medium" />
+            </div>
+          </div>
+      </div>
+
+      <!-- Prepay Discount Section -->
+      <div id="prepaySection" class="mt-4 pt-4 border-t border-primary">
+        <button id="togglePrepay" class="w-full text-xs font-medium text-muted hover:text-hero flex items-center justify-center gap-2 transition-colors py-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" /></svg>
+          Calculate Prepayment Discount
+        </button>
+        <div id="prepayContainer" class="hidden mt-4 card-inner-bg p-4 rounded-xl border border-primary">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b border-primary">
+            <span class="text-xs font-medium text-secondary uppercase tracking-wider">Prepayment Discount</span>
+            <span id="prepayPercentDisplay" class="text-sm font-medium text-hero">0%</span>
+          </div>
+          <div id="prepaySettingsContainer" class="mb-4">
+             <label class="block text-xs font-medium text-muted mb-1">Max Discount % (Rep View)</label>
+             <input id="prepayPercentInput" type="number" min="0" max="50" step="1" value="0" class="w-full p-2.5 text-sm border rounded-lg input-field" />
+          </div>
+          <div id="prepayDateContainer" class="hidden mb-4 pt-2">
+            <label class="block text-xs font-medium text-muted mb-1 text-center">Select Payoff Date</label>
+            <input id="prepayDateInput" type="date" class="w-full p-2.5 text-sm rounded-lg border border-primary input-field text-center" />
+          </div>
+          <div class="grid grid-cols-2 gap-4 text-center border-t border-primary pt-4">
+            <div><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Savings</span><span id="prepaySavingsDisplay" class="text-lg font-medium text-success">$0.00</span></div>
+            <div><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">New Payoff</span><span id="prepayTotalDisplay" class="text-lg font-medium text-primary">$0.00</span></div>
+          </div>
+          <div id="amortizationBtnContainer" class="mt-4 text-center hidden">
+            <button id="viewAmortizationBtn" type="button" class="text-xs font-medium text-hero underline hover:text-primary transition-colors">View Amortization Schedule</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="repContactBlock" class="mt-5 pt-4 border-t border-primary text-xs text-secondary text-center hidden">
+        <div class="font-medium text-muted mb-1 uppercase tracking-wider text-[10px]">Your Funding Specialist</div>
+        <div id="repNameDisplay" class="font-medium text-primary"></div>
+        <div id="repEmailDisplay" class="text-muted"></div>
+        <div id="repPhoneDisplay" class="text-muted"></div>
+      </div>
+    </div>
+
+    <!-- COMPARISON VIEW / ADDITIONAL OFFERS -->
+    <div id="savedOffersSection" class="card-bg mt-4 p-4 rounded-xl shadow-md border border-primary hidden">
+      <div class="flex justify-between items-center border-b border-primary pb-3 mb-4">
+        <h5 class="text-sm font-medium text-secondary uppercase tracking-wider">Compare Offers</h5>
+        <span class="text-[10px] text-muted">Payment amounts relative to highest</span>
+      </div>
+      <div id="savedOffersContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div id="buttonContainer" class="pt-4 border-t border-primary">
+      <div class="flex justify-center gap-3 flex-wrap">
+        <button id="addOfferButton" class="button-secondary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+          Add Offer
+        </button>
+        <button id="shareMenuBtn" class="button-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z"/></svg>
+          Share Offer
+        </button>
+        <button id="downloadPdfBtn" class="button-secondary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SHARE OPTIONS MODAL -->
+  <div id="shareModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 hidden backdrop-blur-sm p-4 transition-opacity">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 border border-gray-100 dark:border-slate-800 relative">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-lg font-medium text-slate-900 dark:text-white tracking-tight">Share Offer</h3>
+        <button id="closeShareBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-gray-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+      </div>
+
+      <!-- QR Code Section -->
+      <div class="mb-5 text-center">
+          <div id="qrCodeContainer" class="inline-block p-4 bg-white rounded-xl shadow-inner border"></div>
+          <p class="text-[10px] text-muted mt-2 uppercase tracking-wider">Scan with phone camera</p>
+      </div>
+
+      <!-- Buttons Stack -->
+      <div class="space-y-3">
+        
+        <!-- Button 1: Copy URL -->
+        <button id="modalCopyLinkBtn" class="w-full p-3.5 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between hover:border-blue-400 hover:shadow-sm transition-all duration-200 group bg-white dark:bg-slate-800">
+           <div class="flex items-center gap-3">
+              <div class="h-9 w-9 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                 </svg>
+              </div>
+              <span class="text-sm font-medium text-slate-900 dark:text-white text-left">Copy Approval Link</span>
+           </div>
+           <span class="text-[10px] font-medium text-gray-400 uppercase tracking-wider">URL</span>
+        </button>
+
+        <!-- Button 2: Copy Text -->
+        <button id="modalCopyTextBtn" class="w-full p-3.5 bg-slate-900 dark:bg-slate-700 border border-slate-900 dark:border-slate-600 rounded-xl flex items-center justify-between hover:bg-slate-800 dark:hover:bg-slate-600 hover:shadow-md transition-all duration-200 group">
+           <div class="flex items-center gap-3">
+              <div class="h-9 w-9 rounded-full bg-green-100/10 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                 </svg>
+              </div>
+              <span class="text-sm font-medium text-white text-left">Copy Proposal Text</span>
+           </div>
+           <span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email/SMS</span>
+        </button>
+        
+        <!-- Button 3: SMS Link -->
+        <button id="modalSmsBtn" class="w-full p-3.5 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between hover:border-purple-400 hover:shadow-sm transition-all duration-200 group bg-white dark:bg-slate-800">
+           <div class="flex items-center gap-3">
+              <div class="h-9 w-9 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                 </svg>
+              </div>
+              <span class="text-sm font-medium text-slate-900 dark:text-white text-left">Send via SMS</span>
+           </div>
+           <span class="text-[10px] font-medium text-gray-400 uppercase tracking-wider">iMessage</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- AMORTIZATION MODAL -->
+  <div id="amortizationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm p-4">
+    <div class="card-bg w-full max-w-2xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col border border-primary overflow-hidden">
+      <div class="p-4 border-b border-primary flex justify-between items-center" style="background-color: var(--bg-card-inner)">
+        <h3 class="font-medium text-lg text-primary">Amortization Schedule</h3>
+        <button id="closeAmortizationBtn" class="text-muted hover:text-primary transition-colors p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="overflow-auto p-0 flex-1">
+         <table class="w-full text-left amort-table">
+           <thead class="sticky top-0 z-10"><tr><th>#</th><th>Date</th><th>Payment</th><th>Balance</th><th>Prepay Savings</th><th>Payoff Amount</th></tr></thead>
+           <tbody id="amortizationTableBody"></tbody>
+         </table>
+      </div>
+      <div class="p-3 border-t border-primary text-center text-[10px] text-muted rounded-b-xl flex justify-between items-center" style="background-color: var(--bg-card-inner)">
+        <span>* Schedule is an estimate. Actual payoff dates and amounts may vary.</span>
+        <button id="downloadAmortPdfBtn" class="button-secondary text-[10px] py-1.5 px-3 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Export
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN PDF TEMPLATE -->
+  <div id="pdfTemplate" style="display:none; position: absolute; left: -9999px;">
+    <div id="pdfContent" style="padding: 40px; font-family: 'Inter', sans-serif; color: #333; width: 600px; background: #fff;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #42D197; padding-bottom: 20px;">
+            <h1 style="margin: 0; color: #0f172a; font-size: 24px; font-weight: 500;">Funding Term Sheet</h1>
+            <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;" id="pdfCompanyName">Generated by TrustBureau.ai</p>
+        </div>
+        <div style="margin-bottom: 25px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; font-size: 13px; color: #64748b;">Business Name:</td>
+                    <td style="padding: 8px 0; font-size: 13px; font-weight: 500; color: #0f172a;" id="pdfBusinessName"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-size: 13px; color: #64748b;">Date Generated:</td>
+                    <td style="padding: 8px 0; font-size: 13px; color: #0f172a;" id="pdfDate"></td>
+                </tr>
+            </table>
+        </div>
+        <div style="background: #f8fafc; border-radius: 12px; padding: 25px; margin-bottom: 25px; text-align: center;">
+            <div style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Funding Amount</div>
+            <div style="font-size: 42px; font-weight: 500; color: #42D197; margin: 10px 0;" id="pdfAmount"></div>
+        </div>
+        <div style="margin-bottom: 25px;">
+            <h3 style="background: #f1f5f9; padding: 12px; margin: 0 0 15px 0; font-size: 13px; color: #334155; border-radius: 6px; font-weight: 500;">Approved Terms</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Factor Rate:</td><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 500;" id="pdfFactor"></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Total Payback:</td><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; color: #0f172a;" id="pdfPayback"></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Term:</td><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px;" id="pdfTerm"></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Payment Frequency:</td><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px;" id="pdfFreq"></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Payment Amount:</td><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; color: #0f172a;" id="pdfPayment"></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Estimated APR:</td><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; color: #42D197;" id="pdfApr"></td></tr>
+            </table>
+        </div>
+        <div id="pdfAmortSection" style="margin-bottom: 25px; display: none;">
+            <h3 style="background: #f1f5f9; padding: 12px; margin: 0 0 15px 0; font-size: 13px; color: #334155; border-radius: 6px; font-weight: 500;">Payment Schedule</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #42D197;">#</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #42D197;">Date</th>
+                        <th style="padding: 8px; text-align: right; border-bottom: 2px solid #42D197;">Payment</th>
+                        <th style="padding: 8px; text-align: right; border-bottom: 2px solid #42D197;">Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfAmortBody"></tbody>
+            </table>
+        </div>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center;">
+            <p>This term sheet is for informational purposes and is subject to final underwriting approval.</p>
+            <p style="margin-top: 5px;">Generated on <span id="pdfTimestamp"></span></p>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    const elements = {
+      calcAmountSlider: document.getElementById('calcAmountSlider'),
+      amountLabel: document.getElementById('amountLabel'),
+      calcFactorSlider: document.getElementById('calcFactorSlider'),
+      calcFeeSlider: document.getElementById('calcFeeSlider'),
+      calcTermSlider: document.getElementById('calcTermSlider'),
+      calcAmountInput: document.getElementById('calcAmountInput'),
+      calcFactorInput: document.getElementById('calcFactorInput'),
+      calcFeeInput: document.getElementById('calcFeeInput'),
+      calcTermInput: document.getElementById('calcTermInput'),
+      termLengthMonthsInput: document.getElementById('termLengthMonthsInput'),
+      
+      amountValidation: document.getElementById('amountValidation'),
+      factorValidation: document.getElementById('factorValidation'),
+
+      toggleDaily: document.getElementById('toggleDaily'),
+      toggleWeekly: document.getElementById('toggleWeekly'),
+      toggleMonthly: document.getElementById('toggleMonthly'),
+
+      shareMenuBtn: document.getElementById('shareMenuBtn'),
+      addOfferButton: document.getElementById('addOfferButton'),
+      downloadPdfBtn: document.getElementById('downloadPdfBtn'),
+      
+      shareModal: document.getElementById('shareModal'),
+      closeShareBtn: document.getElementById('closeShareBtn'),
+      modalCopyLinkBtn: document.getElementById('modalCopyLinkBtn'),
+      modalCopyTextBtn: document.getElementById('modalCopyTextBtn'),
+      modalSmsBtn: document.getElementById('modalSmsBtn'),
+      qrCodeContainer: document.getElementById('qrCodeContainer'),
+
+      summaryAmountOut: document.getElementById('summaryAmountOut'),
+      summaryPaybackOut: document.getElementById('summaryPaybackOut'),
+      summaryFactorOut: document.getElementById('summaryFactorOut'),
+      summaryTermOut: document.getElementById('summaryTermOut'),
+      summaryCostOut: document.getElementById('summaryCostOut'),
+      summaryPaymentLabel: document.getElementById('summaryPaymentLabel'),
+      summaryPaymentValue: document.getElementById('summaryPaymentValue'),
+      summaryFeeOut: document.getElementById('summaryFeeOut'),
+      summaryNetOut: document.getElementById('summaryNetOut'),
+      summaryTermLengthOut: document.getElementById('summaryTermLengthOut'),
+      feeGridItem: document.getElementById('feeGridItem'),
+      netGridItem: document.getElementById('netGridItem'),
+      detailsRowFee: document.getElementById('detailsRowFee'),
+      
+      chartPayback: document.getElementById('chartPayback'),
+      offerDonutChart: document.getElementById('offerDonutChart'),
+      aprValueDisplay: document.getElementById('aprValueDisplay'),
+
+      businessNameInput: document.getElementById('businessNameInput'),
+      businessNameDisplay: document.getElementById('businessNameDisplay'),
+      businessNameContainer: document.getElementById('businessNameContainer'),
+
+      repSettingsToggle: document.getElementById('repSettingsToggle'),
+      repSettingsPanel: document.getElementById('repSettingsPanel'),
+      repNameInput: document.getElementById('repNameInput'),
+      repEmailInput: document.getElementById('repEmailInput'),
+      repPhoneInput: document.getElementById('repPhoneInput'),
+      repContactBlock: document.getElementById('repContactBlock'),
+      repNameDisplay: document.getElementById('repNameDisplay'),
+      repEmailDisplay: document.getElementById('repEmailDisplay'),
+      repPhoneDisplay: document.getElementById('repPhoneDisplay'),
+      
+      companyNameInput: document.getElementById('companyNameInput'),
+      companyLogoInput: document.getElementById('companyLogoInput'),
+      headerTitle: document.getElementById('headerTitle'),
+      headerLogo: document.getElementById('headerLogo'),
+      placeholderIcon: document.getElementById('placeholderIcon'),
+      headerLogoWrapper: document.getElementById('headerLogoWrapper'),
+      headerPoweredBy: document.getElementById('headerPoweredBy'),
+      
+      expirationHoursInput: document.getElementById('expirationHoursInput'),
+      expirationBanner: document.getElementById('expirationBanner'),
+      timerHours: document.getElementById('timerHours'),
+      timerMinutes: document.getElementById('timerMinutes'),
+      timerSeconds: document.getElementById('timerSeconds'),
+      
+      commissionPercentInput: document.getElementById('commissionPercentInput'),
+      commissionEarningsDisplay: document.getElementById('commissionEarningsDisplay'),
+
+      headerContainer: document.getElementById('headerContainer'),
+      themeControls: document.getElementById('themeControls'),
+      calculatorInputs: document.getElementById('calculatorInputs'),
+      factorContainer: document.getElementById('factorContainer'),
+      feeContainer: document.getElementById('feeContainer'),
+      toggleFeeBtn: document.getElementById('toggleFeeBtn'),
+      feeInputWrapper: document.getElementById('feeInputWrapper'),
+      termContainer: document.getElementById('termContainer'),
+      termLengthMonthsContainer: document.getElementById('termLengthMonthsContainer'),
+      toggleContainer: document.getElementById('toggleContainer'),
+      buttonContainer: document.getElementById('buttonContainer'),
+      savedOffersSection: document.getElementById('savedOffersSection'),
+      savedOffersContainer: document.getElementById('savedOffersContainer'),
+
+      prepaySection: document.getElementById('prepaySection'),
+      togglePrepay: document.getElementById('togglePrepay'),
+      prepayContainer: document.getElementById('prepayContainer'),
+      prepayPercentInput: document.getElementById('prepayPercentInput'),
+      prepaySliderContainer: document.getElementById('prepaySettingsContainer'),
+      prepayDateContainer: document.getElementById('prepayDateContainer'),
+      prepayDateInput: document.getElementById('prepayDateInput'),
+      prepayPercentDisplay: document.getElementById('prepayPercentDisplay'),
+      prepaySavingsDisplay: document.getElementById('prepaySavingsDisplay'),
+      prepayTotalDisplay: document.getElementById('prepayTotalDisplay'),
+
+      amortizationBtnContainer: document.getElementById('amortizationBtnContainer'),
+      viewAmortizationBtn: document.getElementById('viewAmortizationBtn'),
+      amortizationModal: document.getElementById('amortizationModal'),
+      closeAmortizationBtn: document.getElementById('closeAmortizationBtn'),
+      amortizationTableBody: document.getElementById('amortizationTableBody'),
+      downloadAmortPdfBtn: document.getElementById('downloadAmortPdfBtn'),
+
+      installContainer: document.getElementById('installContainer'),
+      installBtn: document.getElementById('installBtn'),
+      
+      acceptContainer: document.getElementById('acceptContainer'),
+      acceptOfferBtn: document.getElementById('acceptOfferBtn'),
+      
+      pdfContent: document.getElementById('pdfContent'),
+    };
+
+    let paymentFrequency = 'daily';
+    let currentBaseTheme = 'theme-light';
+    let currentAccentClass = 'accent-mint';
+    let amountSliderMax = 1000000;
+    const MAX_ADDITIONAL_OFFERS = 2;
+    let savedOffers = [];
+    let isApprovalView = false;
+    let termLengthManualDirty = false;
+    let prepayDiscountPercent = 0;
+    let qrCodeInstance = null;
+    let expirationTimerId = null;
+    let offerExpirationTime = null;
+    
+    const DEFAULT_COMPANY_NAME = "TrustBureau.ai";
+
+    function fireConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const pieces = [];
+        const colors = ['#42D197', '#3b82f6', '#f97316', '#a855f7', '#ec4899', '#eab308'];
+        for (let i = 0; i < 150; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 12 + 5,
+                h: Math.random() * 6 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vy: Math.random() * 3 + 2,
+                vx: Math.random() * 4 - 2,
+                rotation: Math.random() * 360
+            });
+        }
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            pieces.forEach(p => {
+                p.y += p.vy;
+                p.x += p.vx;
+                p.rotation += 3;
+                if (p.y < canvas.height + 50) active = true;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                ctx.restore();
+            });
+            if (active) requestAnimationFrame(update);
+            else ctx.clearRect(0,0, canvas.width, canvas.height);
+        }
+        update();
+    }
+
+    function setBaseTheme(themeName) {
+      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-black');
+      currentBaseTheme = themeName;
+      document.documentElement.classList.add(themeName);
+      applyTheme();
+    }
+
+    function setAccent(accentName) {
+       const classes = document.documentElement.classList;
+       for (let i = classes.length - 1; i >= 0; i--) {
+           if (classes[i].startsWith('accent-')) classes.remove(classes[i]);
+       }
+       currentAccentClass = accentName;
+       document.documentElement.classList.add(accentName);
+       applyTheme();
+    }
+
+    function setAmountSliderMax(cap) {
+      amountSliderMax = cap;
+      if (elements.calcAmountSlider) {
+        elements.calcAmountSlider.max = String(cap);
+      }
+    }
+
+    function formatCurrency(num) {
+      const n = Number(num);
+      if (isNaN(n)) return '$0';
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n);
+    }
+
+    function parseFormattedNumber(val) {
+      if (typeof val !== 'string' || !val) return 0;
+      return parseFloat(val.replace(/[\$,]/g, '')) || 0;
+    }
+
+    function calculateAPR(amount, totalPayback, termMonths, frequency) {
+        if (amount <= 0 || totalPayback <= 0 || termMonths <= 0) return 0;
+        let termInYears;
+        if (frequency === 'weekly') { termInYears = termMonths / 52; }
+        else if (frequency === 'monthly') { termInYears = termMonths / 12; }
+        else { termInYears = termMonths / 250; }
+        if (termInYears <= 0) return 0;
+        const totalInterest = totalPayback - amount;
+        const simpleInterestRate = totalInterest / amount;
+        const apr = (simpleInterestRate / termInYears) * 100;
+        return Math.round(apr);
+    }
+
+    function computeOffer(amount, factor, termPayments, frequency, feePercent) {
+      const totalPayback = amount * factor;
+      const totalCost = totalPayback - amount;
+      const paymentsCount = termPayments > 0 ? termPayments : 1;
+      const paymentAmount = totalPayback / paymentsCount;
+      const feeAmount = amount * (feePercent / 100);
+      const netProceeds = amount - feeAmount;
+      let rawMonths;
+      if (frequency === 'weekly') { rawMonths = termPayments * (12 / 52); }
+      else if (frequency === 'monthly') { rawMonths = termPayments; }
+      else { rawMonths = termPayments * (12 / 250); }
+      const termLengthMonths = Math.round(rawMonths * 2) / 2;
+      let paymentLabel = 'Est. Daily Payment';
+      if (frequency === 'weekly') paymentLabel = 'Est. Weekly Payment';
+      if (frequency === 'monthly') paymentLabel = 'Est. Monthly Payment';
+      const apr = calculateAPR(amount, totalPayback, termPayments, frequency);
+      return { amount, factor, feePercent, feeAmount, netProceeds, termMonths: termPayments, termLengthMonths, totalPayback, totalCost, payment: paymentAmount, paymentLabel, frequency, apr };
+    }
+
+    function getCurrentOffer() {
+      const amount = elements.calcAmountInput ? parseFormattedNumber(elements.calcAmountInput.value) : 0;
+      const factor = elements.calcFactorInput ? parseFloat(elements.calcFactorInput.value) || 1.05 : 1.05;
+      const termPayments = elements.calcTermInput ? parseInt(elements.calcTermInput.value) || 1 : 1;
+      const fee = elements.calcFeeInput ? parseFloat(elements.calcFeeInput.value) || 0 : 0;
+      return computeOffer(amount, factor, termPayments, paymentFrequency, fee);
+    }
+
+    function validateInputs() {
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value) || 0;
+        if (elements.amountValidation) {
+            if (amount > 500000) {
+                elements.amountValidation.innerHTML = `<div class="validation-warning"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg><span>High funding amount. Ensure client qualifies for this level.</span></div>`;
+                elements.amountValidation.classList.remove('hidden');
+            } else if (amount < 10000) {
+                elements.amountValidation.innerHTML = `<div class="validation-warning"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>Consider if a smaller advance meets client needs efficiently.</span></div>`;
+                elements.amountValidation.classList.remove('hidden');
+            } else { elements.amountValidation.classList.add('hidden'); }
+        }
+        if (elements.factorValidation) {
+            if (factor > 1.5) {
+                elements.factorValidation.innerHTML = `<div class="validation-warning danger"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg><span>High factor rate. This significantly increases client cost.</span></div>`;
+                elements.factorValidation.classList.remove('hidden');
+            } else if (factor < 1.1) {
+                elements.factorValidation.innerHTML = `<div class="validation-warning"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>Low factor rate. Verify this is accurate for the deal.</span></div>`;
+                elements.factorValidation.classList.remove('hidden');
+            } else { elements.factorValidation.classList.add('hidden'); }
+        }
+    }
+
+    function renderSavedOffers() {
+      if (!elements.savedOffersSection || !elements.savedOffersContainer) return;
+      const used = savedOffers.length;
+      if (used === 0) { elements.savedOffersSection.classList.add('hidden'); elements.savedOffersContainer.innerHTML = ''; return; }
+      elements.savedOffersSection.classList.remove('hidden');
+      const currentOffer = getCurrentOffer();
+      const allOffers = [currentOffer, ...savedOffers];
+      const maxPayment = Math.max(...allOffers.map(o => o.payment));
+      const lowestPaymentIdx = allOffers.findIndex(o => o.payment === Math.min(...allOffers.map(x => x.payment)));
+      const cardsHtml = savedOffers.map((offer, index) => {
+        const labelIndex = index + 2;
+        const paymentPct = (offer.payment / maxPayment) * 100;
+        const isLowest = (index + 1) === lowestPaymentIdx;
+        const acceptBtnHTML = isApprovalView ? `<button class="accept-additional-offer w-full button-primary text-xs uppercase tracking-wider py-2.5 mt-3 flex items-center justify-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>Accept Offer</button>` : '';
+        return `<div class="card-inner-bg rounded-xl border border-primary overflow-hidden"><div class="p-3 border-b border-primary flex items-center justify-between" style="background: var(--accent-color)"><span class="text-xs font-medium" style="color: var(--accent-text-inverted)">Offer ${labelIndex}</span>${isLowest ? '<span class="badge badge-success text-[8px]">Lowest Payment</span>' : ''}</div><div class="p-4"><div class="text-center mb-4"><span class="text-[10px] text-muted uppercase tracking-wider">You Get</span><span class="text-2xl font-medium text-hero block">${formatCurrency(offer.amount)}</span></div><div class="grid grid-cols-2 gap-3 text-xs mb-4"><div class="text-center p-2 rounded-lg" style="background: var(--bg-card)"><span class="text-[10px] text-muted block">Factor</span><span class="font-medium text-primary">${offer.factor.toFixed(2)}x</span></div><div class="text-center p-2 rounded-lg" style="background: var(--bg-card)"><span class="text-[10px] text-muted block">Payback</span><span class="font-medium text-primary">${formatCurrency(offer.totalPayback)}</span></div></div><div class="mb-3"><div class="flex justify-between text-[10px] mb-1"><span class="text-muted">${offer.frequency === 'weekly' ? 'Weekly' : offer.frequency === 'monthly' ? 'Monthly' : 'Daily'} Payment</span><span class="font-medium text-primary">${formatCurrency(offer.payment)}</span></div><div class="comparison-bar-track"><div class="comparison-bar-fill" style="width: ${paymentPct}%"></div></div></div><div class="text-center text-xs text-muted"><span class="font-medium">APR: </span><span class="font-medium text-hero">${offer.apr}%</span></div>${acceptBtnHTML}</div></div>`;
+      }).join('');
+      elements.savedOffersContainer.innerHTML = cardsHtml;
+      if (isApprovalView) {
+          const btns = elements.savedOffersContainer.querySelectorAll('.accept-additional-offer');
+          btns.forEach(btn => { btn.addEventListener('click', (e) => { fireConfetti(); const b = e.currentTarget; b.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Accepted!`; b.disabled = true; b.style.backgroundColor = '#16a34a'; b.style.borderColor = '#16a34a'; }); });
+      }
+    }
+
+    function updateAddOfferButtonState() { if (!elements.addOfferButton) return; const remaining = MAX_ADDITIONAL_OFFERS - savedOffers.length; elements.addOfferButton.disabled = remaining <= 0; }
+    function handleAddOffer() { if (savedOffers.length >= MAX_ADDITIONAL_OFFERS) return; const offer = getCurrentOffer(); savedOffers.push({ ...offer }); renderSavedOffers(); updateAddOfferButtonState(); }
+
+    function updateSliderFill(slider) {
+        if (!slider) return;
+        const min = parseFloat(slider.min) || 0;
+        const max = parseFloat(slider.max) || 100;
+        const val = parseFloat(slider.value) || 0;
+        const percentage = ((val - min) / (max - min)) * 100;
+        slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${percentage}%, var(--bg-slider-track) ${percentage}%, var(--bg-slider-track) 100%)`;
+    }
+
+    function syncInputs(slider, input, isCurrency, min, max, callback) {
+      const isAmountSlider = (slider === elements.calcAmountSlider);
+      const getMax = () => (isAmountSlider ? amountSliderMax : max);
+      const initialValue = parseFloat(slider.value);
+      input.value = isCurrency ? formatCurrency(initialValue) : initialValue.toString();
+      updateSliderFill(slider);
+      slider.addEventListener('input', () => { let val = parseFloat(slider.value); const cap = getMax(); if (!isNaN(val) && val > cap) { val = cap; slider.value = val; } input.value = isCurrency ? formatCurrency(val) : val; updateSliderFill(slider); callback(); });
+      input.addEventListener('input', () => { let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value); const cap = getMax(); if (!isNaN(val) && val >= min && val <= cap) { slider.value = val; updateSliderFill(slider); callback(); } else if (input.value === '') { callback(); } });
+      input.addEventListener('blur', () => { let val = isCurrency ? parseFormattedNumber(input.value) : parseFloat(input.value); const cap = getMax(); if (isNaN(val) || val < min) val = min; if (val > cap) val = cap; slider.value = val; input.value = isCurrency ? formatCurrency(val) : val.toString(); updateSliderFill(slider); callback(); });
+    }
+
+    function setupInputs() {
+        if(elements.calcFactorSlider && elements.calcFactorInput) { syncInputs(elements.calcFactorSlider, elements.calcFactorInput, false, 1.05, 1.7, runCalculator); }
+        if(elements.calcTermSlider && elements.calcTermInput) { syncInputs(elements.calcTermSlider, elements.calcTermInput, false, 3, 528, runCalculator); }
+        if(elements.calcFeeSlider && elements.calcFeeInput) { syncInputs(elements.calcFeeSlider, elements.calcFeeInput, false, 0, 10, runCalculator); }
+    }
+
+    function applyTheme() {
+      document.documentElement.className = `${currentBaseTheme} ${currentAccentClass}`;
+      try { localStorage.setItem('theme', currentBaseTheme); } catch (e) {}
+      if(elements.calcAmountSlider) updateSliderFill(elements.calcAmountSlider);
+      if(elements.calcFactorSlider) updateSliderFill(elements.calcFactorSlider);
+      if(elements.calcTermSlider) updateSliderFill(elements.calcTermSlider);
+      if(elements.calcFeeSlider) updateSliderFill(elements.calcFeeSlider);
+    }
+
+    function updateRepDisplay() {
+      if (!elements.repContactBlock) return;
+      const name = elements.repNameInput ? elements.repNameInput.value.trim() : '';
+      const email = elements.repEmailInput ? elements.repEmailInput.value.trim() : '';
+      const phone = elements.repPhoneInput ? elements.repPhoneInput.value.trim() : '';
+      const hasAny = name || email || phone;
+      if (hasAny) { elements.repContactBlock.classList.remove('hidden'); } else { elements.repContactBlock.classList.add('hidden'); }
+      if (elements.repNameDisplay) elements.repNameDisplay.textContent = name;
+      if (elements.repEmailDisplay) elements.repEmailDisplay.textContent = email;
+      if (elements.repPhoneDisplay) elements.repPhoneDisplay.textContent = phone;
+    }
+    
+    function updateBranding() {
+       const cName = elements.companyNameInput.value.trim();
+       const cLogo = elements.companyLogoInput.value.trim();
+       if (cName) { elements.headerTitle.textContent = cName; elements.headerTitle.classList.remove('hidden'); elements.headerPoweredBy.classList.remove('hidden'); }
+       else { elements.headerTitle.textContent = DEFAULT_COMPANY_NAME; elements.headerTitle.classList.remove('hidden'); elements.headerPoweredBy.classList.add('hidden'); }
+       if (cLogo) { elements.headerLogo.src = cLogo; elements.headerLogo.classList.remove('hidden'); elements.placeholderIcon.classList.add('hidden'); }
+       else { elements.headerLogo.src = ""; elements.headerLogo.classList.add('hidden'); elements.placeholderIcon.classList.remove('hidden'); }
+    }
+    
+    function updateCommission() {
+        const offer = getCurrentOffer();
+        const commissionPct = parseFloat(elements.commissionPercentInput.value) || 0;
+        const earnings = offer.amount * (commissionPct / 100);
+        elements.commissionEarningsDisplay.textContent = formatCurrency(earnings);
+    }
+
+    function updatePaymentToggleUI() {
+      const toggles = [elements.toggleDaily, elements.toggleWeekly, elements.toggleMonthly];
+      const frequencies = ['daily', 'weekly', 'monthly'];
+      toggles.forEach((toggle, index) => { if (!toggle) return; toggle.classList.remove('toggle-active'); if (paymentFrequency === frequencies[index]) { toggle.classList.add('toggle-active'); } });
+    }
+    
+    function startExpirationTimer(expirationHours) {
+        if (expirationTimerId) clearInterval(expirationTimerId);
+        if (!expirationHours || expirationHours <= 0) { elements.expirationBanner.classList.add('hidden'); return; }
+        const now = new Date();
+        offerExpirationTime = new Date(now.getTime() + expirationHours * 60 * 60 * 1000);
+        elements.expirationBanner.classList.remove('hidden');
+        function updateTimer() {
+            const now = new Date();
+            const diff = offerExpirationTime - now;
+            if (diff <= 0) { clearInterval(expirationTimerId); elements.timerHours.textContent = '00'; elements.timerMinutes.textContent = '00'; elements.timerSeconds.textContent = '00'; elements.expirationBanner.classList.add('urgent'); return; }
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            elements.timerHours.textContent = hours.toString().padStart(2, '0');
+            elements.timerMinutes.textContent = minutes.toString().padStart(2, '0');
+            elements.timerSeconds.textContent = seconds.toString().padStart(2, '0');
+            if (hours < 1) { elements.expirationBanner.classList.add('urgent'); }
+        }
+        updateTimer();
+        expirationTimerId = setInterval(updateTimer, 1000);
+    }
+
+    function initializeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const amountParam = params.get('amount');
+      const amount = amountParam ? parseFloat(amountParam) : 50000;
+      const factor = params.get('factor') || 1.25;
+      const term = params.get('term') || 130;
+      const fee = parseFloat(params.get('fee')) || 0;
+      const freq = params.get('freq');
+      const paramTheme = params.get('theme');
+      const paramAccent = params.get('accent');
+      const offersParam = params.get('offers');
+      const businessNameParam = params.get('businessName') || '';
+      const repNameParam = params.get('repName') || '';
+      const repEmailParam = params.get('repEmail') || '';
+      const repPhoneParam = params.get('repPhone') || '';
+      const prepayParam = params.get('prepay');
+      const cNameParam = params.get('cName') || '';
+      const cLogoParam = params.get('cLogo') || '';
+      const expirationParam = params.get('expiry');
+      if (prepayParam) { prepayDiscountPercent = parseInt(prepayParam, 10); if (elements.prepayPercentInput) elements.prepayPercentInput.value = prepayDiscountPercent; }
+      const viewMode = params.get('view');
+      isApprovalView = (viewMode === 'approval');
+      if(paramTheme) currentBaseTheme = paramTheme;
+      if(paramAccent) currentAccentClass = paramAccent;
+      applyTheme();
+      if (isApprovalView) { setAmountSliderMax(amount); if (elements.amountLabel) elements.amountLabel.textContent = `Adjust Amount (Max: ${formatCurrency(amount)})`; if (expirationParam) { startExpirationTimer(parseInt(expirationParam, 10)); } }
+      else { setAmountSliderMax(1000000); }
+      if(elements.calcAmountInput) elements.calcAmountInput.value = formatCurrency(amount);
+      if (elements.calcAmountSlider) elements.calcAmountSlider.value = amount;
+      if(elements.calcFactorInput) elements.calcFactorInput.value = factor;
+      if(elements.calcFactorSlider) elements.calcFactorSlider.value = factor;
+      if(elements.calcTermInput) elements.calcTermInput.value = term;
+      if(elements.calcTermSlider) elements.calcTermSlider.value = term;
+      if(elements.calcFeeInput) elements.calcFeeInput.value = fee;
+      if(elements.calcFeeSlider) elements.calcFeeSlider.value = fee;
+      if (fee > 0 && !isApprovalView && elements.feeInputWrapper) elements.feeInputWrapper.classList.remove('hidden');
+      if (elements.businessNameInput) elements.businessNameInput.value = businessNameParam;
+      if (elements.repNameInput) elements.repNameInput.value = repNameParam;
+      if (elements.repEmailInput) elements.repEmailInput.value = repEmailParam;
+      if (elements.repPhoneInput) elements.repPhoneInput.value = repPhoneParam;
+      if (elements.companyNameInput) elements.companyNameInput.value = cNameParam;
+      if (elements.companyLogoInput) elements.companyLogoInput.value = cLogoParam;
+      updateBranding();
+      paymentFrequency = freq || 'daily';
+      savedOffers = [];
+      if (offersParam) { try { const rawOffers = JSON.parse(offersParam); if (Array.isArray(rawOffers)) { savedOffers = rawOffers.map((raw) => { const a = Number(raw.a ?? raw.amount ?? 0); const f = Number(raw.f ?? raw.factor ?? 1.1); const tRaw = raw.t ?? raw.term ?? 3; const t = parseInt(tRaw, 10); const termPayments = Number.isNaN(t) ? 1 : t; const q = raw.q ?? raw.frequency ?? 'daily'; const fe = Number(raw.fee ?? 0); return computeOffer(a, f, termPayments, q, fe); }); } } catch (err) { console.error('Error parsing offers from URL', err); } }
+      if (isApprovalView) {
+        if (elements.factorContainer) elements.factorContainer.style.display = 'none';
+        if (elements.feeContainer) elements.feeContainer.style.display = 'none';
+        if (elements.termContainer) elements.termContainer.style.display = 'none';
+        if (elements.termLengthMonthsContainer) elements.termLengthMonthsContainer.style.display = 'none';
+        if (elements.toggleContainer) elements.toggleContainer.style.display = 'none';
+        if (elements.businessNameContainer) elements.businessNameContainer.style.display = 'none';
+        if (elements.businessNameInput) elements.businessNameInput.disabled = true;
+        if (elements.themeControls) elements.themeControls.style.display = 'none';
+        if (elements.repSettingsToggle) elements.repSettingsToggle.style.display = 'none';
+        if (elements.repSettingsPanel) elements.repSettingsPanel.style.display = 'none';
+        if (elements.buttonContainer) elements.buttonContainer.style.display = 'none';
+        if (elements.installContainer) elements.installContainer.style.display = 'none';
+        if (elements.acceptContainer) elements.acceptContainer.classList.remove('hidden');
+        if (elements.prepaySliderContainer) elements.prepaySliderContainer.style.display = 'none';
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.remove('hidden');
+        elements.headerContainer.classList.remove('justify-between');
+        elements.headerContainer.classList.add('justify-center');
+      } else {
+        if (elements.prepayDateContainer) elements.prepayDateContainer.classList.add('hidden');
+        if (elements.expirationBanner) elements.expirationBanner.classList.add('hidden');
+      }
+    }
+
+    function generateSchedule(offer) {
+      const schedule = [];
+      let currentDate = new Date(); currentDate.setHours(0,0,0,0);
+      const totalPayments = offer.termMonths;
+      const paymentAmount = offer.payment;
+      const totalPayback = offer.totalPayback;
+      const maxDiscount = totalPayback * (prepayDiscountPercent / 100);
+      let runningDate = new Date(currentDate);
+      let paidSoFar = 0;
+      for (let i = 1; i <= totalPayments; i++) {
+         if (offer.frequency === 'weekly') { runningDate.setDate(runningDate.getDate() + 7); }
+         else if (offer.frequency === 'monthly') { runningDate.setMonth(runningDate.getMonth() + 1); }
+         else { do { runningDate.setDate(runningDate.getDate() + 1); } while (runningDate.getDay() === 0 || runningDate.getDay() === 6); }
+         paidSoFar += paymentAmount;
+         const remainingBalance = totalPayback - paidSoFar;
+         const fractionRemaining = (totalPayments - i) / totalPayments;
+         const savings = maxDiscount * fractionRemaining;
+         let payoff = remainingBalance - savings;
+         if (payoff < 0) payoff = 0;
+         schedule.push({ num: i, date: new Date(runningDate), payment: paymentAmount, balance: remainingBalance < 0.01 ? 0 : remainingBalance, savings: savings, payoff: payoff });
+      }
+      return schedule;
+    }
+
+    function renderAmortizationSchedule(offer) {
+       if (!elements.amortizationTableBody) return;
+       const schedule = generateSchedule(offer);
+       const rows = schedule.map(row => { const dateStr = row.date.toLocaleDateString(); return `<tr><td class="font-mono text-muted">${row.num}</td><td>${dateStr}</td><td>${formatCurrency(row.payment)}</td><td>${formatCurrency(row.balance)}</td><td class="text-success font-medium">${formatCurrency(row.savings)}</td><td class="font-medium text-primary">${formatCurrency(row.payoff)}</td></tr>`; }).join('');
+       elements.amortizationTableBody.innerHTML = rows;
+    }
+
+    function calculatePrepay(offer) {
+      if (isApprovalView) { if (prepayDiscountPercent > 0) { if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.remove('hidden'); } else { if (elements.amortizationBtnContainer) elements.amortizationBtnContainer.classList.add('hidden'); } }
+      if (isApprovalView && prepayDiscountPercent === 0) { if (elements.prepaySection) elements.prepaySection.classList.add('hidden'); return; }
+      if (elements.prepaySection) elements.prepaySection.classList.remove('hidden');
+      if (!elements.prepayContainer || elements.prepayContainer.classList.contains('hidden')) return;
+      const totalPayback = offer.totalPayback;
+      let savings = 0;
+      if (isApprovalView) {
+        const dateVal = elements.prepayDateInput.value;
+        if (!dateVal) { const today = new Date().toISOString().split('T')[0]; elements.prepayDateInput.value = today; }
+        const startDate = new Date(); startDate.setHours(0,0,0,0);
+        let termDays = 0;
+        if (offer.frequency === 'weekly') { termDays = offer.termMonths * 7; }
+        else if (offer.frequency === 'monthly') { termDays = offer.termMonths * 30.44; }
+        else { termDays = offer.termMonths * 1.42; }
+        const endDate = new Date(startDate); endDate.setDate(endDate.getDate() + Math.ceil(termDays));
+        elements.prepayDateInput.min = startDate.toISOString().split('T')[0];
+        elements.prepayDateInput.max = endDate.toISOString().split('T')[0];
+        let selectedDate = new Date(elements.prepayDateInput.value); selectedDate.setHours(0,0,0,0);
+        if (selectedDate < startDate) selectedDate = startDate;
+        if (selectedDate > endDate) selectedDate = endDate;
+        const totalTime = endDate.getTime() - startDate.getTime();
+        const remainingTime = endDate.getTime() - selectedDate.getTime();
+        let fractionRemaining = 0;
+        if (totalTime > 0) { fractionRemaining = remainingTime / totalTime; }
+        if (fractionRemaining < 0) fractionRemaining = 0;
+        if (fractionRemaining > 1) fractionRemaining = 1;
+        const maxPotentialSavings = totalPayback * (prepayDiscountPercent / 100);
+        savings = maxPotentialSavings * fractionRemaining;
+        elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}% Max`;
+      } else { savings = totalPayback * (prepayDiscountPercent / 100); elements.prepayPercentDisplay.textContent = `${prepayDiscountPercent}%`; }
+      const newPayoff = totalPayback - savings;
+      elements.prepaySavingsDisplay.textContent = formatCurrency(savings);
+      elements.prepayTotalDisplay.textContent = formatCurrency(newPayoff);
+    }
+
+    function runCalculator() {
+      try {
+        const amount = elements.calcAmountInput ? parseFormattedNumber(elements.calcAmountInput.value) : 0;
+        const factor = elements.calcFactorInput ? parseFloat(elements.calcFactorInput.value) || 1.05 : 1.05;
+        const termPayments = elements.calcTermInput ? parseInt(elements.calcTermInput.value) || 1 : 1;
+        const fee = elements.calcFeeInput ? parseFloat(elements.calcFeeInput.value) || 0 : 0;
+        const offer = computeOffer(amount, factor, termPayments, paymentFrequency, fee);
+        const businessName = elements.businessNameInput ? elements.businessNameInput.value.trim() : '';
+        if (elements.businessNameDisplay) { if (businessName) { elements.businessNameDisplay.textContent = businessName; elements.businessNameDisplay.classList.remove('hidden'); } else { elements.businessNameDisplay.textContent = ''; elements.businessNameDisplay.classList.add('hidden'); } }
+        elements.summaryAmountOut.textContent = formatCurrency(offer.amount);
+        elements.summaryPaybackOut && (elements.summaryPaybackOut.textContent = formatCurrency(offer.totalPayback));
+        elements.summaryFactorOut.textContent = `${offer.factor.toFixed(2)}x`;
+        elements.summaryTermOut.textContent = `${offer.termMonths} payments`;
+        elements.summaryCostOut.textContent = formatCurrency(offer.totalCost);
+        elements.summaryPaymentLabel.textContent = offer.paymentLabel;
+        elements.summaryPaymentValue.textContent = formatCurrency(offer.payment);
+        elements.summaryFeeOut.textContent = formatCurrency(offer.feeAmount);
+        elements.summaryNetOut.textContent = formatCurrency(offer.netProceeds);
+        if (elements.aprValueDisplay) { elements.aprValueDisplay.textContent = `${offer.apr}%`; }
+        if (elements.chartPayback) elements.chartPayback.textContent = formatCurrency(offer.totalPayback);
+        if (elements.offerDonutChart) { const principalPct = (offer.amount / offer.totalPayback) * 100; const strokeDasharray = `${principalPct} ${100 - principalPct}`; const circlePath = document.getElementById('circlePath'); if(circlePath) { circlePath.setAttribute('stroke-dasharray', strokeDasharray); } }
+        if (offer.feePercent <= 0 && isApprovalView) { if (elements.feeGridItem) elements.feeGridItem.classList.add('hidden'); if (elements.netGridItem) elements.netGridItem.classList.add('hidden'); if (elements.detailsRowFee) elements.detailsRowFee.classList.add('hidden'); }
+        else { if (elements.feeGridItem) elements.feeGridItem.classList.remove('hidden'); if (elements.netGridItem) elements.netGridItem.classList.remove('hidden'); if (elements.detailsRowFee) elements.detailsRowFee.classList.remove('hidden'); }
+        if (elements.summaryTermLengthOut) { let months = offer.termLengthMonths; if (elements.termLengthMonthsInput) { if (!termLengthManualDirty) { const autoRounded = Math.round(months * 2) / 2; elements.termLengthMonthsInput.value = Number.isInteger(autoRounded) ? autoRounded.toString() : autoRounded.toFixed(1); } const manualVal = parseFloat(elements.termLengthMonthsInput.value); if (!isNaN(manualVal) && manualVal > 0) { months = manualVal; } } if (months && months > 0) { const rounded = Math.round(months * 2) / 2; const display = Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1); elements.summaryTermLengthOut.textContent = `${display} months`; } else { elements.summaryTermLengthOut.textContent = ''; } }
+        calculatePrepay(offer);
+        updateRepDisplay();
+        updateCommission();
+        validateInputs();
+        renderSavedOffers();
+      } catch (e) { console.error('Calculator error:', e); }
+    }
+
+    function generateShareUrl() {
+        const amount = parseFormattedNumber(elements.calcAmountInput.value);
+        const factor = parseFloat(elements.calcFactorInput.value);
+        const term = parseInt(elements.calcTermInput.value) || 1;
+        const fee = parseFloat(elements.calcFeeInput.value) || 0;
+        const freq = paymentFrequency;
+        const theme = currentBaseTheme;
+        const accent = currentAccentClass;
+        const businessName = elements.businessNameInput.value.trim();
+        const repName = elements.repNameInput.value.trim();
+        const repEmail = elements.repEmailInput.value.trim();
+        const repPhone = elements.repPhoneInput.value.trim();
+        const cName = elements.companyNameInput.value;
+        const cLogo = elements.companyLogoInput.value;
+        const expiry = elements.expirationHoursInput.value || 0;
+        const offersForUrl = savedOffers.map((offer) => ({ a: offer.amount, f: offer.factor, t: offer.termMonths, q: offer.frequency || freq, fee: offer.feePercent || 0 }));
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams({ amount, factor, term, fee, freq, theme, accent, businessName, repName, repEmail, repPhone, cName, cLogo, prepay: prepayDiscountPercent, offers: JSON.stringify(offersForUrl), view: 'approval', expiry });
+        url.search = params.toString();
+        return url.toString();
+    }
+
+    function generateQRCode(url) {
+        if (qrCodeInstance) { qrCodeInstance.clear(); elements.qrCodeContainer.innerHTML = ''; }
+        qrCodeInstance = new QRCode(elements.qrCodeContainer, { text: url, width: 150, height: 150, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+    }
+
+    function generatePDF(includeAmortization = false) {
+        const offer = getCurrentOffer();
+        const businessName = elements.businessNameInput.value.trim() || 'N/A';
+        const companyName = elements.companyNameInput.value.trim() || DEFAULT_COMPANY_NAME;
+        document.getElementById('pdfCompanyName').textContent = `Generated by ${companyName}`;
+        document.getElementById('pdfBusinessName').textContent = businessName;
+        document.getElementById('pdfDate').textContent = new Date().toLocaleDateString();
+        document.getElementById('pdfAmount').textContent = formatCurrency(offer.amount);
+        document.getElementById('pdfFactor').textContent = `${offer.factor.toFixed(2)}x`;
+        document.getElementById('pdfPayback').textContent = formatCurrency(offer.totalPayback);
+        document.getElementById('pdfTerm').textContent = `${offer.termMonths} payments (${offer.termLengthMonths} months)`;
+        document.getElementById('pdfFreq').textContent = offer.frequency.charAt(0).toUpperCase() + offer.frequency.slice(1);
+        document.getElementById('pdfPayment').textContent = formatCurrency(offer.payment);
+        document.getElementById('pdfApr').textContent = `${offer.apr}%`;
+        document.getElementById('pdfTimestamp').textContent = new Date().toLocaleString();
+        const pdfAmortSection = document.getElementById('pdfAmortSection');
+        if (includeAmortization && prepayDiscountPercent > 0) { pdfAmortSection.style.display = 'block'; const schedule = generateSchedule(offer); const rows = schedule.slice(0, 24).map(row => `<tr><td style="padding: 6px; border-bottom: 1px solid #e2e8f0;">${row.num}</td><td style="padding: 6px; border-bottom: 1px solid #e2e8f0;">${row.date.toLocaleDateString()}</td><td style="padding: 6px; border-bottom: 1px solid #e2e8f0; text-align: right;">${formatCurrency(row.payment)}</td><td style="padding: 6px; border-bottom: 1px solid #e2e8f0; text-align: right;">${formatCurrency(row.balance)}</td></tr>`).join(''); document.getElementById('pdfAmortBody').innerHTML = rows + (schedule.length > 24 ? '<tr><td colspan="4" style="padding: 10px; text-align: center; color: #94a3b8;">... and more payments</td></tr>' : ''); }
+        else { pdfAmortSection.style.display = 'none'; }
+        const pdfElement = document.getElementById('pdfContent');
+        pdfElement.style.display = 'block';
+        const opt = { margin: 10, filename: `term-sheet-${businessName.replace(/\s+/g, '-').toLowerCase()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(pdfElement).save().then(() => { pdfElement.style.display = 'none'; });
+    }
+
+    function initializeCalculator() {
+      if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('Service Worker not available', err)); }); }
+      initializeFromURL();
+      applyTheme();
+      if (elements.calcAmountSlider && elements.calcAmountInput) { syncInputs(elements.calcAmountSlider, elements.calcAmountInput, true, 5000, amountSliderMax, runCalculator); }
+      setupInputs();
+      if (elements.toggleDaily) { elements.toggleDaily.addEventListener('click', () => { paymentFrequency = 'daily'; updatePaymentToggleUI(); runCalculator(); }); }
+      if (elements.toggleWeekly) { elements.toggleWeekly.addEventListener('click', () => { paymentFrequency = 'weekly'; updatePaymentToggleUI(); runCalculator(); }); }
+      if (elements.toggleMonthly) { elements.toggleMonthly.addEventListener('click', () => { paymentFrequency = 'monthly'; updatePaymentToggleUI(); runCalculator(); }); }
+      if (elements.businessNameInput) { elements.businessNameInput.addEventListener('input', runCalculator); }
+      if (elements.termLengthMonthsInput) { elements.termLengthMonthsInput.addEventListener('input', () => { termLengthManualDirty = true; runCalculator(); }); elements.termLengthMonthsInput.addEventListener('blur', () => { const v = parseFloat(elements.termLengthMonthsInput.value); if (!isNaN(v) && v > 0) { const rounded = Math.round(v * 2) / 2; elements.termLengthMonthsInput.value = Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1); } runCalculator(); }); }
+      if (elements.toggleFeeBtn) { elements.toggleFeeBtn.addEventListener('click', () => { elements.feeInputWrapper.classList.toggle('hidden'); }); }
+      if (elements.togglePrepay) { elements.togglePrepay.addEventListener('click', () => { elements.prepayContainer.classList.toggle('hidden'); runCalculator(); }); }
+      if (elements.prepayPercentInput) { elements.prepayPercentInput.addEventListener('input', () => { prepayDiscountPercent = parseInt(elements.prepayPercentInput.value, 10) || 0; runCalculator(); }); }
+      if (elements.prepayDateInput) { elements.prepayDateInput.addEventListener('change', () => { runCalculator(); }); }
+      if (elements.viewAmortizationBtn) { elements.viewAmortizationBtn.addEventListener('click', () => { const currentOffer = getCurrentOffer(); renderAmortizationSchedule(currentOffer); elements.amortizationModal.classList.remove('hidden'); }); }
+      if (elements.closeAmortizationBtn) { elements.closeAmortizationBtn.addEventListener('click', () => { elements.amortizationModal.classList.add('hidden'); }); }
+      if (elements.downloadAmortPdfBtn) { elements.downloadAmortPdfBtn.addEventListener('click', () => { generatePDF(true); }); }
+      if (elements.repSettingsToggle && elements.repSettingsPanel) { elements.repSettingsToggle.addEventListener('click', () => { elements.repSettingsPanel.classList.toggle('hidden'); }); }
+      if (elements.repNameInput) elements.repNameInput.addEventListener('input', updateRepDisplay);
+      if (elements.repEmailInput) elements.repEmailInput.addEventListener('input', updateRepDisplay);
+      if (elements.repPhoneInput) elements.repPhoneInput.addEventListener('input', updateRepDisplay);
+      if (elements.companyNameInput) elements.companyNameInput.addEventListener('input', updateBranding);
+      if (elements.companyLogoInput) elements.companyLogoInput.addEventListener('input', updateBranding);
+      if (elements.commissionPercentInput) elements.commissionPercentInput.addEventListener('input', updateCommission);
+      if (elements.addOfferButton) { elements.addOfferButton.addEventListener('click', handleAddOffer); }
+      if (elements.downloadPdfBtn) { elements.downloadPdfBtn.addEventListener('click', () => generatePDF(false)); }
+      if (elements.shareMenuBtn) { elements.shareMenuBtn.addEventListener('click', () => { const shareUrl = generateShareUrl(); generateQRCode(shareUrl); elements.shareModal.classList.remove('hidden'); }); }
+      if (elements.closeShareBtn) { elements.closeShareBtn.addEventListener('click', () => { elements.shareModal.classList.add('hidden'); }); }
+      if (elements.modalCopyLinkBtn) { elements.modalCopyLinkBtn.addEventListener('click', () => { const linkToCopy = generateShareUrl(); navigator.clipboard.writeText(linkToCopy).then(() => { const originalHTML = elements.modalCopyLinkBtn.innerHTML; elements.modalCopyLinkBtn.innerHTML = `<span class="text-green-600 font-medium flex items-center gap-2 mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Copied!</span>`; setTimeout(() => { elements.modalCopyLinkBtn.innerHTML = originalHTML; }, 1500); }); }); }
+      if (elements.modalCopyTextBtn) { elements.modalCopyTextBtn.addEventListener('click', () => { const off = getCurrentOffer(); const fAmount = formatCurrency(off.amount); const fPayback = formatCurrency(off.totalPayback); const fPayment = formatCurrency(off.payment); const fFreq = off.frequency.charAt(0).toUpperCase() + off.frequency.slice(1); const businessName = elements.businessNameInput.value.trim() || 'Your Business'; const companyName = elements.companyNameInput.value.trim() || DEFAULT_COMPANY_NAME; const textContent = `${companyName} Funding Offer for ${businessName}\n\n✅ Approved Amount: ${fAmount}\n📊 Total Payback: ${fPayback}\n💰 ${fFreq} Payment: ${fPayment}\n📈 Est. APR: ${off.apr}%\n\nView your offer: ${generateShareUrl()}`; navigator.clipboard.writeText(textContent).then(() => { const originalHTML = elements.modalCopyTextBtn.innerHTML; elements.modalCopyTextBtn.innerHTML = `<span class="text-green-400 font-medium flex items-center gap-2 mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Copied!</span>`; setTimeout(() => { elements.modalCopyTextBtn.innerHTML = originalHTML; }, 1500); }); }); }
+      if (elements.modalSmsBtn) { elements.modalSmsBtn.addEventListener('click', () => { const off = getCurrentOffer(); const fAmount = formatCurrency(off.amount); const shareUrl = generateShareUrl(); const smsBody = encodeURIComponent(`Your funding offer for ${fAmount} is ready! View details: ${shareUrl}`); window.location.href = `sms:?&body=${smsBody}`; }); }
+      if (elements.prepayDateInput) { const today = new Date().toISOString().split('T')[0]; elements.prepayDateInput.value = today; }
+      if (elements.acceptOfferBtn) { elements.acceptOfferBtn.addEventListener('click', () => { fireConfetti(); elements.acceptOfferBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Offer Accepted!`; elements.acceptOfferBtn.disabled = true; elements.acceptOfferBtn.style.backgroundColor = '#16a34a'; }); }
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; if (elements.installContainer && !isApprovalView) { elements.installContainer.classList.remove('hidden'); } });
+      if (elements.installBtn) { elements.installBtn.addEventListener('click', async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; deferredPrompt = null; elements.installContainer.classList.add('hidden'); }); }
+      updatePaymentToggleUI();
+      runCalculator();
+      renderSavedOffers();
+      updateAddOfferButtonState();
+    }
+
+    initializeCalculator();
+  </script>
+</body>
+</html>
