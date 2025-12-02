@@ -190,7 +190,7 @@
         </div>
         <nav class="flex-1 p-4 space-y-1">
           <div class="nav-item active" data-view="dashboard">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 01-1 1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
             Dashboard
           </div>
           <div class="nav-item" data-view="calculator">
@@ -367,8 +367,8 @@
                                 <div id="contentExpiry" class="hidden mt-2 pt-2 border-t border-primary/50"><input id="calcExpiryDate" type="date" class="w-full p-1.5 border rounded-md input-field bg-[var(--bg-card)] text-xs text-primary" /></div>
                               </div>
                               <div class="bg-[var(--bg-card-inner)] rounded-lg p-2.5 border border-primary transition-all hover:border-[var(--accent-color)] col-span-1 md:col-span-2">
-                                <div class="flex items-center justify-between"><span class="text-xs font-medium text-primary">Approval Notes</span><label class="switch scale-75 origin-right"><input id="toggleNotes" type="checkbox" onchange="toggleNotesSection(this.checked)"><span class="slider"></span></label></div>
-                                <div id="contentNotes" class="hidden mt-2 pt-2 border-t border-primary/50"><textarea id="calcNotes" rows="3" class="w-full p-2 border rounded-md input-field bg-[var(--bg-card)] text-xs text-primary resize-none" placeholder="Enter notes here..."></textarea></div>
+                                <div class="flex items-center justify-between"><span class="text-xs font-medium text-primary">Approval Notes (Client Visible)</span><label class="switch scale-75 origin-right"><input id="toggleNotes" type="checkbox" onchange="toggleNotesSection(this.checked)"><span class="slider"></span></label></div>
+                                <div id="contentNotes" class="hidden mt-2 pt-2 border-t border-primary/50"><textarea id="calcNotes" rows="3" class="w-full p-2 border rounded-md input-field bg-[var(--bg-card)] text-xs text-primary resize-none" placeholder="Enter notes here... Use 'Enter' for new bullets."></textarea></div>
                               </div>
                           </div>
                         </div>
@@ -485,10 +485,7 @@
         <div class="text-center mb-6 w-full">
             <div id="clientLogoWrapper" class="flex items-center justify-center mb-3">
               <img id="clientLogo" src="" alt="Logo" class="h-12 w-auto hidden" />
-              <svg id="clientLogoPlaceholder" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-hero" viewBox="0 0 24 24">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="var(--accent-color)" />
-                <path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="var(--bg-card)" />
-              </svg>
+              <svg id="clientLogoPlaceholder" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-hero" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" clip-rule="evenodd" /></svg>
             </div>
             <div id="clientCompanyName" class="font-bold text-primary text-2xl">TrustBureau.ai</div>
             <div id="clientBusinessNameDisplay" class="text-lg font-medium text-secondary mt-2 hidden"></div>
@@ -770,33 +767,6 @@
         offers.push(newOffer); saveOffers(); resetCalculator(); refreshView(); showToast('Offer created!'); setTimeout(() => openOfferDetail(newOffer.id), 300);
     }
 
-    function switchView(view) {
-      currentView = view; if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
-      document.querySelectorAll('.nav-item').forEach(i => { i.classList.remove('active'); if (i.dataset.view === view) i.classList.add('active'); });
-      const t = { dashboard: 'Dashboard', calculator: 'New Offer', offers: 'All Offers', accepted: 'Accepted Offers', declined: 'Declined Offers', clients: 'Clients', settings: 'Settings' };
-      document.getElementById('pageTitle').textContent = (view === 'calculator' && editingOfferId) ? 'Edit Offer' : t[view];
-      ['dashboardView','calculatorView','offersView','clientsView','settingsView'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      if(['offers','accepted','declined'].includes(view)) document.getElementById('offersView').classList.remove('hidden');
-      else document.getElementById(view+'View').classList.remove('hidden');
-      refreshView();
-    }
-    function refreshView() {
-        updateStats();
-        if (currentView === 'dashboard') renderOffers(document.getElementById('recentOffersList'), currentFilter, 5);
-        else if (['offers','accepted','declined'].includes(currentView)) renderOffers(document.getElementById('allOffersList'), currentView === 'offers' ? 'all' : currentView);
-        else if (currentView === 'clients') renderClients();
-    }
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-    function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMessage').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-
-    function openOfferDetail(id) {
-        selectedOfferId = id; const o = offers.find(x => x.id === id); if (!o) return;
-        const status = o.status === 'accepted' ? 'badge-accepted' : o.status === 'expired' ? 'badge-expired' : 'badge-pending';
-        const html = o.options.map((opt, i) => `<div class="mb-4 rounded-xl border border-primary bg-[var(--bg-card-inner)] overflow-hidden"><div class="px-4 py-2 border-b border-primary flex justify-between items-center bg-[var(--bg-card)]"><span class="text-xs font-bold text-muted uppercase tracking-wider">Option ${i+1}</span><span class="text-lg font-bold text-hero">${formatCurrency(opt.amount)}</span></div><div class="grid grid-cols-3 gap-4 p-4 text-center"><div><div class="text-[10px] font-bold text-muted uppercase mb-1">Term</div><div class="text-sm font-semibold text-primary">${opt.termOverride || (opt.termMonths + ' mo')}</div></div><div><div class="text-[10px] font-bold text-muted uppercase mb-1">Factor</div><div class="text-sm font-semibold text-primary">${opt.factor}</div></div><div><div class="text-[10px] font-bold text-muted uppercase mb-1">Payment</div><div class="text-sm font-semibold text-primary">${formatCurrency(opt.payment)}</div></div></div></div>`).join('');
-        document.getElementById('offerDetailContent').innerHTML = `<div class="text-center mb-6"><span class="badge ${status} mb-3">${o.status.toUpperCase()}</span><h2 class="text-xl font-bold text-primary">${o.businessName}</h2></div><div class="max-h-[400px] overflow-y-auto pr-1 -mr-1">${html}</div>`;
-        document.getElementById('offerDetailModal').classList.remove('hidden');
-    }
-    function closeOfferDetailModal() { document.getElementById('offerDetailModal').classList.add('hidden'); selectedOfferId = null; }
     function editOffer() { if(!selectedOfferId) return; editingOfferId = selectedOfferId; const o = offers.find(x => x.id === editingOfferId); document.getElementById('calcBusinessName').value = o.businessName; document.getElementById('calcContactName').value = o.contactName; document.getElementById('calcEmail').value = o.email; if(o.contactName || o.email) toggleContactInfo(true); calcOptions = o.options.map(x => ({...x, prepay: x.prepayDiscount})); if(o.expiresAt) { document.getElementById('calcExpiryDate').value = new Date(o.expiresAt).toISOString().split('T')[0]; toggleExpirySection(true); } activeCalcTab = 0; updateTabsUI(); loadStateToInputs(0); document.getElementById('cancelEditBtn').classList.remove('hidden'); document.getElementById('mainActionBtnText').textContent = 'Update Offer'; closeOfferDetailModal(); switchView('calculator'); }
     function cancelEdit() { editingOfferId = null; resetCalculator(); switchView('dashboard'); }
     function confirmDeleteOffer() { if(selectedOfferId) document.getElementById('confirmModal').classList.remove('hidden'); }
@@ -804,7 +774,96 @@
     function executeDelete() { if(selectedOfferId) { offers = offers.filter(x => x.id !== selectedOfferId); saveOffers(); refreshView(); closeConfirmModal(); closeOfferDetailModal(); showToast('Deleted'); } }
     function copyOfferLink() { const o = offers.find(x => x.id === selectedOfferId); if(o) copyToClipboard(`${window.location.origin}${window.location.pathname}?offer=${encodeURIComponent(o.id)}`); }
     function sendOfferEmail() { const o = offers.find(x => x.id === selectedOfferId); if(!o) return; const s = encodeURIComponent(`Funding Offer: ${o.businessName}`); const b = encodeURIComponent(`Hi,\n\nPlease view your funding offer here: ${window.location.origin}${window.location.pathname}?offer=${encodeURIComponent(o.id)}\n\nThanks.`); window.location.href = `mailto:${o.email}?subject=${s}&body=${b}`; }
-    function copyOfferText() { const o = offers.find(x => x.id === selectedOfferId); if(o) { let t = `Funding Offer for ${o.businessName}\n\n`; o.options.forEach((opt, i) => t += `Option ${i+1}: ${formatCurrency(opt.amount)} - ${formatCurrency(opt.payment)}/${opt.frequency}\n`); t += `\nView Offer: ${window.location.origin}${window.location.pathname}?offer=${encodeURIComponent(o.id)}`; copyToClipboard(t); } }
+    function copyOfferText() {
+        const offer = offers.find(x => x.id === selectedOfferId);
+        if (!offer) return;
+
+        const company = offer.companyName || 'TrustBureau.ai';
+        const link = generateOfferLink(offer);
+        
+        // Map accent names to hex codes for inline email styling
+        const colorMap = {
+            mint: '#42D197', blue: '#3b82f6', gold: '#D19B2B', purple: '#a855f7',
+            red: '#ef4444', teal: '#14b8a6', pink: '#ec4899', orange: '#f97316',
+            indigo: '#6366f1', lime: '#84cc16', cyan: '#06b6d4', black: '#18181b',
+            grey: '#64748b', white: '#475569', glow: '#d946ef'
+        };
+        const brandColor = colorMap[offer.accent] || '#42D197';
+        const textColor = ['white', 'mint', 'lime', 'cyan', 'glow'].includes(offer.accent) ? '#0f172a' : '#ffffff';
+
+        // Plain text fallback
+        let plainText = `Funding Offer for ${offer.businessName}\n\n`;
+        offer.options.forEach((opt, i) => {
+            plainText += `Option ${i+1}: ${formatCurrency(opt.amount)} - ${formatCurrency(opt.payment)}/${opt.frequency}\n`;
+        });
+        plainText += `\nView Full Offer: ${link}`;
+
+        // HTML Email Card Construction
+        let optionsRows = '';
+        offer.options.forEach((opt, i) => {
+            const freqLabel = opt.frequency.charAt(0).toUpperCase() + opt.frequency.slice(1);
+            const termLabel = opt.termOverride ? opt.termOverride : (opt.termMonths + ' months');
+            
+            optionsRows += `
+            <div style="margin-bottom: 12px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Option ${i+1}</span>
+                    <span style="font-size: 18px; font-weight: 700; color: ${brandColor};">${formatCurrency(opt.amount)}</span>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <tr>
+                        <td style="padding: 4px 0; color: #475569;">Term</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #0f172a;">${termLabel}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 0; color: #475569;">Payment</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #0f172a;">${formatCurrency(opt.payment)} / ${freqLabel}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 0; color: #475569;">Total Payback</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #0f172a;">${formatCurrency(opt.totalPayback)}</td>
+                    </tr>
+                </table>
+            </div>
+            `;
+        });
+
+        const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 450px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; margin: 0 auto;">
+            <!-- Header -->
+            <div style="background-color: ${brandColor}; padding: 24px 20px; text-align: center;">
+                <h1 style="margin: 0; color: ${textColor}; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">${company}</h1>
+                <p style="margin: 4px 0 0 0; color: ${textColor}; opacity: 0.9; font-size: 13px;">Funding Approval</p>
+            </div>
+            
+            <!-- Body -->
+            <div style="padding: 24px;">
+                <p style="margin: 0 0 20px 0; color: #334155; font-size: 14px; line-height: 1.5;">
+                    Hi ${offer.contactName || 'there'},<br><br>
+                    We are pleased to present the following approval terms for <strong>${offer.businessName}</strong>. Please select an option below to proceed.
+                </p>
+                
+                ${optionsRows}
+                
+                <!-- CTA -->
+                <div style="text-align: center; margin-top: 28px; margin-bottom: 8px;">
+                    <a href="${link}" style="background-color: ${brandColor}; color: ${textColor}; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">View & Accept Offer</a>
+                </div>
+                <div style="text-align: center; margin-top: 16px;">
+                    <span style="font-size: 11px; color: #94a3b8;">Link expires on ${new Date(offer.expiresAt).toLocaleDateString()}</span>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f1f5f9; padding: 12px; text-align: center; border-top: 1px solid #e2e8f0;">
+                <span style="font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Powered by TrustBureau.ai</span>
+            </div>
+        </div>
+        `;
+
+        copyHtmlToClipboard(html, plainText);
+    }
+    function generateOfferLink(offer) { return window.location.origin + window.location.pathname + '?offer=' + encodeURIComponent(offer.id); }
 
     // Client View Logic
     function showClientView(id) {
@@ -878,7 +937,7 @@
                 <!-- 1. Funding Amount & Slider -->
                 <div class="text-center mb-8">
                     <label class="text-xs font-bold text-muted uppercase tracking-wider mb-2 block">Approved Funding Amount</label>
-                    <div class="text-5xl font-bold text-[var(--accent-color)] mb-4 tracking-tight" id="clientMainAmount">${formatCurrency(opt.amount)}</div>
+                    <div class="text-5xl font-bold text-hero mb-4 tracking-tight" id="clientMainAmount">${formatCurrency(opt.amount)}</div>
                     
                     <div class="px-4">
                         <input type="range" id="clientMainSlider" min="5000" max="${opt.amount}" step="1000" value="${opt.amount}" 
@@ -1031,14 +1090,27 @@
         
         calculateMainClientSavings();
     }
-    
-    function generateThumbnailHTML(opt, idx) { const tl = opt.termOverride ? opt.termOverride : (opt.termMonths + ' months'); return `<div onclick="switchClientOption(${idx})" class="bg-[var(--bg-card)] p-4 rounded-xl border border-primary hover:border-[var(--accent-color)] hover:shadow-md cursor-pointer transition-all flex items-center justify-between group"><div><span class="text-[10px] font-bold text-muted uppercase block mb-1">Option ${idx + 1}</span><div class="text-lg font-bold text-primary group-hover:text-[var(--accent-color)] transition-colors">${formatCurrency(opt.amount)}</div><div class="text-xs text-secondary mt-0.5">${tl} • ${opt.frequency}</div></div><div class="text-right"><div class="text-xs font-medium text-muted">Factor</div><div class="font-bold text-primary">${opt.factor}x</div><div class="text-[10px] font-bold text-[var(--accent-color)] mt-1 uppercase tracking-wide">View &rarr;</div></div></div>`; }
-    function switchClientOption(idx) { activeClientOptionIdx = idx; const o = offers.find(x => x.id === window.currentClientOfferId); renderClientViewLogic(o); document.getElementById('clientMainStage').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-    function calculateMainClientSavings() { const o = offers.find(x => x.id === window.currentClientOfferId); if(!o) return; const di = document.getElementById('clientMainPrepayDate'); if(!di || !di.value) return; const a = parseNumber(document.getElementById('clientMainAmount').textContent); const opt = o.options[activeClientOptionIdx]; const tp = a * opt.factor; const sd = new Date(); sd.setHours(0,0,0,0); let td = opt.term; if(opt.frequency === 'weekly') td = opt.term * 7; else if(opt.frequency === 'monthly') td = opt.term * 30.44; else td = opt.term * 1.42; const ed = new Date(sd); ed.setDate(ed.getDate() + Math.ceil(td)); const sel = new Date(di.value); sel.setHours(0,0,0,0); const tt = ed.getTime() - sd.getTime(); const rt = ed.getTime() - sel.getTime(); let fr = tt > 0 ? rt / tt : 0; fr = Math.max(0, Math.min(1, fr)); const ms = tp * (opt.prepayDiscount / 100); const s = ms * fr; const nt = tp - s; document.getElementById('clientMainSavings').textContent = formatCurrency(s); document.getElementById('clientMainNewTotal').textContent = formatCurrency(nt); }
-    function startClientTimer(ea) { if(clientTimerId) clearInterval(clientTimerId); function u() { const n = Date.now(); const d = ea - n; if(d <= 0) { clearInterval(clientTimerId); location.reload(); return; } const days = Math.floor(d / 86400000); const hours = Math.floor((d % 86400000) / 3600000); const minutes = Math.floor((d % 3600000) / 60000); document.getElementById('clientTimerDays').textContent = days.toString().padStart(2, '0'); document.getElementById('clientTimerHours').textContent = hours.toString().padStart(2, '0'); document.getElementById('clientTimerMinutes').textContent = minutes.toString().padStart(2, '0'); } u(); clientTimerId = setInterval(u, 60000); }
-    function acceptOffer(idx) { const o = offers.find(x => x.id === window.currentClientOfferId); if(!o) return; o.status = 'accepted'; o.acceptedAt = Date.now(); o.acceptedOptionIndex = idx; saveOffers(); fireConfetti(); showClientView(window.currentClientOfferId); showToast('Offer accepted!'); }
-    function openAmortSchedule(idx) { const o = offers.find(x => x.id === window.currentClientOfferId); if(!o) return; const opt = o.options[idx]; const a = parseNumber(document.getElementById('clientMainAmount').textContent); const tp = a * opt.factor; const p = tp / opt.term; const tb = document.getElementById('amortTableBody'); tb.innerHTML = ''; let b = tp; let d = new Date(); const mr = 260; for(let i = 1; i <= opt.term; i++) { if(i > mr && i < opt.term) continue; if(i === mr && opt.term > mr) { tb.innerHTML += `<tr><td colspan="4" class="text-center text-muted py-2">... remaining payments ...</td></tr>`; let ld = new Date(); ld.setDate(ld.getDate() + (opt.term * (opt.frequency === 'weekly' ? 7 : 1.4))); tb.innerHTML += `<tr><td>${opt.term}</td><td>${ld.toLocaleDateString()}</td><td>${formatCurrency(p)}</td><td>$0.00</td></tr>`; break; } if(opt.frequency === 'weekly') d.setDate(d.getDate() + 7); else if(opt.frequency === 'monthly') d.setMonth(d.getMonth() + 1); else { d.setDate(d.getDate() + 1); if(d.getDay() === 0) d.setDate(d.getDate() + 1); if(d.getDay() === 6) d.setDate(d.getDate() + 2); } b -= p; if(b < 0) b = 0; const tr = document.createElement('tr'); tr.innerHTML = `<td>${i}</td><td>${d.toLocaleDateString()}</td><td>${formatCurrency(p)}</td><td>${formatCurrency(b)}</td>`; tb.appendChild(tr); } document.getElementById('amortModal').classList.remove('hidden'); }
 
+    // RESTORED MISSING FUNCTIONS
+    function switchView(view) {
+      currentView = view; if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+      document.querySelectorAll('.nav-item').forEach(i => { i.classList.remove('active'); if (i.dataset.view === view) i.classList.add('active'); });
+      const t = { dashboard: 'Dashboard', calculator: 'New Offer', offers: 'All Offers', accepted: 'Accepted Offers', declined: 'Declined Offers', clients: 'Clients', settings: 'Settings' };
+      document.getElementById('pageTitle').textContent = (view === 'calculator' && editingOfferId) ? 'Edit Offer' : t[view];
+      ['dashboardView','calculatorView','offersView','clientsView','settingsView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      if(['offers','accepted','declined'].includes(view)) document.getElementById('offersView').classList.remove('hidden');
+      else document.getElementById(view+'View').classList.remove('hidden');
+      refreshView();
+    }
+    function refreshView() {
+        updateStats();
+        if (currentView === 'dashboard') renderOffers(document.getElementById('recentOffersList'), currentFilter, 5);
+        else if (['offers','accepted','declined'].includes(currentView)) renderOffers(document.getElementById('allOffersList'), currentView === 'offers' ? 'all' : currentView);
+        else if (currentView === 'clients') renderClients();
+    }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMessage').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+    
     // Add event listeners for calculator inputs
     document.getElementById('calcAmountSlider').addEventListener('input', function() { document.getElementById('calcAmount').value = formatNumber(this.value); updateCalculatorPreview(); });
     document.getElementById('calcAmount').addEventListener('input', function() { const v = parseNumber(this.value); if(v >= 5000) document.getElementById('calcAmountSlider').value = v; updateCalculatorPreview(); });
