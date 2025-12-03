@@ -11,7 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body, input, button, select, textarea, * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; font-weight: 400; }
@@ -203,6 +202,7 @@
     .timer-digit { background: var(--bg-card); border-radius: 6px; padding: 6px 10px; font-weight: 500; font-size: 16px; min-width: 40px; text-align: center; box-shadow: 0 2px 4px var(--shadow-color); }
     .no-select { -webkit-user-select: none; -moz-user-select: none; user-select: none; }
 
+    /* FIXED: Sidebar Styling from Original */
     .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; display: none; backdrop-filter: blur(2px); }
     .sidebar.open + .sidebar-overlay { display: block; }
     @media (max-width: 768px) { .sidebar { transform: translateX(-100%); position: fixed; z-index: 50; transition: transform 0.3s ease-in-out; } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0 !important; } .mobile-header { display: flex !important; } }
@@ -242,7 +242,7 @@
       <aside id="sidebar" class="sidebar w-64 sidebar-bg border-r border-primary flex flex-col fixed h-full">
         <div class="p-6 border-b border-primary flex justify-between items-center">
           <div class="flex items-center gap-3">
-            <!-- Logo Shield without Box -->
+            <!-- Updated: Just the Shield (Check filled with sidebar bg for transparency effect) -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-hero" viewBox="0 0 24 24" fill="currentColor">
                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
                <path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="var(--bg-sidebar)" />
@@ -252,7 +252,7 @@
           <button onclick="toggleSidebar()" class="md:hidden text-secondary hover:text-primary"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
         </div>
         
-        <!-- Increased Gap for Nav Items -->
+        <!-- INCREASED GAP HERE using space-y-3 -->
         <nav class="flex-1 p-4 space-y-3">
           <div class="nav-item active" data-view="dashboard"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 01-1 1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>Dashboard</div>
           <div class="nav-item" data-view="calculator"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>New Offer</div>
@@ -363,7 +363,7 @@
                         <path id="previewCircle" class="circle" stroke-dasharray="80, 20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                       </svg>
                       <div class="chart-text">
-                        <span class="text-[9px] font-medium text-muted block uppercase tracking-wider">Payback</span>
+                        <span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Payback</span>
                         <span id="previewPaybackChart" class="text-base font-semibold text-primary block">$62,500</span>
                       </div>
                     </div>
@@ -751,6 +751,7 @@
         const prepayEnabled = document.getElementById('togglePrepay').checked; 
         const overrideEnabled = document.getElementById('toggleOverride').checked; 
         const notesEnabled = document.getElementById('toggleNotes').checked; 
+        const aprEnabled = document.getElementById('toggleApr').checked;
         calcOptions[i] = { 
             amount: parseNumber(document.getElementById('calcAmount').value), 
             factor: parseFloat(document.getElementById('calcFactor').value) || 1.25, 
@@ -776,6 +777,7 @@
         const hf = o.fee > 0; document.getElementById('toggleFee').checked = hf; toggleFeeSection(hf); if(hf) { document.getElementById('calcFee').value = o.fee; document.getElementById('calcFeeSlider').value = o.fee; } 
         const hp = o.prepay > 0; document.getElementById('togglePrepay').checked = hp; togglePrepaySection(hp); if(hp) { document.getElementById('calcPrepay').value = o.prepay; document.getElementById('calcPrepaySlider').value = o.prepay; } 
         const hn = !!o.notes; document.getElementById('toggleNotes').checked = hn; toggleNotesSection(hn); if(hn) document.getElementById('calcNotes').value = o.notes; 
+        const ha = settings.showApr; if(document.getElementById('toggleApr')) document.getElementById('toggleApr').checked = ha;
     }
     
     function updateSliderFill(s) { if (!s) return; const m = parseFloat(s.min) || 0, mx = parseFloat(s.max) || 100, v = parseFloat(s.value) || 0, p = ((v - m) / (mx - m)) * 100; s.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${p}%, var(--bg-slider-track) ${p}%, var(--bg-slider-track) 100%)`; }
@@ -825,16 +827,17 @@
     function createOffer() {
       const bn = document.getElementById('calcBusinessName').value.trim(); if (!bn) { showToast('Please enter a business name'); document.getElementById('calcBusinessName').focus(); return; }
       saveInputsToState(activeCalcTab);
-      let ea; const dv = document.getElementById('calcExpiryDate').value; if (dv) ea = new Date(dv).getTime(); if (!ea || isNaN(ea)) ea = Date.now() + 1209600000;
+      let ea; if(document.getElementById('toggleExpiry').checked) { const dv = document.getElementById('calcExpiryDate').value; if (dv) ea = new Date(dv).getTime(); } 
+      if (!ea || isNaN(ea)) ea = Date.now() + (settings.defaultExpiry * 24 * 60 * 60 * 1000);
       const finalOpts = calcOptions.map((o, i) => { const c = calculateOffer(o.amount, o.factor, o.term, o.frequency, o.fee); return { id: i, amount: o.amount, factor: o.factor, term: o.term, frequency: o.frequency, fee: o.fee, prepayDiscount: o.prepay, termOverride: o.termOverride, notes: o.notes, ...c }; });
       if (editingOfferId) { const idx = offers.findIndex(o => o.id === editingOfferId); if (idx !== -1) { offers[idx] = { ...offers[idx], businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, expiresAt: ea, showApr: settings.showApr }; saveOffers(); showToast('Offer updated!'); cancelEdit(); setTimeout(() => openOfferDetail(editingOfferId), 300); return; } }
       const newOffer = { id: generateId(), businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, status: 'pending', createdAt: Date.now(), expiresAt: ea, repName: settings.repName, repEmail: settings.repEmail, repPhone: settings.repPhone, companyName: settings.companyName, logoUrl: settings.logoUrl, accent: settings.accent, showApr: settings.showApr };
       offers.push(newOffer); saveOffers(); resetCalculator(); refreshView(); showToast('Offer created!'); setTimeout(() => openOfferDetail(newOffer.id), 300);
     }
 
-    function editOffer() { if(!selectedOfferId) return; editingOfferId = selectedOfferId; const o = offers.find(x => x.id === editingOfferId); document.getElementById('calcBusinessName').value = o.businessName; document.getElementById('calcContactName').value = o.contactName; document.getElementById('calcEmail').value = o.email; if(o.contactName || o.email) toggleContactInfo(true); calcOptions = o.options.map(x => ({...x, prepay: x.prepayDiscount})); if(o.expiresAt) { document.getElementById('calcExpiryDate').value = new Date(o.expiresAt).toISOString().split('T')[0]; toggleExpirySection(true); } 
-    // Set APR toggle based on offer settings if available, else global
-    if (o.showApr !== undefined) { settings.showApr = o.showApr; document.getElementById('toggleApr').checked = o.showApr; }
+    function editOffer() { if(!selectedOfferId) return; editingOfferId = selectedOfferId; const o = offers.find(x => x.id === editingOfferId); document.getElementById('calcBusinessName').value = o.businessName; document.getElementById('calcContactName').value = o.contactName; document.getElementById('calcEmail').value = o.email; if(o.contactName || o.email) toggleContactInfo(true); calcOptions = o.options.map(x => ({...x, prepay: x.prepayDiscount})); 
+    if(o.expiresAt) { document.getElementById('calcExpiryDate').value = new Date(o.expiresAt).toISOString().split('T')[0]; document.getElementById('toggleExpiry').checked = true; toggleExpirySection(true); } 
+    if (o.showApr !== undefined) { settings.showApr = o.showApr; if(document.getElementById('toggleApr')) document.getElementById('toggleApr').checked = o.showApr; }
     activeCalcTab = 0; updateTabsUI(); loadStateToInputs(0); document.getElementById('cancelEditBtn').classList.remove('hidden'); document.getElementById('mainActionBtnText').textContent = 'Update Offer'; closeOfferDetailModal(); switchView('calculator'); }
     function cancelEdit() { editingOfferId = null; resetCalculator(); switchView('dashboard'); }
     function confirmDeleteOffer() { if(selectedOfferId) document.getElementById('confirmModal').classList.remove('hidden'); }
@@ -846,12 +849,11 @@
       const offer = offers.find(x => x.id === selectedOfferId); if (!offer) return;
       const company = offer.companyName || 'TrustBureau.ai';
       const link = generateOfferLink(offer);
-      const colorMap = { mint: '#42D197', blue: '#3b82f6', gold: '#D19B2B', purple: '#a855f7', red: '#ef4444', teal: '#14b8a6', pink: '#ec4899', orange: '#f97316', indigo: '#6366f1', lime: '#84cc16', cyan: '#06b6d4', black: '#18181b', grey: '#64748b', white: '#f8fafc', glow: '#d946ef', rose: '#f43f5e', violet: '#8b5cf6', amber: '#f59e0b', emerald: '#10b981', fuchsia: '#d946ef' };
+      const colorMap = { mint: '#42D197', blue: '#3b82f6', gold: '#D19B2B', purple: '#a855f7', red: '#ef4444', teal: '#14b8a6', pink: '#ec4899', orange: '#f97316', indigo: '#6366f1', lime: '#84cc16', cyan: '#06b6d4', black: '#18181b', grey: '#64748b', white: '#f8fafc', glow: '#d946ef' };
       const brandColor = colorMap[offer.accent] || '#42D197';
       const lightAccents = ['mint', 'lime', 'cyan', 'white', 'glow'];
-      // Mint uses white text with shadow now, so standard white text logic
-      const headerTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime') ? '#0f172a' : '#ffffff';
-      const btnTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime') ? '#0f172a' : '#ffffff';
+      const headerTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime' || offer.accent === 'mint') ? '#0f172a' : '#ffffff';
+      const btnTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime' || offer.accent === 'mint') ? '#0f172a' : '#ffffff';
       
       let optionsRows = '';
       offer.options.forEach((opt, i) => {
@@ -884,7 +886,7 @@
       const opt = o.options[activeClientOptionIdx];
       const amt = parseFloat(amountVal);
       
-      // Recalculate based on slider
+      // Recalculate
       const c = calculateOffer(amt, opt.factor, opt.term, opt.frequency, opt.fee);
       
       document.getElementById('clientMainAmount').textContent = formatCurrency(amt);
