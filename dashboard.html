@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body, input, button, select, textarea, * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; font-weight: 400; }
@@ -21,39 +22,19 @@
 
     /* Theme Variables */
     html.theme-light { 
-      --bg-body: #f8fafc; 
-      --bg-card: #ffffff; 
-      --bg-card-inner: #f1f5f9; 
-      --bg-input: #ffffff; 
-      --bg-sidebar: #ffffff;
-      --border-primary: #e2e8f0; 
-      --text-primary: #0f172a; 
-      --text-secondary: #475569; 
-      --text-muted: #94a3b8; 
-      --text-success: #16a34a;
-      --text-warning: #d97706;
-      --text-danger: #dc2626;
-      --shadow-color: rgba(0, 0, 0, 0.05); 
+      --bg-body: #f8fafc; --bg-card: #ffffff; --bg-card-inner: #f1f5f9; --bg-input: #ffffff; --bg-sidebar: #ffffff;
+      --border-primary: #e2e8f0; --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; 
+      --text-success: #16a34a; --text-warning: #d97706; --text-danger: #dc2626; --shadow-color: rgba(0, 0, 0, 0.05); 
       --bg-slider-track: #e2e8f0; 
     }
     html.theme-dark { 
-      --bg-body: #000000; 
-      --bg-card: #121212; 
-      --bg-card-inner: #18181b; 
-      --bg-input: #18181b; 
-      --bg-sidebar: #121212; 
-      --border-primary: #27272a; 
-      --text-primary: #f8fafc; 
-      --text-secondary: #cbd5e1; 
-      --text-muted: #94a3b8; 
-      --text-success: #4ade80; 
-      --text-warning: #fbbf24; 
-      --text-danger: #f87171; 
-      --shadow-color: rgba(0, 0, 0, 0.8); 
+      --bg-body: #000000; --bg-card: #121212; --bg-card-inner: #18181b; --bg-input: #18181b; --bg-sidebar: #121212; 
+      --border-primary: #27272a; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-muted: #94a3b8; 
+      --text-success: #4ade80; --text-warning: #fbbf24; --text-danger: #f87171; --shadow-color: rgba(0, 0, 0, 0.8); 
       --bg-slider-track: #27272a; 
     }
 
-    /* Accent Colors */
+    /* Accent Colors - Mint #42D197 with White Text */
     html.accent-mint { --accent-color: #42D197; --accent-color-light: #74eabc; --accent-color-dark: #2d9668; --accent-text-inverted: #ffffff; }
     html.accent-blue { --accent-color: #3b82f6; --accent-color-light: #60a5fa; --accent-color-dark: #2563eb; --accent-text-inverted: #ffffff; }
     html.accent-gold { --accent-color: #D19B2B; --accent-color-light: #e6b650; --accent-color-dark: #a6781c; --accent-text-inverted: #020617; }
@@ -226,7 +207,6 @@
     .option-toggles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .option-toggle-card { background: var(--bg-card-inner); border-radius: 12px; padding: 14px 16px; border: 1px solid var(--border-primary); transition: all 0.2s ease; }
     .option-toggle-card:hover { border-color: color-mix(in srgb, var(--accent-color) 50%, var(--border-primary)); }
-    /* Removed full-width class logic as we want uniform grid */
     
     .section-header { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
     .preview-card { background: var(--bg-card); border: 3px solid var(--accent-color); border-radius: 24px; padding: 28px; position: sticky; top: 24px; box-shadow: 0 8px 30px color-mix(in srgb, var(--accent-color) 15%, transparent); }
@@ -524,7 +504,7 @@
             </div>
         </div>
 
-        <!-- Details Grid -->
+        <!-- Details Grid - Updated to show terms -->
         <div class="border border-primary rounded-xl overflow-hidden mb-6">
             <div class="grid grid-cols-2 divide-x divide-primary border-b border-primary">
                 <div class="p-4 text-center"><span class="text-[10px] font-medium text-muted block uppercase">Term</span><span id="clientMainTerm" class="text-lg font-bold text-primary"></span></div>
@@ -852,8 +832,10 @@
       const colorMap = { mint: '#42D197', blue: '#3b82f6', gold: '#D19B2B', purple: '#a855f7', red: '#ef4444', teal: '#14b8a6', pink: '#ec4899', orange: '#f97316', indigo: '#6366f1', lime: '#84cc16', cyan: '#06b6d4', black: '#18181b', grey: '#64748b', white: '#f8fafc', glow: '#d946ef' };
       const brandColor = colorMap[offer.accent] || '#42D197';
       const lightAccents = ['mint', 'lime', 'cyan', 'white', 'glow'];
-      const headerTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime' || offer.accent === 'mint') ? '#0f172a' : '#ffffff';
-      const btnTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime' || offer.accent === 'mint') ? '#0f172a' : '#ffffff';
+      // Mint is back to light, so using darker text, or white depending on exact shade.
+      // Reverting to smart logic: if it's a very light color, dark text. #42D197 is mid-tone, but usually white text works with shadow.
+      const headerTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime') ? '#0f172a' : '#ffffff';
+      const btnTextColor = (offer.accent === 'white' || offer.accent === 'cyan' || offer.accent === 'lime') ? '#0f172a' : '#ffffff';
       
       let optionsRows = '';
       offer.options.forEach((opt, i) => {
@@ -1043,7 +1025,6 @@
     function acceptOffer(idx) { const o = offers.find(x => x.id === window.currentClientOfferId); if(!o) return; o.status = 'accepted'; o.acceptedAt = Date.now(); o.acceptedOptionIndex = idx; saveOffers(); fireConfetti(); showClientView(window.currentClientOfferId); showToast('Offer accepted!'); }
     function openAmortSchedule(idx) { 
         let o, opt, a;
-        // Differentiate between dashboard preview and client view
         if (currentView === 'dashboard' || currentView === 'calculator') {
             // Logic for preview mode
             a = parseNumber(document.getElementById('calcAmount').value);
