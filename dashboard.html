@@ -923,7 +923,7 @@
 
        // Update donut chart
        const pct = c.totalPayback > 0 ? (c.amount / c.totalPayback) * 100 : 0;
-       document.getElementById('clientMainDonut').setAttribute('stroke-dasharray', `${pct}, ${100 - pct}`);
+       document.getElementById('clientMainDonut').setAttribute('stroke-dasharray', `${pct}, 100`);
 
        // Configure slider
        const slider = document.getElementById('clientAmountSlider');
@@ -935,8 +935,8 @@
            slider.value = opt.amount;
            sliderContainer.classList.remove('hidden');
            document.getElementById('clientMaxAmountLabel').textContent = 'Approved: ' + formatCurrency(opt.amount);
-           // Set initial slider fill
-           const pctFill = ((opt.amount - 5000) / (opt.amount - 5000)) * 100;
+           // Set initial slider fill (starts at max value, so 100%)
+           const pctFill = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
            slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${pctFill}%, var(--bg-slider-track) ${pctFill}%, var(--bg-slider-track) 100%)`;
        } else {
            sliderContainer.classList.add('hidden');
