@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-light accent-sutton">
+<html lang="en" class="theme-dark accent-sutton">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -28,10 +28,10 @@
       --bg-slider-track: #e2e8f0; 
     }
     html.theme-dark { 
-      --bg-body: #000000; --bg-card: #121212; --bg-card-inner: #18181b; --bg-input: #18181b; --bg-sidebar: #121212; 
-      --border-primary: #27272a; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-muted: #94a3b8; 
+      --bg-body: #020617; --bg-card: #0a0f1a; --bg-card-inner: #111827; --bg-input: #111827; --bg-sidebar: #020617; 
+      --border-primary: #1e293b; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-muted: #94a3b8; 
       --text-success: #4ade80; --text-warning: #fbbf24; --text-danger: #f87171; --shadow-color: rgba(0, 0, 0, 0.8); 
-      --bg-slider-track: #27272a; 
+      --bg-slider-track: #1e293b; 
     }
 
     /* Accent Colors - Mint #42D197 with White Text */
@@ -236,11 +236,7 @@
       <aside id="sidebar" class="sidebar w-64 sidebar-bg border-r border-primary flex flex-col fixed h-full">
         <div class="p-6 border-b border-primary flex justify-between items-center">
           <div class="flex items-center gap-3">
-            <!-- Updated: Just the Shield (Check filled with sidebar bg for transparency effect) -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-hero" viewBox="0 0 24 24" fill="currentColor">
-               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-               <path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="var(--bg-sidebar)" />
-            </svg>
+            <img src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Funding" class="h-8 w-8" />
             <div><div class="font-medium text-primary">Sutton Funding</div><div class="text-[10px] text-muted uppercase tracking-wider">Funding Calculator</div></div>
           </div>
           <button onclick="toggleSidebar()" class="md:hidden text-secondary hover:text-primary"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
@@ -469,11 +465,7 @@
       <div class="p-6 border-b border-primary text-center">
         <div id="clientLogoWrapper" class="flex items-center justify-center mb-3">
           <img id="clientLogo" src="" alt="Logo" class="h-12 w-auto hidden" />
-          <!-- Updated: Simple Shield Logo No Box -->
-          <svg id="clientLogoPlaceholder" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-hero" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-              <path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="var(--bg-card)" />
-          </svg>
+          <img id="clientLogoPlaceholder" src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Funding" class="h-12 w-auto" />
         </div>
         <div id="clientCompanyName" class="font-medium text-primary text-lg">Sutton Funding</div>
         <div id="clientBusinessNameDisplay" class="text-center text-sm font-medium text-primary mb-2 hidden"></div>
@@ -629,7 +621,7 @@
     let offers = [], currentFilter = 'all', currentView = 'dashboard', selectedOfferId = null, editingOfferId = null, clientTimerId = null, activeClientOptionIdx = 0;
     let activeCalcTab = 0, calcOptions = [];
     let settings = { repName: '', repEmail: '', repPhone: '', companyName: '', logoUrl: '', defaultFactor: 1.25, defaultTerm: 130, defaultExpiry: 14, accent: 'sutton', showApr: false };
-    let isDark = false;
+    let isDark = true;
     const STORAGE_KEY = 'sutton_offers', SETTINGS_KEY = 'sutton_settings';
 
     // --- CORE FUNCTIONS ---
@@ -719,8 +711,8 @@
     }
     function updateRepDisplay() { document.getElementById('repNameSidebar').textContent = settings.repName || 'Not Set'; }
     
-    function toggleTheme() { isDark = !isDark; document.documentElement.classList.toggle('theme-dark', isDark); document.documentElement.classList.toggle('theme-light', !isDark); document.getElementById('themeLabel').textContent = isDark ? 'Light Mode' : 'Dark Mode'; localStorage.setItem('theme', isDark ? 'dark' : 'light'); updateSliderFills(); }
-    function loadTheme() { const s = localStorage.getItem('theme'); if (s === 'dark') { isDark = true; document.documentElement.classList.remove('theme-light'); document.documentElement.classList.add('theme-dark'); document.getElementById('themeLabel').textContent = 'Light Mode'; } }
+    function toggleTheme() { isDark = !isDark; document.documentElement.classList.toggle('theme-dark', isDark); document.documentElement.classList.toggle('theme-light', !isDark); document.getElementById('themeLabel').textContent = isDark ? 'Light Mode' : 'Dark Mode'; localStorage.setItem('sutton_theme', isDark ? 'dark' : 'light'); updateSliderFills(); }
+    function loadTheme() { const s = localStorage.getItem('sutton_theme'); if (s === 'light') { isDark = false; document.documentElement.classList.remove('theme-dark'); document.documentElement.classList.add('theme-light'); } else { isDark = true; document.documentElement.classList.remove('theme-light'); document.documentElement.classList.add('theme-dark'); } document.getElementById('themeLabel').textContent = isDark ? 'Light Mode' : 'Dark Mode'; }
     function setAccent(a, s = true) { document.documentElement.className = document.documentElement.className.replace(/accent-\w+/g, ''); document.documentElement.classList.add('accent-' + a); settings.accent = a; if (s) try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} updateSliderFills(); }
 
     // --- CALCULATOR LOGIC ---
