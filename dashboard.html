@@ -468,7 +468,8 @@
           <div class="flex items-center gap-1">
             <span id="clientTimerDays" class="timer-digit text-primary">00</span>d :
             <span id="clientTimerHours" class="timer-digit text-primary">00</span>h :
-            <span id="clientTimerMinutes" class="timer-digit text-primary">00</span>m
+            <span id="clientTimerMinutes" class="timer-digit text-primary">00</span>m :
+            <span id="clientTimerSeconds" class="timer-digit text-primary">00</span>s
           </div>
         </div>
       </div>
@@ -807,16 +808,17 @@
     function createOffer() {
       const bn = document.getElementById('calcBusinessName').value.trim(); if (!bn) { showToast('Please enter a business name'); document.getElementById('calcBusinessName').focus(); return; }
       saveInputsToState(activeCalcTab);
-      let ea; if(document.getElementById('toggleExpiry').checked) { const dv = document.getElementById('calcExpiryDate').value; if (dv) ea = new Date(dv).getTime(); } 
+      const hasExpiration = document.getElementById('toggleExpiry').checked;
+      let ea; if(hasExpiration) { const dv = document.getElementById('calcExpiryDate').value; if (dv) ea = new Date(dv).getTime(); } 
       if (!ea || isNaN(ea)) ea = Date.now() + (settings.defaultExpiry * 24 * 60 * 60 * 1000);
       const finalOpts = calcOptions.map((o, i) => { const c = calculateOffer(o.amount, o.factor, o.term, o.frequency, o.fee); return { id: i, amount: o.amount, factor: o.factor, term: o.term, frequency: o.frequency, fee: o.fee, prepayDiscount: o.prepay, termOverride: o.termOverride, notes: o.notes, ...c }; });
-      if (editingOfferId) { const idx = offers.findIndex(o => o.id === editingOfferId); if (idx !== -1) { offers[idx] = { ...offers[idx], businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, expiresAt: ea, showApr: settings.showApr }; saveOffers(); showToast('Offer updated!'); cancelEdit(); setTimeout(() => openOfferDetail(editingOfferId), 300); return; } }
-      const newOffer = { id: generateId(), businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, status: 'pending', createdAt: Date.now(), expiresAt: ea, repName: settings.repName, repEmail: settings.repEmail, repPhone: settings.repPhone, companyName: settings.companyName, logoUrl: settings.logoUrl, accent: settings.accent, showApr: settings.showApr };
+      if (editingOfferId) { const idx = offers.findIndex(o => o.id === editingOfferId); if (idx !== -1) { offers[idx] = { ...offers[idx], businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, expiresAt: ea, hasExpiration: hasExpiration, showApr: settings.showApr }; saveOffers(); showToast('Offer updated!'); cancelEdit(); setTimeout(() => openOfferDetail(editingOfferId), 300); return; } }
+      const newOffer = { id: generateId(), businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, status: 'pending', createdAt: Date.now(), expiresAt: ea, hasExpiration: hasExpiration, repName: settings.repName, repEmail: settings.repEmail, repPhone: settings.repPhone, companyName: settings.companyName, logoUrl: settings.logoUrl, accent: settings.accent, showApr: settings.showApr };
       offers.push(newOffer); saveOffers(); resetCalculator(); refreshView(); showToast('Offer created!'); setTimeout(() => openOfferDetail(newOffer.id), 300);
     }
 
     function editOffer() { if(!selectedOfferId) return; editingOfferId = selectedOfferId; const o = offers.find(x => x.id === editingOfferId); document.getElementById('calcBusinessName').value = o.businessName; document.getElementById('calcContactName').value = o.contactName; document.getElementById('calcEmail').value = o.email; if(o.contactName || o.email) toggleContactInfo(true); calcOptions = o.options.map(x => ({...x, prepay: x.prepayDiscount})); 
-    if(o.expiresAt) { document.getElementById('calcExpiryDate').value = new Date(o.expiresAt).toISOString().split('T')[0]; document.getElementById('toggleExpiry').checked = true; toggleExpirySection(true); } 
+    if(o.hasExpiration && o.expiresAt) { document.getElementById('calcExpiryDate').value = new Date(o.expiresAt).toISOString().split('T')[0]; document.getElementById('toggleExpiry').checked = true; toggleExpirySection(true); } else { document.getElementById('toggleExpiry').checked = false; toggleExpirySection(false); }
     if (o.showApr !== undefined) { settings.showApr = o.showApr; if(document.getElementById('toggleApr')) document.getElementById('toggleApr').checked = o.showApr; }
     activeCalcTab = 0; updateTabsUI(); loadStateToInputs(0); document.getElementById('cancelEditBtn').classList.remove('hidden'); document.getElementById('mainActionBtnText').textContent = 'Update Offer'; closeOfferDetailModal(); switchView('calculator'); }
     function cancelEdit() { editingOfferId = null; resetCalculator(); switchView('dashboard'); }
@@ -986,7 +988,7 @@
         return `<div onclick="switchClientOption(${idx})" class="bg-[var(--bg-card)] p-4 rounded-xl border border-primary hover:border-[var(--accent-color)] hover:shadow-md cursor-pointer transition-all flex items-center justify-between group ${idx === activeClientOptionIdx ? 'ring-2 ring-[var(--accent-color)]' : ''}"><div><span class="text-[10px] font-bold text-muted uppercase block mb-1">Option ${idx + 1}</span><div class="text-lg font-bold text-primary group-hover:text-[var(--accent-color)] transition-colors">${formatCurrency(opt.amount)}</div><div class="text-xs text-secondary mt-0.5">${tl} • ${opt.frequency}</div></div><div class="text-right"><div class="text-xs font-medium text-muted">Factor</div><div class="font-bold text-primary">${opt.factor}x</div><div class="text-[10px] font-bold text-hero mt-1 uppercase tracking-wide">View &rarr;</div></div></div>`; 
     }
     function switchClientOption(idx) { activeClientOptionIdx = idx; const o = offers.find(x => x.id === window.currentClientOfferId); populateClientView(o); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function startClientTimer(ea) { if(clientTimerId) clearInterval(clientTimerId); function u() { const n = Date.now(); const d = ea - n; if(d <= 0) { clearInterval(clientTimerId); location.reload(); return; } const days = Math.floor(d / 86400000); const hours = Math.floor((d % 86400000) / 3600000); const minutes = Math.floor((d % 3600000) / 60000); document.getElementById('clientTimerDays').textContent = days.toString().padStart(2, '0'); document.getElementById('clientTimerHours').textContent = hours.toString().padStart(2, '0'); document.getElementById('clientTimerMinutes').textContent = minutes.toString().padStart(2, '0'); } u(); clientTimerId = setInterval(u, 60000); }
+    function startClientTimer(ea) { if(clientTimerId) clearInterval(clientTimerId); function u() { const n = Date.now(); const d = ea - n; if(d <= 0) { clearInterval(clientTimerId); location.reload(); return; } const days = Math.floor(d / 86400000); const hours = Math.floor((d % 86400000) / 3600000); const minutes = Math.floor((d % 3600000) / 60000); const seconds = Math.floor((d % 60000) / 1000); document.getElementById('clientTimerDays').textContent = days.toString().padStart(2, '0'); document.getElementById('clientTimerHours').textContent = hours.toString().padStart(2, '0'); document.getElementById('clientTimerMinutes').textContent = minutes.toString().padStart(2, '0'); document.getElementById('clientTimerSeconds').textContent = seconds.toString().padStart(2, '0'); } u(); clientTimerId = setInterval(u, 1000); }
     function acceptOffer(idx) { const o = offers.find(x => x.id === window.currentClientOfferId); if(!o) return; o.status = 'accepted'; o.acceptedAt = Date.now(); o.acceptedOptionIndex = idx; saveOffers(); fireConfetti(); showClientView(window.currentClientOfferId); showToast('Offer accepted!'); }
     function openAmortSchedule(idx) { 
         let o, opt, a;
@@ -1108,7 +1110,7 @@
       }
   
       // Banner
-      if(o.status === 'pending' && o.expiresAt) {
+      if(o.status === 'pending' && o.hasExpiration && o.expiresAt) {
           document.getElementById('clientExpirationBanner').classList.remove('hidden');
           startClientTimer(o.expiresAt);
       } else {
