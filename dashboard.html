@@ -546,7 +546,7 @@
 
         <!-- Actions -->
         <div class="mt-6">
-             <button id="clientAcceptBtn" onclick="acceptOffer()" class="button-primary w-full py-4 text-sm uppercase tracking-wider shadow-lg">Accept This Offer</button>
+             <button id="clientAcceptBtn" onclick="acceptOffer(activeClientOptionIdx)" class="button-primary w-full py-4 text-sm uppercase tracking-wider shadow-lg">Accept This Offer</button>
              <div id="clientAcceptedMsg" class="hidden text-center py-6 bg-green-50 border border-green-200 rounded-2xl text-green-700 font-bold text-xl">Offer Accepted!</div>
         </div>
         
@@ -906,108 +906,73 @@
       document.getElementById('clientMainNewTotal').textContent = formatCurrency(nt); 
     }
 
-    function renderClientViewLogic(offer) {
+    function populateClientView(offer) {
        window.currentClientOfferId = offer.id;
        const opt = offer.options[activeClientOptionIdx];
-       const mainStage = document.getElementById('clientMainStage');
        const c = calculateOffer(opt.amount, opt.factor, opt.term, opt.frequency, opt.fee);
        const termLabel = opt.termOverride || c.termMonths + ' mo';
+       const freqLabel = opt.frequency === 'weekly' ? 'Est. Weekly Payment' : opt.frequency === 'monthly' ? 'Est. Monthly Payment' : 'Est. Daily Payment';
 
-       const prepaySection = opt.prepayDiscount > 0 ? `
-         <div class="mt-6 pt-4 border-t border-primary">
-           <button onclick="document.getElementById('clientPrepayContainer').classList.toggle('hidden')" class="w-full text-xs font-bold text-muted hover:text-hero flex items-center justify-center gap-2 transition-colors py-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" /></svg>
-              Calculate Prepayment Discount
-           </button>
-           <div id="clientPrepayContainer" class="hidden mt-4 p-4 rounded-xl border border-primary bg-[var(--bg-card-inner)]">
-              <div class="flex justify-between items-center mb-3 pb-2 border-b border-primary">
-                <span class="text-xs font-medium text-secondary uppercase tracking-wider">Discount</span>
-                <span class="text-sm font-bold text-hero">${opt.prepayDiscount}% Max</span>
-              </div>
-              <div class="mb-4">
-                 <label class="block text-xs font-medium text-muted mb-1 text-center">Select Payoff Date</label>
-                 <input type="date" id="clientMainPrepayDate" onchange="calculateMainClientSavings()" class="w-full p-2.5 text-sm rounded-lg border border-primary input-field text-center">
-              </div>
-              <div class="grid grid-cols-2 gap-4 text-center border-t border-primary pt-4">
-                 <div><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">Savings</span><span id="clientMainSavings" class="text-lg font-bold text-green-500">$0</span></div>
-                 <div><span class="text-[10px] font-medium text-muted block uppercase tracking-wider">New Payoff</span><span id="clientMainNewTotal" class="text-lg font-bold text-primary">$0</span></div>
-              </div>
-           </div>
-         </div>` : '';
+       // Populate main display values
+       document.getElementById('clientMainAmount').textContent = formatCurrency(c.amount);
+       document.getElementById('clientMainPayback').textContent = formatCurrency(c.totalPayback);
+       document.getElementById('clientMainTerm').textContent = termLabel;
+       document.getElementById('clientMainCost').textContent = formatCurrency(c.totalCost);
+       document.getElementById('clientMainPayment').textContent = formatCurrency(c.payment);
+       document.getElementById('clientMainFreqLabel').textContent = freqLabel;
 
-       const notesSection = opt.notes ? `<div class="mb-6 p-4 bg-[var(--bg-card-inner)] rounded-xl text-xs border border-primary"><div class="font-bold text-muted uppercase mb-2">Approval Notes</div><div class="text-secondary whitespace-pre-wrap">${opt.notes}</div></div>` : '';
+       // Update donut chart
+       const pct = c.totalPayback > 0 ? (c.amount / c.totalPayback) * 100 : 0;
+       document.getElementById('clientMainDonut').setAttribute('stroke-dasharray', `${pct}, ${100 - pct}`);
 
-       const actionBtn = offer.status === 'pending' 
-           ? `<button onclick="acceptOffer(${activeClientOptionIdx})" class="button-primary w-full py-4 text-sm uppercase tracking-wider shadow-lg">Accept This Offer</button>`
-           : `<div class="text-center py-4 bg-green-50 border border-green-200 rounded-xl text-green-700 font-bold text-xl">Offer Accepted!</div>`;
-           
-       // SLIDER HTML
-       const sliderHTML = offer.status === 'pending' ? `
-          <div class="mt-6 max-w-xs mx-auto px-4">
-             <input type="range" min="5000" max="${opt.amount}" step="1000" value="${opt.amount}"
-                 oninput="updateClientMainCard(this.value); this.style.background = 'linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ' + ((this.value-5000)/(this.max-5000))*100 + '%, var(--bg-slider-track) ' + ((this.value-5000)/(this.max-5000))*100 + '%, var(--bg-slider-track) 100%)'"
-                 class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-[var(--bg-slider-track)]">
-             <div class="flex justify-between text-[10px] text-muted mt-2 font-medium px-1">
-                <span>$5,000</span>
-                <span>Approved: ${formatCurrency(opt.amount)}</span>
-             </div>
-          </div>` : '';
+       // Configure slider
+       const slider = document.getElementById('clientAmountSlider');
+       const sliderContainer = document.getElementById('clientSliderContainer');
+       if (offer.status === 'pending') {
+           slider.min = 5000;
+           slider.max = opt.amount;
+           slider.step = 1000;
+           slider.value = opt.amount;
+           sliderContainer.classList.remove('hidden');
+           document.getElementById('clientMaxAmountLabel').textContent = 'Approved: ' + formatCurrency(opt.amount);
+           // Set initial slider fill
+           const pctFill = ((opt.amount - 5000) / (opt.amount - 5000)) * 100;
+           slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${pctFill}%, var(--bg-slider-track) ${pctFill}%, var(--bg-slider-track) 100%)`;
+       } else {
+           sliderContainer.classList.add('hidden');
+       }
 
-       const html = `
-       <div class="client-card">
-         <div class="p-6">
-            <div class="text-center border-b border-primary pb-4 mb-4">
-               <h4 class="text-xs font-bold text-muted uppercase tracking-wider">
-                 Approved for ${offer.businessName}
-                 ${offer.options.length > 1 ? `<span class="block mt-1 text-hero">Option ${activeClientOptionIdx + 1}</span>` : ''}
-               </h4>
-            </div>
-            
-            <div class="text-center py-4">
-               <span class="text-[11px] font-medium text-muted block uppercase tracking-widest">You Get</span>
-               <span id="clientMainAmount" class="text-5xl font-semibold block my-3 text-hero leading-tight">${formatCurrency(c.amount)}</span>
-               ${sliderHTML}
-            </div>
-            
-            <div class="my-6 flex justify-center">
-               <div class="chart-wrapper">
-                  <svg viewBox="0 0 36 36" class="circular-chart">
-                     <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                     <path id="clientMainDonut" class="circle" stroke-dasharray="${(c.amount/c.totalPayback)*100}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                  </svg>
-                  <div class="chart-text">
-                     <span class="text-[10px] font-bold text-muted block uppercase tracking-wider">Payback</span>
-                     <span id="clientMainPayback" class="text-base font-bold text-primary">${formatCurrency(c.totalPayback)}</span>
-                  </div>
-               </div>
-            </div>
-            
-            <div class="border border-primary rounded-xl overflow-hidden mb-6">
-               <div class="grid grid-cols-2 divide-x divide-primary border-b border-primary">
-                  <div class="p-4 text-center"><span class="text-[10px] font-medium text-muted block uppercase">Term</span><span class="text-sm font-bold text-primary">${termLabel}</span></div>
-                  <div class="p-4 text-center"><span class="text-[10px] font-medium text-muted block uppercase">Cost</span><span id="clientMainCost" class="text-sm font-bold text-primary">${formatCurrency(c.totalCost)}</span></div>
-               </div>
-               <div class="p-4 text-center bg-[var(--bg-card-inner)]">
-                  <span class="text-[10px] font-medium text-muted block uppercase">Est. ${opt.frequency} Payment</span>
-                  <span id="clientMainPayment" class="text-xl font-bold text-primary">${formatCurrency(c.payment)}</span>
-               </div>
-            </div>
-            
-            ${notesSection}
-            ${actionBtn}
-            ${prepaySection}
-            
-            <div class="text-center mt-4">
-               <button onclick="openAmortSchedule(${activeClientOptionIdx})" class="text-xs font-bold text-hero hover:underline">View Schedule</button>
-            </div>
-         </div>
-       </div>
-       `;
-       
-       mainStage.innerHTML = html;
-       
-       // 2. Render Thumbnails if > 1 option
-       if(offer.options.length > 1) {
+       // Show/hide prepay section
+       const prepaySection = document.getElementById('clientPrepaySection');
+       if (opt.prepayDiscount > 0) {
+           prepaySection.classList.remove('hidden');
+           document.getElementById('clientPrepayPercent').textContent = opt.prepayDiscount + '% Max';
+       } else {
+           prepaySection.classList.add('hidden');
+       }
+
+       // Show/hide notes
+       const notesContainer = document.getElementById('clientNotesContainer');
+       if (opt.notes) {
+           notesContainer.classList.remove('hidden');
+           document.getElementById('clientNotesText').textContent = opt.notes;
+       } else {
+           notesContainer.classList.add('hidden');
+       }
+
+       // Show/hide accept button vs accepted message
+       const acceptBtn = document.getElementById('clientAcceptBtn');
+       const acceptedMsg = document.getElementById('clientAcceptedMsg');
+       if (offer.status === 'pending') {
+           acceptBtn.classList.remove('hidden');
+           acceptedMsg.classList.add('hidden');
+       } else {
+           acceptBtn.classList.add('hidden');
+           acceptedMsg.classList.remove('hidden');
+       }
+
+       // Render alternative option thumbnails if > 1 option
+       if (offer.options.length > 1) {
            document.getElementById('clientAlternativesContainer').classList.remove('hidden');
            document.getElementById('clientThumbnails').innerHTML = offer.options.map((o, i) => generateThumbnailHTML(o, i)).join('');
        } else {
@@ -1020,7 +985,7 @@
         const tl = opt.termOverride ? opt.termOverride : (c.termMonths + ' months'); 
         return `<div onclick="switchClientOption(${idx})" class="bg-[var(--bg-card)] p-4 rounded-xl border border-primary hover:border-[var(--accent-color)] hover:shadow-md cursor-pointer transition-all flex items-center justify-between group ${idx === activeClientOptionIdx ? 'ring-2 ring-[var(--accent-color)]' : ''}"><div><span class="text-[10px] font-bold text-muted uppercase block mb-1">Option ${idx + 1}</span><div class="text-lg font-bold text-primary group-hover:text-[var(--accent-color)] transition-colors">${formatCurrency(opt.amount)}</div><div class="text-xs text-secondary mt-0.5">${tl} • ${opt.frequency}</div></div><div class="text-right"><div class="text-xs font-medium text-muted">Factor</div><div class="font-bold text-primary">${opt.factor}x</div><div class="text-[10px] font-bold text-hero mt-1 uppercase tracking-wide">View &rarr;</div></div></div>`; 
     }
-    function switchClientOption(idx) { activeClientOptionIdx = idx; const o = offers.find(x => x.id === window.currentClientOfferId); renderClientViewLogic(o); document.getElementById('clientMainStage').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    function switchClientOption(idx) { activeClientOptionIdx = idx; const o = offers.find(x => x.id === window.currentClientOfferId); populateClientView(o); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function startClientTimer(ea) { if(clientTimerId) clearInterval(clientTimerId); function u() { const n = Date.now(); const d = ea - n; if(d <= 0) { clearInterval(clientTimerId); location.reload(); return; } const days = Math.floor(d / 86400000); const hours = Math.floor((d % 86400000) / 3600000); const minutes = Math.floor((d % 3600000) / 60000); document.getElementById('clientTimerDays').textContent = days.toString().padStart(2, '0'); document.getElementById('clientTimerHours').textContent = hours.toString().padStart(2, '0'); document.getElementById('clientTimerMinutes').textContent = minutes.toString().padStart(2, '0'); } u(); clientTimerId = setInterval(u, 60000); }
     function acceptOffer(idx) { const o = offers.find(x => x.id === window.currentClientOfferId); if(!o) return; o.status = 'accepted'; o.acceptedAt = Date.now(); o.acceptedOptionIndex = idx; saveOffers(); fireConfetti(); showClientView(window.currentClientOfferId); showToast('Offer accepted!'); }
     function openAmortSchedule(idx) { 
@@ -1149,8 +1114,13 @@
       } else {
           document.getElementById('clientExpirationBanner').classList.add('hidden');
       }
+
+      // Apply accent color if saved
+      if(o.accent) {
+          setAccent(o.accent, false);
+      }
       
-      renderClientViewLogic(o);
+      populateClientView(o);
     }
   </script>
 </body>
