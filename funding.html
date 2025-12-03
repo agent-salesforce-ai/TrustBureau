@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-light accent-mint">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Funding Calculator | TrustBureau.ai</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22%2342D197%22/><path d=%22M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z%22 fill=%22white%22/></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            mint: { 500: '#42D197', 600: '#2d9668' },
+            slate: { 850: '#1e293b' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Base Variables */
+    :root {
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f8fafc;
+      --bg-input: #ffffff;
+      --border-primary: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent-color: #42D197;
+      --accent-color-light: #74eabc;
+      --accent-text-inverted: #ffffff;
+      --bg-slider-track: #e2e8f0;
+    }
+
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background-color: var(--bg-body); 
+      color: var(--text-primary); 
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Form Elements */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; margin: 0; 
+    }
+
+    .input-field {
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(66, 209, 151, 0.2);
+      outline: none;
+    }
+
+    /* Buttons */
+    .button-primary {
+      background-color: var(--accent-color);
+      color: var(--accent-text-inverted);
+      transition: all 0.2s ease;
+    }
+    .button-primary:hover {
+      background-color: var(--accent-color-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(66, 209, 151, 0.3);
+    }
+
+    .button-secondary {
+      background: white;
+      border: 1px solid var(--border-primary);
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+    .button-secondary:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: #f0fdf9;
+    }
+
+    /* Tabs */
+    .calc-tab {
+      position: relative;
+      transition: all 0.2s;
+    }
+    .calc-tab.active {
+      color: var(--accent-color);
+      background: white;
+      border-color: var(--border-primary);
+      border-bottom-color: white;
+    }
+    .calc-tab.active::after {
+      content: '';
+      position: absolute;
+      top: -1px; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent-color);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Toggles */
+    .toggle-btn.active {
+      background: var(--accent-color);
+      color: white;
+      box-shadow: 0 2px 8px rgba(66, 209, 151, 0.3);
+    }
+
+    /* Custom Switch */
+    .switch input:checked + .switch-slider { background-color: var(--accent-color); }
+    .switch input:checked + .switch-slider:before { transform: translateX(20px); }
+
+    /* Custom Range Slider */
+    .slider {
+      -webkit-appearance: none;
+      height: 6px;
+      background: var(--bg-slider-track);
+      border-radius: 999px;
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px; width: 22px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--accent-color);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.1s;
+      margin-top: -8px; /* Alignment fix */
+    }
+    .slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+    
+    /* Firefox slider fixes */
+    .slider::-moz-range-track {
+        height: 6px;
+        background: var(--bg-slider-track);
+        border-radius: 999px;
+    }
+    .slider::-moz-range-thumb {
+        height: 22px; width: 22px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid var(--accent-color);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Charts */
+    .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; }
+    .circle-bg { fill: none; stroke: #edf2f7; stroke-width: 2.5; }
+    .circle { 
+      fill: none; 
+      stroke-width: 2.5; 
+      stroke-linecap: round; 
+      stroke: var(--accent-color); 
+      transition: stroke-dasharray 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Table */
+    .amort-table th { position: sticky; top: 0; background: white; z-index: 10; }
+    
+    /* Animations */
+    .fade-enter { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .toast {
+      transform: translateY(100%);
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .toast.show { transform: translateY(0); }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-6 lg:p-8 flex justify-center bg-slate-50">
+
+  <div class="w-full max-w-7xl">
+      <!-- HEADER -->
+      <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+        <div class="flex items-center gap-3">
+            <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="var(--accent-color)" /><path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="#ffffff" /></svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Funding Calculator</h1>
+                <p class="text-xs text-slate-500 font-medium">TrustBureau.ai</p>
+            </div>
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+            <button onclick="resetCalculator()" class="button-secondary flex-1 md:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm">Reset</button>
+            <button onclick="shareOffer()" class="button-primary flex-1 md:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-mint-500/20">Create & Share</button>
+        </div>
+      </header>
+
+      <!-- MAIN GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- LEFT: INPUTS (7 Columns) -->
+          <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Client Info Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div class="flex justify-between items-center mb-5">
+                   <div class="flex items-center gap-2">
+                       <span class="w-1 h-6 bg-mint-500 rounded-full"></span>
+                       <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Client Information</h3>
+                   </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">Business Name</label>
+                        <input id="calcBusinessName" type="text" class="w-full p-3 border border-slate-200 rounded-xl input-field text-sm font-medium" placeholder="e.g. Acme Corporation LLC" />
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">Contact Name</label>
+                            <input id="calcContactName" type="text" class="w-full p-3 border border-slate-200 rounded-xl input-field text-sm font-medium" placeholder="First Last" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">Email Address</label>
+                            <input id="calcEmail" type="email" class="w-full p-3 border border-slate-200 rounded-xl input-field text-sm font-medium" placeholder="name@company.com" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1 h-6 bg-mint-500 rounded-full"></span>
+                        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Structure Offer</h3>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-2 border-b border-slate-200 mb-6 px-1">
+                    <button id="tab-btn-0" class="calc-tab active px-4 py-2 text-sm font-semibold rounded-t-lg border border-transparent -mb-[1px]" onclick="switchCalcTab(0)">Option 1</button>
+                    <button id="tab-btn-1" class="calc-tab hidden px-4 py-2 text-sm font-semibold rounded-t-lg border border-transparent -mb-[1px]" onclick="switchCalcTab(1)">Option 2</button>
+                    <button id="tab-btn-2" class="calc-tab hidden px-4 py-2 text-sm font-semibold rounded-t-lg border border-transparent -mb-[1px]" onclick="switchCalcTab(2)">Option 3</button>
+                    <button id="add-tab-btn" class="ml-auto text-xs font-bold text-mint-500 hover:text-mint-600 px-3 py-2" onclick="addCalcOption()">+ Add Option</button>
+                </div>
+                
+                <div class="space-y-8 fade-enter">
+                    <!-- Main Sliders -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Funding Amount</label>
+                            <button id="remove-option-btn" onclick="removeCalcOption()" class="text-xs text-red-500 hidden font-bold hover:underline">Remove This Option</button>
+                        </div>
+                        <div class="flex items-baseline gap-1 mb-3">
+                            <span class="text-slate-400 font-medium text-lg">$</span>
+                            <input id="calcAmount" type="text" class="w-full bg-transparent border-none p-0 text-3xl font-extrabold text-slate-800 focus:ring-0" value="50,000" />
+                        </div>
+                        <input id="calcAmountSlider" type="range" min="5000" max="1000000" step="1000" value="50000" class="slider w-full h-2" />
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-3 block">Factor Rate</label>
+                            <div class="flex items-center justify-between mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                <input id="calcFactor" type="number" step="0.01" class="bg-transparent font-bold text-slate-800 outline-none w-20" value="1.25" />
+                                <span class="text-xs text-slate-400 font-bold bg-white px-2 py-1 rounded border border-slate-100">PTR</span>
+                            </div>
+                            <input id="calcFactorSlider" type="range" min="1.05" max="1.7" step="0.01" value="1.25" class="slider w-full" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-3 block">Term Length</label>
+                            <div class="flex items-center justify-between mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                <input id="calcTerm" type="number" class="bg-transparent font-bold text-slate-800 outline-none w-20" value="130" />
+                                <span class="text-xs text-slate-400 font-bold bg-white px-2 py-1 rounded border border-slate-100">Pmts</span>
+                            </div>
+                            <input id="calcTermSlider" type="range" min="5" max="520" step="1" value="130" class="slider w-full" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase mb-3 block">Payment Frequency</label>
+                        <div class="toggle-group inline-flex bg-slate-100 p-1 rounded-xl w-full border border-slate-200">
+                            <button class="toggle-btn active flex-1 py-2.5 rounded-lg text-sm font-medium transition-all" data-freq="daily" onclick="setFrequency('daily')">Daily</button>
+                            <button class="toggle-btn flex-1 py-2.5 rounded-lg text-sm font-medium transition-all" data-freq="weekly" onclick="setFrequency('weekly')">Weekly</button>
+                            <button class="toggle-btn flex-1 py-2.5 rounded-lg text-sm font-medium transition-all" data-freq="monthly" onclick="setFrequency('monthly')">Monthly</button>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 my-4"></div>
+                    
+                    <!-- Advanced Toggles Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Fee -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 transition-all hover:border-mint-500/50">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-semibold text-slate-700">Origination Fee</span>
+                                <label class="switch relative inline-block w-11 h-6">
+                                    <input id="toggleFee" type="checkbox" onchange="toggleSection('Fee', this.checked)">
+                                    <span class="switch-slider absolute cursor-pointer inset-0 bg-slate-300 rounded-full transition-all before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all"></span>
+                                </label>
+                            </div>
+                            <div id="secFee" class="hidden mt-4 pt-3 border-t border-slate-200">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <input id="calcFee" type="number" step="0.5" min="0" max="15" class="w-16 bg-white border border-slate-300 rounded p-1 text-sm font-bold text-center outline-none focus:border-mint-500" value="0" />
+                                    <span class="text-sm font-bold text-slate-500">%</span>
+                                </div>
+                                <input id="calcFeeSlider" type="range" min="0" max="15" step="0.5" value="0" class="slider h-1 w-full" />
+                            </div>
+                        </div>
+
+                        <!-- Prepay -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 transition-all hover:border-mint-500/50">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-semibold text-slate-700">Prepay Discount</span>
+                                <label class="switch relative inline-block w-11 h-6">
+                                    <input id="togglePrepay" type="checkbox" onchange="toggleSection('Prepay', this.checked)">
+                                    <span class="switch-slider absolute cursor-pointer inset-0 bg-slate-300 rounded-full transition-all before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all"></span>
+                                </label>
+                            </div>
+                            <div id="secPrepay" class="hidden mt-4 pt-3 border-t border-slate-200">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <input id="calcPrepay" type="number" step="1" min="0" max="50" class="w-16 bg-white border border-slate-300 rounded p-1 text-sm font-bold text-center outline-none focus:border-mint-500" value="0" />
+                                    <span class="text-sm font-bold text-slate-500">%</span>
+                                </div>
+                                <input id="calcPrepaySlider" type="range" min="0" max="50" step="1" value="0" class="slider h-1 w-full" />
+                            </div>
+                        </div>
+
+                        <!-- Custom Label -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-semibold text-slate-700">Custom Term Label</span>
+                                <label class="switch relative inline-block w-11 h-6">
+                                    <input id="toggleOverride" type="checkbox" onchange="toggleSection('Override', this.checked)">
+                                    <span class="switch-slider absolute cursor-pointer inset-0 bg-slate-300 rounded-full transition-all before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all"></span>
+                                </label>
+                            </div>
+                            <div id="secOverride" class="hidden mt-3">
+                                <input id="calcTermOverride" type="text" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs" placeholder="e.g. 6 Months" />
+                            </div>
+                        </div>
+
+                        <!-- Expiry -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-semibold text-slate-700">Offer Expiration</span>
+                                <label class="switch relative inline-block w-11 h-6">
+                                    <input id="toggleExpiry" type="checkbox" onchange="toggleSection('Expiry', this.checked)">
+                                    <span class="switch-slider absolute cursor-pointer inset-0 bg-slate-300 rounded-full transition-all before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all"></span>
+                                </label>
+                            </div>
+                            <div id="secExpiry" class="hidden mt-3">
+                                <input id="calcExpiryDate" type="date" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs" />
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 md:col-span-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-semibold text-slate-700">Stipulations / Notes</span>
+                                <label class="switch relative inline-block w-11 h-6">
+                                    <input id="toggleNotes" type="checkbox" onchange="toggleSection('Notes', this.checked)">
+                                    <span class="switch-slider absolute cursor-pointer inset-0 bg-slate-300 rounded-full transition-all before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all"></span>
+                                </label>
+                            </div>
+                            <div id="secNotes" class="hidden mt-3">
+                                <textarea id="calcNotes" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs" rows="2" placeholder="Enter approval conditions..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: PREVIEW (5 Columns) -->
+          <div class="lg:col-span-5 relative">
+              <div class="bg-white rounded-3xl border-2 border-mint-500 shadow-2xl shadow-mint-500/10 p-0 sticky top-6 overflow-hidden">
+                
+                <!-- Preview Header -->
+                <div class="bg-slate-50 p-4 border-b border-slate-100 text-center">
+                  <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest"><span id="previewOptionLabel">Option 1</span> Preview</h4>
+                  <div id="previewBusinessName" class="text-sm font-bold text-slate-800 mt-1 hidden"></div>
+                </div>
+
+                <!-- Main Numbers (Now Hero Ribbon) -->
+                <div class="p-8 text-center bg-slate-900 text-white relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 z-0"></div>
+                  <div class="relative z-10">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">You Get</span>
+                    <span id="previewAmount" class="text-5xl md:text-6xl font-extrabold text-white block tracking-tighter transition-all">$50,000</span>
+                  </div>
+                </div>
+                
+                <!-- Visual Chart -->
+                <div class="px-8 py-8 flex items-center justify-center gap-6 md:gap-8 bg-white">
+                   <div class="relative w-36 h-36 flex-shrink-0">
+                      <svg viewBox="0 0 36 36" class="circular-chart transform -rotate-90">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path id="previewCircle" class="circle" stroke-dasharray="80, 20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      </svg>
+                      <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Payback</span>
+                        <span id="previewPaybackChart" class="text-base font-bold text-slate-700 block tracking-tight">$62,500</span>
+                      </div>
+                   </div>
+                   <div class="space-y-3 text-xs">
+                       <div class="flex items-center gap-2">
+                         <span class="w-3 h-3 rounded-full bg-mint-500 shadow-sm"></span>
+                         <span class="font-semibold text-slate-600">Principal</span>
+                       </div>
+                       <div class="flex items-center gap-2">
+                         <span class="w-3 h-3 rounded-full bg-slate-200"></span>
+                         <span class="font-semibold text-slate-600">Cost of Capital</span>
+                       </div>
+                   </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="border-t border-slate-100 bg-slate-50/50">
+                  <div class="grid grid-cols-2 divide-x divide-slate-100 border-b border-slate-100">
+                    <div class="p-4 text-center group">
+                      <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Term Length</span>
+                      <span id="previewTermLength" class="text-sm font-bold text-slate-700 group-hover:text-mint-500 transition-colors">6 months</span>
+                    </div>
+                    <div class="p-4 text-center group">
+                      <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Payments</span>
+                      <span id="previewTermPayments" class="text-sm font-bold text-slate-700 group-hover:text-mint-500 transition-colors">130</span>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 divide-x divide-slate-100 border-b border-slate-100">
+                    <div class="p-4 text-center group">
+                      <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Factor Rate</span>
+                      <span id="previewFactor" class="text-sm font-bold text-slate-700 group-hover:text-mint-500 transition-colors">1.25x</span>
+                    </div>
+                    <div class="p-4 text-center group">
+                      <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Total Cost</span>
+                      <span id="previewCost" class="text-sm font-bold text-slate-700 group-hover:text-mint-500 transition-colors">$12,500</span>
+                    </div>
+                  </div>
+                  
+                  <div id="previewFeeRow" class="grid grid-cols-2 divide-x divide-slate-100 border-b border-slate-100 hidden bg-orange-50/30">
+                    <div class="p-4 text-center">
+                      <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Origination Fee</span>
+                      <span id="previewFeeAmount" class="text-sm font-bold text-slate-700">$0</span>
+                    </div>
+                    <div class="p-4 text-center">
+                      <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Net Proceeds</span>
+                      <span id="previewNet" class="text-sm font-bold text-slate-700">$50,000</span>
+                    </div>
+                  </div>
+
+                  <!-- Hero Payment Box (Now Standard) -->
+                  <div class="p-6 text-center bg-white border-t border-slate-100 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <span id="previewPaymentLabel" class="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1">Daily Payment</span>
+                        <span id="previewPayment" class="text-3xl font-bold tracking-tight text-slate-800">$480.77</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="p-4 text-center bg-white border-t border-slate-100">
+                      <button onclick="openAmortSchedule()" class="text-xs font-bold text-mint-500 hover:text-mint-600 flex items-center justify-center gap-1 mx-auto group">
+                          <span>View Payment Schedule</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                      </button>
+                </div>
+
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- MODAL: AMORTIZATION -->
+  <div id="amortModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col">
+      <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h3 class="font-bold text-slate-800">Payment Schedule</h3>
+          <button onclick="$('amortModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+      </div>
+      <div class="overflow-y-auto p-0 flex-1">
+          <table class="w-full text-sm amort-table">
+              <thead class="bg-slate-50 text-slate-500">
+                  <tr>
+                      <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">#</th>
+                      <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Date</th>
+                      <th class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Payment</th>
+                      <th class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Balance</th>
+                  </tr>
+              </thead>
+              <tbody id="amortTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SHARE -->
+  <div id="shareModal" class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 text-center">
+      <div class="w-12 h-12 bg-mint-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-mint-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold text-slate-800 mb-2">Share Offer</h3>
+      <p class="text-sm text-slate-500 mb-6">Create a link to send this specific funding scenario to your client or team.</p>
+      <div class="grid grid-cols-2 gap-3 mb-6">
+          <button onclick="copyLink()" class="button-secondary py-3 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg> 
+              <span class="text-xs font-semibold">Copy Link</span>
+          </button>
+          <button onclick="copyText()" class="button-secondary py-3 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> 
+              <span class="text-xs font-semibold">Email Template</span>
+          </button>
+      </div>
+      <button onclick="$('shareModal').classList.add('hidden')" class="text-sm font-semibold text-slate-400 hover:text-slate-600">Cancel</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3">
+    <div class="bg-green-500/20 p-1 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+    </div>
+    <span id="toastMessage" class="font-medium text-sm">Success!</span>
+  </div>
+
+  <script>
+    // --- UTILS ---
+    const $ = (id) => document.getElementById(id);
+    const $$ = (s) => document.querySelectorAll(s);
+    const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
+    const parseNumber = (v) => parseFloat(v.toString().replace(/[\$,]/g, '')) || 0;
+    const formatNumber = (n) => new Intl.NumberFormat('en-US').format(n);
+
+    // --- STATE ---
+    let calcOptions = [];
+    let activeCalcTab = 0;
+
+    // --- LOGIC ---
+    function initDefaultOption() { 
+        return { amount: 50000, factor: 1.25, term: 130, frequency: 'daily', fee: 0, prepay: 0, termOverride: '', notes: '' }; 
+    }
+
+    function addCalcOption() { 
+        if (calcOptions.length >= 3) return; 
+        // Clone the last option as the new starting point
+        const p = calcOptions[calcOptions.length - 1] || initDefaultOption(); 
+        calcOptions.push({ ...p }); 
+        updateTabsUI(); 
+        switchCalcTab(calcOptions.length - 1); 
+    }
+
+    function removeCalcOption() { 
+        if (calcOptions.length <= 1) return; 
+        calcOptions.splice(activeCalcTab, 1); 
+        if (activeCalcTab >= calcOptions.length) activeCalcTab = calcOptions.length - 1; 
+        updateTabsUI(); 
+        switchCalcTab(activeCalcTab); 
+    }
+
+    function switchCalcTab(i) { 
+        saveState(activeCalcTab); 
+        activeCalcTab = i; 
+        updateTabsUI(); 
+        loadState(activeCalcTab); 
+        updatePreview(); 
+        updateSliders(); 
+    }
+    
+    function updateTabsUI() { 
+        for(let i=0; i<3; i++) { 
+            const b = $(`tab-btn-${i}`); 
+            if (i < calcOptions.length) { 
+                b.classList.remove('hidden'); 
+                b.classList.toggle('active', i === activeCalcTab); 
+                b.textContent = `Option ${i + 1}`;
+            } else { 
+                b.classList.add('hidden'); 
+            } 
+        } 
+        $('add-tab-btn').classList.toggle('hidden', calcOptions.length >= 3); 
+        $('remove-option-btn').classList.toggle('hidden', calcOptions.length <= 1); 
+        $('previewOptionLabel').textContent = `Option ${activeCalcTab + 1}`; 
+    }
+
+    function getVal(id, num=false) { 
+        const el = $(id); 
+        if (!el) return num ? 0 : ''; 
+        if (num) return parseNumber(el.value); 
+        return el.value.trim(); 
+    }
+
+    function setVal(id, v) { 
+        if($(id)) $(id).value = v; 
+    }
+
+    function saveState(i) { 
+        if (!calcOptions[i]) return; 
+        const freqBtn = document.querySelector('.toggle-btn.active');
+        const fr = freqBtn ? freqBtn.dataset.freq : 'daily';
+        
+        calcOptions[i] = { 
+            amount: getVal('calcAmount', true), 
+            factor: getVal('calcFactor', true), 
+            term: getVal('calcTerm', true), 
+            frequency: fr, 
+            fee: $('toggleFee').checked ? getVal('calcFee', true) : 0, 
+            prepay: $('togglePrepay').checked ? getVal('calcPrepay', true) : 0, 
+            termOverride: $('toggleOverride').checked ? getVal('calcTermOverride') : '', 
+            notes: $('toggleNotes').checked ? getVal('calcNotes') : '' 
+        }; 
+    }
+
+    function loadState(i) { 
+        const o = calcOptions[i]; 
+        if (!o) return; 
+        
+        setVal('calcAmount', formatNumber(o.amount)); setVal('calcAmountSlider', o.amount); 
+        setVal('calcFactor', o.factor); setVal('calcFactorSlider', o.factor); 
+        setVal('calcTerm', o.term); setVal('calcTermSlider', o.term); 
+        
+        // Toggles
+        const hf = o.fee > 0; 
+        $('toggleFee').checked = hf; 
+        toggleSection('Fee', hf); 
+        if(hf) { setVal('calcFee', o.fee); setVal('calcFeeSlider', o.fee); }
+
+        const hp = o.prepay > 0; 
+        $('togglePrepay').checked = hp; 
+        toggleSection('Prepay', hp); 
+        if(hp) { setVal('calcPrepay', o.prepay); setVal('calcPrepaySlider', o.prepay); }
+
+        const ho = !!o.termOverride; 
+        $('toggleOverride').checked = ho; 
+        toggleSection('Override', ho); 
+        if(ho) setVal('calcTermOverride', o.termOverride);
+
+        const hn = !!o.notes; 
+        $('toggleNotes').checked = hn; 
+        toggleSection('Notes', hn); 
+        if(hn) setVal('calcNotes', o.notes);
+        
+        setFrequency(o.frequency);
+    }
+
+    function calculate(a, f, t, fr, fe) { 
+        const tp = a * f; 
+        const tc = tp - a; 
+        const p = tp / t; 
+        const fa = a * (fe / 100); 
+        const net = a - fa; 
+        return { amount: a, factor: f, term: t, frequency: fr, fee: fe, feeAmount: fa, net: net, totalPayback: tp, totalCost: tc, payment: p }; 
+    }
+
+    function updatePreview() {
+        const a = getVal('calcAmount', true); 
+        const f = getVal('calcFactor', true) || 1.25; 
+        const t = getVal('calcTerm', true) || 130;
+        const freqBtn = document.querySelector('.toggle-btn.active');
+        const fr = freqBtn ? freqBtn.dataset.freq : 'daily';
+        
+        const fe = $('toggleFee').checked ? (getVal('calcFee', true) || 0) : 0;
+        const c = calculate(a, f, t, fr, fe);
+        
+        // Header Text
+        const bn = getVal('calcBusinessName');
+        if(bn) { 
+            $('previewBusinessName').textContent = bn; 
+            $('previewBusinessName').classList.remove('hidden'); 
+        } else {
+            $('previewBusinessName').classList.add('hidden');
+        }
+        
+        // Values
+        $('previewAmount').textContent = formatCurrency(c.amount); 
+        $('previewPaybackChart').textContent = formatCurrency(c.totalPayback);
+        
+        const to = $('toggleOverride').checked ? getVal('calcTermOverride') : '';
+        let tm = t;
+        if(fr === 'weekly') tm = t / 4.33; else if (fr === 'daily') tm = t / 21;
+        const monthLabel = Math.round(tm * 2) / 2 + ' months';
+
+        $('previewTermLength').textContent = to ? to : monthLabel; 
+        $('previewTermPayments').textContent = c.term; 
+        $('previewFactor').textContent = c.factor.toFixed(2) + 'x'; 
+        $('previewCost').textContent = formatCurrency(c.totalCost);
+        
+        const pLabel = fr === 'weekly' ? 'Weekly Payment' : fr === 'monthly' ? 'Monthly Payment' : 'Daily Payment';
+        $('previewPaymentLabel').textContent = pLabel;
+        $('previewPayment').textContent = formatCurrency(c.payment);
+        
+        if (fe > 0) { 
+            $('previewFeeRow').classList.remove('hidden'); 
+            $('previewFeeAmount').textContent = formatCurrency(c.feeAmount); 
+            $('previewNet').textContent = formatCurrency(c.net); 
+        } else {
+            $('previewFeeRow').classList.add('hidden');
+        }
+        
+        // Chart Logic (Circumference ~ 100)
+        const pp = c.totalPayback > 0 ? (c.amount / c.totalPayback) * 100 : 0; 
+        // stroke-dasharray: filled_length, gap_length
+        $('previewCircle').setAttribute('stroke-dasharray', `${pp}, ${100 - pp}`);
+    }
+
+    // UI Handlers
+    function updateSliderFill(s) { 
+        if (!s) return; 
+        const m = parseFloat(s.min), mx = parseFloat(s.max), v = parseFloat(s.value);
+        const p = ((v - m) / (mx - m)) * 100; 
+        // Use CSS vars for colors
+        s.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${p}%, var(--bg-slider-track) ${p}%, var(--bg-slider-track) 100%)`; 
+    }
+    
+    function updateSliders() { 
+        $$('.slider').forEach(s => updateSliderFill(s)); 
+    }
+
+    function toggleSection(id, show) { 
+        const el = $('sec'+id); 
+        if(show) {
+            el.classList.remove('hidden');
+            el.classList.add('fade-enter');
+        } else { 
+            el.classList.add('hidden'); 
+            updatePreview(); 
+        } 
+    }
+
+    function setFrequency(f) { 
+        $$('.toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.freq === f)); 
+        updatePreview(); 
+    }
+
+    function resetCalculator() { 
+        calcOptions = [initDefaultOption()]; 
+        activeCalcTab = 0; 
+        setVal('calcBusinessName',''); 
+        setVal('calcContactName',''); 
+        setVal('calcEmail',''); 
+        ['toggleFee','togglePrepay','toggleOverride','toggleExpiry','toggleNotes'].forEach(id => {
+            $(id).checked = false;
+            toggleSection(id.replace('toggle',''), false);
+        });
+        updateTabsUI(); 
+        loadState(0); 
+        updatePreview(); 
+        updateSliders(); 
+        showToast('Calculator Reset');
+    }
+    
+    function shareOffer() { 
+        saveState(activeCalcTab); 
+        $('shareModal').classList.remove('hidden'); 
+    }
+    
+    // Copy Logic
+    function getLink() {
+        saveState(activeCalcTab);
+        const d = { 
+            b: getVal('calcBusinessName'), c: getVal('calcContactName'), e: getVal('calcEmail'),
+            ex: $('toggleExpiry').checked ? getVal('calcExpiryDate') : null,
+            o: calcOptions.map(op => ({ a: op.amount, f: op.factor, t: op.term, q: op.frequency, fe: op.fee, pp: op.prepay, to: op.termOverride, n: op.notes }))
+        };
+        const json = JSON.stringify(d);
+        // Base64 encode for URL safety
+        const enc = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+        return `${window.location.origin}${window.location.pathname}?d=${enc}`;
+    }
+    
+    function copyLink() { 
+        const l = getLink(); 
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(l).then(() => showToast('Link copied to clipboard!')).catch(() => prompt("Copy Link:", l)); 
+        } else {
+             prompt("Copy Link:", l);
+        }
+        $('shareModal').classList.add('hidden');
+    }
+    
+    function copyText() {
+        const l = getLink();
+        const c = getVal('calcBusinessName') || 'Business Funding';
+        let rows = '';
+        calcOptions.forEach((opt, i) => {
+            const cal = calculate(opt.amount, opt.factor, opt.term, opt.frequency, opt.fee);
+            rows += `<tr style="border-bottom:1px solid #eee"><td style="padding:12px 8px;"><strong>Option ${i+1}</strong></td><td style="padding:12px 8px;text-align:right;font-size:18px;font-weight:bold;color:#42D197">${formatCurrency(opt.amount)}</td></tr><tr><td style="padding:4px 8px;color:#666">Term</td><td style="padding:4px 8px;text-align:right"><strong>${opt.termOverride || cal.term + ' Pmts'}</strong></td></tr><tr><td style="padding:4px 8px;color:#666;padding-bottom:12px;">Payment</td><td style="padding:4px 8px;text-align:right;padding-bottom:12px;"><strong>${formatCurrency(cal.payment)} / ${opt.frequency}</strong></td></tr>`;
+        });
+        
+        const html = `
+        <div style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;max-width:500px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin:0 auto;">
+            <div style="background:#1e293b;color:#fff;padding:24px;text-align:center">
+                <h2 style="margin:0;font-size:20px;">${c}</h2>
+                <p style="margin:5px 0 0 0;opacity:0.8;font-size:14px;">Funding Approval</p>
+            </div>
+            <div style="padding:20px;">
+                <table style="width:100%;border-collapse:collapse;">${rows}</table>
+            </div>
+            <div style="text-align:center;padding:24px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                <a href="${l}" style="background:#42D197;color:#fff;text-decoration:none;padding:12px 30px;border-radius:6px;font-weight:bold;display:inline-block;font-size:16px;">View & Accept Offer</a>
+            </div>
+        </div>`;
+        
+        const div = document.createElement('div'); 
+        div.innerHTML = html; 
+        div.style.position='fixed'; div.style.opacity='0'; div.contentEditable='true'; 
+        document.body.appendChild(div);
+        
+        const range = document.createRange(); 
+        range.selectNodeContents(div); 
+        const sel = window.getSelection(); 
+        sel.removeAllRanges(); 
+        sel.addRange(range);
+        
+        try { 
+            document.execCommand('copy'); 
+            showToast('Email template copied!'); 
+        } catch(e) { 
+            copyLink(); 
+        }
+        document.body.removeChild(div);
+        $('shareModal').classList.add('hidden');
+    }
+
+    function openAmortSchedule() { 
+        const a = getVal('calcAmount', true), f = getVal('calcFactor', true), t = getVal('calcTerm', true); 
+        const freqBtn = document.querySelector('.toggle-btn.active');
+        const fr = freqBtn ? freqBtn.dataset.freq : 'daily';
+        
+        const c = calculate(a, f, t, fr, 0);
+        let b = c.totalPayback, d = new Date(), html = '';
+        
+        for(let i=1; i<=t; i++) {
+            if(i > 300 && i < t) continue;
+            if(i === 300 && t > 300) { 
+                html += `<tr><td colspan="4" class="text-center text-slate-400 py-3 bg-slate-50 italic">... (${t - 300} remaining payments) ...</td></tr>`; 
+                continue; 
+            }
+            
+            // Date Logic
+            if(fr==='weekly') d.setDate(d.getDate()+7); 
+            else if(fr==='monthly') d.setMonth(d.getMonth()+1); 
+            else { 
+                d.setDate(d.getDate()+1); 
+                // Skip weekends
+                if(d.getDay()===0) d.setDate(d.getDate()+1); 
+                if(d.getDay()===6) d.setDate(d.getDate()+2); 
+            }
+            
+            b -= c.payment; 
+            if(b<0) b=0;
+            
+            html += `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-2.5 text-slate-500 font-medium">${i}</td>
+                <td class="px-6 py-2.5 text-slate-700">${d.toLocaleDateString()}</td>
+                <td class="px-6 py-2.5 text-right font-mono text-slate-700">${formatCurrency(c.payment)}</td>
+                <td class="px-6 py-2.5 text-right font-mono font-bold text-slate-900">${formatCurrency(b)}</td>
+            </tr>`;
+        }
+        $('amortTableBody').innerHTML = html; 
+        $('amortModal').classList.remove('hidden'); 
+    }
+
+    function showToast(m) { 
+        const t=$('toast'); 
+        $('toastMessage').textContent=m; 
+        t.classList.add('show'); 
+        setTimeout(()=>t.classList.remove('show'), 3000); 
+    }
+
+    // --- EVENTS ---
+    ['calcAmount','calcFactor','calcTerm','calcFee','calcPrepay'].forEach(id => {
+        const el = $(id);
+        if(!el) return;
+        el.addEventListener('input', function() { 
+            // Sync Text -> Slider
+            const v = parseFloat(this.value.replace(/,/g,''))||0; 
+            const slider = $(id+'Slider');
+            if(slider) {
+                 slider.value = v; 
+                 updateSliderFill(slider);
+            }
+            updatePreview(); 
+        });
+    });
+
+    ['calcAmountSlider','calcFactorSlider','calcTermSlider','calcFeeSlider','calcPrepaySlider'].forEach(id => {
+        const el = $(id);
+        if(!el) return;
+        el.addEventListener('input', function() { 
+            // Sync Slider -> Text
+            const k = id.replace('Slider',''); 
+            setVal(k, k==='calcAmount'?formatNumber(this.value):this.value); 
+            updatePreview(); 
+            updateSliderFill(this); 
+        });
+    });
+
+    ['calcTermOverride','calcBusinessName'].forEach(id => $(id).addEventListener('input', updatePreview));
+
+    // --- INIT ---
+    window.addEventListener('load', () => {
+        resetCalculator();
+        
+        // URL Param Loading
+        const params = new URLSearchParams(window.location.search);
+        const d = params.get('d');
+        if (d) {
+            try {
+                const json = decodeURIComponent(atob(d).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+                const data = JSON.parse(json);
+                if(data.o && data.o.length) {
+                    calcOptions = data.o.map(op => ({ amount: op.a, factor: op.f, term: op.t, frequency: op.q, fee: op.fe, prepay: op.pp, termOverride: op.to, notes: op.n }));
+                    setVal('calcBusinessName', data.b); 
+                    setVal('calcContactName', data.c); 
+                    setVal('calcEmail', data.e);
+                    if(data.ex) { $('toggleExpiry').checked = true; toggleSection('Expiry', true); setVal('calcExpiryDate', data.ex); }
+                    updateTabsUI(); 
+                    switchCalcTab(0);
+                }
+            } catch(e) { 
+                console.error("Error loading shared data", e); 
+            }
+        }
+    });
+  </script>
+</body>
+</html>
