@@ -1,6 +1,7 @@
-import { Component, OnInit, signal, computed, inject, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, signal, computed, effect, inject, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 // --- Interfaces ---
 
@@ -12,7 +13,6 @@ interface OfferOption {
   fee: number;
   prepayDiscount: number;
   termOverride: string;
-  notes?: string;
   // Calculated fields
   payment?: number;
   totalPayback?: number;
@@ -32,6 +32,7 @@ interface Offer {
   contactName: string;
   email: string;
   options: OfferOption[];
+  // Rep/Company info snapshot
   repName?: string;
   repEmail?: string;
   repPhone?: string;
@@ -39,8 +40,7 @@ interface Offer {
   logoUrl?: string;
   accent?: string;
   showApr?: boolean;
-  acceptedAt?: number;
-  acceptedOptionIndex?: number;
+  businessKey?: string;
 }
 
 interface Settings {
@@ -65,28 +65,27 @@ interface SearchResult {
   email?: string;
   ucc_filings?: string;
   court_records?: string;
-}
-
-interface AmortizationRow {
-  index: number;
-  date: Date;
-  payment: number;
-  balance: number;
+  owners?: string[];
+  google_rating?: number;
+  google_count?: number;
+  trustpilot_rating?: number;
+  trustpilot_count?: number;
+  sentiment_summary?: string;
 }
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   template: `
-    <!-- Theme Wrapper -->
+    <!-- Global Styles / Theme Wrapper -->
     <div class="min-h-screen text-slate-900 font-sans transition-colors duration-300"
          [class.theme-dark]="isDark()"
          [class.theme-light]="!isDark()"
          [ngClass]="'accent-' + settings().accent">
       
-      <!-- CONFETTI CANVAS -->
-      <canvas #confettiCanvas class="fixed inset-0 pointer-events-none z-[9999]"></canvas>
+      <!-- CONFETTI CANVAS (Placeholder for logic) -->
+      <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-[9999]"></canvas>
 
       <!-- TOAST -->
       <div class="fixed bottom-6 right-6 px-5 py-3 rounded-xl shadow-2xl z-[200] transform transition-all duration-300 flex items-center gap-3"
@@ -102,167 +101,99 @@ interface AmortizationRow {
         <span class="font-medium text-sm">{{ toastMessage() }}</span>
       </div>
 
-      <!-- === CLIENT VIEW MODE === -->
+      <!-- CLIENT VIEW MODE -->
       <div *ngIf="viewMode() === 'client'" class="min-h-screen flex items-center justify-center p-4 bg-[var(--bg-body)]">
-        <div class="w-full max-w-4xl flex flex-col items-center pb-20">
-          
+        <div class="w-full max-w-lg bg-[var(--bg-card)] rounded-3xl shadow-xl overflow-hidden border-4 border-[var(--accent-color)]">
           <!-- Header -->
-          <div class="text-center mb-6 w-full">
-             <div class="flex items-center justify-center mb-3">
+          <div class="p-6 border-b border-[var(--border-primary)] text-center bg-[var(--bg-card)]">
+             <div class="flex items-center justify-center mb-4">
                 <img *ngIf="clientOffer()?.logoUrl" [src]="clientOffer()?.logoUrl" class="h-12 w-auto object-contain" alt="Logo">
                 <svg *ngIf="!clientOffer()?.logoUrl" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[var(--accent-color)]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" /></svg>
              </div>
-             <div class="font-bold text-2xl text-[var(--text-primary)]">{{ clientOffer()?.companyName || 'TrustBureau.ai' }}</div>
-             
-             <!-- Expiration Banner -->
-             <div *ngIf="clientOffer()?.status === 'pending' && clientTimer()" 
-                  class="inline-flex mt-6 px-4 py-2 rounded-xl items-center justify-center gap-2 border shadow-lg"
-                  style="background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 15%, transparent), color-mix(in srgb, var(--accent-color) 5%, transparent)); border-color: color-mix(in srgb, var(--accent-color) 30%, transparent);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[var(--accent-color)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span class="text-sm font-medium text-[var(--text-secondary)]">Offer expires in</span>
-                <div class="flex items-center gap-1 font-mono text-[var(--text-primary)] font-bold">
-                   <span>{{ clientTimer().days }}d</span> : <span>{{ clientTimer().hours }}h</span> : <span>{{ clientTimer().minutes }}m</span>
-                </div>
+             <div class="font-bold text-xl text-[var(--text-primary)]">{{ clientOffer()?.companyName || 'TrustBureau.ai' }}</div>
+             <div *ngIf="clientOffer()?.companyName" class="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mt-1">powered by TrustBureau.ai</div>
+          </div>
+
+          <!-- Expiration Banner -->
+          <div *ngIf="clientOffer()?.status === 'pending' && clientOffer()?.expiresAt" class="mx-6 mt-6 p-3 rounded-xl flex items-center justify-center gap-3 border"
+               style="background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 15%, transparent), color-mix(in srgb, var(--accent-color) 5%, transparent)); border-color: color-mix(in srgb, var(--accent-color) 30%, transparent);">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[var(--accent-color-dark)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+             <span class="text-sm font-semibold text-[var(--text-secondary)]">Offer Expires: {{ clientOffer()?.expiresAt | date:'mediumDate' }}</span>
+          </div>
+
+          <!-- Content -->
+          <div class="p-6">
+             <div class="text-center border-b border-[var(--border-primary)] pb-4 mb-4">
+               <h4 class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Approved for {{ clientOffer()?.businessName }}</h4>
              </div>
-          </div>
 
-          <!-- Main Card -->
-          <div class="w-full max-w-lg bg-[var(--bg-card)] rounded-3xl shadow-xl overflow-hidden border-4 border-[var(--accent-color)] mb-8 transition-all">
-            <div class="p-6">
-               <div class="text-center border-b border-[var(--border-primary)] pb-4 mb-4">
-                 <h4 class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                    Approved for {{ clientOffer()?.businessName }}
-                    <span *ngIf="clientOffer()?.options?.length > 1" class="block mt-1 text-[var(--accent-color)]">Option {{ activeClientOptionIndex() + 1 }}</span>
-                 </h4>
-               </div>
+             <!-- Primary Option -->
+             <div class="text-center py-4">
+               <span class="text-[11px] font-bold text-[var(--text-muted)] block uppercase tracking-widest">You Get</span>
+               <span class="text-5xl font-bold block my-3 text-[var(--accent-color)] leading-tight">{{ getClientPrimaryOption().amount | currency:'USD':'symbol':'1.0-0' }}</span>
+             </div>
 
-               <!-- Primary Option -->
-               <div class="text-center py-4">
-                 <span class="text-[11px] font-bold text-[var(--text-muted)] block uppercase tracking-widest">You Get</span>
-                 <span class="text-5xl font-bold block my-3 text-[var(--accent-color)] leading-tight">{{ getClientActiveOption().amount | currency:'USD':'symbol':'1.0-0' }}</span>
-               </div>
-
-               <!-- Donut Chart -->
-               <div class="my-6 flex justify-center">
-                  <div class="relative w-36 h-36 flex items-center justify-center">
-                     <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
-                        <path class="text-[var(--bg-slider-track)]" stroke-width="2.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="currentColor" />
-                        <path class="text-[var(--accent-color)] transition-all duration-1000 ease-out" stroke-dasharray="0, 100" [attr.stroke-dasharray]="getClientActiveCircle()" stroke-width="2.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="currentColor" />
-                     </svg>
-                     <div class="absolute text-center">
-                        <span class="text-[10px] text-[var(--text-muted)] block uppercase tracking-wider">Payback</span>
-                        <span class="text-base font-bold text-[var(--text-primary)]">{{ getClientActiveOption().totalPayback | currency:'USD':'symbol':'1.0-0' }}</span>
-                     </div>
-                  </div>
-               </div>
-
-               <!-- Grid Stats -->
-               <div class="border border-[var(--border-primary)] rounded-xl overflow-hidden mb-6 bg-[var(--bg-card)]">
-                  <div class="grid grid-cols-2 divide-x divide-[var(--border-primary)] border-b border-[var(--border-primary)]">
-                     <div class="p-4 text-center">
-                        <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">Term</span>
-                        <span class="text-sm font-bold text-[var(--text-primary)]">{{ getClientActiveOption().termOverride || (getClientActiveOption().termMonths + ' months') }}</span>
-                     </div>
-                     <div class="p-4 text-center">
-                        <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">Cost</span>
-                        <span class="text-sm font-bold text-[var(--text-primary)]">{{ getClientActiveOption().totalCost | currency:'USD':'symbol':'1.0-0' }}</span>
-                     </div>
-                  </div>
-                  <div class="p-4 text-center bg-[var(--bg-card-inner)]">
-                     <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">
-                       Est. {{ getClientActiveOption().frequency | titlecase }} Payment
-                     </span>
-                     <span class="text-xl font-bold text-[var(--text-primary)]">{{ getClientActiveOption().payment | currency:'USD' }}</span>
-                  </div>
-               </div>
-
-               <!-- Notes -->
-               <div *ngIf="getClientActiveOption().notes" class="mb-6 p-4 bg-[var(--bg-card-inner)] rounded-xl text-xs border border-[var(--border-primary)]">
-                  <div class="font-bold text-[var(--text-muted)] uppercase mb-2">Approval Notes</div>
-                  <div class="text-[var(--text-secondary)] whitespace-pre-wrap">{{ getClientActiveOption().notes }}</div>
-               </div>
-
-               <!-- Actions -->
-               <div *ngIf="clientOffer()?.status === 'pending'">
-                  <button (click)="acceptClientOffer()" class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2 text-[var(--accent-text-inverted)] bg-[var(--accent-color)] hover:bg-[var(--accent-color-light)] transition-colors shadow-lg shadow-[var(--accent-color)]/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Accept This Offer
-                  </button>
-               </div>
-               <div *ngIf="clientOffer()?.status === 'accepted'" class="text-center py-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                   <div class="text-xl font-bold text-green-600 mb-1">Offer Accepted!</div>
-                   <div class="text-sm text-green-700">A representative will contact you shortly.</div>
-               </div>
-               <div *ngIf="clientOffer()?.status === 'expired'" class="text-center py-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-                   <div class="text-xl font-bold text-red-500">Offer Expired</div>
-               </div>
-
-               <!-- Prepay Calculator Toggle -->
-               <div *ngIf="getClientActiveOption().prepayDiscount > 0" class="mt-6 pt-4 border-t border-[var(--border-primary)]">
-                  <button (click)="showPrepay.set(!showPrepay())" class="w-full text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent-color)] flex items-center justify-center gap-2 transition-colors py-2">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" /></svg>
-                     Calculate Prepayment Discount
-                  </button>
-                  
-                  <div *ngIf="showPrepay()" class="mt-4 p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card-inner)]">
-                     <div class="flex justify-between items-center mb-3 pb-2 border-b border-[var(--border-primary)]">
-                        <span class="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">Discount</span>
-                        <span class="text-sm font-bold text-[var(--accent-color)]">{{ getClientActiveOption().prepayDiscount }}% Max</span>
-                     </div>
-                     <div class="mb-4">
-                        <label class="block text-xs font-medium text-[var(--text-muted)] mb-1 text-center">Select Payoff Date</label>
-                        <input type="date" [ngModel]="prepayDate()" (ngModelChange)="calculatePrepay($event)" class="w-full p-2.5 text-sm rounded-lg border border-[var(--border-primary)] bg-[var(--bg-input)] text-center text-[var(--text-primary)]">
-                     </div>
-                     <div class="grid grid-cols-2 gap-4 text-center border-t border-[var(--border-primary)] pt-4">
-                        <div>
-                           <span class="text-[10px] font-medium text-[var(--text-muted)] block uppercase tracking-wider">Savings</span>
-                           <span class="text-lg font-bold text-green-500">{{ prepaySavings() | currency:'USD' }}</span>
-                        </div>
-                        <div>
-                           <span class="text-[10px] font-medium text-[var(--text-muted)] block uppercase tracking-wider">New Payoff</span>
-                           <span class="text-lg font-bold text-[var(--text-primary)]">{{ newPayoff() | currency:'USD' }}</span>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-          </div>
-
-          <!-- Other Options -->
-          <div *ngIf="clientOffer()?.options?.length > 1" class="w-full">
-             <h4 class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest text-center mb-4">Other Available Options</h4>
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div *ngFor="let opt of clientOffer()?.options; let i = index" 
-                     (click)="activeClientOptionIndex.set(i)"
-                     class="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-primary)] hover:border-[var(--accent-color)] hover:shadow-md cursor-pointer transition-all flex items-center justify-between group"
-                     [class.ring-2]="activeClientOptionIndex() === i"
-                     [class.ring-[var(--accent-color)]]="activeClientOptionIndex() === i">
-                   <div>
-                      <span class="text-[10px] font-bold text-[var(--text-muted)] uppercase block mb-1">Option {{ i + 1 }}</span>
-                      <div class="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-color)] transition-colors">{{ opt.amount | currency:'USD':'symbol':'1.0-0' }}</div>
-                      <div class="text-xs text-[var(--text-secondary)] mt-0.5">{{ opt.termOverride || (opt.termMonths + ' mo') }} • {{ opt.frequency }}</div>
-                   </div>
-                   <div class="text-right">
-                      <div class="text-xs font-medium text-[var(--text-muted)]">Factor</div>
-                      <div class="font-bold text-[var(--text-primary)]">{{ opt.factor }}x</div>
-                      <div class="text-[10px] font-bold text-[var(--accent-color)] mt-1 uppercase tracking-wide">View →</div>
+             <!-- Donut Chart -->
+             <div class="my-6 flex justify-center">
+                <div class="relative w-36 h-36 flex items-center justify-center">
+                   <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                      <path class="text-[var(--bg-slider-track)]" stroke-width="2.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="currentColor" />
+                      <path class="text-[var(--accent-color)] transition-all duration-1000 ease-out" stroke-dasharray="0, 100" [attr.stroke-dasharray]="getClientPrimaryCircle()" stroke-width="2.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="currentColor" />
+                   </svg>
+                   <div class="absolute text-center">
+                      <span class="text-[10px] text-[var(--text-muted)] block uppercase tracking-wider">Payback</span>
+                      <span class="text-base font-bold text-[var(--text-primary)]">{{ getClientPrimaryOption().totalPayback | currency:'USD':'symbol':'1.0-0' }}</span>
                    </div>
                 </div>
              </div>
-          </div>
 
-          <!-- Rep Info -->
-          <div *ngIf="clientOffer()?.repName" class="mt-12 pt-6 border-t border-[var(--border-primary)] text-center w-full max-w-lg">
-             <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">Your Funding Specialist</div>
-             <div class="font-bold text-[var(--text-primary)] text-base">{{ clientOffer()?.repName }}</div>
-             <div class="text-sm text-[var(--text-muted)] font-medium mt-1">{{ clientOffer()?.repEmail }}</div>
-             <div class="text-sm text-[var(--text-muted)] font-medium">{{ clientOffer()?.repPhone }}</div>
-          </div>
+             <!-- Grid Stats -->
+             <div class="border border-[var(--border-primary)] rounded-xl overflow-hidden mb-6 bg-[var(--bg-card)]">
+                <div class="grid grid-cols-2 divide-x divide-[var(--border-primary)] border-b border-[var(--border-primary)]">
+                   <div class="p-4 text-center">
+                      <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">Term</span>
+                      <span class="text-sm font-bold text-[var(--text-primary)]">{{ getClientPrimaryOption().termOverride || (getClientPrimaryOption().termMonths + ' months') }}</span>
+                   </div>
+                   <div class="p-4 text-center">
+                      <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">Cost</span>
+                      <span class="text-sm font-bold text-[var(--text-primary)]">{{ getClientPrimaryOption().totalCost | currency:'USD':'symbol':'1.0-0' }}</span>
+                   </div>
+                </div>
+                <div class="p-4 text-center bg-[var(--bg-card-inner)]">
+                   <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">
+                     Est. {{ getClientPrimaryOption().frequency | titlecase }} Payment
+                   </span>
+                   <span class="text-xl font-bold text-[var(--text-primary)]">{{ getClientPrimaryOption().payment | currency:'USD' }}</span>
+                </div>
+             </div>
 
+             <!-- Actions -->
+             <div *ngIf="clientOffer()?.status === 'pending'">
+                <button (click)="acceptClientOffer()" class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2 text-[var(--accent-text-inverted)] bg-[var(--accent-color)] hover:bg-[var(--accent-color-light)] transition-colors shadow-lg shadow-[var(--accent-color)]/30">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  Accept This Offer
+                </button>
+             </div>
+             <div *ngIf="clientOffer()?.status === 'accepted'" class="text-center py-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                 <div class="text-xl font-bold text-green-600 mb-1">Offer Accepted!</div>
+                 <div class="text-sm text-green-700">A representative will contact you shortly.</div>
+             </div>
+             <div *ngIf="clientOffer()?.status === 'expired'" class="text-center py-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                 <div class="text-xl font-bold text-red-500">Offer Expired</div>
+             </div>
+
+             <!-- Rep Info -->
+             <div *ngIf="clientOffer()?.repName" class="mt-8 pt-6 border-t border-[var(--border-primary)] text-center">
+                <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">Your Funding Specialist</div>
+                <div class="font-medium text-[var(--text-primary)]">{{ clientOffer()?.repName }}</div>
+                <div class="text-sm text-[var(--text-secondary)]">{{ clientOffer()?.repEmail }}</div>
+                <div class="text-sm text-[var(--text-secondary)]">{{ clientOffer()?.repPhone }}</div>
+             </div>
+          </div>
         </div>
       </div>
 
-      <!-- === DASHBOARD MODE === -->
+      <!-- DASHBOARD MODE -->
       <div *ngIf="viewMode() !== 'client'" class="flex min-h-screen bg-[var(--bg-body)] text-[var(--text-primary)]">
         
         <!-- SIDEBAR -->
@@ -280,7 +211,7 @@ interface AmortizationRow {
           <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
              <a *ngFor="let item of navItems" 
                 (click)="switchView(item.id)" 
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer mb-1"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
                 [class.bg-[color-mix(in_srgb,var(--accent-color)_15%,transparent)]]="currentView() === item.id"
                 [class.text-[var(--accent-color-dark)]]="currentView() === item.id && !isDark()"
                 [class.text-[var(--accent-color)]]="currentView() === item.id && isDark()"
@@ -384,7 +315,7 @@ interface AmortizationRow {
                  <!-- Client Info -->
                  <div class="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-primary)] p-6 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
-                       <h3 class="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">Client Information</h3>
+                       <h3 class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Client Information</h3>
                     </div>
                     <div class="space-y-4">
                        <input type="text" [(ngModel)]="currentOfferState.businessName" placeholder="Business Name" class="w-full p-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] text-[var(--text-primary)] focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] outline-none transition-all text-sm">
@@ -397,35 +328,27 @@ interface AmortizationRow {
 
                  <!-- Calculator Tabs -->
                  <div class="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-primary)] p-6 shadow-sm">
-                    <!-- Cleaned up Tabs -->
-                    <div class="flex gap-2 mb-6 border-b border-[var(--border-primary)] pb-[2px]">
+                    <div class="flex items-center gap-2 mb-6 border-b border-[var(--border-primary)]">
                        <button *ngFor="let opt of currentOptions(); let i = index" 
                                (click)="setActiveOption(i)"
-                               class="px-4 py-2 rounded-t-lg text-sm transition-all relative -mb-[3px]"
-                               [class.bg-[var(--bg-card)]]="activeOptionIndex() === i"
-                               [class.border]="activeOptionIndex() === i"
-                               [class.border-[var(--border-primary)]]="activeOptionIndex() === i"
-                               [class.border-b-[var(--bg-card)]]="activeOptionIndex() === i"
+                               class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors"
+                               [class.border-[var(--accent-color)]]="activeOptionIndex() === i"
                                [class.text-[var(--accent-color)]]="activeOptionIndex() === i"
-                               [class.font-medium]="activeOptionIndex() === i"
-                               [class.text-[var(--text-secondary)]]="activeOptionIndex() !== i"
-                               [class.border-transparent]="activeOptionIndex() !== i">
+                               [class.border-transparent]="activeOptionIndex() !== i"
+                               [class.text-[var(--text-secondary)]]="activeOptionIndex() !== i">
                           Option {{ i + 1 }}
                        </button>
-                       <button *ngIf="currentOptions().length < 3" (click)="addOption()" class="px-3 py-1 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--accent-color)]">+ Add</button>
+                       <button *ngIf="currentOptions().length < 3" (click)="addOption()" class="px-3 py-1 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent-color)]">+ Add</button>
+                       <button *ngIf="currentOptions().length > 1" (click)="removeOption()" class="ml-auto px-3 py-1 text-xs font-bold text-red-400 hover:text-red-500">Remove</button>
                     </div>
 
-                    <!-- Sliders & Inputs -->
+                    <!-- Sliders -->
                     <div class="space-y-6">
                        <!-- Amount -->
                        <div>
-                          <div class="flex justify-between items-center mb-2">
-                             <label class="text-xs font-medium text-[var(--text-secondary)]">Funding Amount</label>
-                             <button *ngIf="currentOptions().length > 1" (click)="removeOption()" class="text-xs text-red-400 hover:text-red-500 font-medium">Remove Option</button>
-                          </div>
-                          <div class="relative w-full mb-2">
-                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium">$</span>
-                             <input type="number" [(ngModel)]="activeOption().amount" class="w-full p-2.5 pl-7 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-input)] text-[var(--text-primary)] font-medium text-sm focus:border-[var(--accent-color)] outline-none">
+                          <div class="flex justify-between mb-2">
+                             <label class="text-xs font-bold text-[var(--text-secondary)]">Funding Amount</label>
+                             <span class="text-xs font-bold text-[var(--accent-color)]">{{ activeOption().amount | currency:'USD':'symbol':'1.0-0' }}</span>
                           </div>
                           <input type="range" min="5000" max="1000000" step="1000" [(ngModel)]="activeOption().amount" 
                                  [style.background]="getSliderGradient(activeOption().amount, 5000, 1000000)"
@@ -436,11 +359,8 @@ interface AmortizationRow {
                           <!-- Factor -->
                           <div>
                              <div class="flex justify-between mb-2">
-                                <label class="text-xs font-medium text-[var(--text-secondary)]">Factor Rate</label>
-                             </div>
-                             <div class="relative w-full mb-2">
-                                <input type="number" step="0.01" [(ngModel)]="activeOption().factor" class="w-full p-2.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-input)] text-[var(--text-primary)] font-medium text-sm focus:border-[var(--accent-color)] outline-none">
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs font-medium">x</span>
+                                <label class="text-xs font-bold text-[var(--text-secondary)]">Factor Rate</label>
+                                <span class="text-xs font-bold text-[var(--text-primary)]">{{ activeOption().factor | number:'1.2-2' }}</span>
                              </div>
                              <input type="range" min="1.05" max="1.70" step="0.01" [(ngModel)]="activeOption().factor"
                                     [style.background]="getSliderGradient(activeOption().factor, 1.05, 1.70)"
@@ -449,11 +369,8 @@ interface AmortizationRow {
                           <!-- Term -->
                           <div>
                              <div class="flex justify-between mb-2">
-                                <label class="text-xs font-medium text-[var(--text-secondary)]">Term</label>
-                             </div>
-                             <div class="relative w-full mb-2">
-                                <input type="number" step="1" [(ngModel)]="activeOption().term" class="w-full p-2.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-input)] text-[var(--text-primary)] font-medium text-sm focus:border-[var(--accent-color)] outline-none">
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs font-medium">Pmts</span>
+                                <label class="text-xs font-bold text-[var(--text-secondary)]">Term (Pmts)</label>
+                                <span class="text-xs font-bold text-[var(--text-primary)]">{{ activeOption().term }}</span>
                              </div>
                              <input type="range" min="10" max="300" step="1" [(ngModel)]="activeOption().term"
                                     [style.background]="getSliderGradient(activeOption().term, 10, 300)"
@@ -463,11 +380,11 @@ interface AmortizationRow {
 
                        <!-- Frequency -->
                        <div>
-                          <label class="block text-xs font-medium text-[var(--text-secondary)] mb-3">Payment Frequency</label>
+                          <label class="block text-xs font-bold text-[var(--text-secondary)] mb-3">Payment Frequency</label>
                           <div class="flex rounded-xl bg-[var(--bg-card-inner)] p-1 border border-[var(--border-primary)]">
                              <button *ngFor="let f of ['daily', 'weekly', 'monthly']" 
                                      (click)="activeOption().frequency = $any(f)"
-                                     class="flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all"
+                                     class="flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all"
                                      [class.bg-[var(--bg-card)]]="activeOption().frequency === f"
                                      [class.text-[var(--accent-color)]]="activeOption().frequency === f"
                                      [class.shadow-sm]="activeOption().frequency === f"
@@ -482,8 +399,8 @@ interface AmortizationRow {
                            <!-- Fee -->
                            <div class="p-3 bg-[var(--bg-card-inner)] rounded-xl border border-[var(--border-primary)]">
                               <div class="flex justify-between items-center mb-2">
-                                 <span class="text-xs font-medium text-[var(--text-primary)]">Origination Fee (%)</span>
-                                 <input type="number" [(ngModel)]="activeOption().fee" class="w-16 p-1 text-right bg-transparent border-b border-[var(--border-primary)] outline-none text-sm font-medium">
+                                 <span class="text-xs font-bold text-[var(--text-primary)]">Origination Fee (%)</span>
+                                 <input type="number" [(ngModel)]="activeOption().fee" class="w-16 p-1 text-right bg-transparent border-b border-[var(--border-primary)] outline-none text-sm font-bold">
                               </div>
                               <input type="range" min="0" max="15" step="0.5" [(ngModel)]="activeOption().fee"
                                      [style.background]="getSliderGradient(activeOption().fee, 0, 15)"
@@ -491,21 +408,16 @@ interface AmortizationRow {
                            </div>
                            <!-- Override -->
                            <div class="p-3 bg-[var(--bg-card-inner)] rounded-xl border border-[var(--border-primary)]">
-                              <span class="text-xs font-medium text-[var(--text-primary)] block mb-2">Custom Term Label</span>
+                              <span class="text-xs font-bold text-[var(--text-primary)] block mb-2">Custom Term Label</span>
                               <input type="text" [(ngModel)]="activeOption().termOverride" placeholder="e.g. 6 Months" class="w-full p-1.5 text-xs bg-[var(--bg-card)] rounded border border-[var(--border-primary)]">
-                           </div>
-                           <!-- Notes -->
-                           <div class="p-3 bg-[var(--bg-card-inner)] rounded-xl border border-[var(--border-primary)] col-span-1 md:col-span-2">
-                              <span class="text-xs font-medium text-[var(--text-primary)] block mb-2">Approval Notes</span>
-                              <textarea [(ngModel)]="activeOption().notes" rows="3" placeholder="Enter notes here (visible to client)..." class="w-full p-2 text-xs bg-[var(--bg-card)] rounded border border-[var(--border-primary)] resize-none"></textarea>
                            </div>
                        </div>
                     </div>
                  </div>
 
                  <div class="flex gap-4">
-                    <button (click)="resetCalculator()" class="flex-1 py-3 rounded-xl font-medium text-[var(--text-secondary)] border border-[var(--border-primary)] hover:bg-[var(--bg-card-inner)] transition-colors">Reset</button>
-                    <button (click)="saveOffer()" class="flex-1 py-3 rounded-xl font-medium text-[var(--accent-text-inverted)] bg-[var(--accent-color)] hover:bg-[var(--accent-color-light)] transition-colors shadow-lg shadow-[var(--accent-color)]/30">
+                    <button (click)="resetCalculator()" class="flex-1 py-3 rounded-xl font-bold text-[var(--text-secondary)] border border-[var(--border-primary)] hover:bg-[var(--bg-card-inner)] transition-colors">Reset</button>
+                    <button (click)="saveOffer()" class="flex-1 py-3 rounded-xl font-bold text-[var(--accent-text-inverted)] bg-[var(--accent-color)] hover:bg-[var(--accent-color-light)] transition-colors shadow-lg shadow-[var(--accent-color)]/30">
                        {{ editingOfferId() ? 'Update Offer' : 'Create & Share' }}
                     </button>
                  </div>
@@ -515,12 +427,12 @@ interface AmortizationRow {
               <div>
                  <div class="bg-[var(--bg-card)] rounded-2xl border-4 border-[var(--accent-color)] p-8 sticky top-6 shadow-xl">
                     <div class="text-center pb-6 border-b border-[var(--border-primary)] mb-6">
-                       <h4 class="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Option {{ activeOptionIndex() + 1 }} Preview</h4>
+                       <h4 class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Option {{ activeOptionIndex() + 1 }} Preview</h4>
                        <div *ngIf="currentOfferState.businessName" class="font-bold text-[var(--text-primary)] mt-1">{{ currentOfferState.businessName }}</div>
                     </div>
                     
                     <div class="text-center">
-                       <span class="text-[11px] font-medium text-[var(--text-muted)] block uppercase tracking-widest">You Get</span>
+                       <span class="text-[11px] font-bold text-[var(--text-muted)] block uppercase tracking-widest">You Get</span>
                        <span class="text-5xl font-bold block my-4 text-[var(--accent-color)]">{{ activeOption().amount | currency:'USD':'symbol':'1.0-0' }}</span>
                     </div>
 
@@ -562,10 +474,6 @@ interface AmortizationRow {
                            <span class="text-[10px] text-[var(--text-muted)] block uppercase font-medium">Est. {{ activeOption().frequency }} Payment</span>
                            <span class="text-xl font-bold text-[var(--text-primary)]">{{ getPreviewCalculations().payment | currency:'USD' }}</span>
                         </div>
-                    </div>
-                    
-                    <div class="text-center">
-                       <button (click)="openAmortSchedule()" class="text-xs font-bold text-[var(--accent-color)] hover:underline">View Amortization Schedule</button>
                     </div>
                  </div>
               </div>
@@ -635,11 +543,21 @@ interface AmortizationRow {
                   </div>
 
                   <!-- Diligence -->
-                  <div class="bg-[var(--bg-card)] rounded-xl border border-[var(--border-primary)] p-0 overflow-hidden relative min-h-[300px]">
-                     <!-- Google Map -->
-                     <iframe *ngIf="searchResult()?.address" class="w-full h-full absolute inset-0" frameborder="0" style="border:0" 
-                             [src]="getMapUrl(searchResult()?.address!)" allowfullscreen></iframe>
-                     <div *ngIf="!searchResult()?.address" class="absolute inset-0 flex items-center justify-center bg-[var(--bg-card)] text-[var(--text-muted)]">No address available for map.</div>
+                  <div class="bg-[var(--bg-card)] rounded-xl border border-[var(--border-primary)] p-6">
+                     <div class="font-bold text-lg mb-4 flex items-center gap-2 text-[var(--text-primary)]">
+                        <svg class="w-5 h-5 text-[var(--accent-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Diligence
+                     </div>
+                     <div class="space-y-4 text-sm">
+                        <div>
+                           <span class="font-bold text-[var(--text-primary)] block">UCC Filings</span>
+                           <span class="text-[var(--text-muted)]">{{ searchResult()?.ucc_filings || 'None found.' }}</span>
+                        </div>
+                        <div>
+                           <span class="font-bold text-[var(--text-primary)] block">Court Records</span>
+                           <span class="text-[var(--text-muted)]">{{ searchResult()?.court_records || 'No recent litigation found.' }}</span>
+                        </div>
+                     </div>
                   </div>
                </div>
            </div>
@@ -726,54 +644,9 @@ interface AmortizationRow {
                     </div>
                  </div>
                  <div class="p-4 border-t border-[var(--border-primary)] flex gap-3">
-                    <button (click)="copyOfferText(selectedOffer!)" class="flex-1 py-2 rounded-lg font-bold border border-[var(--border-primary)] bg-[var(--bg-card-inner)] text-[var(--text-primary)] text-sm">Copy Text</button>
-                    <button (click)="copyLink(selectedOffer!.id)" class="flex-1 py-2 rounded-lg font-bold border border-[var(--border-primary)] text-[var(--text-primary)] text-sm">Copy Link</button>
-                    <button (click)="openDeleteConfirm(selectedOffer!)" class="flex-1 py-2 rounded-lg font-bold border border-red-200 text-red-500 bg-red-50 text-sm">Delete</button>
-                 </div>
-              </div>
-           </div>
-
-           <!-- DELETE CONFIRMATION MODAL -->
-           <div *ngIf="offerToDelete()" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-              <div class="bg-[var(--bg-card)] rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                 <h3 class="font-bold text-lg text-[var(--text-primary)] mb-2">Delete Offer?</h3>
-                 <p class="text-sm text-[var(--text-muted)] mb-6">Are you sure you want to delete the offer for <strong>{{offerToDelete()?.businessName}}</strong>?</p>
-                 <div class="flex gap-3">
-                    <button (click)="offerToDelete.set(null)" class="flex-1 py-2 rounded-lg font-bold border border-[var(--border-primary)] text-[var(--text-primary)]">Cancel</button>
-                    <button (click)="executeDelete()" class="flex-1 py-2 rounded-lg font-bold bg-red-500 text-white">Delete</button>
-                 </div>
-              </div>
-           </div>
-
-           <!-- AMORTIZATION MODAL -->
-           <div *ngIf="amortModalOpen()" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-              <div class="bg-[var(--bg-card)] rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
-                 <div class="p-5 border-b border-[var(--border-primary)] flex justify-between items-center bg-[var(--bg-card-inner)]">
-                    <div>
-                       <h3 class="font-bold text-[var(--text-primary)]">Payment Schedule</h3>
-                       <p class="text-xs text-[var(--text-muted)]">Estimated repayment timeline</p>
-                    </div>
-                    <button (click)="amortModalOpen.set(false)" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">✕</button>
-                 </div>
-                 <div class="overflow-y-auto flex-1 p-0">
-                    <table class="w-full text-sm">
-                       <thead class="sticky top-0 bg-[var(--bg-card)] shadow-sm text-[var(--text-muted)] text-xs uppercase">
-                          <tr>
-                             <th class="p-3 text-left font-medium">#</th>
-                             <th class="p-3 text-left font-medium">Date</th>
-                             <th class="p-3 text-right font-medium">Payment</th>
-                             <th class="p-3 text-right font-medium">Balance</th>
-                          </tr>
-                       </thead>
-                       <tbody class="divide-y divide-[var(--border-primary)] text-[var(--text-primary)]">
-                          <tr *ngFor="let row of amortSchedule()">
-                             <td class="p-3">{{ row.index }}</td>
-                             <td class="p-3">{{ row.date | date:'shortDate' }}</td>
-                             <td class="p-3 text-right">{{ row.payment | currency:'USD' }}</td>
-                             <td class="p-3 text-right">{{ row.balance | currency:'USD' }}</td>
-                          </tr>
-                       </tbody>
-                    </table>
+                    <button (click)="editOffer(selectedOffer!)" class="flex-1 py-2 rounded-lg font-bold border border-[var(--border-primary)] text-[var(--text-primary)]">Edit</button>
+                    <button (click)="deleteOffer(selectedOffer!.id)" class="flex-1 py-2 rounded-lg font-bold border border-red-200 text-red-500 bg-red-50">Delete</button>
+                    <button (click)="copyLink(selectedOffer!.id)" class="flex-1 py-2 rounded-lg font-bold bg-[var(--accent-color)] text-[var(--accent-text-inverted)]">Copy Link</button>
                  </div>
               </div>
            </div>
@@ -818,7 +691,7 @@ interface AmortizationRow {
 })
 export class App implements OnInit {
   // --- Services ---
-  @ViewChild('confettiCanvas') confettiCanvas!: ElementRef<HTMLCanvasElement>;
+  http = inject(HttpClient);
 
   // --- Signals (State) ---
   isDark = signal<boolean>(false);
@@ -841,14 +714,6 @@ export class App implements OnInit {
   activeOptionIndex = signal<number>(0);
   editingOfferId = signal<string | null>(null);
 
-  // Client State
-  activeClientOptionIndex = signal<number>(0);
-  showPrepay = signal<boolean>(false);
-  prepayDate = signal<string>(new Date().toISOString().split('T')[0]);
-  prepaySavings = signal<number>(0);
-  newPayoff = signal<number>(0);
-  clientTimer = signal<any>(null);
-
   // Search State
   searchQuery = '';
   isSearching = signal<boolean>(false);
@@ -859,22 +724,13 @@ export class App implements OnInit {
   clientOffer = signal<Offer | null>(null);
   toastVisible = signal<boolean>(false);
   toastMessage = signal<string>('');
-  
-  // Modal Signals
-  offerToDelete = signal<Offer | null>(null);
-  amortModalOpen = signal<boolean>(false);
-  amortSchedule = signal<AmortizationRow[]>([]);
 
   // --- Computed ---
   activeOption = computed(() => this.currentOptions()[this.activeOptionIndex()]);
   
   stats = computed(() => {
     const list = this.offers();
-    const value = list.filter(o => o.status === 'accepted').reduce((sum, o) => {
-        // Use accepted option if set, otherwise first
-        const idx = o.acceptedOptionIndex || 0;
-        return sum + (o.options[idx]?.amount || 0);
-    }, 0);
+    const value = list.reduce((sum, o) => sum + (o.options[0]?.amount || 0), 0);
     return {
       total: list.length,
       pending: list.filter(o => o.status === 'pending').length,
@@ -887,10 +743,19 @@ export class App implements OnInit {
     return this.offers().slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, 10);
   });
 
+  navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>' },
+    { id: 'search', label: 'Business Search', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>' },
+    { id: 'calculator', label: 'New Offer', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>' },
+    { id: 'offers', label: 'All Offers', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>' },
+    { id: 'settings', label: 'Settings', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>' }
+  ];
+
   // --- Lifecycle ---
   ngOnInit() {
     this.loadData();
     
+    // Simulate routing based on URL params
     const urlParams = new URLSearchParams(window.location.search);
     const offerId = urlParams.get('offer');
     if (offerId) {
@@ -898,7 +763,6 @@ export class App implements OnInit {
       if (found) {
         this.clientOffer.set(found);
         this.viewMode.set('client');
-        this.startClientTimer(found.expiresAt);
       }
     }
   }
@@ -936,8 +800,7 @@ export class App implements OnInit {
       frequency: 'daily',
       fee: 0,
       prepayDiscount: 0,
-      termOverride: '',
-      notes: ''
+      termOverride: ''
     };
   }
 
@@ -964,12 +827,14 @@ export class App implements OnInit {
     const feeAmount = amount * (opt.fee / 100);
     const netProceeds = amount - feeAmount;
     
-    let divisor = 250; 
+    // Term math
+    let divisor = 250; // Daily default
     if (opt.frequency === 'weekly') divisor = 52;
     if (opt.frequency === 'monthly') divisor = 12;
 
     const payment = opt.term > 0 ? totalPayback / opt.term : 0;
     
+    // Convert payments to months approximation
     let termMonths = 6;
     if (opt.frequency === 'daily') termMonths = opt.term / 21;
     if (opt.frequency === 'weekly') termMonths = opt.term / 4.3;
@@ -1034,7 +899,7 @@ export class App implements OnInit {
       contactName: offer.contactName, 
       email: offer.email 
     };
-    this.currentOptions.set(offer.options.map(o => ({...o}))); 
+    this.currentOptions.set(offer.options.map(o => ({...o}))); // Deep copy options
     this.activeOptionIndex.set(0);
     this.selectedOffer = null;
     this.switchView('calculator');
@@ -1045,37 +910,21 @@ export class App implements OnInit {
     this.switchView('dashboard');
   }
 
-  // --- Deletion Logic ---
-  openDeleteConfirm(offer: Offer) {
-      this.offerToDelete.set(offer);
-      this.selectedOffer = null;
-  }
-
-  executeDelete() {
-    const offer = this.offerToDelete();
-    if(offer) {
-        this.offers.update(list => list.filter(o => o.id !== offer.id));
-        this.saveData();
-        this.offerToDelete.set(null);
-        this.showToast('Offer Deleted');
-    }
-  }
-
   deleteOffer(id: string) {
-    // Legacy fallback, normally handled by modal now
+    if(!confirm('Delete this offer?')) return;
     this.offers.update(list => list.filter(o => o.id !== id));
     this.saveData();
     this.selectedOffer = null;
+    this.showToast('Offer Deleted');
   }
 
-  // --- Client View Logic ---
-  getClientActiveOption() {
-    const opts = this.clientOffer()!.options;
-    return opts[this.activeClientOptionIndex()] || opts[0];
+  // Client Methods
+  getClientPrimaryOption() {
+    return this.clientOffer()!.options[0]; // Assuming first is primary
   }
 
-  getClientActiveCircle() {
-    const opt = this.getClientActiveOption();
+  getClientPrimaryCircle() {
+    const opt = this.getClientPrimaryOption();
     if(!opt.totalPayback) return '0, 100';
     const pct = (opt.amount / opt.totalPayback) * 100;
     return `${pct}, ${100 - pct}`;
@@ -1085,107 +934,13 @@ export class App implements OnInit {
     const offer = this.clientOffer();
     if(offer) {
         offer.status = 'accepted';
-        offer.acceptedOptionIndex = this.activeClientOptionIndex();
-        offer.acceptedAt = Date.now();
         this.offers.update(list => list.map(o => o.id === offer.id ? offer : o));
         this.saveData();
-        this.showConfetti();
+        // Trigger confetti here ideally
     }
   }
 
-  startClientTimer(expiresAt: number) {
-      const updateTimer = () => {
-          const now = Date.now();
-          const diff = expiresAt - now;
-          if (diff <= 0) {
-              this.clientTimer.set(null);
-              return;
-          }
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          this.clientTimer.set({ days, hours, minutes });
-      };
-      updateTimer();
-      setInterval(updateTimer, 60000);
-  }
-
-  // --- Prepayment Calculator ---
-  calculatePrepay(dateVal: string) {
-      this.prepayDate.set(dateVal);
-      const opt = this.getClientActiveOption();
-      if (!opt || !dateVal) return;
-
-      const startDate = new Date();
-      startDate.setHours(0,0,0,0);
-      
-      // Est end date
-      const days = opt.frequency === 'weekly' ? opt.term * 7 : opt.frequency === 'monthly' ? opt.term * 30 : opt.term * 1.4;
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + days);
-
-      const selDate = new Date(dateVal);
-      selDate.setHours(0,0,0,0);
-
-      const totalDuration = endDate.getTime() - startDate.getTime();
-      const remainingDuration = endDate.getTime() - selDate.getTime();
-      
-      let fraction = totalDuration > 0 ? remainingDuration / totalDuration : 0;
-      fraction = Math.max(0, Math.min(1, fraction));
-
-      const maxSavings = (opt.totalPayback || 0) * (opt.prepayDiscount / 100);
-      const actualSavings = maxSavings * fraction;
-      
-      this.prepaySavings.set(actualSavings);
-      this.newPayoff.set((opt.totalPayback || 0) - actualSavings);
-  }
-
-  // --- Amortization Logic ---
-  openAmortSchedule() {
-      // Use active option from either calculator (preview) or client view
-      let opt: OfferOption;
-      if (this.viewMode() === 'client') {
-          opt = this.getClientActiveOption();
-      } else {
-          opt = this.getPreviewCalculations();
-      }
-
-      const rows: AmortizationRow[] = [];
-      let balance = opt.totalPayback || 0;
-      const payment = opt.payment || 0;
-      let date = new Date();
-
-      for(let i=1; i<=opt.term; i++) {
-          if (balance <= 0) break;
-          
-          // Advance date
-          if (opt.frequency === 'weekly') date.setDate(date.getDate() + 7);
-          else if (opt.frequency === 'monthly') date.setMonth(date.getMonth() + 1);
-          else {
-              date.setDate(date.getDate() + 1);
-              // Skip weekends for daily
-              if (date.getDay() === 0) date.setDate(date.getDate() + 1);
-              if (date.getDay() === 6) date.setDate(date.getDate() + 2);
-          }
-
-          balance -= payment;
-          if (balance < 0) balance = 0;
-
-          rows.push({
-              index: i,
-              date: new Date(date),
-              payment: payment,
-              balance: balance
-          });
-          
-          // Limit rows for performance if term is huge
-          if (i >= 500) break; 
-      }
-      this.amortSchedule.set(rows);
-      this.amortModalOpen.set(true);
-  }
-
-  // --- Search Logic ---
+  // Search Logic (Mocked + Gemini Hook)
   async performSearch() {
     if(!this.searchQuery) return;
     if(!this.settings().apiKey) {
@@ -1194,23 +949,19 @@ export class App implements OnInit {
     }
     this.isSearching.set(true);
     
+    // Call Gemini API
     try {
       const prompt = `Find official business entity details for "${this.searchQuery}". Extract: Legal Name, Official Address, Formation Date, Contact Name, Email. Also simulate finding UCC filings and court records. Return JSON keys: legal_name, address, formation_date, contact_name, email, ucc_filings, court_records.`;
       
-      const response = await fetch(
+      const response: any = await this.http.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${this.settings().apiKey}`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            tools: [{ google_search: {} }]
-          })
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search: {} }]
         }
-      );
+      ).toPromise();
 
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
       const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : '{}';
       
@@ -1232,17 +983,7 @@ export class App implements OnInit {
     }
   }
 
-  getMapUrl(address: string) {
-      const q = encodeURIComponent(address);
-      return this.sanitizerUrl(`https://maps.google.com/maps?q=${q}&output=embed`);
-  }
-  
-  // Simple sanitizer bypass for iframe (unsafe in prod, okay for demo)
-  sanitizerUrl(url: string): any {
-      return url as any; // In real Angular use DomSanitizer
-  }
-
-  // --- Helpers ---
+  // Helpers
   toggleTheme() {
     this.isDark.update(d => !d);
     localStorage.setItem('trustbureau_theme', this.isDark() ? 'dark' : 'light');
@@ -1314,107 +1055,13 @@ export class App implements OnInit {
   }
 
   getOfferUrl(id: string) {
+    // In a real app this would be full URL, here we use current URL + param
     return encodeURIComponent(`${window.location.origin}${window.location.pathname}?offer=${id}`);
   }
   
   copyLink(id: string) {
     const url = `${window.location.origin}${window.location.pathname}?offer=${id}`;
-    
-    // Modern API might be blocked, use fallback
-    this.fallbackCopy(url);
+    navigator.clipboard.writeText(url);
+    this.showToast('Link Copied');
   }
-
-  // --- Advanced Copy Text (HTML Clipboard) ---
-  copyOfferText(offer: Offer) {
-      // Simplified HTML generation for clipboard
-      const lines = [`Funding Approval for ${offer.businessName}`];
-      offer.options.forEach((o, i) => {
-          lines.push(`OPTION ${i+1}: ${this.formatMoney(o.amount)} | Term: ${o.termOverride || o.term} | Pmt: ${this.formatMoney(o.payment)}`);
-          if(o.notes) lines.push(`Notes: ${o.notes}`);
-      });
-      lines.push(`\nLink: ${window.location.origin}${window.location.pathname}?offer=${offer.id}`);
-      
-      const text = lines.join('\n');
-      this.fallbackCopy(text);
-  }
-
-  fallbackCopy(text: string) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    
-    // Ensure it's not visible but part of the DOM
-    textArea.style.position = "fixed";
-    textArea.style.left = "-9999px";
-    textArea.style.top = "0";
-    document.body.appendChild(textArea);
-    
-    textArea.focus();
-    textArea.select();
-    
-    try {
-      const successful = document.execCommand('copy');
-      if (successful) {
-        this.showToast('Copied to clipboard');
-      } else {
-        this.showToast('Copy failed');
-      }
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-      this.showToast('Copy error');
-    }
-    
-    document.body.removeChild(textArea);
-  }
-
-  formatMoney(val: any) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val || 0);
-  }
-
-  // --- Confetti Logic ---
-  showConfetti() {
-      const canvas = this.confettiCanvas.nativeElement;
-      const ctx = canvas.getContext('2d')!;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      
-      const particles: any[] = [];
-      const colors = ['#42D197', '#3b82f6', '#f97316', '#a855f7', '#ec4899'];
-      
-      for(let i=0; i<100; i++) {
-          particles.push({
-              x: Math.random() * canvas.width,
-              y: Math.random() * canvas.height - canvas.height,
-              color: colors[Math.floor(Math.random() * colors.length)],
-              size: Math.random() * 5 + 5,
-              speedY: Math.random() * 3 + 2,
-              speedX: Math.random() * 2 - 1
-          });
-      }
-
-      const animate = () => {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          let active = false;
-          particles.forEach(p => {
-              p.y += p.speedY;
-              p.x += p.speedX;
-              if(p.y < canvas.height) {
-                  active = true;
-                  ctx.fillStyle = p.color;
-                  ctx.fillRect(p.x, p.y, p.size, p.size);
-              }
-          });
-          if(active) requestAnimationFrame(animate);
-          else ctx.clearRect(0,0, canvas.width, canvas.height);
-      };
-      animate();
-  }
-
-  // Nav Items
-  navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>' },
-    { id: 'search', label: 'Business Search', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>' },
-    { id: 'calculator', label: 'New Offer', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>' },
-    { id: 'offers', label: 'All Offers', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>' },
-    { id: 'settings', label: 'Settings', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>' }
-  ];
 }
