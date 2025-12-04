@@ -65,7 +65,7 @@
             flex-direction: column;
         }
 
-        /* Header - Bold Editorial */
+        /* Header */
         header {
             padding: 1.5rem 0;
             display: flex;
@@ -132,7 +132,7 @@
             padding: 0.5rem 0.875rem;
             background: transparent;
             border: 1px solid var(--border-primary);
-            border-radius: 6px; /* Squared */
+            border-radius: 10px; /* Soft Squared */
             color: var(--text-secondary);
             font-size: 0.75rem;
             font-weight: 600;
@@ -158,7 +158,7 @@
         .status-dot.active { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
         .status-dot.inactive { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
 
-        /* Search Input Area - Squared */
+        /* Search Input Area - Updated to 10px (Soft Squared) */
         .search-wrapper {
             max-width: 680px;
             margin: 0 auto;
@@ -169,7 +169,7 @@
         .input-group {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 16px; /* Soft Rounded */
+            border-radius: 10px; /* Soft Squared */
             padding: 0.35rem 0.35rem 0.35rem 1.5rem;
             display: flex;
             flex-direction: row;
@@ -207,7 +207,7 @@
             justify-content: center;
             width: 48px;
             height: 48px;
-            border-radius: 12px; /* Soft Rounded */
+            border-radius: 8px; /* Matching internal radius */
             background: var(--text-primary);
             color: #000;
             border: none;
@@ -236,63 +236,73 @@
             100% { transform: rotate(360deg); } 
         }
 
-        /* Terminal / Logs */
-        .system-log {
-            margin: 2rem auto;
-            max-width: 600px;
-            background: transparent;
-            padding: 1rem;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            display: none;
-            height: auto;
-            min-height: 40px;
-            text-align: center;
+        /* Report Layout & Animation Container */
+        .report-container-wrapper {
+            position: relative;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
         }
 
-        .log-entry {
-            margin-bottom: 0.5rem;
-            display: flex;
-            gap: 0.5rem;
+        /* Canvas Overlay for "Dot Grid" Effect */
+        #loadingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10; /* Above report */
+            pointer-events: none;
             opacity: 0;
-            animation: fadeIn 0.5s forwards;
-            align-items: center;
-            justify-content: center;
+            transition: opacity 0.5s ease;
         }
 
-        .log-time { display: none; }
-        .log-msg-info { color: var(--text-secondary); }
-        .log-msg-success { color: #fff; font-weight: 500; }
-        .log-msg-warn { color: #ef4444; }
+        #loadingCanvas.active {
+            opacity: 1;
+        }
 
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* Report Layout */
         .report-grid {
             display: none;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1px;
-            background: var(--border-primary);
-            border: 1px solid var(--border-primary);
-            border-radius: 16px; /* Soft Rounded */
-            overflow: hidden;
-            margin-bottom: 4rem;
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 4rem;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.5rem;
+            opacity: 0; 
+            transition: filter 0.5s ease-out, opacity 0.5s ease-out;
+        }
+        
+        /* Resolution / Blur Effect State */
+        .report-grid.scanning {
+            display: grid;
+            filter: blur(20px); /* Heavy start blur */
+            opacity: 0.4;
+        }
+        
+        .report-grid.resolved {
+            filter: blur(0px);
+            opacity: 1;
         }
 
         .report-card {
             background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px; /* Soft Squared */
             padding: 2rem;
             position: relative;
-            transition: all 0.3s;
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .report-card:hover {
-            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .report-card.full-width {
+            grid-column: 1 / -1;
+            border-color: var(--text-secondary);
+        }
+        
+        @media (min-width: 900px) {
+            .report-card.wide-card { grid-column: span 2; }
         }
 
         .card-header {
@@ -310,9 +320,7 @@
             gap: 0.75rem;
         }
 
-        .card-icon {
-            color: var(--text-muted);
-        }
+        .card-icon { color: var(--text-muted); }
 
         .card-title {
             font-size: 0.75rem;
@@ -328,7 +336,7 @@
             color: var(--text-muted);
             font-size: 0.65rem;
             padding: 0.25rem 0.5rem;
-            border-radius: 8px; /* Soft Rounded */
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             letter-spacing: 0.05em;
@@ -357,20 +365,29 @@
         .data-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .data-row {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
 
-        .data-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
+        .data-row:last-child { border-bottom: none; }
+
+        .data-label-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .data-icon {
+            color: var(--text-muted);
+            width: 14px;
+            height: 14px;
         }
 
         .data-label {
@@ -380,6 +397,13 @@
             letter-spacing: 0.05em;
             min-width: 90px;
             padding-top: 0.1rem;
+            font-weight: 600;
+        }
+
+        .check-icon {
+            color: var(--accent-green);
+            width: 14px;
+            height: 14px;
         }
 
         .data-value {
@@ -388,14 +412,77 @@
             text-align: right;
             font-weight: 500;
             word-break: break-word;
-            max-width: 75%;
+            max-width: 250px;
+        }
+
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+            align-self: flex-start;
+        }
+
+        .source-link:hover { color: var(--text-primary); }
+
+        /* Map Embed Styles */
+        .map-container {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+            background: var(--bg-card-hover);
+            margin-top: 0.5rem;
+            height: 250px;
+            position: relative;
+        }
+        
+        .map-iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+            filter: grayscale(100%) invert(90%);
+            pointer-events: none; /* Make static */
+        }
+
+        .map-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-map-action {
+            flex: 1;
+            padding: 0.625rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px; /* Soft Squared */
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-map-action:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
         }
 
         /* Review Specific Styles */
         .review-item {
             padding: 1rem;
             background: rgba(255,255,255,0.02);
-            border-radius: 12px; /* Soft Rounded */
+            border-radius: 10px;
             border: 1px solid var(--border-primary);
             margin-bottom: 0.75rem;
         }
@@ -446,104 +533,6 @@
             line-height: 1.5;
         }
 
-        .source-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            margin-top: 1.5rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: all 0.2s;
-            align-self: flex-start;
-        }
-
-        .source-link:hover {
-            color: var(--text-primary);
-        }
-
-        /* Map Embed Styles */
-        .map-container {
-            border-radius: 12px; /* Soft Rounded */
-            overflow: hidden;
-            border: 1px solid var(--border-primary);
-            background: var(--bg-card-hover);
-            margin-top: 0.5rem;
-        }
-        
-        .map-iframe {
-            width: 100%;
-            height: 250px;
-            border: 0;
-            display: block;
-            filter: grayscale(100%) invert(90%);
-            pointer-events: none; /* Make static */
-        }
-
-        .map-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .btn-map-action {
-            flex: 1;
-            padding: 0.625rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-primary);
-            border-radius: 8px; /* Soft Rounded */
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-map-action:hover {
-            background: rgba(255,255,255,0.1);
-            color: var(--text-primary);
-            border-color: var(--text-secondary);
-        }
-
-        /* Pong Game Styles */
-        .pong-container {
-            width: 100%;
-            height: 200px;
-            background: #000;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        canvas {
-            display: block;
-            cursor: none; /* Hide default cursor over game */
-        }
-
-        .pong-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            color: #666;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
         /* Summary Header */
         .report-meta {
             grid-column: 1 / -1;
@@ -572,7 +561,7 @@
             gap: 0.5rem;
             padding: 0.5rem 1rem;
             border: 1px solid var(--border-hover);
-            border-radius: 12px; /* Soft Rounded */
+            border-radius: 10px;
             font-size: 0.75rem;
             color: var(--text-primary);
             background: rgba(255,255,255,0.02);
@@ -581,6 +570,88 @@
         }
 
         .status-pill:hover { background: rgba(255,255,255,0.05); }
+
+        /* Follow Up Section */
+        .follow-up-container {
+            display: none;
+            margin-top: 1.5rem; 
+            margin-bottom: 4rem;
+            text-align: center; /* Center content */
+            max-width: 680px; /* Match top search width */
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .follow-up-response {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 10px;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            display: none;
+            text-align: left;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        
+        .follow-up-response strong { color: var(--text-primary); font-weight: 600; }
+        .follow-up-response p { margin-bottom: 1rem; }
+
+        /* Alternatives Section */
+        .alternatives-container {
+            display: none;
+            max-width: 680px;
+            margin: 2rem auto 0 auto; /* Moved to top */
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .alt-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .alt-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .alt-chip {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .alt-chip:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .alt-icon {
+            width: 14px;
+            height: 14px;
+            opacity: 0.5;
+        }
 
         /* Footer */
         footer {
@@ -592,20 +663,12 @@
             font-size: 0.8125rem;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Settings Modal */
+        /* Settings Modal - REDESIGNED */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(8px);
             z-index: 100;
             display: none;
             align-items: center;
@@ -613,92 +676,119 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-
-        .modal-overlay.open {
-            display: flex;
-            opacity: 1;
-        }
-
+        .modal-overlay.open { display: flex; opacity: 1; }
+        
         .modal {
-            background: var(--bg-modal);
+            background: #0a0a0a;
             border: 1px solid var(--border-primary);
-            border-radius: 16px; /* Soft Rounded */
-            padding: 2rem;
+            border-radius: 16px;
+            padding: 0;
             width: 100%;
-            max-width: 480px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-width: 520px; 
+            box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.95);
             transform: scale(0.95);
-            transition: transform 0.3s;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
         }
-
         .modal-overlay.open .modal { transform: scale(1); }
-
+        
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .btn-close {
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 2rem 2.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-primary); 
             background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
         }
-
-        .form-label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .modal-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        
+        .btn-close { 
+            background: transparent; border: none; color: var(--text-muted); 
+            cursor: pointer; padding: 0.5rem; transition: color 0.2s; display: flex; 
+            border-radius: 50%;
         }
-
-        .form-input {
-            width: 100%;
-            background: #000;
+        .btn-close:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        
+        .modal-body { 
+            padding: 2.5rem; 
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        /* Status Card inside Modal */
+        .status-card {
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-primary);
-            border-radius: 12px; /* Soft Rounded */
-            padding: 0.75rem;
-            color: var(--text-primary);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.875rem;
-            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--text-secondary);
+        .status-icon-wrapper {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-primary);
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .btn-save {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--text-primary);
-            color: #000;
-            border: none;
-            border-radius: 12px; /* Soft Rounded */
-            font-weight: 600;
-            cursor: pointer;
+        .status-details { display: flex; flex-direction: column; gap: 0.25rem; }
+        
+        .status-label-text { 
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; 
+            color: var(--text-muted); font-weight: 600; 
+        }
+        
+        .status-value-text { 
+            font-size: 0.9375rem; color: var(--text-primary); font-weight: 500; 
         }
 
-        .key-status {
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            border-radius: 8px; /* Soft Rounded */
-            background: rgba(255,255,255,0.05);
-            color: var(--text-secondary);
+        /* Form Elements */
+        .form-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        
+        .form-header { display: flex; justify-content: space-between; align-items: baseline; }
+        
+        .form-label { 
+            font-size: 1rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.01em;
         }
 
+        .form-hint { font-size: 0.8125rem; color: var(--text-muted); }
+        .form-hint a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+        .form-hint a:hover { color: var(--text-primary); }
+        
+        .form-input {
+            width: 100%; background: #050505; border: 1px solid var(--border-primary); 
+            border-radius: 10px; padding: 1.25rem; color: var(--text-primary); 
+            font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; 
+            transition: all 0.2s;
+        }
+        .form-input:focus { 
+            outline: none; border-color: var(--text-secondary); 
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.05); 
+        }
+        
+        .modal-actions { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; }
+        
+        .btn-save { 
+            width: 100%; padding: 1.125rem; background: var(--text-primary); color: #000; 
+            border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; 
+            cursor: pointer; transition: all 0.2s; letter-spacing: -0.01em; 
+        }
+        .btn-save:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,255,255,0.15); }
+        
+        .btn-reset {
+            background: transparent; border: none; color: var(--text-muted); 
+            font-size: 0.875rem; cursor: pointer; padding: 0.5rem; 
+            transition: color 0.2s; width: fit-content; margin: 0 auto;
+        }
+        .btn-reset:hover { color: var(--accent-red); }
+        
+        /* Pong Game Styles */
+        .pong-container { width: 100%; height: 200px; background: #000; position: relative; overflow: hidden; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        canvas { display: block; cursor: none; }
+        .pong-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; color: #666; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -707,25 +797,40 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">API Configuration</div>
+                <div class="modal-title">System Configuration</div>
                 <button class="btn-close" onclick="toggleSettings()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             
-            <div class="key-status" id="keyStatusText">
-                Using: System Default Key
-            </div>
+            <div class="modal-body">
+                <!-- Status Card -->
+                <div class="status-card">
+                    <div class="status-icon-wrapper">
+                        <span class="status-dot active" id="modalStatusDot"></span>
+                    </div>
+                    <div class="status-details">
+                        <div class="status-label-text">Connection Status</div>
+                        <div class="status-value-text" id="keyStatusTextLabel">Using: System Default Key</div>
+                    </div>
+                </div>
 
-            <label class="form-label">Custom Gemini API Key</label>
-            <input type="password" class="form-input" id="apiKeyInput" placeholder="AIzaSy...">
-            
-            <button class="btn-save" onclick="saveApiKey()">Save Configuration</button>
-            <div style="text-align: center; margin-top: 1rem;">
-                <a href="#" onclick="clearApiKey(); return false;" style="color: var(--text-muted); font-size: 0.75rem; text-decoration: none;">Clear Custom Key & Reset</a>
+                <!-- Input Group -->
+                <div class="form-group">
+                    <div class="form-header">
+                        <label class="form-label">Gemini API Key</label>
+                    </div>
+                    <div class="form-hint">
+                        Required for deep dive investigations. <a href="https://aistudio.google.com/app/apikey" target="_blank">Get a free key here &rarr;</a>
+                    </div>
+                    <input type="password" class="form-input" id="apiKeyInput" placeholder="Paste your AIzaSy... key here">
+                </div>
+                
+                <!-- Actions -->
+                <div class="modal-actions">
+                    <button class="btn-save" onclick="saveApiKey()">Save Configuration</button>
+                    <button class="btn-reset" onclick="clearApiKey()">Reset to Default System Key</button>
+                </div>
             </div>
         </div>
     </div>
@@ -733,7 +838,7 @@
     <div class="container">
         <header>
             <div class="logo-group">
-                <a href="#" class="logo">
+                <a href="index.html" class="logo">
                     <svg class="logo-icon" viewBox="0 0 24 24" fill="none">
                         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="currentColor" opacity="0.1"/>
                         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="#888888" stroke-width="1.5" fill="none"/>
@@ -746,17 +851,7 @@
             <div class="header-actions">
                 <button class="btn-api" onclick="toggleSettings()" title="Configure API">
                     <span class="status-dot active" id="systemStatusDot"></span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="4" y1="21" x2="4" y2="14"></line>
-                        <line x1="4" y1="10" x2="4" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12" y2="3"></line>
-                        <line x1="20" y1="21" x2="20" y2="16"></line>
-                        <line x1="20" y1="12" x2="20" y2="3"></line>
-                        <line x1="1" y1="14" x2="7" y2="14"></line>
-                        <line x1="9" y1="8" x2="15" y2="8"></line>
-                        <line x1="17" y1="16" x2="23" y2="16"></line>
-                    </svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
                     API
                 </button>
             </div>
@@ -766,114 +861,111 @@
             <div class="input-group">
                 <input type="text" class="unibox" id="searchInput" placeholder="Enter Business Name and State..." autocomplete="off">
                 <button class="btn-action" id="btnScrub" onclick="runScrub()" aria-label="Run Investigation">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
 
-        <div class="system-log" id="terminal">
-            <!-- Logs appear here -->
+        <!-- Alternatives Section (Moved to Top) -->
+        <div class="alternatives-container" id="alternativesContainer">
+            <div class="alt-label">Possible Alternative Matches</div>
+            <div class="alt-grid" id="alternativesGrid"></div>
         </div>
 
-        <div id="reportContainer" class="report-grid">
-            <div class="report-meta">
-                <div>
-                    <div class="meta-title" id="reportName">Acme Logistics LLC</div>
-                    <div class="meta-subtitle">Report Generated: <span id="timestamp"></span></div>
-                </div>
-                <div class="status-pill">
-                    Confidence: High
-                </div>
-            </div>
-
-            <!-- Card 1: SOS -->
-            <div class="report-card">
-                <div class="card-header">
-                    <div class="header-title-group">
-                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-2a4 4 0 0 1 4-4v0a4 4 0 0 1 4 4v2"/>
-                        </svg>
-                        <span class="card-title">Corporate Registry</span>
+        <div class="report-container-wrapper">
+            <canvas id="loadingCanvas"></canvas>
+            <div id="reportContainer" class="report-grid">
+                <div class="report-meta">
+                    <div>
+                        <div class="meta-title" id="reportName">Acme Logistics LLC</div>
+                        <div class="meta-subtitle">Report Generated: <span id="timestamp"></span></div>
                     </div>
-                    <button class="btn-deep" onclick="runDeepDive('sos')">DEEP</button>
+                    <div class="status-pill">Confidence: High</div>
                 </div>
-                <div class="card-content" id="sosContent">Pending...</div>
-            </div>
 
-            <!-- Card 2: Legal -->
-            <div class="report-card">
-                <div class="card-header">
-                    <div class="header-title-group">
-                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2l-9.5 17h19L12 2zm0 3.3L18.4 19H5.6L12 5.3z"/>
-                            <path d="M12 16a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0-7v5"/>
-                        </svg>
-                        <span class="card-title">Litigation & Filings</span>
+                <!-- Section 1: Key Findings -->
+                <div class="report-card full-width">
+                    <div class="card-header">
+                        <div class="header-title-group">
+                            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span class="card-title">Key Findings</span>
+                        </div>
                     </div>
-                    <button class="btn-deep" onclick="runDeepDive('legal')">DEEP</button>
+                    <div class="card-content" id="summaryContent">Pending...</div>
                 </div>
-                <div class="card-content" id="legalContent">Pending...</div>
-            </div>
 
-            <!-- Card 3: Footprint -->
-            <div class="report-card">
-                <div class="card-header">
-                    <div class="header-title-group">
-                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                            <line x1="8" y1="2" x2="8" y2="18"></line>
-                            <line x1="16" y1="6" x2="16" y2="22"></line>
-                        </svg>
-                        <span class="card-title">Operational Footprint</span>
+                <!-- Section 2: SOS -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <div class="header-title-group">
+                            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-2a4 4 0 0 1 4-4v0a4 4 0 0 1 4 4v2"/></svg>
+                            <span class="card-title">Corporate Registry</span>
+                        </div>
+                        <button class="btn-deep" onclick="runDeepDive('sos')">DEEP</button>
                     </div>
-                    <button class="btn-deep" onclick="runDeepDive('footprint')">DEEP</button>
+                    <div class="card-content" id="sosContent">Pending...</div>
                 </div>
-                <div class="card-content" id="footprintContent">Pending...</div>
-            </div>
 
-            <!-- Card 7: Location -->
-            <div class="report-card">
-                <div class="card-header">
-                    <div class="header-title-group">
-                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"></path>
-                            <circle cx="12" cy="9" r="2.5"></circle>
-                        </svg>
-                        <span class="card-title">Location Intelligence</span>
+                <!-- Section 3: Legal -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <div class="header-title-group">
+                            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l-9.5 17h19L12 2zm0 3.3L18.4 19H5.6L12 5.3z"/><path d="M12 16a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0-7v5"/></svg>
+                            <span class="card-title">Litigation & Filings</span>
+                        </div>
+                        <button class="btn-deep" onclick="runDeepDive('legal')">DEEP</button>
                     </div>
+                    <div class="card-content" id="legalContent">Pending...</div>
                 </div>
-                <div class="card-content" id="locationContent">Pending...</div>
-            </div>
 
-            <!-- Card 4: Reviews -->
-            <div class="report-card">
-                <div class="card-header">
-                    <div class="header-title-group">
-                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                        <span class="card-title">Reviews & Reputation</span>
+                <!-- Section 4: Location -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <div class="header-title-group">
+                            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+                            <span class="card-title">Location Intelligence</span>
+                        </div>
                     </div>
-                    <button class="btn-deep" onclick="runDeepDive('reviews')">DEEP</button>
+                    <div class="card-content" id="locationContent">Pending...</div>
                 </div>
-                <div class="card-content" id="reviewsContent">Pending...</div>
-            </div>
 
-            <!-- Card 6: Summary -->
-            <div class="report-card">
-                <div class="card-header">
-                    <div class="header-title-group">
-                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                        </svg>
-                        <span class="card-title">Key Findings</span>
+                 <!-- Section 5: Footprint -->
+                 <div class="report-card">
+                    <div class="card-header">
+                        <div class="header-title-group">
+                            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                            <span class="card-title">Digital Footprint</span>
+                        </div>
+                        <button class="btn-deep" onclick="runDeepDive('footprint')">DEEP</button>
                     </div>
+                    <div class="card-content" id="footprintContent">Pending...</div>
                 </div>
-                <div class="card-content" id="summaryContent">Pending...</div>
+
+                <!-- Section 6: Reviews -->
+                <div class="report-card wide-card">
+                    <div class="card-header">
+                        <div class="header-title-group">
+                            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <span class="card-title">Reviews & Reputation</span>
+                        </div>
+                        <button class="btn-deep" onclick="runDeepDive('reviews')">DEEP</button>
+                    </div>
+                    <div class="card-content" id="reviewsContent">Pending...</div>
+                </div>
             </div>
+        </div>
+
+        <!-- Follow Up Section - Simple Search Bar -->
+        <div class="follow-up-container" id="followUpContainer">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="unibox" id="followUpInput" placeholder="Ask follow-up questions about this entity..." autocomplete="off">
+                    <button class="btn-action" id="btnFollowUp" onclick="askFollowUp()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="follow-up-response" id="followUpResponse"></div>
         </div>
 
         <footer>
@@ -882,28 +974,41 @@
     </div>
 
     <script>
-        const apiKey = ""; // Managed by environment
+        const apiKey = ""; 
         let userApiKey = localStorage.getItem('trustbureau_api_key') || "";
         let currentSearchQuery = "";
         let gameActive = false;
         let animationFrameId;
+        let blurInterval;
+        let simulationTimeouts = [];
+        let gridAnimationId;
 
         function updateKeyStatus() {
-            const statusText = document.getElementById('keyStatusText');
+            const statusText = document.getElementById('keyStatusTextLabel');
             const dot = document.getElementById('systemStatusDot');
+            const modalDot = document.getElementById('modalStatusDot');
             
             if (userApiKey) {
-                statusText.innerText = "Using: Custom User API Key";
-                statusText.style.color = "#22c55e";
-                dot.className = "status-dot active";
+                if(statusText) {
+                    statusText.innerText = "Using: Custom User API Key";
+                    statusText.style.color = "#22c55e";
+                }
+                if(dot) dot.className = "status-dot active";
+                if(modalDot) modalDot.className = "status-dot active";
             } else if (apiKey) {
-                statusText.innerText = "Using: Environment Test Key";
-                statusText.style.color = "#a3a3a3";
-                dot.className = "status-dot active";
+                if(statusText) {
+                    statusText.innerText = "Using: Environment Test Key";
+                    statusText.style.color = "#a3a3a3";
+                }
+                if(dot) dot.className = "status-dot active";
+                if(modalDot) modalDot.className = "status-dot active";
             } else {
-                statusText.innerText = "No API Key Available";
-                statusText.style.color = "#ef4444";
-                dot.className = "status-dot inactive";
+                if(statusText) {
+                    statusText.innerText = "No API Key Available";
+                    statusText.style.color = "#ef4444";
+                }
+                if(dot) dot.className = "status-dot inactive";
+                if(modalDot) modalDot.className = "status-dot inactive";
             }
         }
         updateKeyStatus();
@@ -937,145 +1042,131 @@
                 updateKeyStatus();
             }
         }
+        
+        function clearSimulation() {
+            simulationTimeouts.forEach(id => clearTimeout(id));
+            simulationTimeouts = [];
+            if(blurInterval) clearInterval(blurInterval);
+            if(gridAnimationId) cancelAnimationFrame(gridAnimationId);
+        }
 
         function getEffectiveApiKey() { return userApiKey || apiKey; }
 
-        // --- PONG GAME ---
-        function startPong(container) {
-            container.innerHTML = `
-                <div class="pong-container">
-                    <canvas id="pongCanvas"></canvas>
-                    <div class="pong-overlay">DEEP SCANNING...</div>
-                </div>
-            `;
-            
-            const canvas = document.getElementById('pongCanvas');
+        // --- DOT GRID ANIMATION ---
+        function startActiveGrid(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if(!canvas) return;
             const ctx = canvas.getContext('2d');
+            const parent = canvas.parentElement;
             
-            // Set scale
-            const width = container.offsetWidth;
-            const height = 200;
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = parent.offsetWidth;
+            canvas.height = parent.offsetHeight;
+            canvas.classList.add('active');
 
-            // Game State
-            const paddleHeight = 50;
-            const paddleWidth = 8;
-            let playerY = (height - paddleHeight) / 2;
-            let aiY = (height - paddleHeight) / 2;
-            let ballX = width / 2;
-            let ballY = height / 2;
-            let ballSpeedX = 4;
-            let ballSpeedY = 4;
+            const dots = [];
+            const spacing = 40;
+            const cols = Math.ceil(canvas.width / spacing);
+            const rows = Math.ceil(canvas.height / spacing);
 
-            // Mouse Control
-            canvas.addEventListener('mousemove', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const root = document.documentElement;
-                const mouseY = e.clientY - rect.top - root.scrollTop;
-                playerY = mouseY - (paddleHeight / 2);
-            });
-
-            gameActive = true;
-
-            function draw() {
-                if(!gameActive) return;
-
-                // Clear
-                ctx.fillStyle = '#0a0a0a';
-                ctx.fillRect(0, 0, width, height);
-
-                // Net
-                ctx.strokeStyle = '#222';
-                ctx.beginPath();
-                ctx.setLineDash([5, 15]);
-                ctx.moveTo(width/2, 0);
-                ctx.lineTo(width/2, height);
-                ctx.stroke();
-
-                // Ball Movement
-                ballX += ballSpeedX;
-                ballY += ballSpeedY;
-
-                // AI Movement (Simple tracking)
-                const aiCenter = aiY + (paddleHeight/2);
-                if (aiCenter < ballY - 35) {
-                    aiY += 3;
-                } else if (aiCenter > ballY + 35) {
-                    aiY -= 3;
+            // Init dots
+            for(let i=0; i<cols; i++){
+                for(let j=0; j<rows; j++){
+                    dots.push({
+                        x: i * spacing + spacing/2,
+                        y: j * spacing + spacing/2,
+                        opacity: 0.1,
+                        targetOpacity: 0.1,
+                        pulseSpeed: Math.random() * 0.05 + 0.01
+                    });
                 }
-
-                // Collisions
-                if (ballY < 0 || ballY > height) ballSpeedY = -ballSpeedY;
-
-                // Paddle Collision
-                // Left (Player)
-                if (ballX < paddleWidth + 10) {
-                    if (ballY > playerY && ballY < playerY + paddleHeight) {
-                        ballSpeedX = -ballSpeedX;
-                        // Add some spin/speed variation
-                        const deltaY = ballY - (playerY + paddleHeight/2);
-                        ballSpeedY = deltaY * 0.35;
-                    } else if (ballX < 0) {
-                        // Reset
-                        ballX = width/2;
-                        ballY = height/2;
-                        ballSpeedX = 4;
-                    }
-                }
-                
-                // Right (AI)
-                if (ballX > width - paddleWidth - 10) {
-                    if (ballY > aiY && ballY < aiY + paddleHeight) {
-                        ballSpeedX = -ballSpeedX;
-                        const deltaY = ballY - (aiY + paddleHeight/2);
-                        ballSpeedY = deltaY * 0.35;
-                    } else if (ballX > width) {
-                        // Reset
-                        ballX = width/2;
-                        ballY = height/2;
-                        ballSpeedX = -4;
-                    }
-                }
-
-                // Draw Elements
-                ctx.fillStyle = '#fff';
-                // Player Paddle
-                ctx.fillRect(10, playerY, paddleWidth, paddleHeight);
-                // AI Paddle
-                ctx.fillRect(width - 10 - paddleWidth, aiY, paddleWidth, paddleHeight);
-                // Ball
-                ctx.beginPath();
-                ctx.arc(ballX, ballY, 5, 0, Math.PI*2, true);
-                ctx.fill();
-
-                animationFrameId = requestAnimationFrame(draw);
             }
 
-            draw();
+            let scanY = 0;
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Move scanline
+                scanY += 8;
+                if(scanY > canvas.height + 100) scanY = -100;
 
+                dots.forEach(dot => {
+                    // Scanline effect interaction
+                    const dist = Math.abs(dot.y - scanY);
+                    if(dist < 50) {
+                        dot.opacity = Math.max(dot.opacity, 1 - (dist/50));
+                    }
+                    
+                    // Natural decay
+                    if(dot.opacity > 0.15) dot.opacity -= 0.05;
+                    
+                    // Draw
+                    ctx.fillStyle = `rgba(255, 255, 255, ${dot.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                gridAnimationId = requestAnimationFrame(animate);
+            }
+            animate();
+            
             return () => {
-                gameActive = false;
-                cancelAnimationFrame(animationFrameId);
+                canvas.classList.remove('active');
+                setTimeout(() => cancelAnimationFrame(gridAnimationId), 500);
             };
+        }
+
+        // --- PONG GAME ---
+        function startPong(container) {
+            container.innerHTML = `<div class="pong-container"><canvas id="pongCanvas"></canvas><div class="pong-overlay">DEEP SCANNING...</div></div>`;
+            const canvas = document.getElementById('pongCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = container.offsetWidth;
+            canvas.height = 200;
+            
+            let playerY = 75, aiY = 75, ballX = canvas.width/2, ballY = 100, ballSX = 4, ballSY = 4;
+            const paddleH = 50, paddleW = 8;
+
+            canvas.addEventListener('mousemove', e => {
+                const r = canvas.getBoundingClientRect();
+                playerY = e.clientY - r.top - paddleH/2;
+            });
+            
+            gameActive = true;
+            function draw() {
+                if(!gameActive) return;
+                ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(10, playerY, paddleW, paddleH);
+                ctx.fillRect(canvas.width-10-paddleW, aiY, paddleW, paddleH);
+                ctx.beginPath(); ctx.arc(ballX, ballY, 5, 0, Math.PI*2); ctx.fill();
+                
+                ballX += ballSX; ballY += ballSY;
+                if(ballY<0 || ballY>200) ballSY = -ballSY;
+                if(ballX < 20) { if(ballY > playerY && ballY < playerY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
+                if(ballX > canvas.width-20) { if(ballY > aiY && ballY < aiY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
+                
+                if(aiY + paddleH/2 < ballY - 20) aiY += 3;
+                else if(aiY + paddleH/2 > ballY + 20) aiY -= 3;
+                
+                requestAnimationFrame(draw);
+            }
+            draw();
+            return () => { gameActive = false; };
         }
 
         // --- PARSING ---
         function cleanJson(text) {
             const startObject = text.indexOf('{');
             const startArray = text.indexOf('[');
-            
             let startIndex = -1;
             let endIndex = -1;
-
             if (startObject !== -1 && (startArray === -1 || startObject < startArray)) {
-                startIndex = startObject;
-                endIndex = text.lastIndexOf('}');
+                startIndex = startObject; endIndex = text.lastIndexOf('}');
             } else if (startArray !== -1) {
-                startIndex = startArray;
-                endIndex = text.lastIndexOf(']');
+                startIndex = startArray; endIndex = text.lastIndexOf(']');
             }
-
             if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
                 return text.substring(startIndex, endIndex + 1);
             }
@@ -1083,26 +1174,41 @@
         }
 
         // --- RENDERING ---
+        // Icons Map
+        const iconMap = {
+            'status': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+            'formationDate': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+            'entityType': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-2a4 4 0 0 1 4-4v0a4 4 0 0 1 4 4v2"/></svg>',
+            'registeredAgent': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+            'principals': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+            'riskLevel': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+            'bankruptcies': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>',
+            'liens': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"/><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2v-6l-3.4-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.8 1.1z"/></svg>',
+            'judgments': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+            'uccFilings': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+            'website': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>',
+            'domainAge': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+            'addressType': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+            'socialPresence': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>'
+        };
         
         function renderDataGrid(dataObj, type) {
             if (!dataObj) return '<div class="data-value">No data available</div>';
-            
             let html = '<div class="data-list">';
-            
             const config = {
                 'sos': [
                     { key: 'status', label: 'Status', color: true },
                     { key: 'formationDate', label: 'Formed' },
                     { key: 'entityType', label: 'Type' },
                     { key: 'registeredAgent', label: 'Agent' },
-                    { key: 'principals', label: 'Owners' }
+                    { key: 'principals', label: 'Principals' }
                 ],
                 'legal': [
                     { key: 'riskLevel', label: 'Risk Level', color: true },
                     { key: 'bankruptcies', label: 'Bankruptcies', isArray: true },
                     { key: 'liens', label: 'Liens', isArray: true },
                     { key: 'judgments', label: 'Judgments', isArray: true },
-                    { key: 'uccFilings', label: 'UCC', isArray: true }
+                    { key: 'uccFilings', label: 'UCC Filings', isArray: true }
                 ],
                 'footprint': [
                     { key: 'website', label: 'Website' },
@@ -1111,76 +1217,83 @@
                     { key: 'socialPresence', label: 'Socials' }
                 ]
             };
-
             const fields = config[type] || [];
-
             fields.forEach(field => {
                 if (dataObj[field.key] !== undefined) {
                      let val = dataObj[field.key];
                      let style = '';
+                     let checkIcon = '<svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
                      
-                     // Clickable website logic
-                     if (field.key === 'website' && val && val !== 'None' && val !== 'Unknown' && val.includes('.')) {
+                     if (field.key === 'website' && val && val.includes('.')) {
                          let href = val.startsWith('http') ? val : 'https://' + val;
                          val = `<a href="${href}" target="_blank" style="color:inherit; text-decoration:underline;">${val}</a>`;
                      }
-
-                     // Array Handling
                      if (field.isArray) {
                          if (!Array.isArray(val) || val.length === 0 || (val.length === 1 && (val[0].toLowerCase().includes('none') || val[0].toLowerCase().includes('clean')))) {
                              val = 'None found';
                              style = 'color: var(--accent-green)';
                          } else {
-                             // Check again if it's a "None found" string inside array
                              if (val.length === 1 && val[0].toLowerCase().includes('none')) {
-                                 val = 'None found';
-                                 style = 'color: var(--accent-green)';
+                                 val = 'None found'; style = 'color: var(--accent-green)';
                              } else {
-                                style = 'color: var(--accent-red)';
-                                val = val.join('<br>');
+                                style = 'color: var(--accent-red)'; val = val.join('<br>');
                              }
                          }
-                     } else {
-                         // String Color Logic
-                         if (field.color) {
-                             const v = String(val).toLowerCase();
-                             if (v.includes('active') || v.includes('low') || v.includes('clean')) style = 'color: var(--accent-green)'; 
-                             else if (v.includes('inactive') || v.includes('medium') || v.includes('mod')) style = 'color: var(--accent-yellow)'; 
-                             else if (v.includes('dissolved') || v.includes('high') || v.includes('found') || v.includes('bad')) style = 'color: var(--accent-red)'; 
-                         }
+                     } else if (field.color) {
+                         const v = String(val).toLowerCase();
+                         if (v.includes('active') || v.includes('low') || v.includes('clean')) style = 'color: var(--accent-green)'; 
+                         else if (v.includes('inactive') || v.includes('medium') || v.includes('mod')) style = 'color: var(--accent-yellow)'; 
+                         else if (v.includes('dissolved') || v.includes('high') || v.includes('found')) style = 'color: var(--accent-red)'; 
+                         // Fix for "clean" status in risk level to be green
+                         if (field.key === 'riskLevel' && (v.includes('low') || v.includes('clean'))) style = 'color: var(--accent-green)';
                      }
-                     
-                     html += `<div class="data-row"><div class="data-label">${field.label}</div><div class="data-value" style="${style}">${val}</div></div>`;
+                     html += `<div class="data-row">
+                        <div class="data-label-group">
+                            ${checkIcon}
+                            ${iconMap[field.key] || ''}
+                            <div class="data-label">${field.label}</div>
+                        </div>
+                        <div class="data-value" style="${style}">${val}</div>
+                     </div>`;
                 }
             });
             html += '</div>';
-
             if (dataObj.sourceUrl) {
-                html += `<a href="${dataObj.sourceUrl}" target="_blank" class="source-link">Source Reference <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                html += `<a href="${dataObj.sourceUrl}" target="_blank" class="source-link">Source Reference &rarr;</a>`;
             }
             return html;
         }
 
         function renderLocation(data) {
             if (!data || !data.address) return '<div class="data-value">No location data found</div>';
-            
             let html = `
             <div class="data-list">
                 <div class="data-row">
-                    <div class="data-label">Address</div>
+                    <div class="data-label-group">
+                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <div class="data-label">Address</div>
+                    </div>
                     <div class="data-value">${data.address}</div>
                 </div>
                 <div class="data-row">
-                    <div class="data-label">Type</div>
+                    <div class="data-label-group">
+                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        <div class="data-label">Type</div>
+                    </div>
                     <div class="data-value">${data.locationType || 'Unknown'}</div>
                 </div>
             </div>`;
-
-            // Embed Map - Corrected Syntax & Static Interaction
-            const encodedAddr = encodeURIComponent(data.address);
+            
+            let safeAddr = data.address;
+            safeAddr = safeAddr.replace(/#\w+/g, '').replace(/(Unit|Suite|Ste|Floor|Fl)\s?\S+/gi, '');
+            const encodedAddr = encodeURIComponent(safeAddr);
+            const mapUrl = `https://maps.google.com/maps?q=${encodedAddr}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+            
             html += `
             <div class="map-container">
-                <iframe class="map-iframe" src="[https://maps.google.com/maps?q=$](https://maps.google.com/maps?q=$){encodedAddr}&t=&z=13&ie=UTF8&iwloc=&output=embed" style="pointer-events:none;"></iframe>
+                <iframe class="map-iframe" src="${mapUrl}"></iframe>
             </div>
             <div class="map-actions">
                 <a href="[https://www.google.com/maps/search/?api=1&query=$](https://www.google.com/maps/search/?api=1&query=$){encodedAddr}&layer=c" target="_blank" class="btn-map-action">
@@ -1191,31 +1304,26 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                     Open Maps
                 </a>
-            </div>
-            `;
+            </div>`;
             return html;
         }
 
         function renderListGroup(items, type) {
             if (!items || items.length === 0) return '<div class="data-value">No data available</div>';
-            let html = '<div class="list-group">';
-            
+            let html = '<div class="data-list">';
             items.forEach(item => {
-                if (type === 'reviews') {
-                    let sentimentColor = '#888';
-                    if(item.sentiment && (item.sentiment.toLowerCase().includes('pos') || item.sentiment.toLowerCase().includes('accred'))) sentimentColor = '#22c55e';
-                    if(item.sentiment && item.sentiment.toLowerCase().includes('neg')) sentimentColor = '#ef4444';
-
-                    html += `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <span>${item.source || item.platform}</span>
-                            <span style="opacity:0.7">${item.date || ''}</span>
-                        </div>
-                        <div class="review-text">"${item.text || 'No text'}"</div>
-                        <div class="review-rating" style="color:${sentimentColor}">★ ${item.rating}</div>
-                    </div>`;
-                }
+                let sentimentColor = '#888';
+                if(item.sentiment && (item.sentiment.toLowerCase().includes('pos') || item.sentiment.toLowerCase().includes('accred'))) sentimentColor = '#22c55e';
+                else if(item.sentiment && item.sentiment.toLowerCase().includes('neg')) sentimentColor = '#ef4444';
+                html += `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span>${item.source || item.platform}</span>
+                        <span style="opacity:0.7">${item.date || ''}</span>
+                    </div>
+                    <div class="review-text">"${item.text || 'No text'}"</div>
+                    <div class="review-rating" style="color:${sentimentColor}">★ ${item.rating}</div>
+                </div>`;
             });
             html += '</div>';
             return html;
@@ -1235,110 +1343,168 @@
             return html;
         }
 
-        // --- MAIN LOGIC ---
+        function renderAlternatives(alts) {
+            const container = document.getElementById('alternativesContainer');
+            const grid = document.getElementById('alternativesGrid');
+            
+            if (!alts || alts.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
 
+            let html = '';
+            alts.forEach(alt => {
+                const displayText = alt.location ? `${alt.name} (${alt.location})` : alt.name;
+                const safeName = displayText.replace(/'/g, "\\'");
+                
+                html += `
+                <div class="alt-chip" onclick="triggerNewSearch('${safeName}')">
+                    <svg class="alt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    ${displayText}
+                </div>`;
+            });
+
+            grid.innerHTML = html;
+            container.style.display = 'block';
+        }
+
+        function triggerNewSearch(name) {
+            document.getElementById('searchInput').value = name;
+            runScrub();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- GAME LOGIC ---
+        function startPong(container) {
+            container.innerHTML = `<div class="pong-container"><canvas id="pongCanvas"></canvas><div class="pong-overlay">DEEP SCANNING...</div></div>`;
+            const canvas = document.getElementById('pongCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = container.offsetWidth;
+            canvas.height = 200;
+            
+            let playerY = 75, aiY = 75, ballX = canvas.width/2, ballY = 100, ballSX = 4, ballSY = 4;
+            const paddleH = 50, paddleW = 8;
+
+            canvas.addEventListener('mousemove', e => {
+                const r = canvas.getBoundingClientRect();
+                playerY = e.clientY - r.top - paddleH/2;
+            });
+            
+            gameActive = true;
+            function draw() {
+                if(!gameActive) return;
+                ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(10, playerY, paddleW, paddleH);
+                ctx.fillRect(canvas.width-10-paddleW, aiY, paddleW, paddleH);
+                ctx.beginPath(); ctx.arc(ballX, ballY, 5, 0, Math.PI*2); ctx.fill();
+                
+                ballX += ballSX; ballY += ballSY;
+                if(ballY<0 || ballY>200) ballSY = -ballSY;
+                if(ballX < 20) { if(ballY > playerY && ballY < playerY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
+                if(ballX > canvas.width-20) { if(ballY > aiY && ballY < aiY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
+                
+                if(aiY + paddleH/2 < ballY - 20) aiY += 3;
+                else if(aiY + paddleH/2 > ballY + 20) aiY -= 3;
+                
+                requestAnimationFrame(draw);
+            }
+            draw();
+            return () => { gameActive = false; };
+        }
+
+        // --- MAIN SEARCH ---
         async function runScrub() {
             const query = document.getElementById('searchInput').value.trim();
             if (!query) { alert('Enter a business name.'); return; }
-            
             currentSearchQuery = query;
-
             const key = getEffectiveApiKey();
-            if (!key) { toggleSettings(); alert("API Key Required."); return; }
+            if (!key) { toggleSettings(); return; }
 
             const btn = document.getElementById('btnScrub');
-            const terminal = document.getElementById('terminal');
             const report = document.getElementById('reportContainer');
+            const followUp = document.getElementById('followUpContainer');
+            const altsContainer = document.getElementById('alternativesContainer');
+            const stopGridAnim = startActiveGrid('loadingCanvas'); // Start dot grid
             
             btn.disabled = true;
             btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
             
-            terminal.style.display = 'block';
-            report.style.display = 'none';
-            terminal.innerHTML = '<div class="log-entry"><span class="log-msg-info">Initiating deep scan...</span></div>';
+            // Initialize report view in "scanning" mode
+            report.style.display = 'grid';
+            report.classList.remove('resolved'); // Reset state
+            report.classList.add('scanning');
+            
+            // Hide secondary sections initially
+            document.getElementById('followUpContainer').style.display = 'none'; 
+            altsContainer.style.display = 'none';
+            const followUpResponse = document.getElementById('followUpResponse');
+            if (followUpResponse) followUpResponse.style.display = 'none'; 
 
-            const makeRequest = async (retry = 0) => {
-                const prompt = `
-                    You are a forensic business analyst. Investigate: "${query}".
-                    Use Google Search tools to find real, current information.
-                    
-                    CRITICAL: Return ONLY a valid raw JSON object. No markdown. No prose.
-                    
-                    REQUIREMENTS:
-                    1. NO WALLS OF TEXT. Return structured data only.
-                    2. For "summaryData", return a list of specific, hard-hitting bullet points (findings).
-                    3. For legal filings (bankruptcies, liens, etc.), return specific arrays of strings describing EACH finding (e.g., ["Case #12345 (2022)"]). Do not just say "Found". If none, return empty array.
-                    4. Include "uccFilings" in legalData.
-                    5. RIGOROUSLY SEARCH FOR UCC FILINGS, JUDGMENTS, AND LIENS. LIST EVERY SINGLE ONE FOUND. "Found" is not an acceptable answer.
-                    6. Extract specific physical location address for map pin.
-
-                    JSON STRUCTURE:
-                    {
-                        "entityName": "Official Verified Name",
-                        "sosData": {
-                            "status": "Active/Inactive/Dissolved",
-                            "formationDate": "YYYY-MM-DD",
-                            "entityType": "LLC/Corp",
-                            "registeredAgent": "Name",
-                            "principals": "Name1, Name2",
-                            "sourceUrl": "URL"
-                        },
-                        "legalData": {
-                            "riskLevel": "Low/Medium/High",
-                            "bankruptcies": ["Specific Case 1", "Specific Case 2"],
-                            "liens": ["Specific Lien 1"],
-                            "judgments": ["Specific Judgment 1"],
-                            "uccFilings": ["UCC-1 Filing #..."],
-                            "sourceUrl": "URL"
-                        },
-                        "footprintData": {
-                            "website": "URL",
-                            "domainAge": "e.g. 10 Years",
-                            "addressType": "Commercial/Residential",
-                            "socialPresence": "High/Low",
-                            "sourceUrl": "URL"
-                        },
-                        "locationData": {
-                            "address": "Full physical address",
-                            "locationType": "Office/Warehouse/Residential/Virtual",
-                            "sourceUrl": "URL"
-                        },
-                        "reviewsData": [
-                            { "source": "Google/Yelp", "rating": "4.5/5", "text": "Review text excerpt...", "date": "2023-..", "sentiment": "Positive/Negative" }
-                        ],
-                        "summaryData": {
-                            "keyFindings": [
-                                "Finding 1: e.g. Business was formed in 2023, relatively new.",
-                                "Finding 2: e.g. No legal flags found.",
-                                "Finding 3: e.g. Strong social proof."
-                            ]
-                        }
-                    }
-                `;
-
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
-                    });
-                    
-                    if (!res.ok) {
-                        if(res.status === 429 && retry < 3) {
-                            await new Promise(r => setTimeout(r, 2000));
-                            return makeRequest(retry + 1);
-                        }
-                        throw new Error(res.status);
-                    }
-                    return res.json();
-                } catch(e) { throw e; }
+            // Helper to populate placeholders
+            const fillPlaceholders = (id) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    // Generate random hash-like string
+                    el.innerHTML = `<div style="font-family:monospace; color:#444; word-break:break-all;">${Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)}...</div>`;
+                }
             };
 
-            try {
-                const result = await makeRequest();
-                const text = cleanJson(result.candidates[0].content.parts[0].text);
-                const data = JSON.parse(text);
+            // Fill placeholders initially
+            ['sosContent', 'legalContent', 'footprintContent', 'locationContent', 'reviewsContent', 'summaryContent'].forEach(fillPlaceholders);
 
+            // Start blur animation timer
+            let currentBlur = 20; // Start blur
+            clearSimulation();
+            blurInterval = setInterval(() => {
+                if (currentBlur > 5) { // Don't go to 0 yet, wait for API
+                    currentBlur -= 0.5;
+                    const grid = document.getElementById('reportContainer');
+                    if (grid.classList.contains('scanning')) {
+                        grid.style.filter = `blur(${currentBlur}px)`;
+                        // Refresh placeholders to simulate scanning activity
+                        ['sosContent', 'legalContent', 'footprintContent', 'locationContent', 'reviewsContent', 'summaryContent'].forEach(fillPlaceholders);
+                    }
+                }
+            }, 500); // Update every 500ms
+
+            const prompt = `
+                Investigate "${query}". Return ONLY JSON.
+                
+                REQUIREMENTS:
+                1. Standard DeepScrub analysis.
+                2. Identify 2-3 alternative businesses if the search is ambiguous or return related entities (e.g. parent co, similar names).
+
+                JSON: {
+                    "entityName": "Name",
+                    "sosData": { "status": "Active", "formationDate": "Date", "entityType": "Type", "registeredAgent": "Name", "principals": "Names", "sourceUrl": "URL" },
+                    "legalData": { "riskLevel": "Low", "bankruptcies": [], "liens": [], "judgments": [], "uccFilings": [], "sourceUrl": "URL" },
+                    "footprintData": { "website": "URL", "domainAge": "Age", "addressType": "Type", "socialPresence": "High" },
+                    "locationData": { "address": "Address", "locationType": "Type", "sourceUrl": "URL" },
+                    "reviewsData": [ { "source": "Google", "rating": "4.5", "text": "text", "date": "date", "sentiment": "pos" } ],
+                    "summaryData": { "keyFindings": ["Finding 1", "Finding 2"] },
+                    "alternatives": [ { "name": "Alt Business Name", "location": "State/City" } ]
+                }
+            `;
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
+                });
+                const json = await res.json();
+                const data = JSON.parse(cleanJson(json.candidates[0].content.parts[0].text));
+                
+                // Stop blur and clear it
+                clearInterval(blurInterval);
+                if(stopGridAnim) stopGridAnim();
+                
+                // TRANSITION TO VISIBLE STATE
+                const grid = document.getElementById('reportContainer');
+                grid.style.filter = 'blur(0px)';
+                grid.classList.remove('scanning');
+                grid.classList.add('resolved'); // FORCE OPACITY 1
+                
                 document.getElementById('reportName').innerText = data.entityName;
                 document.getElementById('timestamp').innerText = new Date().toLocaleDateString();
                 
@@ -1348,80 +1514,76 @@
                 document.getElementById('locationContent').innerHTML = renderLocation(data.locationData);
                 document.getElementById('reviewsContent').innerHTML = renderListGroup(data.reviewsData, 'reviews');
                 document.getElementById('summaryContent').innerHTML = renderFindings(data.summaryData?.keyFindings);
+                
+                // Render Alternatives
+                renderAlternatives(data.alternatives);
 
-                terminal.style.display = 'none';
-                report.style.display = 'grid'; 
-            } catch (e) {
+                document.getElementById('followUpContainer').style.display = 'block'; 
+
+            } catch(e) {
+                clearInterval(blurInterval);
+                if(stopGridAnim) stopGridAnim();
+                document.getElementById('reportContainer').style.filter = 'blur(0px)';
+                document.getElementById('reportContainer').classList.remove('scanning');
+                document.getElementById('reportContainer').style.opacity = '1'; // Ensure visible on error
+                
                 console.error(e);
-                alert("Search failed. See console.");
+                alert("Search failed.");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
             }
         }
-
+        
         async function runDeepDive(section) {
             const targetDiv = document.getElementById(section + 'Content');
-            const originalContent = targetDiv.innerHTML;
-            const stopPong = startPong(targetDiv); // Start Pong Game
-
-            let prompt = "";
-            let jsonStructure = "";
-
-            if (section === 'sos') {
-                prompt = `Perform an aggressive deep dive into the corporate registry for "${currentSearchQuery}". Find exact filing dates, ALL past and present registered agents, and specific addresses of principals.`;
-                jsonStructure = `{ "status": "...", "formationDate": "...", "entityType": "...", "registeredAgent": "Name & Address", "principals": "Name & Address (List all)", "sourceUrl": "..." }`;
-            } else if (section === 'legal') {
-                prompt = `Perform a forensic legal search for "${currentSearchQuery}". Look specifically for UCC-1 financing statements, federal tax liens, and civil litigation dockets. List exact case numbers and filing dates.`;
-                jsonStructure = `{ "riskLevel": "...", "bankruptcies": ["Case..."], "liens": ["Lien..."], "judgments": ["Judgment..."], "uccFilings": ["UCC..."], "sourceUrl": "..." }`;
-            } else if (section === 'footprint') {
-                prompt = `Analyze the digital and physical footprint of "${currentSearchQuery}". Whois data, server location, and zoning verification of their primary address.`;
-                jsonStructure = `{ "website": "...", "domainAge": "...", "addressType": "...", "socialPresence": "...", "sourceUrl": "..." }`;
-            } else if (section === 'reviews') {
-                prompt = `Find critical/negative reviews for "${currentSearchQuery}" to identify risk patterns. Quote them directly.`;
-                jsonStructure = `[ { "source": "...", "rating": "...", "text": "...", "date": "...", "sentiment": "..." } ]`;
-            }
-
-            const fullPrompt = `
-                ${prompt}
-                CRITICAL: Return ONLY valid raw JSON matching this structure: ${jsonStructure}. No markdown.
-            `;
-
+            const original = targetDiv.innerHTML;
+            const stop = startPong(targetDiv);
+            
+            const prompt = `Deep dive for "${currentSearchQuery}" on section: ${section}. Return ONLY JSON matching the specific structure for this section previously defined. Be extremely detailed.`;
+            
             try {
-                const result = await makeApiCall(fullPrompt);
-                stopPong(); // Stop game
+                const key = getEffectiveApiKey();
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
+                });
+                const json = await res.json();
+                stop();
+                const data = JSON.parse(cleanJson(json.candidates[0].content.parts[0].text));
                 
-                const text = cleanJson(result.candidates[0].content.parts[0].text);
-                const data = JSON.parse(text);
-
-                // Re-render specifically based on section type
-                if (section === 'reviews') {
-                    targetDiv.innerHTML = renderListGroup(data, 'reviews');
-                } else {
-                    targetDiv.innerHTML = renderDataGrid(data, section);
-                }
-
-            } catch (e) {
-                stopPong();
+                if(section === 'reviews') targetDiv.innerHTML = renderListGroup(data, 'reviews');
+                else targetDiv.innerHTML = renderDataGrid(data, section);
+            } catch(e) {
+                stop();
                 console.error(e);
-                alert("Deep dive failed. Reverting.");
-                targetDiv.innerHTML = originalContent;
+                targetDiv.innerHTML = original;
+                alert("Deep dive failed.");
             }
         }
 
-        async function makeApiCall(prompt) {
-            const key = getEffectiveApiKey();
-            return fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    tools: [{ google_search: {} }]
-                })
-            }).then(res => {
-                if (!res.ok) throw new Error(res.status);
-                return res.json();
-            });
+        async function askFollowUp() {
+            const q = document.getElementById('followUpInput').value.trim();
+            if(!q) return;
+            const box = document.getElementById('followUpResponse');
+            const btn = document.getElementById('btnFollowUp');
+            const oldBtn = btn.innerHTML;
+            
+            btn.disabled = true; btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>`;
+            box.style.display = 'none';
+            
+            const prompt = `Answer question about "${currentSearchQuery}": "${q}". Keep it concise.`;
+             try {
+                const key = getEffectiveApiKey();
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
+                });
+                const json = await res.json();
+                box.innerHTML = marked.parse(json.candidates[0].content.parts[0].text);
+                box.style.display = 'block';
+            } catch(e) { alert("Error getting answer."); }
+            finally { btn.disabled = false; btn.innerHTML = oldBtn; }
         }
 
         document.getElementById('searchInput').addEventListener('keypress', (e) => { if(e.key==='Enter') runScrub(); });
