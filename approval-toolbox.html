@@ -6003,11 +6003,40 @@ Government Issued ID</textarea>
     // INITIALIZATION
     // ============================================
     window.addEventListener('load', () => {
+        // Check for client share link FIRST - bypass login entirely
+        const params = new URLSearchParams(window.location.search);
+        const d = params.get('d');
+        let isClientShareLink = false;
+        let clientShareData = null;
+        
+        if (d) {
+            try {
+                const json = decodeURIComponent(atob(d).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+                const data = JSON.parse(json);
+                if(data.o && data.o.length) {
+                    isClientShareLink = true;
+                    clientShareData = data;
+                    // Hide welcome screen immediately for client share links
+                    $('welcomeScreen').classList.add('hidden');
+                }
+            } catch(e) { console.error("Error parsing shared data", e); }
+        }
+        
         resetBrandKit();
-        loadAuthState();
+        
+        // Only load auth state if NOT a client share link
+        if (!isClientShareLink) {
+            loadAuthState();
+        }
+        
         resetCalculator();
         initMobileSections();
-        checkISOShareMode();
+        
+        // Only check ISO share mode if NOT a client share link
+        if (!isClientShareLink) {
+            checkISOShareMode();
+        }
+        
         loadOfferCount(); // Load offer count on startup
         
         // Attach Clear All button handler
@@ -6028,16 +6057,9 @@ Government Issued ID</textarea>
             }
         });
         
-        const params = new URLSearchParams(window.location.search);
-        const d = params.get('d');
-        if (d) {
-            try {
-                const json = decodeURIComponent(atob(d).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
-                const data = JSON.parse(json);
-                if(data.o && data.o.length) {
-                    initClientView(data);
-                }
-            } catch(e) { console.error("Error loading shared data", e); }
+        // Initialize client view if this is a client share link
+        if (isClientShareLink && clientShareData) {
+            initClientView(clientShareData);
         }
     });
   </script>
