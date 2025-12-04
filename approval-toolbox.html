@@ -2619,6 +2619,13 @@
                         </svg>
                         ISO
                     </button>
+                    <div style="width: 1px; height: 14px; background: var(--accent); opacity: 0.3; margin: 0 4px;"></div>
+                    <button id="clientModeBtn" onclick="previewClientView()" class="mode-toggle-btn flex items-center gap-2 transition-all" style="color: var(--accent); padding: 0 8px; font-size: 12px; font-weight: 600;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Client
+                    </button>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -4980,6 +4987,14 @@ Government Issued ID</textarea>
             window.isoShareMode = false;
             window.isoPreviewMode = false;
             
+            // Update mode toggle to show Client as active
+            const clientBtn = $('clientModeBtn');
+            const isoBtn = $('isoModeBtn');
+            const lenderBtn = $('lenderModeBtn');
+            if (clientBtn) clientBtn.classList.add('active');
+            if (isoBtn) isoBtn.classList.remove('active');
+            if (lenderBtn) lenderBtn.classList.remove('active');
+            
             // Ensure factor rate is set to max sell rate for client preview
             const maxSell = parseFloat($('lenderMaxSell')?.value) || parseFloat($('maxSellRateInput')?.value) || 1.25;
             if ($('calcFactor')) $('calcFactor').value = maxSell;
@@ -5114,6 +5129,18 @@ Government Issued ID</textarea>
         $('adminPanel').classList.remove('hidden');
         $('clientPreviewBar').classList.add('hidden');
         $('floatingShareBtn').classList.remove('hidden');
+        
+        // Reset mode toggle buttons
+        const clientBtn = $('clientModeBtn');
+        const isoBtn = $('isoModeBtn');
+        const lenderBtn = $('lenderModeBtn');
+        if (clientBtn) clientBtn.classList.remove('active');
+        if (currentClientMode === 'iso') {
+            if (isoBtn) isoBtn.classList.add('active');
+        } else {
+            if (lenderBtn) lenderBtn.classList.add('active');
+        }
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
