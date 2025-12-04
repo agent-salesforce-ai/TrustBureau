@@ -1124,7 +1124,14 @@
       height: 64px;
       margin: 0 auto 20px;
       color: var(--accent);
-      transition: color 1s ease;
+      transition: color 1s ease, transform 0.2s ease;
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+    }
+    
+    .welcome-logo:hover {
+      transform: scale(1.1);
     }
 
     .welcome-logo svg {
@@ -2358,12 +2365,12 @@
   <div id="welcomeScreen" class="welcome-screen">
     <div class="welcome-card">
       <!-- Icon -->
-      <div class="welcome-logo">
+      <a href="index.html" class="welcome-logo" title="Back to Home">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
           <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="currentColor"/>
           <path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="white"/>
         </svg>
-      </div>
+      </a>
       
       <!-- Title -->
       <h1 class="welcome-title">Approval Toolbox</h1>
@@ -2572,7 +2579,7 @@
           <!-- HEADER -->
           <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
             <div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-                <div class="p-3 rounded-2xl shadow-md border" style="background: var(--bg-card); border-color: var(--border-secondary);">
+                <a href="index.html" class="p-3 rounded-2xl shadow-md border transition-transform hover:scale-105" style="background: var(--bg-card); border-color: var(--border-secondary); display: block;" title="Back to Home">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24">
                       <defs>
                         <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -2583,7 +2590,7 @@
                       <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="url(#shieldGrad)"/>
                       <path d="M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="#ffffff"/>
                     </svg>
-                </div>
+                </a>
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight" style="color: var(--text-primary);">Approval Toolbox</h1>
                     <p class="text-xs font-semibold tracking-wide" style="color: var(--text-muted);">TrustBureau.ai</p>
@@ -2778,6 +2785,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
                                     Reset Theme
+                                </button>
+                                
+                                <!-- Save as Favorite Button (logged-in users only) -->
+                                <button id="saveFavoriteBtn" onclick="saveFavoriteTheme()" class="w-full text-xs font-semibold py-2 px-3 rounded-lg transition-all hidden" style="margin-top: 8px; color: var(--accent); background: var(--bg-option-card); border: 1px solid var(--accent);" onmouseover="this.style.background='var(--accent)'; this.style.color='white'" onmouseout="this.style.background='var(--bg-option-card)'; this.style.color='var(--accent)'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    Save as Favorite
                                 </button>
                             </div>
                         </div>
@@ -4241,6 +4256,9 @@ Government Issued ID</textarea>
         const previewLogo = $('previewLogo');
         
         if (currentLogoUrl) {
+            // Save to localStorage for persistence across sessions
+            localStorage.setItem('trustbureau_logo_url', currentLogoUrl);
+            
             // Display directly in small preview
             previewSmall.innerHTML = `<img src="${currentLogoUrl}" alt="Logo Preview" onload="this.style.opacity=1" onerror="this.parentElement.innerHTML='<span class=\\'logo-preview-placeholder\\'>Unable to load</span>'" style="opacity:0; transition: opacity 0.2s;" />`;
             clearBtn.classList.remove('hidden');
@@ -4256,6 +4274,7 @@ Government Issued ID</textarea>
             
             saveThemePreference();
         } else {
+            localStorage.removeItem('trustbureau_logo_url');
             previewSmall.innerHTML = '<span class="logo-preview-placeholder">Logo preview will appear here</span>';
             clearBtn.classList.add('hidden');
             previewContainer.classList.add('hidden');
@@ -4264,6 +4283,7 @@ Government Issued ID</textarea>
 
     function clearLogo() {
         $('logoUrlInput').value = '';
+        localStorage.removeItem('trustbureau_logo_url');
         updateLogoPreview('');
     }
 
@@ -4273,11 +4293,14 @@ Government Issued ID</textarea>
         const cPreviewName = $('cPreviewCompanyName');
         
         if (currentCompanyName) {
+            // Save to localStorage for persistence across sessions
+            localStorage.setItem('trustbureau_company_name', currentCompanyName);
             previewName.textContent = currentCompanyName;
             previewName.classList.remove('hidden');
             cPreviewName.textContent = currentCompanyName;
             cPreviewName.classList.remove('hidden');
         } else {
+            localStorage.removeItem('trustbureau_company_name');
             previewName.classList.add('hidden');
             cPreviewName.classList.add('hidden');
         }
@@ -4292,6 +4315,89 @@ Government Issued ID</textarea>
             logoUrl: currentLogoUrl,
             companyName: currentCompanyName
         }));
+    }
+
+    // Load saved brand data (logo URL and company name) from localStorage
+    function loadSavedBrandData() {
+        const savedLogoUrl = localStorage.getItem('trustbureau_logo_url');
+        const savedCompanyName = localStorage.getItem('trustbureau_company_name');
+        
+        if (savedLogoUrl) {
+            $('logoUrlInput').value = savedLogoUrl;
+            updateLogoPreview(savedLogoUrl);
+        }
+        
+        if (savedCompanyName) {
+            $('companyNameInput').value = savedCompanyName;
+            updateCompanyName(savedCompanyName);
+        }
+        
+        // Update preview if any brand data was loaded
+        if (savedLogoUrl || savedCompanyName) {
+            updatePreview();
+        }
+    }
+
+    // Save current theme settings as favorite (for logged-in users)
+    function saveFavoriteTheme() {
+        if (!currentUser) return;
+        
+        const favoriteTheme = {
+            mode: currentTheme,
+            accent: currentAccent,
+            logoUrl: currentLogoUrl,
+            companyName: currentCompanyName
+        };
+        localStorage.setItem('trustbureau_favorite_theme_' + currentUser, JSON.stringify(favoriteTheme));
+        
+        // Show confirmation
+        const btn = $('saveFavoriteBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Saved!';
+        btn.style.background = 'var(--accent)';
+        btn.style.color = 'white';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = 'var(--bg-option-card)';
+            btn.style.color = 'var(--accent)';
+        }, 1500);
+    }
+
+    // Load favorite theme (for logged-in users)
+    function loadFavoriteTheme() {
+        if (!currentUser) return;
+        
+        const saved = localStorage.getItem('trustbureau_favorite_theme_' + currentUser);
+        if (saved) {
+            try {
+                const fav = JSON.parse(saved);
+                if (fav.mode) setThemeMode(fav.mode);
+                if (fav.accent) setAccentColor(fav.accent);
+                if (fav.logoUrl) {
+                    $('logoUrlInput').value = fav.logoUrl;
+                    updateLogoPreview(fav.logoUrl);
+                }
+                if (fav.companyName) {
+                    $('companyNameInput').value = fav.companyName;
+                    updateCompanyName(fav.companyName);
+                }
+                updatePreview();
+            } catch (e) {
+                console.error('Failed to load favorite theme', e);
+            }
+        }
+    }
+
+    // Update Save Favorite button visibility based on login state
+    function updateSaveFavoriteButton() {
+        const btn = $('saveFavoriteBtn');
+        if (btn) {
+            if (currentUser) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
     }
 
     function loadThemePreference() {
@@ -4553,6 +4659,9 @@ Government Issued ID</textarea>
             userBadge.classList.add('hidden');
         }
         
+        // Update Save Favorite button visibility
+        updateSaveFavoriteButton();
+        
         // Update lite usage display
         updateLiteUsageUI();
     }
@@ -4562,6 +4671,8 @@ Government Issued ID</textarea>
         
         if (savedUser) {
             currentUser = savedUser;
+            // Load favorite theme for logged-in users
+            loadFavoriteTheme();
         }
         // Welcome screen always shows on page load
         // User must sign in or continue as free each session
@@ -6254,6 +6365,7 @@ Government Issued ID</textarea>
         }
         
         resetBrandKit();
+        loadSavedBrandData(); // Restore saved logo and company name from localStorage
         
         // Only load auth state if NOT a client share link
         if (!isClientShareLink) {
