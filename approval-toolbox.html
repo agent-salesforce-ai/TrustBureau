@@ -8,6 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22%2310b981%22/><path d=%22M10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z%22 fill=%22white%22/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   
   <script>
@@ -4862,6 +4863,14 @@ Government Issued ID</textarea>
             cCompanyName.classList.add('hidden');
         }
 
+        // Apply theme from share link
+        if (data.theme) {
+            setThemeMode(data.theme);
+        }
+        if (data.accent) {
+            setAccentColor(data.accent);
+        }
+
         const tabsContainer = $('clientTabsContainer');
         tabsContainer.innerHTML = '';
         if(data.o.length > 1) {
@@ -5108,10 +5117,12 @@ Government Issued ID</textarea>
             ex: $('toggleExpiry').checked ? getVal('calcExpiryDate') : null,
             logo: currentLogoUrl,
             companyName: currentCompanyName,
+            theme: currentTheme,
+            accent: currentAccent,
             o: calcOptions.map(op => ({ a: op.amount, f: op.factor, t: op.term, q: op.frequency, fe: op.fee, pp: op.prepay, pd: op.prepayDate, to: op.termOverride, n: op.notes, d: op.docs, dt: op.docsText }))
         };
         const json = JSON.stringify(d);
-        const enc = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+        const enc = LZString.compressToEncodedURIComponent(json);
         return `${window.location.origin}${window.location.pathname}?d=${enc}`;
     }
     
@@ -6011,7 +6022,14 @@ Government Issued ID</textarea>
         
         if (d) {
             try {
-                const json = decodeURIComponent(atob(d).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+                // Try LZString decompression first (new format)
+                let json = LZString.decompressFromEncodedURIComponent(d);
+                
+                // Fall back to old base64 format for backwards compatibility
+                if (!json) {
+                    json = decodeURIComponent(atob(d).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+                }
+                
                 const data = JSON.parse(json);
                 if(data.o && data.o.length) {
                     isClientShareLink = true;
