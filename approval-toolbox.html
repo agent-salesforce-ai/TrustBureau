@@ -2907,7 +2907,7 @@
                                     <div>
                                         <label class="text-xs font-bold uppercase tracking-wide mb-2 block" style="color: var(--text-muted);">Buy Rate (ISO)</label>
                                         <div class="flex items-center justify-between mb-2 p-2.5 rounded-lg border" style="background: var(--bg-card); border-color: var(--border-primary);">
-                                            <input id="lenderBuyRate" type="number" step="0.01" class="bg-transparent font-bold outline-none w-20 text-lg" style="color: var(--text-primary);" value="1.15" />
+                                            <input id="lenderBuyRate" type="number" step="0.01" min="1.05" max="1.60" class="bg-transparent font-bold outline-none w-20 text-lg" style="color: var(--text-primary);" value="1.15" />
                                             <span class="text-[10px] font-bold px-2 py-1 rounded border uppercase tracking-wider" style="color: var(--text-muted); background: var(--bg-option-card); border-color: var(--border-secondary);">BUY</span>
                                         </div>
                                         <input id="lenderBuyRateSlider" type="range" min="1.05" max="1.60" step="0.01" value="1.15" class="slider w-full" />
@@ -2917,7 +2917,7 @@
                                     <div>
                                         <label class="text-xs font-bold uppercase tracking-wide mb-2 block" style="color: var(--text-muted);">Max Sell Rate (ISO Ceiling)</label>
                                         <div class="flex items-center justify-between mb-2 p-2.5 rounded-lg border" style="background: var(--bg-card); border-color: var(--border-primary);">
-                                            <input id="lenderMaxSell" type="number" step="0.01" class="bg-transparent font-bold outline-none w-20 text-lg" style="color: var(--text-primary);" value="1.25" />
+                                            <input id="lenderMaxSell" type="number" step="0.01" min="1.10" max="1.70" class="bg-transparent font-bold outline-none w-20 text-lg" style="color: var(--text-primary);" value="1.25" />
                                             <span class="text-[10px] font-bold px-2 py-1 rounded border uppercase tracking-wider" style="color: var(--text-muted); background: var(--bg-option-card); border-color: var(--border-secondary);">MAX</span>
                                         </div>
                                         <input id="lenderMaxSellSlider" type="range" min="1.10" max="1.70" step="0.01" value="1.25" class="slider w-full" />
@@ -2953,10 +2953,10 @@
                                 </div>
                                 <p class="text-xs mb-3" style="color: var(--text-muted);">Adjust your sell rate to set your profit margin</p>
                                 <div class="flex items-center justify-between mb-4 p-2.5 rounded-lg border" style="background: var(--bg-card); border-color: var(--border-primary);">
-                                    <input id="isoSellRate" type="number" step="0.01" class="bg-transparent font-bold outline-none w-20 text-lg" style="color: var(--text-primary);" value="1.25" />
+                                    <input id="isoSellRate" type="number" step="0.01" min="1.05" max="1.70" class="bg-transparent font-bold outline-none w-20 text-lg" style="color: var(--text-primary);" value="1.25" />
                                     <span class="text-[10px] font-bold px-2.5 py-1 rounded border uppercase tracking-wider" style="color: var(--text-muted); background: var(--bg-option-card); border-color: var(--border-secondary);">SELL</span>
                                 </div>
-                                <input id="isoSellRateSlider" type="range" min="1.15" max="1.25" step="0.01" value="1.25" class="slider w-full" />
+                                <input id="isoSellRateSlider" type="range" min="1.05" max="1.70" step="0.01" value="1.25" class="slider w-full" />
                                 <div class="grid grid-cols-3 gap-2 mt-4 pt-4" style="border-top: 1px solid var(--border-secondary);">
                                     <div class="text-center">
                                         <p class="text-[10px] uppercase font-bold" style="color: var(--text-muted);">Buy Rate</p>
@@ -3751,25 +3751,49 @@ Government Issued ID</textarea>
             updateLenderDisplay();
         } else {
             // ISO mode - set factor rate to max sell rate
-            const maxSell = parseFloat($('lenderMaxSell')?.value) || parseFloat($('maxSellRateInput')?.value) || 1.25;
-            const buyRate = parseFloat($('lenderBuyRate')?.value) || parseFloat($('buyRateInput')?.value) || 1.15;
-            
-            // Set up the ISO sell rate slider bounds
             const sellSlider = $('isoSellRateSlider');
             const sellInput = $('isoSellRate');
-            if (sellSlider) {
-                sellSlider.min = buyRate;
-                sellSlider.max = maxSell;
-                // Set initial sell rate to max sell (full margin)
-                sellSlider.value = maxSell;
-                updateSliderFill(sellSlider);
-            }
-            if (sellInput) {
-                sellInput.value = maxSell;
+            
+            // Check if this is a shared link (restricted range) or direct ISO login (full range)
+            if (window.isoShareMode) {
+                // Shared link: use the buy/max rates from URL params
+                const maxSell = parseFloat($('lenderMaxSell')?.value) || parseFloat($('maxSellRateInput')?.value) || 1.25;
+                const buyRate = parseFloat($('lenderBuyRate')?.value) || parseFloat($('buyRateInput')?.value) || 1.15;
+                
+                if (sellSlider) {
+                    sellSlider.min = buyRate;
+                    sellSlider.max = maxSell;
+                    sellSlider.value = maxSell;
+                    updateSliderFill(sellSlider);
+                }
+                if (sellInput) {
+                    sellInput.value = maxSell.toFixed(2);
+                }
+                
+                if ($('calcFactor')) $('calcFactor').value = maxSell;
+                if ($('calcFactorSlider')) $('calcFactorSlider').value = maxSell;
+            } else {
+                // Direct ISO login: give full range 1.05-1.70
+                const defaultRate = 1.25;
+                
+                if (sellSlider) {
+                    sellSlider.min = 1.05;
+                    sellSlider.max = 1.70;
+                    sellSlider.value = defaultRate;
+                    updateSliderFill(sellSlider);
+                }
+                if (sellInput) {
+                    sellInput.value = defaultRate.toFixed(2);
+                }
+                
+                // Update global vars for ISO calculations
+                lenderBuyRate = 1.05;
+                lenderMaxSellRate = 1.70;
+                
+                if ($('calcFactor')) $('calcFactor').value = defaultRate;
+                if ($('calcFactorSlider')) $('calcFactorSlider').value = defaultRate;
             }
             
-            $('calcFactor').value = maxSell;
-            $('calcFactorSlider').value = maxSell;
             updateSliderFill($('calcFactorSlider'));
             
             if (lenderRateSection) lenderRateSection.classList.add('hidden');
@@ -3885,9 +3909,11 @@ Government Issued ID</textarea>
         if ($('lenderMaxProfit')) $('lenderMaxProfit').textContent = '$' + maxProfit.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
         
         // Sync factor rate with buy rate in lender mode
-        $('calcFactor').value = buyRate;
-        $('calcFactorSlider').value = buyRate;
-        updateSliderFill($('calcFactorSlider'));
+        if ($('calcFactor')) $('calcFactor').value = buyRate;
+        if ($('calcFactorSlider')) {
+            $('calcFactorSlider').value = buyRate;
+            updateSliderFill($('calcFactorSlider'));
+        }
     }
     
     function shareWithISO() {
@@ -3986,10 +4012,14 @@ Government Issued ID</textarea>
             if (lenderRateSection) lenderRateSection.classList.add('hidden');
             
             // Set factor rate to max sell rate (ISO's default sell rate)
-            $('calcFactor').value = maxSell;
-            $('calcFactorSlider').value = maxSell;
-            $('calcFactor').disabled = true;
-            $('calcFactorSlider').disabled = true;
+            if ($('calcFactor')) {
+                $('calcFactor').value = maxSell;
+                $('calcFactor').disabled = true;
+            }
+            if ($('calcFactorSlider')) {
+                $('calcFactorSlider').value = maxSell;
+                $('calcFactorSlider').disabled = true;
+            }
             
             // Force ISO client mode in menu
             setClientMode('iso');
@@ -4016,31 +4046,37 @@ Government Issued ID</textarea>
             // If buy rate changed more, adjust max sell up
             if (Math.abs(buyFromMenu - currentBuy) > Math.abs(maxFromMenu - currentMax)) {
                 maxFromMenu = Math.min(buyFromMenu + 0.05, 1.70);
-                $('maxSellRateInput').value = maxFromMenu.toFixed(2);
+                if ($('maxSellRateInput')) $('maxSellRateInput').value = maxFromMenu.toFixed(2);
             } else {
                 // Max sell changed more, adjust buy rate down
                 buyFromMenu = Math.max(maxFromMenu - 0.05, 1.05);
-                $('buyRateInput').value = buyFromMenu.toFixed(2);
+                if ($('buyRateInput')) $('buyRateInput').value = buyFromMenu.toFixed(2);
             }
         }
         
         // Sync to calculator area sliders
         if ($('lenderBuyRate')) {
             $('lenderBuyRate').value = buyFromMenu;
-            $('lenderBuyRateSlider').value = buyFromMenu;
-            updateSliderFill($('lenderBuyRateSlider'));
+            if ($('lenderBuyRateSlider')) {
+                $('lenderBuyRateSlider').value = buyFromMenu;
+                updateSliderFill($('lenderBuyRateSlider'));
+            }
         }
         if ($('lenderMaxSell')) {
             $('lenderMaxSell').value = maxFromMenu;
-            $('lenderMaxSellSlider').value = maxFromMenu;
-            updateSliderFill($('lenderMaxSellSlider'));
+            if ($('lenderMaxSellSlider')) {
+                $('lenderMaxSellSlider').value = maxFromMenu;
+                updateSliderFill($('lenderMaxSellSlider'));
+            }
         }
         
         // In ISO mode, calcFactor should match max sell rate
         if (currentClientMode === 'iso') {
-            $('calcFactor').value = maxFromMenu;
-            $('calcFactorSlider').value = maxFromMenu;
-            updateSliderFill($('calcFactorSlider'));
+            if ($('calcFactor')) $('calcFactor').value = maxFromMenu;
+            if ($('calcFactorSlider')) {
+                $('calcFactorSlider').value = maxFromMenu;
+                updateSliderFill($('calcFactorSlider'));
+            }
             updatePreview();
         }
         
@@ -4060,9 +4096,11 @@ Government Issued ID</textarea>
         
         // When in ISO mode, the sell rate becomes the client's factor rate
         if (currentClientMode === 'iso' || window.isoShareMode || window.isoPreviewMode) {
-            $('calcFactor').value = sellRate;
-            $('calcFactorSlider').value = sellRate;
-            updateSliderFill($('calcFactorSlider'));
+            if ($('calcFactor')) $('calcFactor').value = sellRate;
+            if ($('calcFactorSlider')) {
+                $('calcFactorSlider').value = sellRate;
+                updateSliderFill($('calcFactorSlider'));
+            }
             
             // Update preview without triggering another updateIsoUpsell
             window._skipIsoUpdate = true;
@@ -4631,8 +4669,8 @@ Government Issued ID</textarea>
             
             // Ensure factor rate is set to max sell rate for client preview
             const maxSell = parseFloat($('lenderMaxSell')?.value) || parseFloat($('maxSellRateInput')?.value) || 1.25;
-            $('calcFactor').value = maxSell;
-            $('calcFactorSlider').value = maxSell;
+            if ($('calcFactor')) $('calcFactor').value = maxSell;
+            if ($('calcFactorSlider')) $('calcFactorSlider').value = maxSell;
             
             const data = getCurrentData();
             console.log('data:', data);
@@ -5804,15 +5842,24 @@ Government Issued ID</textarea>
     
     // ISO Sell Rate slider
     $('isoSellRateSlider')?.addEventListener('input', function() {
-        $('isoSellRate').value = this.value;
+        if ($('isoSellRate')) $('isoSellRate').value = parseFloat(this.value).toFixed(2);
         updateSliderFill(this);
         updateIsoUpsell();
     });
     
     $('isoSellRate')?.addEventListener('input', function() {
-        const val = parseFloat(this.value) || lenderBuyRate;
-        $('isoSellRateSlider').value = val;
-        updateSliderFill($('isoSellRateSlider'));
+        const slider = $('isoSellRateSlider');
+        const minVal = parseFloat(slider?.min) || 1.05;
+        const maxVal = parseFloat(slider?.max) || 1.70;
+        
+        let val = parseFloat(this.value) || minVal;
+        val = Math.max(minVal, Math.min(maxVal, val));
+        this.value = val.toFixed(2);
+        
+        if (slider) {
+            slider.value = val;
+            updateSliderFill(slider);
+        }
         updateIsoUpsell();
     });
     
@@ -5832,18 +5879,22 @@ Government Issued ID</textarea>
                 maxSellSlider.value = maxSellVal;
                 updateSliderFill(maxSellSlider);
             }
-            $('maxSellRateInput').value = maxSellVal.toFixed(2);
+            if ($('maxSellRateInput')) $('maxSellRateInput').value = maxSellVal.toFixed(2);
         }
         
-        $('lenderBuyRate').value = this.value;
-        $('buyRateInput').value = this.value; // Sync to theme menu
+        if ($('lenderBuyRate')) $('lenderBuyRate').value = buyVal.toFixed(2);
+        if ($('buyRateInput')) $('buyRateInput').value = buyVal.toFixed(2); // Sync to theme menu
         updateSliderFill(this);
         updateLenderDisplay();
     });
     
     $('lenderBuyRate')?.addEventListener('input', function() {
         clearTierSelection();
-        const buyVal = parseFloat(this.value) || 1.15;
+        // Clamp value to slider bounds
+        let buyVal = parseFloat(this.value) || 1.15;
+        buyVal = Math.max(1.05, Math.min(1.60, buyVal));
+        this.value = buyVal.toFixed(2);
+        
         const maxSellEl = $('lenderMaxSell');
         const maxSellSlider = $('lenderMaxSellSlider');
         let maxSellVal = parseFloat(maxSellEl?.value) || 1.25;
@@ -5856,12 +5907,14 @@ Government Issued ID</textarea>
                 maxSellSlider.value = maxSellVal;
                 updateSliderFill(maxSellSlider);
             }
-            $('maxSellRateInput').value = maxSellVal.toFixed(2);
+            if ($('maxSellRateInput')) $('maxSellRateInput').value = maxSellVal.toFixed(2);
         }
         
-        $('lenderBuyRateSlider').value = buyVal;
-        $('buyRateInput').value = buyVal; // Sync to theme menu
-        updateSliderFill($('lenderBuyRateSlider'));
+        if ($('lenderBuyRateSlider')) {
+            $('lenderBuyRateSlider').value = buyVal;
+            updateSliderFill($('lenderBuyRateSlider'));
+        }
+        if ($('buyRateInput')) $('buyRateInput').value = buyVal.toFixed(2); // Sync to theme menu
         updateLenderDisplay();
     });
     
@@ -5881,17 +5934,19 @@ Government Issued ID</textarea>
                 buyRateSlider.value = buyVal;
                 updateSliderFill(buyRateSlider);
             }
-            $('buyRateInput').value = buyVal.toFixed(2);
+            if ($('buyRateInput')) $('buyRateInput').value = buyVal.toFixed(2);
         }
         
-        $('lenderMaxSell').value = this.value;
-        $('maxSellRateInput').value = this.value; // Sync to theme menu
+        if ($('lenderMaxSell')) $('lenderMaxSell').value = maxSellVal.toFixed(2);
+        if ($('maxSellRateInput')) $('maxSellRateInput').value = maxSellVal.toFixed(2); // Sync to theme menu
         updateSliderFill(this);
         // In ISO mode, calcFactor should match max sell rate
         if (currentClientMode === 'iso') {
-            $('calcFactor').value = this.value;
-            $('calcFactorSlider').value = this.value;
-            updateSliderFill($('calcFactorSlider'));
+            if ($('calcFactor')) $('calcFactor').value = maxSellVal.toFixed(2);
+            if ($('calcFactorSlider')) {
+                $('calcFactorSlider').value = maxSellVal;
+                updateSliderFill($('calcFactorSlider'));
+            }
             updatePreview();
         }
         updateLenderDisplay();
@@ -5899,7 +5954,11 @@ Government Issued ID</textarea>
     
     $('lenderMaxSell')?.addEventListener('input', function() {
         clearTierSelection();
-        const maxSellVal = parseFloat(this.value) || 1.25;
+        // Clamp value to slider bounds
+        let maxSellVal = parseFloat(this.value) || 1.25;
+        maxSellVal = Math.max(1.10, Math.min(1.70, maxSellVal));
+        this.value = maxSellVal.toFixed(2);
+        
         const buyRateEl = $('lenderBuyRate');
         const buyRateSlider = $('lenderBuyRateSlider');
         let buyVal = parseFloat(buyRateEl?.value) || 1.15;
@@ -5912,17 +5971,21 @@ Government Issued ID</textarea>
                 buyRateSlider.value = buyVal;
                 updateSliderFill(buyRateSlider);
             }
-            $('buyRateInput').value = buyVal.toFixed(2);
+            if ($('buyRateInput')) $('buyRateInput').value = buyVal.toFixed(2);
         }
         
-        $('lenderMaxSellSlider').value = maxSellVal;
-        $('maxSellRateInput').value = maxSellVal; // Sync to theme menu
-        updateSliderFill($('lenderMaxSellSlider'));
+        if ($('lenderMaxSellSlider')) {
+            $('lenderMaxSellSlider').value = maxSellVal;
+            updateSliderFill($('lenderMaxSellSlider'));
+        }
+        if ($('maxSellRateInput')) $('maxSellRateInput').value = maxSellVal.toFixed(2); // Sync to theme menu
         // In ISO mode, calcFactor should match max sell rate
         if (currentClientMode === 'iso') {
-            $('calcFactor').value = maxSellVal;
-            $('calcFactorSlider').value = maxSellVal;
-            updateSliderFill($('calcFactorSlider'));
+            if ($('calcFactor')) $('calcFactor').value = maxSellVal;
+            if ($('calcFactorSlider')) {
+                $('calcFactorSlider').value = maxSellVal;
+                updateSliderFill($('calcFactorSlider'));
+            }
             updatePreview();
         }
         updateLenderDisplay();
