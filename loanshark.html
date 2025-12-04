@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Loan Shark | Apex Capital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700&display=swap');
+
+        :root {
+            --deep-sea: #020617;
+            --blood-red: #ef4444;
+            --steel-grey: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--deep-sea);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .heading-font {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 0.05em;
+        }
+
+        .mono-font {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .shark-bg {
+            background: radial-gradient(circle at 50% 0%, #1e3a8a 0%, #020617 70%);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(30, 58, 138, 0.3);
+        }
+
+        .fin-clip {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+        }
+
+        /* Bubbles Animation */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { bottom: 100vh; transform: translateX(-20px); opacity: 0; }
+        }
+
+        /* Text Reveal */
+        .reveal-text {
+            animation: reveal 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes reveal {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <!-- Ambient Bubbles -->
+    <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Nav -->
+    <nav class="fixed w-full z-50 border-b border-blue-900/30 bg-slate-950/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i data-lucide="waves" class="text-blue-500 w-8 h-8"></i>
+                <span class="heading-font text-2xl uppercase tracking-widest text-white">The <span class="text-red-500">Loan Shark</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 mono-font text-sm text-slate-400">
+                <a href="#territory" class="hover:text-blue-400 transition-colors">TERRITORY</a>
+                <a href="#feeding" class="hover:text-blue-400 transition-colors">FEEDING TIME</a>
+                <a href="#testimonials" class="hover:text-blue-400 transition-colors">SURVIVORS</a>
+                <a href="#contact" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-sm transition-colors clip-path-slant">
+                    GET BIT
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-40 shark-bg overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-blue-800 rounded-full bg-blue-950/30 text-blue-400 text-xs mono-font mb-6">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    BLOOD IN THE WATER
+                </div>
+                <h1 class="heading-font text-6xl md:text-8xl leading-none mb-6">
+                    WE SMELL <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-slate-200">OPPORTUNITY</span>
+                </h1>
+                <p class="text-xl text-slate-400 mb-8 max-w-lg leading-relaxed">
+                    Traditional banks tread water. We strike. 
+                    Short-term, high-interest capital for businesses ready to dominate the food chain.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="px-8 py-4 bg-white text-slate-950 font-bold hover:bg-slate-200 transition-all heading-font tracking-wider text-lg">
+                        LIQUIDATE ME
+                    </button>
+                    <button class="px-8 py-4 border border-slate-700 hover:border-blue-500 text-slate-300 hover:text-white transition-all mono-font">
+                        VIEW RATES
+                    </button>
+                </div>
+            </div>
+            <div class="relative hidden lg:block">
+                <!-- Abstract dorsal fin shape -->
+                <div class="absolute inset-0 bg-blue-500/10 blur-[100px] rounded-full"></div>
+                <svg viewBox="0 0 200 200" class="w-full max-w-lg mx-auto relative z-10 transform hover:scale-105 transition-transform duration-700">
+                    <path d="M100 20 C 140 100, 180 150, 180 180 L 20 180 C 20 150, 60 100, 100 20" fill="#0f172a" stroke="#1e40af" stroke-width="2"/>
+                    <path d="M100 35 C 130 100, 160 140, 160 165 L 40 165 C 40 140, 70 100, 100 35" fill="#1e293b" opacity="0.5"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ticker -->
+    <div class="bg-blue-900/20 border-y border-blue-900/50 py-3 overflow-hidden whitespace-nowrap">
+        <div class="inline-block animate-[ticker_20s_linear_infinite] mono-font text-sm text-blue-300">
+            MARKET VOLATILITY DETECTED +++ RATES ADJUSTING +++ APEX PREDATORS ONLY +++ NO MINNOWS ALLOWED +++ CHUM THE WATERS +++ LIQUIDITY CRISIS AVERTED +++ 
+            MARKET VOLATILITY DETECTED +++ RATES ADJUSTING +++ APEX PREDATORS ONLY +++ NO MINNOWS ALLOWED +++ CHUM THE WATERS +++ LIQUIDITY CRISIS AVERTED +++
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <section class="py-20 z-10 relative">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 group hover:border-red-500/50 transition-colors duration-500">
+                <i data-lucide="droplets" class="text-red-500 w-10 h-10 mb-4 group-hover:scale-110 transition-transform"></i>
+                <h3 class="heading-font text-3xl mb-2">INSTANT BITE</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    We don't wait for committee approval. If you're bleeding cash, we strike immediately. Funding in under 4 hours.
+                </p>
+            </div>
+            <div class="glass-card p-8 group hover:border-blue-500/50 transition-colors duration-500">
+                <i data-lucide="skull" class="text-blue-500 w-10 h-10 mb-4 group-hover:scale-110 transition-transform"></i>
+                <h3 class="heading-font text-3xl mb-2">AGGRESSIVE TERMS</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Our rates are high because our tolerance for risk is infinite. We swim where others drown.
+                </p>
+            </div>
+            <div class="glass-card p-8 group hover:border-slate-500/50 transition-colors duration-500">
+                <i data-lucide="anchor" class="text-slate-500 w-10 h-10 mb-4 group-hover:scale-110 transition-transform"></i>
+                <h3 class="heading-font text-3xl mb-2">IRON GRIP</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Once we lock on, we don't let go until you're capitalized. Or until we own your boat.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services (Feeding Frenzy) -->
+    <section id="feeding" class="py-20 bg-slate-950 border-t border-slate-900 z-10 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-16">
+                <h2 class="heading-font text-5xl mb-4 text-white">THE MENU</h2>
+                <div class="h-1 w-20 bg-red-600"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Item 1 -->
+                <div class="p-6 border border-slate-800 hover:bg-slate-900 hover:border-blue-900 transition-all flex justify-between items-center group cursor-pointer">
+                    <div>
+                        <h4 class="mono-font text-blue-400 text-sm mb-1">OPTION A</h4>
+                        <h3 class="heading-font text-2xl group-hover:text-white transition-colors">THE HAMMERHEAD</h3>
+                        <p class="text-slate-500 text-sm mt-2">Wide coverage, heavy impact bridge loans.</p>
+                    </div>
+                    <i data-lucide="arrow-right" class="text-slate-700 group-hover:text-red-500 transition-colors"></i>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="p-6 border border-slate-800 hover:bg-slate-900 hover:border-blue-900 transition-all flex justify-between items-center group cursor-pointer">
+                    <div>
+                        <h4 class="mono-font text-blue-400 text-sm mb-1">OPTION B</h4>
+                        <h3 class="heading-font text-2xl group-hover:text-white transition-colors">THE GREAT WHITE</h3>
+                        <p class="text-slate-500 text-sm mt-2">Massive capital injection. Total dominance.</p>
+                    </div>
+                    <i data-lucide="arrow-right" class="text-slate-700 group-hover:text-red-500 transition-colors"></i>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="p-6 border border-slate-800 hover:bg-slate-900 hover:border-blue-900 transition-all flex justify-between items-center group cursor-pointer">
+                    <div>
+                        <h4 class="mono-font text-blue-400 text-sm mb-1">OPTION C</h4>
+                        <h3 class="heading-font text-2xl group-hover:text-white transition-colors">THE MAKO</h3>
+                        <p class="text-slate-500 text-sm mt-2">Fastest funding speed in the ocean.</p>
+                    </div>
+                    <i data-lucide="arrow-right" class="text-slate-700 group-hover:text-red-500 transition-colors"></i>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="p-6 border border-slate-800 hover:bg-slate-900 hover:border-blue-900 transition-all flex justify-between items-center group cursor-pointer">
+                    <div>
+                        <h4 class="mono-font text-blue-400 text-sm mb-1">OPTION D</h4>
+                        <h3 class="heading-font text-2xl group-hover:text-white transition-colors">THE PIRANHA SWARM</h3>
+                        <p class="text-slate-500 text-sm mt-2">Micro-loans for when you're being picked clean.</p>
+                    </div>
+                    <i data-lucide="arrow-right" class="text-slate-700 group-hover:text-red-500 transition-colors"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-20 z-10 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="mono-font text-center text-slate-500 text-sm mb-12 tracking-widest uppercase">What the survivors say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card p-8">
+                    <p class="heading-font text-4xl text-blue-900 absolute top-4 right-6 opacity-20">"</p>
+                    <p class="text-slate-300 mb-6 italic">
+                        "I was drowning in debt. They didn't offer a lifeline, they offered a jet ski. The interest rate is terrifying, but hey, I'm alive."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center font-bold text-blue-500">JP</div>
+                        <div>
+                            <div class="heading-font text-sm">JIMMY P.</div>
+                            <div class="text-xs text-slate-500 mono-font">FISHING CHARTERS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8">
+                    <p class="heading-font text-4xl text-blue-900 absolute top-4 right-6 opacity-20">"</p>
+                    <p class="text-slate-300 mb-6 italic">
+                        "Other banks saw risk. The Loan Shark saw blood. They funded my underwater welding business in 30 minutes."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center font-bold text-blue-500">MK</div>
+                        <div>
+                            <div class="heading-font text-sm">MIKE K.</div>
+                            <div class="text-xs text-slate-500 mono-font">SALVAGE OPS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8">
+                    <p class="heading-font text-4xl text-blue-900 absolute top-4 right-6 opacity-20">"</p>
+                    <p class="text-slate-300 mb-6 italic">
+                        "They told me if I missed a payment, things would get 'wet'. I haven't missed a payment. Best motivation ever."
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center font-bold text-blue-500">TS</div>
+                        <div>
+                            <div class="heading-font text-sm">TONY S.</div>
+                            <div class="text-xs text-slate-500 mono-font">WASTE MANAGEMENT</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section id="contact" class="py-20 bg-blue-950 z-10 relative">
+        <div class="max-w-3xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="heading-font text-5xl mb-2 text-white">ENTER THE CAGE</h2>
+                <p class="mono-font text-blue-400">Fill out the chum line. We'll smell it.</p>
+            </div>
+
+            <form class="glass-card p-8 md:p-12 border-t-4 border-t-red-500">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block mono-font text-xs text-slate-400 mb-2">PREY NAME</label>
+                        <input type="text" class="w-full bg-slate-900 border border-slate-700 p-3 text-white focus:outline-none focus:border-red-500 transition-colors" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label class="block mono-font text-xs text-slate-400 mb-2">SPECIES (BUSINESS)</label>
+                        <input type="text" class="w-full bg-slate-900 border border-slate-700 p-3 text-white focus:outline-none focus:border-red-500 transition-colors" placeholder="LLC">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block mono-font text-xs text-slate-400 mb-2">AMOUNT OF FLESH NEEDED ($)</label>
+                    <input type="range" min="10000" max="1000000" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-red-500">
+                    <div class="flex justify-between text-xs mono-font text-slate-500 mt-2">
+                        <span>$10k</span>
+                        <span>$1M+</span>
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <label class="block mono-font text-xs text-slate-400 mb-2">DROP A LINE (MESSAGE)</label>
+                    <textarea class="w-full bg-slate-900 border border-slate-700 p-3 text-white h-32 focus:outline-none focus:border-red-500 transition-colors" placeholder="Help me..."></textarea>
+                </div>
+                <button type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 heading-font text-xl tracking-widest transition-all hover:scale-[1.01]">
+                    SUBMIT TO FATE
+                </button>
+                <p class="text-center text-xs text-slate-600 mt-4 mono-font">
+                    By clicking submit, you agree that swimming with sharks is inherently dangerous. No refunds.
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12 border-t border-slate-900 z-10 relative">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+                <i data-lucide="waves" class="text-white w-6 h-6"></i>
+                <span class="heading-font text-xl uppercase tracking-widest text-white">The Loan Shark</span>
+            </div>
+            <div class="mono-font text-xs text-slate-600 text-center md:text-right">
+                <p>&copy; 2024 Apex Capital. All rights devoured.</p>
+                <p class="mt-1">We are not a loan shark in the legal sense. We are a fish-themed financial entity.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Generate ambient bubbles
+        const container = document.getElementById('bubbles-container');
+        const bubbleCount = 20;
+
+        for (let i = 0; i < bubbleCount; i++) {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            
+            // Randomize size
+            const size = Math.random() * 6 + 2;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            // Randomize position
+            bubble.style.left = `${Math.random() * 100}vw`;
+            
+            // Randomize speed/delay
+            const duration = Math.random() * 10 + 5;
+            const delay = Math.random() * 5;
+            bubble.style.animationDuration = `${duration}s`;
+            bubble.style.animationDelay = `-${delay}s`; // Negative delay to start mid-animation
+
+            container.appendChild(bubble);
+        }
+    </script>
+</body>
+</html>
