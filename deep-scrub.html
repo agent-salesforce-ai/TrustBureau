@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrustBureau DeepScrub | AI Due Diligence</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z' fill='white' opacity='0.1' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M9 12l2 2 4-4' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,56 +15,81 @@
         }
 
         :root {
-            --bg-body: #050505;
+            --bg-body: #0a0a0a;
+            --bg-aurora: #1a2c2a;
             --bg-card: rgba(20, 20, 20, 0.4);
             --bg-card-hover: rgba(30, 30, 30, 0.6);
-            --bg-modal: #0a0a0a;
-            --border-primary: rgba(255, 255, 255, 0.08);
+            --border-primary: rgba(255, 255, 255, 0.1);
             --border-hover: rgba(255, 255, 255, 0.2);
             --text-primary: #ffffff;
             --text-secondary: #a1a1aa;
-            --text-muted: #666666;
-            --accent: #888888;
+            --text-muted: #888888;
             --accent-green: #22c55e;
             --accent-yellow: #eab308;
             --accent-red: #ef4444;
-            --accent-glow: 120, 120, 120;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-body);
+            background: var(--bg-body);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
             position: relative;
+            overflow-x: hidden;
         }
 
-        /* Ambient Background Animation */
-        .aurora-bg {
+        /* Aurora Background */
+        body::before {
+            content: '';
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 0%, #1a2c2a 0%, #050505 50%, #000000 100%);
-            z-index: -2;
-            animation: auroraPulse 10s ease-in-out infinite alternate;
-        }
-        
-        @keyframes auroraPulse {
-            0% { opacity: 0.8; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.05); }
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse 120% 80% at 50% 20%, var(--bg-aurora) 0%, transparent 50%),
+                        radial-gradient(ellipse 80% 60% at 80% 50%, rgba(20, 40, 35, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse 60% 80% at 20% 80%, rgba(15, 30, 25, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -3;
+            animation: auroraPulse 10s ease-in-out infinite;
         }
 
-        /* Film Grain Overlay */
+        @keyframes auroraPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* Grid Pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        /* Noise Texture */
         .noise-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             pointer-events: none;
             z-index: -1;
             opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .container {
@@ -74,7 +100,8 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            z-index: 10;
+            position: relative;
+            z-index: 1;
         }
 
         /* Header */
@@ -83,7 +110,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4rem; 
+            position: relative;
+            margin-bottom: 4rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .logo {
@@ -92,47 +132,66 @@
             gap: 0.875rem;
             text-decoration: none;
             color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .logo:hover {
+            transform: translateX(4px);
         }
 
         .logo-icon {
-            width: 24px;
-            height: 24px;
-            opacity: 1;
-            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.2));
         }
 
         .logo-text {
             font-size: 0.875rem;
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
         }
 
-        .logo-text span { 
-            color: #666;
+        .logo-text .bureau {
+            color: var(--text-muted);
+        }
+
+        .logo-text .deepscrub {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .btn-api {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 0.875rem;
-            background: transparent;
+            padding: 0.625rem 1rem;
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 8px; 
+            border-radius: 12px;
             color: var(--text-secondary);
             font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
 
         .btn-api:hover {
-            border-color: var(--text-secondary);
+            border-color: var(--border-hover);
             color: var(--text-primary);
-            background: rgba(255,255,255,0.05);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
         }
 
         .status-dot {
@@ -140,39 +199,64 @@
             height: 6px;
             background: #fff;
             border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
             display: inline-block;
         }
         
-        .status-dot.active { background: var(--accent-green); box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
-        .status-dot.inactive { background: var(--accent-red); box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+        .status-dot.active { 
+            background: var(--accent-green); 
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); 
+        }
+        .status-dot.inactive { 
+            background: var(--accent-red); 
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); 
+        }
 
-        /* Search Input Area - Premium Glass */
+        /* Search Input Area */
         .search-wrapper {
             max-width: 680px;
             margin: 0 auto;
             position: relative;
             width: 100%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .input-group {
-            background: rgba(20, 20, 20, 0.6);
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            border-radius: 16px;
+            padding: 0.35rem 0.35rem 0.35rem 1.5rem;
             display: flex;
             flex-direction: row;
             align-items: center;
             gap: 0.5rem;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 30px rgba(255,255,255,0.03),
+                0 0 60px rgba(255,255,255,0.02),
+                inset 0 0 20px rgba(255,255,255,0.02);
+            backdrop-filter: blur(20px);
         }
 
         .input-group:focus-within {
-            border-color: var(--text-secondary);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
-            transform: translateY(-2px);
-            background: rgba(30, 30, 30, 0.8);
+            border-color: var(--border-hover);
+            box-shadow: 
+                0 0 40px rgba(255,255,255,0.08),
+                0 0 80px rgba(255,255,255,0.04),
+                0 0 2px rgba(255,255,255,0.3),
+                inset 0 0 30px rgba(255,255,255,0.03);
+            transform: scale(1.01);
         }
 
         .unibox {
@@ -180,27 +264,29 @@
             border: none;
             color: var(--text-primary);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1rem;
-            padding: 0.5rem 0;
+            font-size: 1.125rem;
+            padding: 0.75rem 0;
             outline: none;
             width: 100%;
             flex: 1;
         }
 
-        .unibox::placeholder { color: #444; }
+        .unibox::placeholder {
+            color: #555;
+        }
 
         .btn-action {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
             background: var(--text-primary);
             color: #000;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             flex-shrink: 0;
             padding: 0;
         }
@@ -208,7 +294,7 @@
         .btn-action:hover {
             transform: scale(1.05);
             background: #fff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
         }
 
         .btn-action:disabled {
@@ -220,22 +306,31 @@
             box-shadow: none;
         }
 
-        /* Canvas Overlay for "Dot Grid" Effect */
+        @keyframes spin { 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* Report Layout & Animation Container */
+        .report-container-wrapper {
+            position: relative;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+        }
+
         #loadingCanvas {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 10;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-        #loadingCanvas.active { opacity: 1; }
 
-        /* Report Layout */
-        .report-container-wrapper {
-            position: relative;
-            margin-top: 3rem;
-            margin-bottom: 2rem;
+        #loadingCanvas.active {
+            opacity: 1;
         }
 
         .report-grid {
@@ -257,7 +352,6 @@
             opacity: 1;
         }
 
-        /* Premium Card Styling */
         .report-card {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
@@ -266,36 +360,29 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s, border-color 0.3s;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            overflow: hidden;
-        }
-
-        /* Inner Light Border Effect */
-        .report-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 16px; 
-            padding: 1px; 
-            background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent); 
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
-            -webkit-mask-composite: xor; 
-            mask-composite: exclude; 
-            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 
+                0 0 30px rgba(255,255,255,0.03),
+                0 0 60px rgba(255,255,255,0.02),
+                inset 0 0 20px rgba(255,255,255,0.02),
+                0 0 1px rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
         }
 
         .report-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-4px);
             background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            box-shadow: 
+                0 0 40px rgba(255,255,255,0.08),
+                0 0 80px rgba(255,255,255,0.04),
+                0 0 2px rgba(255,255,255,0.3),
+                inset 0 0 30px rgba(255,255,255,0.03);
         }
 
         .report-card.full-width {
             grid-column: 1 / -1;
-            border-color: var(--text-secondary);
+            border-color: var(--border-hover);
         }
         
         @media (min-width: 900px) {
@@ -317,40 +404,47 @@
             gap: 0.75rem;
         }
 
-        .card-icon { color: var(--text-secondary); }
+        .card-icon { 
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
 
         .card-title {
             font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         .btn-deep {
-            background: transparent;
-            border: 1px solid var(--border-hover);
-            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            color: var(--text-muted);
             font-size: 0.65rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            transition: all 0.2s;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
         }
 
         .btn-deep:hover {
             color: var(--text-primary);
-            border-color: var(--text-primary);
-            background: rgba(255,255,255,0.05);
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
 
-        .btn-deep:disabled { opacity: 0.5; cursor: wait; }
+        .btn-deep:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
 
         .card-content {
             font-size: 0.9375rem;
-            line-height: 1.6;
+            line-height: 1.7;
             color: var(--text-secondary);
             flex: 1;
         }
@@ -359,15 +453,15 @@
         .data-list {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.25rem;
         }
 
         .data-row {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 0.875rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .data-row:last-child { border-bottom: none; }
@@ -379,14 +473,15 @@
         }
 
         .data-icon {
-            color: var(--text-secondary);
+            color: var(--text-muted);
             width: 14px;
             height: 14px;
+            opacity: 0.6;
         }
 
         .data-label {
             font-size: 0.75rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             min-width: 90px;
@@ -398,6 +493,7 @@
             color: var(--accent-green);
             width: 14px;
             height: 14px;
+            filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.4));
         }
 
         .data-value {
@@ -421,9 +517,11 @@
             align-self: flex-start;
         }
 
-        .source-link:hover { color: var(--text-primary); }
+        .source-link:hover { 
+            color: var(--text-primary); 
+        }
 
-        /* Map Embed */
+        /* Map Embed Styles */
         .map-container {
             border-radius: 12px;
             overflow: hidden;
@@ -451,15 +549,16 @@
 
         .btn-map-action {
             flex: 1;
-            padding: 0.625rem;
-            background: rgba(255,255,255,0.05);
+            padding: 0.75rem;
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 8px;
+            border-radius: 12px;
             color: var(--text-secondary);
             font-size: 0.75rem;
+            font-weight: 600;
             text-align: center;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -467,21 +566,29 @@
         }
 
         .btn-map-action:hover {
-            background: rgba(255,255,255,0.1);
+            background: var(--bg-card-hover);
             color: var(--text-primary);
-            border-color: var(--text-secondary);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255,255,255,0.08);
         }
 
-        /* Review Items */
+        /* Review Styles */
         .review-item {
-            padding: 1rem;
+            padding: 1.25rem;
             background: rgba(255,255,255,0.02);
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid var(--border-primary);
             margin-bottom: 0.75rem;
+            transition: all 0.3s;
         }
         
         .review-item:last-child { margin-bottom: 0; }
+
+        .review-item:hover {
+            border-color: var(--border-hover);
+            background: rgba(255,255,255,0.04);
+        }
 
         .review-header {
             display: flex;
@@ -496,6 +603,7 @@
             color: var(--text-secondary);
             font-size: 0.875rem;
             margin-bottom: 0.5rem;
+            line-height: 1.6;
         }
 
         .review-rating {
@@ -506,9 +614,9 @@
         /* Findings */
         .finding-item {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.875rem;
             align-items: flex-start;
-            padding: 0.5rem 0;
+            padding: 0.625rem 0;
         }
 
         .finding-dot {
@@ -518,24 +626,29 @@
             border-radius: 50%;
             margin-top: 0.5rem;
             flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(255,255,255,0.4);
         }
 
         .finding-text {
             font-size: 0.9375rem;
             color: var(--text-primary);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        /* Summary Header */
+        /* Report Meta Header */
         .report-meta {
             grid-column: 1 / -1;
-            background: rgba(255,255,255,0.02);
+            background: rgba(10,10,10,0.6);
             padding: 2rem;
-            border-bottom: 1px solid var(--border-primary);
+            border-radius: 16px;
+            border: 1px solid var(--border-primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 16px 16px 0 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 30px rgba(255,255,255,0.03),
+                inset 0 0 20px rgba(255,255,255,0.02);
         }
 
         .meta-title {
@@ -548,23 +661,67 @@
         .meta-subtitle {
             font-size: 0.875rem;
             color: var(--text-muted);
+            margin-top: 0.25rem;
         }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 1rem;
+            padding: 0.625rem 1.25rem;
             border: 1px solid var(--border-hover);
-            border-radius: 10px;
+            border-radius: 100px;
             font-size: 0.75rem;
+            font-weight: 600;
             color: var(--text-primary);
-            background: rgba(255,255,255,0.02);
+            background: var(--bg-card);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s;
         }
 
-        .status-pill:hover { background: rgba(255,255,255,0.05); }
+        .status-pill:hover { 
+            background: var(--bg-card-hover);
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
+
+        /* Follow Up Section */
+        .follow-up-container {
+            display: none;
+            margin-top: 2rem; 
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .follow-up-container .search-wrapper {
+            max-width: 100%;
+        }
+
+        .follow-up-response {
+            margin-top: 1.5rem;
+            padding: 1.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            font-size: 0.9375rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            display: none;
+            text-align: left;
+            box-shadow: 
+                0 0 30px rgba(255,255,255,0.03),
+                inset 0 0 20px rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
+        }
+        
+        .follow-up-response strong { 
+            color: var(--text-primary); 
+            font-weight: 600; 
+        }
+        .follow-up-response p { margin-bottom: 1rem; }
 
         /* Alternatives Section */
         .alternatives-container {
@@ -594,23 +751,25 @@
         .alt-chip {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            padding: 0.5rem 1rem;
+            padding: 0.625rem 1.25rem;
             border-radius: 100px;
             font-size: 0.8125rem;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            backdrop-filter: blur(10px);
         }
 
         .alt-chip:hover {
             background: var(--bg-card-hover);
-            border-color: var(--text-secondary);
+            border-color: var(--border-hover);
             color: var(--text-primary);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255,255,255,0.08);
         }
 
         .alt-icon {
@@ -629,12 +788,22 @@
             font-size: 0.8125rem;
         }
 
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--text-primary);
+        }
+
         /* Settings Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
             z-index: 100;
             display: none;
             align-items: center;
@@ -647,11 +816,14 @@
         .modal {
             background: #0a0a0a;
             border: 1px solid var(--border-primary);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 0;
             width: 100%;
-            max-width: 520px;
-            box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.95);
+            max-width: 520px; 
+            box-shadow: 
+                0 40px 80px -12px rgba(0, 0, 0, 0.95),
+                0 0 40px rgba(255,255,255,0.03),
+                inset 0 0 30px rgba(255,255,255,0.02);
             transform: scale(0.95);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
@@ -659,19 +831,35 @@
         .modal-overlay.open .modal { transform: scale(1); }
         
         .modal-header {
-            display: flex; justify-content: space-between; align-items: center; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
             padding: 2rem 2.5rem 1.5rem;
             border-bottom: 1px solid var(--border-primary); 
             background: transparent;
         }
-        .modal-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        
+        .modal-title { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            letter-spacing: -0.02em; 
+        }
         
         .btn-close { 
-            background: transparent; border: none; color: var(--text-muted); 
-            cursor: pointer; padding: 0.5rem; transition: color 0.2s; display: flex; 
+            background: transparent; 
+            border: none; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            padding: 0.5rem; 
+            transition: all 0.2s; 
+            display: flex; 
             border-radius: 50%;
         }
-        .btn-close:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .btn-close:hover { 
+            color: var(--text-primary); 
+            background: rgba(255,255,255,0.05); 
+        }
         
         .modal-body { 
             padding: 2.5rem; 
@@ -683,7 +871,7 @@
         .status-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 1.25rem;
             display: flex;
             align-items: center;
@@ -691,59 +879,196 @@
         }
 
         .status-icon-wrapper {
-            width: 40px; height: 40px;
+            width: 40px; 
+            height: 40px;
             border-radius: 50%;
             background: rgba(0,0,0,0.3);
             border: 1px solid var(--border-primary);
-            display: flex; align-items: center; justify-content: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
 
-        .status-details { display: flex; flex-direction: column; gap: 0.25rem; }
-        .status-label-text { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
-        .status-value-text { font-size: 0.9375rem; color: var(--text-primary); font-weight: 500; }
+        .status-details { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.25rem; 
+        }
+        
+        .status-label-text { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            color: var(--text-muted); 
+            font-weight: 600; 
+        }
+        
+        .status-value-text { 
+            font-size: 0.9375rem; 
+            color: var(--text-primary); 
+            font-weight: 500; 
+        }
 
-        .form-group { display: flex; flex-direction: column; gap: 0.75rem; }
-        .form-header { display: flex; justify-content: space-between; align-items: baseline; }
-        .form-label { font-size: 1rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.01em; }
-        .form-hint { font-size: 0.8125rem; color: var(--text-muted); }
-        .form-hint a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.75rem; 
+        }
+        
+        .form-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: baseline; 
+        }
+        
+        .form-label { 
+            font-size: 1rem; 
+            color: var(--text-primary); 
+            font-weight: 600; 
+            letter-spacing: -0.01em;
+        }
+
+        .form-hint { 
+            font-size: 0.8125rem; 
+            color: var(--text-muted); 
+            line-height: 1.5;
+        }
+        .form-hint a { 
+            color: var(--text-secondary); 
+            text-decoration: underline; 
+            text-underline-offset: 3px; 
+            transition: color 0.2s; 
+        }
         .form-hint a:hover { color: var(--text-primary); }
         
         .form-input {
-            width: 100%; background: #050505; border: 1px solid var(--border-primary); 
-            border-radius: 10px; padding: 1.25rem; color: var(--text-primary); 
-            font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; 
-            transition: all 0.2s;
+            width: 100%; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--border-primary); 
+            border-radius: 12px; 
+            padding: 1.25rem; 
+            color: var(--text-primary); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-size: 1rem; 
+            transition: all 0.3s;
         }
-        .form-input:focus { outline: none; border-color: var(--text-secondary); box-shadow: 0 0 0 4px rgba(255,255,255,0.05); }
+        .form-input:focus { 
+            outline: none; 
+            border-color: var(--border-hover); 
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.05); 
+        }
         
-        .modal-actions { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; }
+        .modal-actions { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+            margin-top: 0.5rem; 
+        }
         
         .btn-save { 
-            width: 100%; padding: 1.125rem; background: var(--text-primary); color: #000; 
-            border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; 
-            cursor: pointer; transition: all 0.2s; letter-spacing: -0.01em; 
+            width: 100%; 
+            padding: 1.125rem; 
+            background: var(--text-primary); 
+            color: #000; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            letter-spacing: -0.01em; 
         }
-        .btn-save:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,255,255,0.15); }
+        .btn-save:hover { 
+            background: #fff; 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 20px rgba(255,255,255,0.2); 
+        }
         
         .btn-reset {
-            background: transparent; border: none; color: var(--text-muted); 
-            font-size: 0.875rem; cursor: pointer; padding: 0.5rem; 
-            transition: color 0.2s; width: fit-content; margin: 0 auto;
+            background: transparent; 
+            border: none; 
+            color: var(--text-muted); 
+            font-size: 0.875rem; 
+            cursor: pointer; 
+            padding: 0.5rem; 
+            transition: color 0.2s; 
+            width: fit-content; 
+            margin: 0 auto;
         }
         .btn-reset:hover { color: var(--accent-red); }
         
         /* Pong Game Styles */
-        .pong-container { width: 100%; height: 200px; background: #000; position: relative; overflow: hidden; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .pong-container { 
+            width: 100%; 
+            height: 200px; 
+            background: #000; 
+            position: relative; 
+            overflow: hidden; 
+            border-radius: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
         canvas { display: block; cursor: none; }
-        .pong-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; color: #666; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .pong-overlay { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            pointer-events: none; 
+            text-transform: uppercase; 
+            font-size: 0.75rem; 
+            letter-spacing: 0.1em; 
+            color: #666; 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 
+            0% { opacity: 0.5; } 
+            50% { opacity: 1; } 
+            100% { opacity: 0.5; } 
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            header {
+                margin-bottom: 2rem;
+            }
+            
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-card.wide-card {
+                grid-column: 1;
+            }
+            
+            .meta-title {
+                font-size: 1.25rem;
+            }
+            
+            .report-meta {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="aurora-bg"></div>
-    <div class="noise-overlay"></div>
+    <!-- Noise Texture Overlay -->
+    <svg class="noise-overlay" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise)" opacity="1"/>
+    </svg>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
@@ -756,7 +1081,6 @@
             </div>
             
             <div class="modal-body">
-                <!-- Status Card -->
                 <div class="status-card">
                     <div class="status-icon-wrapper">
                         <span class="status-dot active" id="modalStatusDot"></span>
@@ -767,7 +1091,6 @@
                     </div>
                 </div>
 
-                <!-- Input Group -->
                 <div class="form-group">
                     <div class="form-header">
                         <label class="form-label">Gemini API Key</label>
@@ -778,7 +1101,6 @@
                     <input type="password" class="form-input" id="apiKeyInput" placeholder="Paste your AIzaSy... key here">
                 </div>
                 
-                <!-- Actions -->
                 <div class="modal-actions">
                     <button class="btn-save" onclick="saveApiKey()">Save Configuration</button>
                     <button class="btn-reset" onclick="clearApiKey()">Reset to Default System Key</button>
@@ -792,29 +1114,27 @@
             <div class="logo-group">
                 <a href="index.html" class="logo">
                     <svg class="logo-icon" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="currentColor" opacity="0.1"/>
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="#888888" stroke-width="1.5" fill="none"/>
-                        <path d="M9 12l2 2 4-4" stroke="#888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="white" opacity="0.1"/>
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="white" stroke-width="1.5" fill="none"/>
+                        <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span class="logo-text">DEEP<span>SCRUB</span></span>
+                    <span class="logo-text">
+                        TRUST<span class="bureau">BUREAU</span>
+                        <span class="deepscrub">DeepScrub</span>
+                    </span>
                 </a>
             </div>
 
             <div class="header-actions">
                 <button class="btn-api" onclick="toggleSettings()" title="Configure API">
                     <span class="status-dot active" id="systemStatusDot"></span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg);">
-                        <circle cx="7.5" cy="15.5" r="5.5"></circle>
-                        <path d="m11.5 11.5 2.5-2.5"></path>
-                        <path d="m15.5 7.5 3-3"></path>
-                        <path d="m19 6 2 2"></path>
-                    </svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
                     API
                 </button>
             </div>
         </header>
 
-        <div class="search-wrapper">
+        <div class="search-wrapper" id="initialSearchWrapper">
             <div class="input-group">
                 <input type="text" class="unibox" id="searchInput" placeholder="Enter Business Name and State..." autocomplete="off">
                 <button class="btn-action" id="btnScrub" onclick="runScrub()" aria-label="Run Investigation">
@@ -823,10 +1143,21 @@
             </div>
         </div>
 
-        <!-- Alternatives Section (Moved to Top) -->
         <div class="alternatives-container" id="alternativesContainer">
             <div class="alt-label">Possible Alternative Matches</div>
             <div class="alt-grid" id="alternativesGrid"></div>
+        </div>
+
+        <div class="follow-up-container" id="followUpContainer">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="unibox" id="followUpInput" placeholder="Ask follow-up questions about this entity..." autocomplete="off">
+                    <button class="btn-action" id="btnFollowUp" onclick="askFollowUp()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="follow-up-response" id="followUpResponse"></div>
         </div>
 
         <div class="report-container-wrapper">
@@ -840,7 +1171,6 @@
                     <div class="status-pill">Confidence: High</div>
                 </div>
 
-                <!-- Section 1: Key Findings -->
                 <div class="report-card full-width">
                     <div class="card-header">
                         <div class="header-title-group">
@@ -851,7 +1181,6 @@
                     <div class="card-content" id="summaryContent">Pending...</div>
                 </div>
 
-                <!-- Section 2: SOS -->
                 <div class="report-card">
                     <div class="card-header">
                         <div class="header-title-group">
@@ -863,7 +1192,6 @@
                     <div class="card-content" id="sosContent">Pending...</div>
                 </div>
 
-                <!-- Section 3: Legal -->
                 <div class="report-card">
                     <div class="card-header">
                         <div class="header-title-group">
@@ -875,7 +1203,6 @@
                     <div class="card-content" id="legalContent">Pending...</div>
                 </div>
 
-                <!-- Section 4: Location -->
                 <div class="report-card">
                     <div class="card-header">
                         <div class="header-title-group">
@@ -886,7 +1213,6 @@
                     <div class="card-content" id="locationContent">Pending...</div>
                 </div>
 
-                 <!-- Section 5: Footprint -->
                  <div class="report-card">
                     <div class="card-header">
                         <div class="header-title-group">
@@ -898,7 +1224,6 @@
                     <div class="card-content" id="footprintContent">Pending...</div>
                 </div>
 
-                <!-- Section 6: Reviews -->
                 <div class="report-card wide-card">
                     <div class="card-header">
                         <div class="header-title-group">
@@ -913,7 +1238,7 @@
         </div>
 
         <footer>
-            © 2025 TrustBureau.ai. AI-generated report. Not a formal background check.
+            © 2025 <a href="index.html">TrustBureau.ai</a>. AI-generated report. Not a formal background check.
         </footer>
     </div>
 
@@ -933,24 +1258,15 @@
             const modalDot = document.getElementById('modalStatusDot');
             
             if (userApiKey) {
-                if(statusText) {
-                    statusText.innerText = "Using: Custom User API Key";
-                    statusText.style.color = "#22c55e";
-                }
+                if(statusText) { statusText.innerText = "Using: Custom User API Key"; statusText.style.color = "#22c55e"; }
                 if(dot) dot.className = "status-dot active";
                 if(modalDot) modalDot.className = "status-dot active";
             } else if (apiKey) {
-                if(statusText) {
-                    statusText.innerText = "Using: Environment Test Key";
-                    statusText.style.color = "#a3a3a3";
-                }
+                if(statusText) { statusText.innerText = "Using: Environment Test Key"; statusText.style.color = "#a3a3a3"; }
                 if(dot) dot.className = "status-dot active";
                 if(modalDot) modalDot.className = "status-dot active";
             } else {
-                if(statusText) {
-                    statusText.innerText = "No API Key Available";
-                    statusText.style.color = "#ef4444";
-                }
+                if(statusText) { statusText.innerText = "No API Key Available"; statusText.style.color = "#ef4444"; }
                 if(dot) dot.className = "status-dot inactive";
                 if(modalDot) modalDot.className = "status-dot inactive";
             }
@@ -996,7 +1312,6 @@
 
         function getEffectiveApiKey() { return userApiKey || apiKey; }
 
-        // --- DOT GRID ANIMATION ---
         function startActiveGrid(canvasId) {
             const canvas = document.getElementById(canvasId);
             if(!canvas) return;
@@ -1012,16 +1327,9 @@
             const cols = Math.ceil(canvas.width / spacing);
             const rows = Math.ceil(canvas.height / spacing);
 
-            // Init dots
             for(let i=0; i<cols; i++){
                 for(let j=0; j<rows; j++){
-                    dots.push({
-                        x: i * spacing + spacing/2,
-                        y: j * spacing + spacing/2,
-                        opacity: 0.1,
-                        targetOpacity: 0.1,
-                        pulseSpeed: Math.random() * 0.05 + 0.01
-                    });
+                    dots.push({ x: i * spacing + spacing/2, y: j * spacing + spacing/2, opacity: 0.1, targetOpacity: 0.1, pulseSpeed: Math.random() * 0.05 + 0.01 });
                 }
             }
 
@@ -1029,54 +1337,32 @@
             
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Move scanline
                 scanY += 8;
                 if(scanY > canvas.height + 100) scanY = -100;
-
                 dots.forEach(dot => {
-                    // Scanline effect interaction
                     const dist = Math.abs(dot.y - scanY);
-                    if(dist < 50) {
-                        dot.opacity = Math.max(dot.opacity, 1 - (dist/50));
-                    }
-                    
-                    // Natural decay
+                    if(dist < 50) { dot.opacity = Math.max(dot.opacity, 1 - (dist/50)); }
                     if(dot.opacity > 0.15) dot.opacity -= 0.05;
-                    
-                    // Draw
                     ctx.fillStyle = `rgba(255, 255, 255, ${dot.opacity})`;
                     ctx.beginPath();
                     ctx.arc(dot.x, dot.y, 1.5, 0, Math.PI * 2);
                     ctx.fill();
                 });
-
                 gridAnimationId = requestAnimationFrame(animate);
             }
             animate();
-            
-            return () => {
-                canvas.classList.remove('active');
-                setTimeout(() => cancelAnimationFrame(gridAnimationId), 500);
-            };
+            return () => { canvas.classList.remove('active'); setTimeout(() => cancelAnimationFrame(gridAnimationId), 500); };
         }
 
-        // --- PONG GAME ---
         function startPong(container) {
             container.innerHTML = `<div class="pong-container"><canvas id="pongCanvas"></canvas><div class="pong-overlay">DEEP SCANNING...</div></div>`;
             const canvas = document.getElementById('pongCanvas');
             const ctx = canvas.getContext('2d');
             canvas.width = container.offsetWidth;
             canvas.height = 200;
-            
             let playerY = 75, aiY = 75, ballX = canvas.width/2, ballY = 100, ballSX = 4, ballSY = 4;
             const paddleH = 50, paddleW = 8;
-
-            canvas.addEventListener('mousemove', e => {
-                const r = canvas.getBoundingClientRect();
-                playerY = e.clientY - r.top - paddleH/2;
-            });
-            
+            canvas.addEventListener('mousemove', e => { const r = canvas.getBoundingClientRect(); playerY = e.clientY - r.top - paddleH/2; });
             gameActive = true;
             function draw() {
                 if(!gameActive) return;
@@ -1085,40 +1371,27 @@
                 ctx.fillRect(10, playerY, paddleW, paddleH);
                 ctx.fillRect(canvas.width-10-paddleW, aiY, paddleW, paddleH);
                 ctx.beginPath(); ctx.arc(ballX, ballY, 5, 0, Math.PI*2); ctx.fill();
-                
                 ballX += ballSX; ballY += ballSY;
                 if(ballY<0 || ballY>200) ballSY = -ballSY;
                 if(ballX < 20) { if(ballY > playerY && ballY < playerY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
                 if(ballX > canvas.width-20) { if(ballY > aiY && ballY < aiY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
-                
-                if(aiY + paddleH/2 < ballY - 20) aiY += 3;
-                else if(aiY + paddleH/2 > ballY + 20) aiY -= 3;
-                
+                if(aiY + paddleH/2 < ballY - 20) aiY += 3; else if(aiY + paddleH/2 > ballY + 20) aiY -= 3;
                 requestAnimationFrame(draw);
             }
             draw();
             return () => { gameActive = false; };
         }
 
-        // --- PARSING ---
         function cleanJson(text) {
             const startObject = text.indexOf('{');
             const startArray = text.indexOf('[');
-            let startIndex = -1;
-            let endIndex = -1;
-            if (startObject !== -1 && (startArray === -1 || startObject < startArray)) {
-                startIndex = startObject; endIndex = text.lastIndexOf('}');
-            } else if (startArray !== -1) {
-                startIndex = startArray; endIndex = text.lastIndexOf(']');
-            }
-            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                return text.substring(startIndex, endIndex + 1);
-            }
+            let startIndex = -1, endIndex = -1;
+            if (startObject !== -1 && (startArray === -1 || startObject < startArray)) { startIndex = startObject; endIndex = text.lastIndexOf('}'); }
+            else if (startArray !== -1) { startIndex = startArray; endIndex = text.lastIndexOf(']'); }
+            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) { return text.substring(startIndex, endIndex + 1); }
             return text.replace(/```json\n|\n```|```/g, "").trim();
         }
 
-        // --- RENDERING ---
-        // Icons Map
         const iconMap = {
             'status': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
             'formationDate': '<svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
@@ -1140,26 +1413,9 @@
             if (!dataObj) return '<div class="data-value">No data available</div>';
             let html = '<div class="data-list">';
             const config = {
-                'sos': [
-                    { key: 'status', label: 'Status', color: true },
-                    { key: 'formationDate', label: 'Formed' },
-                    { key: 'entityType', label: 'Type' },
-                    { key: 'registeredAgent', label: 'Agent' },
-                    { key: 'principals', label: 'Principals' }
-                ],
-                'legal': [
-                    { key: 'riskLevel', label: 'Risk Level', color: true },
-                    { key: 'bankruptcies', label: 'Bankruptcies', isArray: true },
-                    { key: 'liens', label: 'Liens', isArray: true },
-                    { key: 'judgments', label: 'Judgments', isArray: true },
-                    { key: 'uccFilings', label: 'UCC Filings', isArray: true }
-                ],
-                'footprint': [
-                    { key: 'website', label: 'Website' },
-                    { key: 'domainAge', label: 'Domain' },
-                    { key: 'addressType', label: 'Addr Type' },
-                    { key: 'socialPresence', label: 'Socials' }
-                ]
+                'sos': [ { key: 'status', label: 'Status', color: true }, { key: 'formationDate', label: 'Formed' }, { key: 'entityType', label: 'Type' }, { key: 'registeredAgent', label: 'Agent' }, { key: 'principals', label: 'Principals' } ],
+                'legal': [ { key: 'riskLevel', label: 'Risk Level', color: true }, { key: 'bankruptcies', label: 'Bankruptcies', isArray: true }, { key: 'liens', label: 'Liens', isArray: true }, { key: 'judgments', label: 'Judgments', isArray: true }, { key: 'uccFilings', label: 'UCC Filings', isArray: true } ],
+                'footprint': [ { key: 'website', label: 'Website' }, { key: 'domainAge', label: 'Domain' }, { key: 'addressType', label: 'Addr Type' }, { key: 'socialPresence', label: 'Socials' } ]
             };
             const fields = config[type] || [];
             fields.forEach(field => {
@@ -1167,88 +1423,24 @@
                      let val = dataObj[field.key];
                      let style = '';
                      let checkIcon = '<svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                     
-                     if (field.key === 'website' && val && val.includes('.')) {
-                         let href = val.startsWith('http') ? val : 'https://' + val;
-                         val = `<a href="${href}" target="_blank" style="color:inherit; text-decoration:underline;">${val}</a>`;
-                     }
-                     if (field.isArray) {
-                         if (!Array.isArray(val) || val.length === 0 || (val.length === 1 && (val[0].toLowerCase().includes('none') || val[0].toLowerCase().includes('clean')))) {
-                             val = 'None found';
-                             style = 'color: var(--accent-green)';
-                         } else {
-                             if (val.length === 1 && val[0].toLowerCase().includes('none')) {
-                                 val = 'None found'; style = 'color: var(--accent-green)';
-                             } else {
-                                style = 'color: var(--accent-red)'; val = val.join('<br>');
-                             }
-                         }
-                     } else if (field.color) {
-                         const v = String(val).toLowerCase();
-                         if (v.includes('active') || v.includes('low') || v.includes('clean')) style = 'color: var(--accent-green)'; 
-                         else if (v.includes('inactive') || v.includes('medium') || v.includes('mod')) style = 'color: var(--accent-yellow)'; 
-                         else if (v.includes('dissolved') || v.includes('high') || v.includes('found')) style = 'color: var(--accent-red)'; 
-                         // Fix for "clean" status in risk level to be green
-                         if (field.key === 'riskLevel' && (v.includes('low') || v.includes('clean'))) style = 'color: var(--accent-green)';
-                     }
-                     html += `<div class="data-row">
-                        <div class="data-label-group">
-                            ${checkIcon}
-                            ${iconMap[field.key] || ''}
-                            <div class="data-label">${field.label}</div>
-                        </div>
-                        <div class="data-value" style="${style}">${val}</div>
-                     </div>`;
+                     if (field.key === 'website' && val && val.includes('.')) { let href = val.startsWith('http') ? val : 'https://' + val; val = `<a href="${href}" target="_blank" style="color:inherit; text-decoration:underline;">${val}</a>`; }
+                     if (field.isArray) { if (!Array.isArray(val) || val.length === 0 || (val.length === 1 && (val[0].toLowerCase().includes('none') || val[0].toLowerCase().includes('clean')))) { val = 'None found'; style = 'color: var(--accent-green)'; } else { if (val.length === 1 && val[0].toLowerCase().includes('none')) { val = 'None found'; style = 'color: var(--accent-green)'; } else { style = 'color: var(--accent-red)'; val = val.join('<br>'); } } }
+                     else if (field.color) { const v = String(val).toLowerCase(); if (v.includes('active') || v.includes('low') || v.includes('clean')) style = 'color: var(--accent-green)'; else if (v.includes('inactive') || v.includes('medium') || v.includes('mod')) style = 'color: var(--accent-yellow)'; else if (v.includes('dissolved') || v.includes('high') || v.includes('found')) style = 'color: var(--accent-red)'; if (field.key === 'riskLevel' && (v.includes('low') || v.includes('clean'))) style = 'color: var(--accent-green)'; }
+                     html += `<div class="data-row"><div class="data-label-group">${checkIcon}${iconMap[field.key] || ''}<div class="data-label">${field.label}</div></div><div class="data-value" style="${style}">${val}</div></div>`;
                 }
             });
             html += '</div>';
-            if (dataObj.sourceUrl) {
-                html += `<a href="${dataObj.sourceUrl}" target="_blank" class="source-link">Source Reference &rarr;</a>`;
-            }
+            if (dataObj.sourceUrl) { html += `<a href="${dataObj.sourceUrl}" target="_blank" class="source-link">Source Reference &rarr;</a>`; }
             return html;
         }
 
         function renderLocation(data) {
             if (!data || !data.address) return '<div class="data-value">No location data found</div>';
-            let html = `
-            <div class="data-list">
-                <div class="data-row">
-                    <div class="data-label-group">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <div class="data-label">Address</div>
-                    </div>
-                    <div class="data-value">${data.address}</div>
-                </div>
-                <div class="data-row">
-                    <div class="data-label-group">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        <div class="data-label">Type</div>
-                    </div>
-                    <div class="data-value">${data.locationType || 'Unknown'}</div>
-                </div>
-            </div>`;
-            
-            let safeAddr = data.address;
-            safeAddr = safeAddr.replace(/#\w+/g, '').replace(/(Unit|Suite|Ste|Floor|Fl)\s?\S+/gi, '');
+            let html = `<div class="data-list"><div class="data-row"><div class="data-label-group"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><div class="data-label">Address</div></div><div class="data-value">${data.address}</div></div><div class="data-row"><div class="data-label-group"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><svg class="data-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><div class="data-label">Type</div></div><div class="data-value">${data.locationType || 'Unknown'}</div></div></div>`;
+            let safeAddr = data.address.replace(/#\w+/g, '').replace(/(Unit|Suite|Ste|Floor|Fl)\s?\S+/gi, '');
             const encodedAddr = encodeURIComponent(safeAddr);
             const mapUrl = `https://maps.google.com/maps?q=${encodedAddr}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-            
-            html += `
-            <div class="map-container">
-                <iframe class="map-iframe" src="${mapUrl}"></iframe>
-            </div>
-            <div class="map-actions">
-                <a href="[https://www.google.com/maps/search/?api=1&query=$](https://www.google.com/maps/search/?api=1&query=$){encodedAddr}&layer=c" target="_blank" class="btn-map-action">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>
-                    Launch Street View
-                </a>
-                <a href="[https://www.google.com/maps/search/?api=1&query=$](https://www.google.com/maps/search/?api=1&query=$){encodedAddr}" target="_blank" class="btn-map-action">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
-                    Open Maps
-                </a>
-            </div>`;
+            html += `<div class="map-container"><iframe class="map-iframe" src="${mapUrl}"></iframe></div><div class="map-actions"><a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}&layer=c" target="_blank" class="btn-map-action"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>Launch Street View</a><a href="https://www.google.com/maps/search/?api=1&query=${encodedAddr}" target="_blank" class="btn-map-action"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>Open Maps</a></div>`;
             return html;
         }
 
@@ -1259,15 +1451,7 @@
                 let sentimentColor = '#888';
                 if(item.sentiment && (item.sentiment.toLowerCase().includes('pos') || item.sentiment.toLowerCase().includes('accred'))) sentimentColor = '#22c55e';
                 else if(item.sentiment && item.sentiment.toLowerCase().includes('neg')) sentimentColor = '#ef4444';
-                html += `
-                <div class="review-item">
-                    <div class="review-header">
-                        <span>${item.source || item.platform}</span>
-                        <span style="opacity:0.7">${item.date || ''}</span>
-                    </div>
-                    <div class="review-text">"${item.text || 'No text'}"</div>
-                    <div class="review-rating" style="color:${sentimentColor}">★ ${item.rating}</div>
-                </div>`;
+                html += `<div class="review-item"><div class="review-header"><span>${item.source || item.platform}</span><span style="opacity:0.7">${item.date || ''}</span></div><div class="review-text">"${item.text || 'No text'}"</div><div class="review-rating" style="color:${sentimentColor}">★ ${item.rating}</div></div>`;
             });
             html += '</div>';
             return html;
@@ -1276,13 +1460,7 @@
         function renderFindings(findings) {
             if (!findings || findings.length === 0) return '<div class="data-value">No findings generated</div>';
             let html = '<div class="data-list">';
-            findings.forEach(f => {
-                html += `
-                <div class="finding-item">
-                    <div class="finding-dot"></div>
-                    <div class="finding-text">${f}</div>
-                </div>`;
-            });
+            findings.forEach(f => { html += `<div class="finding-item"><div class="finding-dot"></div><div class="finding-text">${f}</div></div>`; });
             html += '</div>';
             return html;
         }
@@ -1290,181 +1468,82 @@
         function renderAlternatives(alts) {
             const container = document.getElementById('alternativesContainer');
             const grid = document.getElementById('alternativesGrid');
-            
-            if (!alts || alts.length === 0) {
-                container.style.display = 'none';
-                return;
-            }
-
+            if (!alts || alts.length === 0) { container.style.display = 'none'; return; }
             let html = '';
             alts.forEach(alt => {
                 const displayText = alt.location ? `${alt.name} (${alt.location})` : alt.name;
                 const safeName = displayText.replace(/'/g, "\\'");
-                
-                html += `
-                <div class="alt-chip" onclick="triggerNewSearch('${safeName}')">
-                    <svg class="alt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    ${displayText}
-                </div>`;
+                html += `<div class="alt-chip" onclick="triggerNewSearch('${safeName}')"><svg class="alt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>${displayText}</div>`;
             });
-
             grid.innerHTML = html;
             container.style.display = 'block';
         }
 
-        function triggerNewSearch(name) {
-            document.getElementById('searchInput').value = name;
-            runScrub();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function triggerNewSearch(name) { 
+            document.getElementById('searchInput').value = name; 
+            // Re-show initial search for transition effect if needed
+            document.getElementById('initialSearchWrapper').style.display = 'block';
+            runScrub(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
-        // --- GAME LOGIC ---
-        function startPong(container) {
-            container.innerHTML = `<div class="pong-container"><canvas id="pongCanvas"></canvas><div class="pong-overlay">DEEP SCANNING...</div></div>`;
-            const canvas = document.getElementById('pongCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = container.offsetWidth;
-            canvas.height = 200;
-            
-            let playerY = 75, aiY = 75, ballX = canvas.width/2, ballY = 100, ballSX = 4, ballSY = 4;
-            const paddleH = 50, paddleW = 8;
-
-            canvas.addEventListener('mousemove', e => {
-                const r = canvas.getBoundingClientRect();
-                playerY = e.clientY - r.top - paddleH/2;
-            });
-            
-            gameActive = true;
-            function draw() {
-                if(!gameActive) return;
-                ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(10, playerY, paddleW, paddleH);
-                ctx.fillRect(canvas.width-10-paddleW, aiY, paddleW, paddleH);
-                ctx.beginPath(); ctx.arc(ballX, ballY, 5, 0, Math.PI*2); ctx.fill();
-                
-                ballX += ballSX; ballY += ballSY;
-                if(ballY<0 || ballY>200) ballSY = -ballSY;
-                if(ballX < 20) { if(ballY > playerY && ballY < playerY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
-                if(ballX > canvas.width-20) { if(ballY > aiY && ballY < aiY+paddleH) ballSX = -ballSX; else { ballX=canvas.width/2; ballY=100; } }
-                
-                if(aiY + paddleH/2 < ballY - 20) aiY += 3;
-                else if(aiY + paddleH/2 > ballY + 20) aiY -= 3;
-                
-                requestAnimationFrame(draw);
-            }
-            draw();
-            return () => { gameActive = false; };
-        }
-
-        // --- MAIN SEARCH ---
         async function runScrub() {
             const query = document.getElementById('searchInput').value.trim();
             if (!query) { alert('Enter a business name.'); return; }
             currentSearchQuery = query;
             const key = getEffectiveApiKey();
             if (!key) { toggleSettings(); return; }
-
             const btn = document.getElementById('btnScrub');
             const report = document.getElementById('reportContainer');
             const altsContainer = document.getElementById('alternativesContainer');
-            const stopGridAnim = startActiveGrid('loadingCanvas'); // Start dot grid
-            
+            const stopGridAnim = startActiveGrid('loadingCanvas');
             btn.disabled = true;
             btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
-            
-            // Initialize report view in "scanning" mode
             report.style.display = 'grid';
-            report.classList.remove('resolved'); // Reset state
+            report.classList.remove('resolved');
             report.classList.add('scanning');
-            
-            // Hide secondary sections initially
+            document.getElementById('followUpContainer').style.display = 'none'; 
             altsContainer.style.display = 'none';
-
-            // Helper to populate placeholders
-            const fillPlaceholders = (id) => {
-                const el = document.getElementById(id);
-                if (el) {
-                    // Generate random hash-like string
-                    el.innerHTML = `<div style="font-family:monospace; color:#444; word-break:break-all;">${Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)}...</div>`;
-                }
-            };
-
-            // Fill placeholders initially
+            const followUpResponse = document.getElementById('followUpResponse');
+            if (followUpResponse) followUpResponse.style.display = 'none'; 
+            const fillPlaceholders = (id) => { const el = document.getElementById(id); if (el) { el.innerHTML = `<div style="font-family:monospace; color:#444; word-break:break-all;">${Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)}...</div>`; } };
             ['sosContent', 'legalContent', 'footprintContent', 'locationContent', 'reviewsContent', 'summaryContent'].forEach(fillPlaceholders);
-
-            // Start blur animation timer
-            let currentBlur = 20; // Start blur
+            let currentBlur = 20;
             clearSimulation();
-            blurInterval = setInterval(() => {
-                if (currentBlur > 5) { // Don't go to 0 yet, wait for API
-                    currentBlur -= 0.5;
-                    const grid = document.getElementById('reportContainer');
-                    if (grid.classList.contains('scanning')) {
-                        grid.style.filter = `blur(${currentBlur}px)`;
-                        // Refresh placeholders to simulate scanning activity
-                        ['sosContent', 'legalContent', 'footprintContent', 'locationContent', 'reviewsContent', 'summaryContent'].forEach(fillPlaceholders);
-                    }
-                }
-            }, 500); // Update every 500ms
-
-            const prompt = `
-                Investigate "${query}". Return ONLY JSON.
-                
-                REQUIREMENTS:
-                1. Standard DeepScrub analysis.
-                2. Identify 2-3 alternative businesses if the search is ambiguous or return related entities (e.g. parent co, similar names).
-
-                JSON: {
-                    "entityName": "Name",
-                    "sosData": { "status": "Active", "formationDate": "Date", "entityType": "Type", "registeredAgent": "Name", "principals": "Names", "sourceUrl": "URL" },
-                    "legalData": { "riskLevel": "Low", "bankruptcies": [], "liens": [], "judgments": [], "uccFilings": [], "sourceUrl": "URL" },
-                    "footprintData": { "website": "URL", "domainAge": "Age", "addressType": "Type", "socialPresence": "High" },
-                    "locationData": { "address": "Address", "locationType": "Type", "sourceUrl": "URL" },
-                    "reviewsData": [ { "source": "Google", "rating": "4.5", "text": "text", "date": "date", "sentiment": "pos" } ],
-                    "summaryData": { "keyFindings": ["Finding 1", "Finding 2"] },
-                    "alternatives": [ { "name": "Alt Business Name", "location": "State/City" } ]
-                }
-            `;
-
+            blurInterval = setInterval(() => { if (currentBlur > 5) { currentBlur -= 0.5; const grid = document.getElementById('reportContainer'); if (grid.classList.contains('scanning')) { grid.style.filter = `blur(${currentBlur}px)`; ['sosContent', 'legalContent', 'footprintContent', 'locationContent', 'reviewsContent', 'summaryContent'].forEach(fillPlaceholders); } } }, 500);
+            const prompt = `Investigate "${query}". Return ONLY JSON.\n\nREQUIREMENTS:\n1. Standard DeepScrub analysis.\n2. Identify 2-3 alternative businesses if the search is ambiguous or return related entities (e.g. parent co, similar names).\n\nJSON: { "entityName": "Name", "sosData": { "status": "Active", "formationDate": "Date", "entityType": "Type", "registeredAgent": "Name", "principals": "Names", "sourceUrl": "URL" }, "legalData": { "riskLevel": "Low", "bankruptcies": [], "liens": [], "judgments": [], "uccFilings": [], "sourceUrl": "URL" }, "footprintData": { "website": "URL", "domainAge": "Age", "addressType": "Type", "socialPresence": "High" }, "locationData": { "address": "Address", "locationType": "Type", "sourceUrl": "URL" }, "reviewsData": [ { "source": "Google", "rating": "4.5", "text": "text", "date": "date", "sentiment": "pos" } ], "summaryData": { "keyFindings": ["Finding 1", "Finding 2"] }, "alternatives": [ { "name": "Alt Business Name", "location": "State/City" } ] }`;
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
-                });
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }) });
                 const json = await res.json();
                 const data = JSON.parse(cleanJson(json.candidates[0].content.parts[0].text));
-                
-                // Stop blur and clear it
                 clearInterval(blurInterval);
                 if(stopGridAnim) stopGridAnim();
-                
-                // TRANSITION TO VISIBLE STATE
                 const grid = document.getElementById('reportContainer');
                 grid.style.filter = 'blur(0px)';
                 grid.classList.remove('scanning');
-                grid.classList.add('resolved'); // FORCE OPACITY 1
-                
+                grid.classList.add('resolved');
                 document.getElementById('reportName').innerText = data.entityName;
                 document.getElementById('timestamp').innerText = new Date().toLocaleDateString();
-                
                 document.getElementById('sosContent').innerHTML = renderDataGrid(data.sosData, 'sos');
                 document.getElementById('legalContent').innerHTML = renderDataGrid(data.legalData, 'legal');
                 document.getElementById('footprintContent').innerHTML = renderDataGrid(data.footprintData, 'footprint');
                 document.getElementById('locationContent').innerHTML = renderLocation(data.locationData);
                 document.getElementById('reviewsContent').innerHTML = renderListGroup(data.reviewsData, 'reviews');
                 document.getElementById('summaryContent').innerHTML = renderFindings(data.summaryData?.keyFindings);
-                
-                // Render Alternatives
                 renderAlternatives(data.alternatives);
-
+                
+                // Hide initial search and show follow-up
+                document.getElementById('initialSearchWrapper').style.display = 'none';
+                document.getElementById('followUpContainer').style.display = 'block'; 
+                
+                // Auto-focus to show blinking cursor
+                setTimeout(() => document.getElementById('followUpInput').focus(), 100);
             } catch(e) {
                 clearInterval(blurInterval);
                 if(stopGridAnim) stopGridAnim();
                 document.getElementById('reportContainer').style.filter = 'blur(0px)';
                 document.getElementById('reportContainer').classList.remove('scanning');
-                document.getElementById('reportContainer').style.opacity = '1'; // Ensure visible on error
-                
+                document.getElementById('reportContainer').style.opacity = '1';
                 console.error(e);
                 alert("Search failed.");
             } finally {
@@ -1477,45 +1556,40 @@
             const targetDiv = document.getElementById(section + 'Content');
             const original = targetDiv.innerHTML;
             const stop = startPong(targetDiv);
-            
             const prompt = `Deep dive for "${currentSearchQuery}" on section: ${section}. Return ONLY JSON matching the specific structure for this section previously defined. Be extremely detailed.`;
-            
             try {
                 const key = getEffectiveApiKey();
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
-                });
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }) });
                 const json = await res.json();
                 stop();
                 const data = JSON.parse(cleanJson(json.candidates[0].content.parts[0].text));
-                
                 if(section === 'reviews') targetDiv.innerHTML = renderListGroup(data, 'reviews');
                 else targetDiv.innerHTML = renderDataGrid(data, section);
-            } catch(e) {
-                stop();
-                console.error(e);
-                targetDiv.innerHTML = original;
-                alert("Deep dive failed.");
-            }
+            } catch(e) { stop(); console.error(e); targetDiv.innerHTML = original; alert("Deep dive failed."); }
         }
 
-        async function makeApiCall(prompt) {
-            const key = getEffectiveApiKey();
-            return fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    tools: [{ google_search: {} }]
-                })
-            }).then(res => {
-                if (!res.ok) throw new Error(res.status);
-                return res.json();
-            });
+        async function askFollowUp() {
+            const q = document.getElementById('followUpInput').value.trim();
+            if(!q) return;
+            const box = document.getElementById('followUpResponse');
+            const btn = document.getElementById('btnFollowUp');
+            const oldBtn = btn.innerHTML;
+            btn.disabled = true; 
+            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>`;
+            box.style.display = 'none';
+            const prompt = `Answer question about "${currentSearchQuery}": "${q}". Keep it concise.`;
+             try {
+                const key = getEffectiveApiKey();
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }) });
+                const json = await res.json();
+                box.innerHTML = marked.parse(json.candidates[0].content.parts[0].text);
+                box.style.display = 'block';
+            } catch(e) { alert("Error getting answer."); }
+            finally { btn.disabled = false; btn.innerHTML = oldBtn; }
         }
 
         document.getElementById('searchInput').addEventListener('keypress', (e) => { if(e.key==='Enter') runScrub(); });
+        document.getElementById('followUpInput').addEventListener('keypress', (e) => { if(e.key==='Enter') askFollowUp(); });
     </script>
 </body>
 </html>
