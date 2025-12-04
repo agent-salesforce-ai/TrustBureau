@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-black accent-rainbow rainbow-mode">
+<html lang="en" class="theme-black accent-mint">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -166,6 +166,13 @@
       --accent-rgb: 16, 185, 129;
     }
 
+    /* Rainbow mode: Nuclear transition override - ONLY color properties allowed */
+    html.rainbow-mode *,
+    html.rainbow-mode *::before,
+    html.rainbow-mode *::after {
+      transition: color 0.8s ease, background-color 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease, fill 0.8s ease, stroke 0.8s ease !important;
+    }
+
     /* ORANGE ACCENT */
     .accent-orange {
       --accent: #f97316;
@@ -320,13 +327,12 @@
     .btn-primary {
       background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
       color: var(--accent-text);
-      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3), var(--shadow-md);
-      transition: all 0.2s ease;
+      box-shadow: var(--shadow-md), 0 0 0 0 var(--accent-glow);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.5), var(--shadow-lg), 0 8px 20px -4px rgba(var(--accent-rgb), 0.4);
+      box-shadow: var(--shadow-lg), 0 8px 20px -4px rgba(var(--accent-rgb), 0.4);
     }
 
     .btn-primary:active {
@@ -338,13 +344,12 @@
       border: 1px solid var(--border-primary);
       color: var(--text-secondary);
       box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
     }
 
     .btn-secondary:hover {
       border-color: var(--accent);
       color: var(--accent);
-      box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2), var(--shadow-md);
+      box-shadow: var(--shadow-md);
     }
 
     .btn-ghost {
@@ -504,13 +509,13 @@
       background: white;
       border: 3px solid var(--accent);
       cursor: grab;
-      box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4), 0 2px 8px rgba(0,0,0,0.12);
-      transition: all 0.15s ease, border-color 1.5s ease, box-shadow 1.5s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: all 0.15s ease;
     }
 
     .slider::-webkit-slider-thumb:hover {
       transform: scale(1.1);
-      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5), 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .slider::-webkit-slider-thumb:active {
@@ -525,8 +530,7 @@
       background: white;
       border: 3px solid var(--accent);
       cursor: grab;
-      box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4), 0 2px 8px rgba(0,0,0,0.12);
-      transition: all 0.15s ease, border-color 1.5s ease, box-shadow 1.5s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
 
     .slider::-moz-range-track {
@@ -544,12 +548,11 @@
     .slider-dark::-webkit-slider-thumb {
       border: 0;
       background: linear-gradient(135deg, var(--accent-light), var(--accent));
-      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5), 0 0 0 4px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.3);
-      transition: all 0.15s ease, background 1.5s ease, box-shadow 1.5s ease;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.3);
     }
 
     .slider-dark::-webkit-slider-thumb:hover {
-      box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.6), 0 0 0 6px rgba(255,255,255,0.2), 0 6px 16px rgba(0,0,0,0.35);
+      box-shadow: 0 0 0 6px rgba(255,255,255,0.2), 0 6px 16px rgba(0,0,0,0.35);
     }
 
     /* ============================================
@@ -585,19 +588,17 @@
       border-radius: 28px;
       border: 4px solid var(--accent);
       box-shadow: 
-        0 0 40px rgba(var(--accent-rgb), 0.25),
-        0 0 80px rgba(var(--accent-rgb), 0.1),
-        0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        0 25px 50px -12px rgba(var(--accent-rgb), 0.15),
+        0 0 0 1px rgba(var(--accent-rgb), 0.1);
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 1.5s ease, box-shadow 1.5s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .preview-card:hover {
       transform: translateY(-4px);
       box-shadow: 
-        0 0 60px rgba(var(--accent-rgb), 0.35),
-        0 0 100px rgba(var(--accent-rgb), 0.15),
-        0 30px 60px -12px rgba(0, 0, 0, 0.3);
+        0 30px 60px -12px rgba(var(--accent-rgb), 0.2),
+        0 0 0 1px rgba(var(--accent-rgb), 0.15);
     }
 
     .preview-header {
@@ -1085,10 +1086,9 @@
       -webkit-backdrop-filter: blur(12px);
       z-index: 2000;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       padding: 20px;
-      overflow-y: auto;
       opacity: 1;
       visibility: visible;
       transition: all 0.4s ease-out;
@@ -1110,19 +1110,48 @@
       padding: 32px;
       width: 100%;
       max-width: 400px;
-      margin: auto;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.4), 0 0 80px rgba(var(--accent-rgb), 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       text-align: center;
       position: relative;
       overflow: visible;
+      animation: cardGlowCycle 36s infinite;
+    }
+
+    @keyframes cardGlowCycle {
+      0%, 100% { border: 2px solid #10b981; box-shadow: 0 0 40px rgba(16, 185, 129, 0.4), 0 0 80px rgba(16, 185, 129, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      8.33% { border: 2px solid #3b82f6; box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      16.66% { border: 2px solid #8b5cf6; box-shadow: 0 0 40px rgba(139, 92, 246, 0.4), 0 0 80px rgba(139, 92, 246, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      25% { border: 2px solid #f43f5e; box-shadow: 0 0 40px rgba(244, 63, 94, 0.4), 0 0 80px rgba(244, 63, 94, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      33.33% { border: 2px solid #f97316; box-shadow: 0 0 40px rgba(249, 115, 22, 0.4), 0 0 80px rgba(249, 115, 22, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      41.66% { border: 2px solid #06b6d4; box-shadow: 0 0 40px rgba(6, 182, 212, 0.4), 0 0 80px rgba(6, 182, 212, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      50% { border: 2px solid #eab308; box-shadow: 0 0 40px rgba(234, 179, 8, 0.4), 0 0 80px rgba(234, 179, 8, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      58.33% { border: 2px solid #525252; box-shadow: 0 0 40px rgba(82, 82, 82, 0.4), 0 0 80px rgba(82, 82, 82, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      66.66% { border: 2px solid #166534; box-shadow: 0 0 40px rgba(22, 101, 52, 0.4), 0 0 80px rgba(22, 101, 52, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      75% { border: 2px solid #1e3a5f; box-shadow: 0 0 40px rgba(30, 58, 95, 0.4), 0 0 80px rgba(30, 58, 95, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      83.33% { border: 2px solid #881337; box-shadow: 0 0 40px rgba(136, 19, 55, 0.4), 0 0 80px rgba(136, 19, 55, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      91.66% { border: 2px solid #64748b; box-shadow: 0 0 40px rgba(100, 116, 139, 0.4), 0 0 80px rgba(100, 116, 139, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
     }
     
     .welcome-logo {
       width: 64px;
       height: 64px;
       margin: 0 auto 20px;
-      color: var(--accent);
+      animation: shieldColorCycle 36s infinite;
+    }
+
+    @keyframes shieldColorCycle {
+      0%, 100% { color: #10b981; }      /* mint */
+      8.33% { color: #3b82f6; }         /* blue */
+      16.66% { color: #8b5cf6; }        /* purple */
+      25% { color: #f43f5e; }           /* rose */
+      33.33% { color: #f97316; }        /* orange */
+      41.66% { color: #06b6d4; }        /* cyan */
+      50% { color: #eab308; }           /* gold */
+      58.33% { color: #525252; }        /* slate */
+      66.66% { color: #166534; }        /* forest */
+      75% { color: #1e3a5f; }           /* navy */
+      83.33% { color: #881337; }        /* burgundy */
+      91.66% { color: #64748b; }        /* steel */
     }
 
     .welcome-logo svg {
@@ -1177,99 +1206,42 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
-      padding: 16px 20px;
-      color: var(--accent-text);
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      padding: 14px 16px;
+      color: white;
       border: none;
-      border-radius: 14px;
-      font-size: 15px;
+      border-radius: 12px;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 0.02em;
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 1.5s ease, box-shadow 1.5s ease;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.4), 0 0 40px rgba(var(--accent-rgb), 0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+      transition: transform 0.2s;
+      animation: btnColorCycle 36s infinite;
     }
-    
-    .welcome-btn-primary::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.3s;
+
+    @keyframes btnColorCycle {
+      0%, 100% { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+      8.33% { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+      16.66% { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+      25% { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+      33.33% { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+      41.66% { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+      50% { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); }
+      58.33% { background: linear-gradient(135deg, #525252 0%, #404040 100%); }
+      66.66% { background: linear-gradient(135deg, #166534 0%, #14532d 100%); }
+      75% { background: linear-gradient(135deg, #1e3a5f 0%, #172554 100%); }
+      83.33% { background: linear-gradient(135deg, #881337 0%, #4c0519 100%); }
+      91.66% { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
     }
 
     .welcome-btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 8px 30px rgba(var(--accent-rgb), 0.5), 0 0 60px rgba(var(--accent-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-    }
-    
-    .welcome-btn-primary:hover::before {
-      opacity: 1;
-    }
-    
-    .welcome-btn-primary:active {
-      transform: translateY(-1px) scale(1.01);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
     
     .welcome-btn-primary svg {
       width: 18px;
       height: 18px;
-    }
-    
-    .welcome-btn-primary .pro-badge {
-      background: rgba(0,0,0,0.25);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .welcome-btn-secondary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px 20px;
-      background: var(--bg-card-inner);
-      border: 1px solid var(--accent);
-      border-radius: 14px;
-      color: var(--accent);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 1.5s ease, color 1.5s ease, box-shadow 1.5s ease;
-      position: relative;
-      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.15);
-    }
-
-    .welcome-btn-secondary:hover {
-      background: var(--accent-glow);
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.25);
-    }
-    
-    .welcome-btn-secondary:active {
-      transform: translateY(0);
-    }
-    
-    .welcome-btn-secondary .lite-badge {
-      background: rgba(var(--accent-rgb), 0.15);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: var(--accent);
-      border: 1px solid rgba(var(--accent-rgb), 0.3);
-      transition: all 1.5s ease;
     }
 
     .welcome-error {
@@ -1304,6 +1276,25 @@
       flex: 1;
       height: 1px;
       background: var(--border-primary);
+    }
+
+    .welcome-btn-secondary {
+      width: 100%;
+      padding: 14px 16px;
+      background: transparent;
+      border: 2px solid var(--border-primary);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .welcome-btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-glow);
     }
 
     .welcome-features {
@@ -1549,9 +1540,6 @@
     }
 
     .login-free-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 100%;
       padding: 14px 16px;
       background: transparent;
@@ -1641,15 +1629,13 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--accent);
-      box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
-      transition: all 0.2s, border-color 1.5s ease, background 1.5s ease, color 1.5s ease, box-shadow 1.5s ease;
+      transition: all 0.2s;
     }
     
     .user-badge:hover {
       background: var(--accent);
       color: var(--accent-text);
       border-color: var(--accent);
-      box-shadow: 0 0 25px rgba(var(--accent-rgb), 0.5);
     }
 
     .user-badge svg {
@@ -1672,49 +1658,6 @@
     .logout-btn:hover {
       border-color: #ef4444;
       color: #ef4444;
-    }
-
-    /* Lite Usage Badge */
-    .lite-usage-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: rgba(245, 158, 11, 0.1);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #f59e0b;
-      transition: all 0.2s;
-    }
-    
-    .lite-usage-badge .lite-count {
-      font-weight: 800;
-      font-size: 13px;
-    }
-    
-    .lite-usage-badge .lite-label {
-      font-weight: 500;
-      opacity: 0.8;
-    }
-    
-    .lite-usage-badge.low {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ef4444;
-    }
-    
-    .lite-usage-badge.depleted {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.5);
-      color: #ef4444;
-      animation: pulse-warning 2s infinite;
-    }
-    
-    @keyframes pulse-warning {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
     }
 
     /* ============================================
@@ -2101,32 +2044,13 @@
     /* Dashboard Styles */
     .offer-count-badge {
       background: var(--accent);
-      color: var(--accent-text);
+      color: white;
       font-size: 10px;
       font-weight: 700;
       padding: 2px 6px;
       border-radius: 10px;
       min-width: 18px;
       text-align: center;
-      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
-    }
-    
-    /* Lite usage badge - grey by default, orange when low */
-    .lite-badge {
-      background: var(--bg-tertiary);
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 10px;
-      min-width: 18px;
-      text-align: center;
-    }
-    
-    .lite-badge.low {
-      background: var(--accent);
-      color: var(--accent-text);
-      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
     }
     
     .dashboard-modal {
@@ -2331,14 +2255,6 @@
       font-size: 11px;
       color: var(--text-muted);
     }
-
-    /* NUCLEAR: Kill ALL transitions when rainbow mode is active */
-    html.rainbow-mode *,
-    html.rainbow-mode *::before,
-    html.rainbow-mode *::after {
-      transition: none !important;
-      animation: none !important;
-    }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-6 lg:p-8 flex justify-center">
@@ -2398,7 +2314,6 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
           </svg>
           Sign In
-          <span class="pro-badge">PRO</span>
         </button>
       </div>
       
@@ -2406,10 +2321,7 @@
       <div class="welcome-divider">or</div>
       
       <!-- Free Version Button -->
-      <button onclick="continueAsFree()" class="welcome-btn-secondary">
-          Continue
-          <span class="lite-badge">LITE</span>
-        </button>
+      <button onclick="continueAsFree()" class="welcome-btn-secondary">Continue with Free Version</button>
       
       <!-- Features -->
       <div class="welcome-features">
@@ -2470,14 +2382,11 @@
           <input type="text" id="loginUsername" class="login-input" placeholder="Username" autocomplete="username" required />
           <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password" required />
           <div id="loginError" class="login-error">Invalid username or password</div>
-          <button type="button" onclick="handleLogin()" class="login-btn" style="flex-direction: column; gap: 6px;">
-            <span style="display: flex; align-items: center; gap: 8px;">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-              Sign In
-            </span>
-            <span style="background: rgba(0,0,0,0.3); padding: 2px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;">PRO</span>
+          <button type="button" onclick="handleLogin()" class="login-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            Sign In
           </button>
         </form>
         
@@ -2487,10 +2396,7 @@
         </div>
         
         <!-- Free Version Button -->
-        <button onclick="closeLoginModal()" class="login-free-btn" style="flex-direction: column; gap: 6px;">
-          <span>Continue</span>
-          <span style="background: rgba(255,255,255,0.15); padding: 2px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;">LITE</span>
-        </button>
+        <button onclick="closeLoginModal()" class="login-free-btn">Continue with Free Version</button>
         
         <!-- Features -->
         <div class="login-features">
@@ -2594,7 +2500,6 @@
                     </svg>
                     <span id="userBadgeName">User</span>
                 </div>
-                
                 
                 <!-- Mode Toggle -->
                 <div class="flex items-center rounded-full overflow-hidden" style="background: var(--accent-glow); border: 1px solid var(--accent); padding: 6px 4px;">
@@ -2826,8 +2731,7 @@
                     </div>
                     
                     <!-- Share Button -->
-                    <button onclick="shareOffer()" class="share-btn h-8 px-3 rounded-full flex items-center justify-center gap-2 font-semibold" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); font-size: 12px;">
-                        <span id="liteUsageBadge" class="lite-badge hidden">25</span>
+                    <button onclick="shareOffer()" class="h-8 px-4 rounded-full flex items-center justify-center gap-2 transition-all font-semibold" style="background: var(--accent); color: var(--accent-text); font-size: 12px;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='brightness(1)'">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                         </svg>
@@ -3613,37 +3517,6 @@ Government Issued ID</textarea>
     </div>
   </div>
 
-  <!-- Upgrade Modal (shown when lite limit reached) -->
-  <div id="upgradeModal" class="login-modal-overlay">
-    <div class="login-modal rounded-2xl w-full max-w-md shadow-2xl p-8 text-center">
-      <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
-      </div>
-      <h3 class="text-2xl font-extrabold mb-3" style="color: var(--text-primary);">Monthly Limit Reached</h3>
-      <p class="text-sm mb-6" style="color: var(--text-secondary);">You've used all <strong>25 free shares</strong> this month. Upgrade to Pro for unlimited shares and white-label branding.</p>
-      
-      <div class="rounded-xl p-4 mb-6" style="background: var(--bg-card-inner); border: 1px solid var(--border-primary);">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-sm font-semibold" style="color: var(--text-muted);">LITE (Free)</span>
-          <span class="text-sm font-bold" style="color: var(--text-muted);">Current</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold" style="color: var(--accent);">PRO</span>
-          <span class="text-sm font-bold" style="color: var(--accent);">Unlimited + Branding</span>
-        </div>
-      </div>
-      
-      <button onclick="openLoginModal(); closeUpgradeModal();" class="btn btn-primary w-full py-4 rounded-xl font-bold mb-3">
-        Sign In to Upgrade
-      </button>
-      <button onclick="closeUpgradeModal()" class="text-sm font-semibold transition-colors" style="color: var(--text-muted);">Maybe Later</button>
-      
-      <p class="text-xs mt-6" style="color: var(--text-muted);">Your limit resets on the 1st of each month.</p>
-    </div>
-  </div>
-
   <!-- Toast -->
   <div id="toast" class="toast fixed bottom-6 right-6 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3" style="background: var(--bg-card);">
     <div class="p-1.5 rounded-full" style="background: rgba(var(--accent-rgb), 0.2);">
@@ -3667,7 +3540,7 @@ Government Issued ID</textarea>
     // THEME MANAGEMENT
     // ============================================
     let currentTheme = 'black';
-    let currentAccent = 'rainbow';
+    let currentAccent = 'mint';
     let currentLogoUrl = '';
     let currentCompanyName = '';
     let currentClientMode = 'iso';
@@ -3811,7 +3684,7 @@ Government Issued ID</textarea>
             };
             
             applyColor();
-            window.rainbowInterval = setInterval(applyColor, 4000);
+            window.rainbowInterval = setInterval(applyColor, 3000);
         } else {
             html.classList.add(`accent-${accent}`);
         }
@@ -4363,81 +4236,6 @@ Government Issued ID</textarea>
         'sutton': 'nouns'
     };
     
-    // ============================================
-    // LITE VERSION USAGE TRACKING
-    // ============================================
-    const LITE_MONTHLY_LIMIT = 25;
-    
-    function getLiteUsage() {
-        try {
-            const data = JSON.parse(localStorage.getItem('trustbureau_lite_usage') || '{}');
-            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-            
-            // Reset if new month
-            if (data.month !== currentMonth) {
-                return { month: currentMonth, count: 0 };
-            }
-            return data;
-        } catch (e) {
-            return { month: new Date().toISOString().slice(0, 7), count: 0 };
-        }
-    }
-    
-    function saveLiteUsage(data) {
-        localStorage.setItem('trustbureau_lite_usage', JSON.stringify(data));
-    }
-    
-    function incrementLiteUsage() {
-        const usage = getLiteUsage();
-        usage.count++;
-        saveLiteUsage(usage);
-        updateLiteUsageUI();
-        return usage.count;
-    }
-    
-    function canUseLiteShare() {
-        if (currentUser) return true; // Logged in users have unlimited
-        const usage = getLiteUsage();
-        return usage.count < LITE_MONTHLY_LIMIT;
-    }
-    
-    function getRemainingLiteShares() {
-        if (currentUser) return Infinity;
-        const usage = getLiteUsage();
-        return Math.max(0, LITE_MONTHLY_LIMIT - usage.count);
-    }
-    
-    function updateLiteUsageUI() {
-        const badge = $('liteUsageBadge');
-        const remaining = getRemainingLiteShares();
-        
-        if (currentUser) {
-            // Hide for logged in users
-            if (badge) badge.classList.add('hidden');
-            return;
-        }
-        
-        if (badge) {
-            badge.classList.remove('hidden');
-            badge.textContent = remaining;
-            
-            // Change color when low (5 or less)
-            if (remaining <= 5) {
-                badge.classList.add('low');
-            } else {
-                badge.classList.remove('low');
-            }
-        }
-    }
-    
-    function showUpgradeModal() {
-        $('upgradeModal').classList.add('open');
-    }
-    
-    function closeUpgradeModal() {
-        $('upgradeModal').classList.remove('open');
-    }
-    
     let currentUser = null;
 
     function handleWelcomeLogin() {
@@ -4551,9 +4349,6 @@ Government Issued ID</textarea>
             brandSection.classList.add('locked');
             userBadge.classList.add('hidden');
         }
-        
-        // Update lite usage display
-        updateLiteUsageUI();
     }
 
     function loadAuthState() {
@@ -5327,20 +5122,8 @@ Government Issued ID</textarea>
     }
     
     function copyLink() { 
-        // Check lite usage limit
-        if (!canUseLiteShare()) {
-            showUpgradeModal();
-            return;
-        }
-        
         const l = getLink(); 
         saveOfferToDashboard(l); // Save offer to dashboard
-        
-        // Increment usage for lite users
-        if (!currentUser) {
-            incrementLiteUsage();
-        }
-        
         if (navigator.clipboard) { navigator.clipboard.writeText(l).then(() => showToast('Link copied!')).catch(() => prompt("Copy Link:", l)); } else { prompt("Copy Link:", l); }
         $('shareModal').classList.add('hidden');
     }
@@ -6286,16 +6069,6 @@ Government Issued ID</textarea>
                 closeLoginModal();
             }
         });
-        
-        // Close upgrade modal on overlay click
-        $('upgradeModal').addEventListener('click', (e) => {
-            if (e.target === $('upgradeModal')) {
-                closeUpgradeModal();
-            }
-        });
-        
-        // Initialize lite usage UI
-        updateLiteUsageUI();
         
         // Initialize client view if this is a client share link
         if (isClientShareLink && clientShareData) {
