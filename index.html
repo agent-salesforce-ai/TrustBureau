@@ -13,15 +13,39 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-body: #050505;
-      --bg-card: rgba(20, 20, 20, 0.4);
-      --bg-card-hover: rgba(30, 30, 30, 0.6);
-      --border-primary: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.2);
-      --text-primary: #ffffff;
-      --text-secondary: #a1a1aa;
-      --accent-green: #22c55e;
-      --accent-glow: 120, 120, 120;
+        /* Dark Theme (Default - Matches Vision) */
+        --bg-body: #0a0a0a;
+        --bg-aurora: #2c2c2c;
+        --bg-card: rgba(20, 20, 20, 0.4);
+        --bg-card-hover: rgba(30, 30, 30, 0.6);
+        --border-primary: rgba(255, 255, 255, 0.1);
+        --border-hover: rgba(255, 255, 255, 0.2);
+        --text-primary: #ffffff;
+        --text-secondary: #a1a1aa;
+        --text-muted: #888888;
+        --accent-green: #15803d;
+        --accent-red: #991b1b;
+        --accent-yellow: #eab308;
+        --accent-glow: 120, 120, 120; /* For spotlight effect */
+        --grid-color: rgba(255,255,255,0.03);
+    }
+
+    /* Light Theme Override (Matches Vision) */
+    [data-theme="light"] {
+        --bg-body: #ffffff;
+        --bg-aurora: #f3f4f6;
+        --bg-card: #ffffff;
+        --bg-card-hover: #f9fafb;
+        --border-primary: #e5e7eb;
+        --border-hover: #d1d5db;
+        --text-primary: #111827; 
+        --text-secondary: #4b5563; 
+        --text-muted: #9ca3af; 
+        --accent-green: #15803d;
+        --accent-red: #991b1b;
+        --accent-yellow: #eab308;
+        --accent-glow: 100, 100, 100;
+        --grid-color: rgba(0,0,0,0.04);
     }
 
     body {
@@ -34,19 +58,25 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       position: relative;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    .aurora-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 50% 0%, #1a2c2a 0%, #050505 50%, #000000 100%);
-      z-index: -2;
-      animation: auroraPulse 10s ease-in-out infinite alternate;
+    /* Aurora & Grid Backgrounds */
+    body::before {
+        content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(ellipse 120% 80% at 50% 20%, var(--bg-aurora) 0%, transparent 50%);
+        pointer-events: none; z-index: -3; animation: auroraPulse 10s infinite;
+        transition: background 0.3s ease;
     }
+    @keyframes auroraPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
     
-    @keyframes auroraPulse {
-      0% { opacity: 0.8; transform: scale(1); }
-      100% { opacity: 1; transform: scale(1.05); }
+    body::after {
+        content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+        background-size: 60px 60px; pointer-events: none; z-index: -2;
+        mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 0%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 0%, transparent 70%);
+        transition: background-image 0.3s ease;
     }
 
     .noise-overlay {
@@ -78,10 +108,10 @@
       animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .hero-logo-icon { width: 48px; height: 48px; color: var(--text-primary); filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.2)); }
+    .hero-logo-icon { width: 48px; height: 48px; color: var(--text-primary); transition: color 0.3s ease; }
 
-    .hero-logo-text { font-size: 2rem; font-weight: 800; letter-spacing: 0.15em; color: var(--text-primary); text-transform: uppercase; }
-    .hero-logo-text span { color: #888; font-weight: 400; }
+    .hero-logo-text { font-size: 2rem; font-weight: 800; letter-spacing: 0.15em; color: var(--text-primary); text-transform: uppercase; transition: color 0.3s ease; }
+    .hero-logo-text span { color: var(--text-muted); font-weight: 400; transition: color 0.3s ease; }
 
     .hub-title {
       font-size: 0.75rem;
@@ -96,13 +126,15 @@
       display: flex;
       align-items: center;
       gap: 1rem;
+      transition: color 0.3s ease;
     }
 
     .hub-title::before, .hub-title::after {
         content: '';
         height: 1px;
         width: 30px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+        transition: background 0.3s ease;
     }
 
     .cards-container {
@@ -115,7 +147,7 @@
 
     .tool-card {
       background: var(--bg-card);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-primary);
       border-radius: 16px;
       padding: 3rem 2rem;
       text-decoration: none;
@@ -127,45 +159,42 @@
       opacity: 0;
       transform: translateY(10px);
       animation: slideUp 0.6s ease-out forwards;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.03), 0 0 60px rgba(255, 255, 255, 0.02), inset 0 0 20px rgba(255, 255, 255, 0.02), 0 0 1px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 30px rgba(0,0,0,0.02);
       position: relative;
       overflow: hidden;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
 
-    .tool-card .icon-wrapper { border-color: #444; background: rgba(255,255,255,0.03); }
-    .tool-card .tool-icon { color: #fff; filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2)); }
-    .tool-card .tool-name { color: #ccc; }
-    .tool-card .tool-desc { color: #888; }
-    .tool-card:hover .icon-wrapper { border-color: rgba(255,255,255,0.2); background: rgba(255, 255, 255, 0.08); }
-    .tool-card:hover .tool-icon { color: var(--text-primary); }
+    .tool-card .icon-wrapper { 
+        border-color: var(--border-primary); 
+        background: rgba(255,255,255,0.03); 
+        transition: all 0.3s ease;
+    }
+    
+    [data-theme="light"] .tool-card .icon-wrapper {
+        background: rgba(0,0,0,0.03);
+    }
+
+    .tool-card .tool-icon { color: var(--text-primary); transition: color 0.3s ease; }
+    .tool-card .tool-name { color: var(--text-primary); transition: color 0.3s ease; }
+    .tool-card .tool-desc { color: var(--text-muted); transition: color 0.3s ease; }
+    
+    .tool-card:hover .icon-wrapper { 
+        border-color: var(--text-primary); 
+        background: var(--bg-card-hover); 
+    }
+    
+    .tool-card:hover .tool-icon { color: var(--text-primary); transform: scale(1.05); }
     .tool-card:hover .tool-name { color: var(--text-primary); }
     .tool-card:hover .tool-desc { color: var(--text-secondary); }
 
-    .tool-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 16px; 
-      padding: 1px; 
-      background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent); 
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
-      -webkit-mask-composite: xor; 
-      mask-composite: exclude; 
-      pointer-events: none;
-    }
-
-    .tool-card:nth-child(1) { animation-delay: 0.1s; }
-    .tool-card:nth-child(2) { animation-delay: 0.2s; }
-    .tool-card:nth-child(3) { animation-delay: 0.3s; }
-    .tool-card:nth-child(4) { animation-delay: 0.4s; }
-
+    /* Spotlight Effect */
     .tool-card::after {
       content: "";
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(var(--accent-glow), 0.1), transparent 40%);
+      background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(var(--accent-glow), 0.06), transparent 40%);
       opacity: 0;
       transition: opacity 0.5s;
       pointer-events: none;
@@ -176,15 +205,14 @@
 
     .tool-card:hover {
       background: var(--bg-card-hover);
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: var(--border-hover);
       transform: translateY(-5px);
-      box-shadow: 0 0 40px rgba(255, 255, 255, 0.08), 0 0 80px rgba(255, 255, 255, 0.04), inset 0 0 30px rgba(255, 255, 255, 0.03), 0 0 2px rgba(255, 255, 255, 0.3), 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
     .icon-wrapper {
       width: 72px;
       height: 72px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
       border-radius: 20px;
       display: flex;
       align-items: center;
@@ -193,21 +221,13 @@
       border: 1px solid var(--border-primary);
       transition: all 0.4s ease;
       position: relative;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       z-index: 2;
     }
 
-    .tool-card:hover .icon-wrapper {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255,255,255,0.2);
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255,255,255,0.05);
-    }
-
-    .tool-icon { width: 32px; height: 32px; color: var(--text-primary); transition: color 0.3s ease; }
+    .tool-icon { width: 32px; height: 32px; color: var(--text-primary); }
     .tool-content { position: relative; z-index: 2; }
-    .tool-name { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; letter-spacing: 0.02em; transition: color 0.3s ease; }
-    .tool-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; font-weight: 500; transition: color 0.3s ease; }
+    .tool-name { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; letter-spacing: 0.02em; }
+    .tool-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; font-weight: 500; }
 
     footer {
       padding: 2rem;
@@ -219,7 +239,7 @@
       border-top: 1px solid transparent;
     }
 
-    footer a { font-size: 0.75rem; color: #444; text-decoration: none; transition: color 0.2s; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    footer a { font-size: 0.75rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
     footer a:hover { color: var(--text-primary); }
 
     .login-btn {
@@ -233,15 +253,51 @@
       font-weight: 600;
       border: 1px solid var(--border-primary);
       border-radius: 8px;
-      background: rgba(255,255,255,0.03);
+      background: var(--bg-card);
       transition: all 0.2s;
       backdrop-filter: blur(4px);
+      z-index: 20; /* Fixed: Ensure button is above main content */
     }
 
-    .login-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); background: rgba(255,255,255,0.08); }
+    .login-btn:hover { color: var(--text-primary); border-color: var(--text-primary); background: var(--bg-card-hover); }
+
+    .theme-toggle {
+      position: absolute;
+      top: 2rem;
+      right: 8rem;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+      z-index: 20; /* Fixed: Ensure button is above main content */
+    }
+
+    .theme-toggle:hover {
+      color: var(--text-primary);
+      border-color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    .theme-toggle .sun-icon { display: none; }
+    .theme-toggle .moon-icon { display: block; }
+    [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+    [data-theme="light"] .theme-toggle .moon-icon { display: none; }
 
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .tool-card:nth-child(1) { animation-delay: 0.1s; }
+    .tool-card:nth-child(2) { animation-delay: 0.2s; }
+    .tool-card:nth-child(3) { animation-delay: 0.3s; }
+    .tool-card:nth-child(4) { animation-delay: 0.4s; }
 
     @media (max-width: 768px) {
       .cards-container { grid-template-columns: 1fr; max-width: 400px; }
@@ -254,7 +310,24 @@
   <div class="aurora-bg"></div>
   <div class="noise-overlay"></div>
   
-  <a href="https://trustbureau.ai/approval-toolbox.html" class="login-btn">Sign In</a>
+  <a href="#" class="login-btn">Sign In</a>
+
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </button>
 
   <main>
     <div class="hero-logo">
@@ -271,7 +344,7 @@
     <div class="cards-container">
       
       <!-- 1. DeepScrub -->
-      <a href="https://trustbureau.ai/deep-scrub.html" class="tool-card">
+      <a href="index.html" class="tool-card">
         <div class="icon-wrapper">
           <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(180deg);">
             <circle cx="11" cy="11" r="8"></circle>
@@ -285,7 +358,7 @@
       </a>
 
       <!-- 2. Approval ToolBox -->
-      <a href="https://trustbureau.ai/approval-toolbox.html" class="tool-card">
+      <a href="#" class="tool-card">
         <div class="icon-wrapper">
           <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
@@ -300,15 +373,13 @@
       </a>
 
       <!-- 3. Vision Document Analysis -->
-      <a href="https://trustbureau.ai/vision.html" class="tool-card">
+      <a href="vision.html" class="tool-card">
         <div class="icon-wrapper">
           <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <!-- Glasses -->
-            <circle cx="6" cy="12" r="4"></circle>
-            <circle cx="18" cy="12" r="4"></circle>
-            <path d="M10 12h4"></path>
-            <path d="M2 12h0"></path>
-            <path d="M22 12h0"></path>
+            <circle cx="6" cy="12" r="5"></circle>
+            <circle cx="18" cy="12" r="5"></circle>
+            <line x1="11" y1="12" x2="13" y2="12"></line>
           </svg>
         </div>
         <div class="tool-content">
@@ -318,7 +389,7 @@
       </a>
 
       <!-- 4. ables.ai -->
-      <a href="https://trustbureau.ai/approval-toolbox.html" class="tool-card">
+      <a href="#" class="tool-card">
         <div class="icon-wrapper">
           <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">
             <circle cx="12" cy="12" r="4"></circle>
@@ -341,6 +412,7 @@
   </footer>
 
   <script>
+    // Spotlight Effect
     document.querySelectorAll('.tool-card').forEach(card => {
       card.addEventListener('mousemove', e => {
         const rect = card.getBoundingClientRect();
@@ -349,6 +421,23 @@
         card.style.setProperty('--mouse-x', `${x}px`);
         card.style.setProperty('--mouse-y', `${y}px`);
       });
+    });
+
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('themeToggle');
+    
+    function initTheme() {
+        const savedTheme = localStorage.getItem('trustbureau_theme') || 'light'; 
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    initTheme();
+    
+    themeToggle.addEventListener('click', () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('trustbureau_theme', newTheme);
     });
   </script>
 
