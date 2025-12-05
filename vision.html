@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustBureau | Vision</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z' fill='white' opacity='0.1' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M9 12l2 2 4-4' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-body: #0a0a0a;
+            --bg-aurora: #2c1a2b; /* Slightly purple for Vision */
+            --bg-card: rgba(20, 20, 20, 0.4);
+            --bg-card-hover: rgba(30, 30, 30, 0.6);
+            --border-primary: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #888888;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-yellow: #eab308;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse 120% 80% at 50% 20%, var(--bg-aurora) 0%, transparent 50%);
+            pointer-events: none; z-index: -3; animation: auroraPulse 10s infinite;
+        }
+        @keyframes auroraPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px; pointer-events: none; z-index: -2;
+            mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 0%, transparent 70%);
+        }
+        .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 0 2rem; flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
+        
+        header { padding: 1.5rem 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 2rem; }
+        .logo-group { grid-column: 1; display: flex; align-items: center; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.875rem; text-decoration: none; color: var(--text-primary); }
+        .logo-text { font-size: 0.875rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+        
+        /* Updated Header Center Styles */
+        .header-center { 
+            grid-column: 2; 
+            justify-self: center; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        
+        .vision-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer; /* Makes it clickable */
+        }
+
+        .vision-icon-box {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .vision-brand:hover .vision-icon-box {
+            border-color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.05);
+        }
+
+        .vision-title-text {
+            font-size: 1rem; 
+            font-weight: 700; 
+            letter-spacing: 0.15em; 
+            text-transform: uppercase; 
+            color: var(--text-primary);
+        }
+
+        .header-actions { grid-column: 3; justify-self: end; position: relative; z-index: 10; display: flex; gap: 0.75rem; }
+        
+        .btn-api { display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-api:hover { border-color: var(--border-hover); color: var(--text-primary); background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: 0 0 20px rgba(255,255,255,0.05); }
+        
+        .status-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .status-dot.active { background: var(--accent-green); box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+        .status-dot.inactive { background: var(--accent-red); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+
+        /* Vision Specifics */
+        .vision-wrapper { max-width: 1100px; margin: 0 auto; width: 100%; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .upload-zone {
+            border: 2px dashed var(--border-primary);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 30px rgba(255,255,255,0.02);
+            max-width: 680px;
+            margin: 2rem auto;
+        }
+        .upload-zone:hover { border-color: var(--text-muted); background: var(--bg-card-hover); transform: translateY(-2px); }
+        .upload-zone.dragover { border-color: var(--accent-green); background: rgba(34, 197, 94, 0.05); }
+        
+        .upload-icon { width: 64px; height: 64px; margin-bottom: 1.5rem; color: var(--text-muted); opacity: 0.6; }
+        
+        .upload-text { 
+            font-size: 1rem; 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        .upload-subtext { 
+            font-size: 0.75rem; 
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+
+        .file-preview { display: flex; align-items: center; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border-primary); padding: 1rem; border-radius: 12px; margin: 1rem auto 0; max-width: 680px; }
+        .file-icon { width: 32px; height: 32px; color: var(--accent-green); }
+        .file-info { flex: 1; }
+        .file-name { font-size: 0.875rem; font-weight: 500; }
+        .file-status { font-size: 0.75rem; color: var(--text-muted); }
+        .btn-reset { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; text-decoration: underline; margin-top: 1rem; display: block; width: 100%; transition: color 0.2s; }
+        .btn-reset:hover { color: var(--accent-red); }
+        
+        .loading-spinner { animation: spin 1s linear infinite; width: 20px; height: 20px; color: var(--text-muted); }
+
+        /* Rich HTML Analysis Styles */
+        .analysis-result { margin-top: 2rem; background: var(--bg-card); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-primary); display: none; }
+        
+        .analysis-section { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-primary); border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; }
+        .analysis-section-header { background: rgba(255, 255, 255, 0.03); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-primary); display: flex; align-items: center; gap: 0.75rem; }
+        .analysis-section-title { font-size: 0.8125rem; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.1em; }
+        .analysis-content { padding: 0; }
+        .analysis-content.padded { padding: 1.5rem; color: var(--text-secondary); line-height: 1.6; }
+
+        .rich-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .rich-table th { text-align: left; padding: 1rem 1.5rem; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-primary); background: rgba(0,0,0,0.2); }
+        .rich-table td { padding: 1rem 1.5rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-primary); vertical-align: middle; }
+        .rich-table tr:last-child td { border-bottom: none; }
+        .rich-table tr:hover td { background: rgba(255,255,255,0.02); color: var(--text-primary); }
+        .averages-row { background: rgba(34, 197, 94, 0.1) !important; font-weight: 700; }
+        .averages-row td { color: var(--text-primary) !important; }
+        
+        .col-money { font-family: 'Plus Jakarta Sans', monospace; font-weight: 600; color: var(--text-primary); }
+        .text-pos { color: #4ade80 !important; }
+        .text-neg { color: #f87171 !important; }
+        .text-warn { color: #facc15 !important; }
+        
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 100px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+        .badge-yellow { background: rgba(234, 179, 8, 0.1); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.2); }
+
+        /* Risk List */
+        .risk-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .risk-item { display: flex; gap: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15); border-radius: 12px; align-items: flex-start; }
+        .risk-icon { color: #ef4444; margin-top: 0.1rem; flex-shrink: 0; font-size: 1.2rem; }
+        .risk-content { flex: 1; }
+        .risk-content strong { display: block; color: #fff; margin-bottom: 0.25rem; font-size: 0.95rem; }
+        .risk-content p { margin: 0; font-size: 0.85rem; color: #dcbaba; line-height: 1.5; }
+
+        /* Settings Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(12px); z-index: 100; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal { background: #0a0a0a; border: 1px solid var(--border-primary); border-radius: 20px; padding: 0; width: 100%; max-width: 520px; box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255,255,255,0.03), inset 0 0 30px rgba(255,255,255,0.02); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+        .modal-overlay.open .modal { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 2rem 2.5rem 1.5rem; border-bottom: 1px solid var(--border-primary); background: transparent; }
+        .modal-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .btn-close { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; transition: all 0.2s; display: flex; border-radius: 50%; }
+        .btn-close:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .modal-body { padding: 2.5rem; display: flex; flex-direction: column; gap: 2rem; }
+        .status-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-primary); border-radius: 14px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+        .status-icon-wrapper { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: center; }
+        .status-details { display: flex; flex-direction: column; gap: 0.25rem; }
+        .status-label-text { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+        .status-value-text { font-size: 0.9375rem; color: var(--text-primary); font-weight: 500; }
+        .form-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .form-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .form-label { font-size: 1rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.01em; }
+        .form-hint { font-size: 0.8125rem; color: var(--text-muted); line-height: 1.5; }
+        .form-hint a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+        .form-hint a:hover { color: var(--text-primary); }
+        .form-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-primary); border-radius: 12px; padding: 1.25rem; color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; transition: all 0.3s; }
+        .form-input:focus { outline: none; border-color: var(--border-hover); box-shadow: 0 0 0 4px rgba(255,255,255,0.05); }
+        .modal-actions { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; }
+        .btn-save { width: 100%; padding: 1.125rem; background: var(--text-primary); color: #000; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; letter-spacing: -0.01em; }
+        .btn-save:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(255,255,255,0.2); }
+        .btn-reset { width: fit-content; margin: 0 auto; }
+
+        footer { margin-top: auto; padding: 2rem 0; border-top: 1px solid var(--border-primary); text-align: center; color: var(--text-muted); font-size: 0.8125rem; }
+    </style>
+</head>
+<body>
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">System Configuration</div>
+                <button class="btn-close" onclick="toggleSettings()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="status-card">
+                    <div class="status-icon-wrapper">
+                        <span class="status-dot active" id="modalStatusDot"></span>
+                    </div>
+                    <div class="status-details">
+                        <div class="status-label-text">Connection Status</div>
+                        <div class="status-value-text" id="keyStatusTextLabel">Using: System Default Key</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-header">
+                        <label class="form-label">Gemini API Key</label>
+                    </div>
+                    
+                    <!-- Enhanced Help Section -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-primary); border-radius: 12px; padding: 1.25rem; margin-bottom: 0.5rem;">
+                        <p style="margin: 0 0 0.75rem 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+                            This tool requires a <strong>Google Gemini API Key</strong> to process documents. It is free to generate.
+                        </p>
+                        <ol style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+                            <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-green); text-decoration: none; font-weight: 500;">Google AI Studio &rarr;</a></li>
+                            <li>Click the blue <strong>"Create API key"</strong> button.</li>
+                            <li>Select "Create key in new project".</li>
+                            <li>Copy the string starting with <code>AIzaSy...</code></li>
+                        </ol>
+                        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-primary); font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Your key is stored locally in your browser only.
+                        </div>
+                    </div>
+
+                    <input type="password" class="form-input" id="apiKeyInput" placeholder="Paste your AIzaSy... key here">
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-save" onclick="saveApiKey()">Save Configuration</button>
+                    <button class="btn-reset" onclick="clearApiKey()">Reset to Default System Key</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-group">
+                <a href="index.html" class="logo">
+                    <svg style="width:32px; height:32px;" viewBox="0 0 24 24" fill="none"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="white" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="white" stroke-width="2"/></svg>
+                    <span class="logo-text">TRUST<span style="color:#888;">BUREAU</span></span>
+                </a>
+            </div>
+            <div class="header-center">
+                <div class="vision-brand" onclick="resetUpload()">
+                    <div class="vision-icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="6" cy="12" r="5"></circle>
+                            <circle cx="18" cy="12" r="5"></circle>
+                            <line x1="11" y1="12" x2="13" y2="12"></line>
+                        </svg>
+                    </div>
+                    <span class="vision-title-text">VISION</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-api" onclick="resetUpload()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    Reset
+                </button>
+                <button class="btn-api" onclick="toggleSettings()">
+                    <span class="status-dot active" id="systemStatusDot"></span> 
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                    API
+                </button>
+            </div>
+        </header>
+
+        <div class="vision-wrapper">
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" hidden accept="image/*,application/pdf" multiple>
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div class="upload-text">Analyze Financial Documents</div>
+                <div class="upload-subtext">Drag & Drop Bank Statements, Tax Returns (PDF/IMG)</div>
+            </div>
+            <div id="filePreviewContainer" style="display:none;"></div>
+            <div id="docAnalysisResult" class="analysis-result"></div>
+        </div>
+
+        <footer>© 2025 TrustBureau.ai</footer>
+    </div>
+
+    <script>
+        const apiKey = "";
+        let userApiKey = "";
+        try {
+            userApiKey = localStorage.getItem('trustbureau_api_key') || "";
+        } catch(e) { console.error("LocalStorage unavailable"); }
+        
+        function updateKeyStatus() {
+            const statusText = document.getElementById('keyStatusTextLabel');
+            const dot = document.getElementById('systemStatusDot');
+            const modalDot = document.getElementById('modalStatusDot');
+            
+            if (userApiKey) {
+                if(statusText) { statusText.innerText = "Using: Custom User API Key"; statusText.style.color = "#22c55e"; }
+                if(dot) dot.className = "status-dot active";
+                if(modalDot) modalDot.className = "status-dot active";
+            } else if (apiKey) {
+                if(statusText) { statusText.innerText = "Using: Environment Test Key"; statusText.style.color = "#a3a3a3"; }
+                if(dot) dot.className = "status-dot active";
+                if(modalDot) modalDot.className = "status-dot active";
+            } else {
+                if(statusText) { statusText.innerText = "No API Key Available"; statusText.style.color = "#ef4444"; }
+                if(dot) dot.className = "status-dot inactive";
+                if(modalDot) modalDot.className = "status-dot inactive";
+            }
+        }
+        updateKeyStatus();
+
+        function toggleSettings() {
+            console.log("Toggling settings modal");
+            const modal = document.getElementById('settingsModal');
+            if(modal) {
+                modal.classList.toggle('open');
+                if(modal.classList.contains('open') && userApiKey) {
+                    document.getElementById('apiKeyInput').value = userApiKey;
+                }
+            } else {
+                console.error("Settings modal not found!");
+            }
+        }
+
+        function saveApiKey() {
+            const input = document.getElementById('apiKeyInput').value.trim();
+            if (input) {
+                userApiKey = input;
+                try { localStorage.setItem('trustbureau_api_key', input); } catch(e){}
+                alert("API Key saved.");
+                toggleSettings();
+                updateKeyStatus();
+            } else {
+                alert("Please enter a valid key.");
+            }
+        }
+
+        function clearApiKey() {
+            if(confirm("Clear custom API key?")) {
+                userApiKey = "";
+                try { localStorage.removeItem('trustbureau_api_key'); } catch(e){}
+                document.getElementById('apiKeyInput').value = "";
+                updateKeyStatus();
+            }
+        }
+
+        function getEffectiveApiKey() { return userApiKey || apiKey; }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if(e.dataTransfer.files.length) handleFilesSelect(e.dataTransfer.files); });
+        fileInput.addEventListener('change', () => { if(fileInput.files.length) handleFilesSelect(fileInput.files); });
+
+        async function handleFilesSelect(fileList) {
+            // CHECK FOR API KEY FIRST
+            if (!getEffectiveApiKey()) {
+                alert("Please configure your API Key first.");
+                toggleSettings();
+                document.getElementById('fileInput').value = '';
+                return;
+            }
+
+            const container = document.getElementById('filePreviewContainer');
+            const resultBox = document.getElementById('docAnalysisResult');
+            const dropZone = document.getElementById('dropZone');
+            
+            // Clear previous previews properly
+            container.innerHTML = ''; 
+            container.style.display = 'block';
+            resultBox.style.display = 'none'; 
+            dropZone.style.display = 'none';
+
+            const files = Array.from(fileList);
+            const fileDataPromises = [];
+
+            files.forEach(file => {
+                const fileEl = document.createElement('div');
+                fileEl.className = 'file-preview';
+                fileEl.innerHTML = `
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-status">Queued...</div>
+                    </div>
+                    <svg class="loading-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                `;
+                container.appendChild(fileEl);
+
+                const p = new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve({ mimeType: file.type, data: e.target.result.split(',')[1], name: file.name, element: fileEl });
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                fileDataPromises.push(p);
+            });
+
+            // Append button safely using createElement instead of innerHTML +=
+            const resetButton = document.createElement('button');
+            resetButton.className = 'btn-reset';
+            resetButton.innerText = 'Cancel / Start Over';
+            resetButton.onclick = resetUpload;
+            container.appendChild(resetButton);
+
+            try {
+                const uploadedFiles = await Promise.all(fileDataPromises);
+                await analyzeDocuments(uploadedFiles);
+            } catch (error) { 
+                console.error(error);
+                alert("Error processing files"); 
+                resetUpload(); 
+            }
+        }
+
+        async function analyzeDocuments(fileObjects) {
+            const resultBox = document.getElementById('docAnalysisResult');
+            const promptText = `Analyze these ${fileObjects.length} document(s) for due diligence.
+            
+            CRITICAL INSTRUCTION: Output ONLY valid HTML code. Do NOT use markdown code fences (\`\`\`html). Use the following HTML classes and structure:
+
+            <div class="analysis-wrapper">
+                <!-- 1. Executive Summary -->
+                <div class="analysis-section">
+                    <div class="analysis-section-header">
+                        <span class="analysis-section-title">1. Executive Summary</span>
+                    </div>
+                    <div class="analysis-content padded">
+                        <!-- Top Stats Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                            <div style="background:rgba(255,255,255,0.03); padding:1rem; border-radius:12px; border:1px solid var(--border-primary);">
+                                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Entity Name</div>
+                                <div style="font-size:1rem; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">[Extract Name]</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.03); padding:1rem; border-radius:12px; border:1px solid var(--border-primary);">
+                                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Review Period</div>
+                                <div style="font-size:1rem; font-weight:600; color:var(--text-primary);">[e.g. Jan - Jun 2024]</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.03); padding:1rem; border-radius:12px; border:1px solid var(--border-primary);">
+                                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Health Score</div>
+                                <div style="font-size:1rem; font-weight:600; color:var(--text-primary);">[Strong / Stable / Weak]</div>
+                            </div>
+                        </div>
+
+                        <!-- Narrative & Recommendation -->
+                        <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 2rem; align-items: start; border-top:1px solid var(--border-primary); padding-top:1.5rem;">
+                            <div>
+                                <h4 style="color:var(--text-primary); margin:0 0 0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">ANALYST HIGHLIGHTS</h4>
+                                <ul style="margin:0; padding-left:1.2rem; font-size:0.9rem; color:var(--text-secondary); line-height:1.6;">
+                                    <li>[Concise point about revenue trend]</li>
+                                    <li>[Concise point about balance consistency]</li>
+                                    <li>[Concise point about operational risks]</li>
+                                </ul>
+                            </div>
+                            <div style="text-align:right;">
+                                <h4 style="color:var(--text-primary); margin:0 0 0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">RECOMMENDATION</h4>
+                                <div style="font-size:1rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">
+                                    [APPROVE / DECLINE]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Financial Overview -->
+                <div class="analysis-section">
+                    <div class="analysis-section-header">
+                        <span class="analysis-section-title">2. Financial Overview</span>
+                    </div>
+                    <div class="analysis-content">
+                        <table class="rich-table">
+                            <thead><tr><th>Metric</th><th>Value</th><th>Notes</th></tr></thead>
+                            <tbody>
+                                <tr><td>Revenue</td><td class="col-money">$0.00</td><td class="text-pos">Details</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. MCA Bank Analysis (If applicable) -->
+                <div class="analysis-section">
+                    <div class="analysis-section-header">
+                        <span class="analysis-section-title">3. MCA Bank Analysis Worksheet</span>
+                    </div>
+                    <div class="analysis-content">
+                        <div style="overflow-x:auto;">
+                            <table class="rich-table">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th><th>Total Deps</th><th>True Deps</th><th>Total Debits</th><th>True Debits</th><th>Transfers</th><th># Deps</th><th>Avg Bal</th><th>Neg Days</th><th>NSFs</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows here. LAST ROW MUST BE AVERAGES -->
+                                    <tr class="averages-row">
+                                        <td>Averages</td><td>$0.00</td><td>$0.00</td><td>$0.00</td><td>$0.00</td><td>$0.00</td><td>0</td><td>$0.00</td><td>0</td><td>0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Existing Debt -->
+                <div class="analysis-section">
+                    <div class="analysis-section-header">
+                        <span class="analysis-section-title">4. Existing Debt Stack</span>
+                    </div>
+                    <div class="analysis-content">
+                        <table class="rich-table">
+                            <thead><tr><th>Lender</th><th>Frequency</th><th>Payment</th><th>Balance</th></tr></thead>
+                            <tbody><!-- Rows --></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 5. Risk Assessment (Structured Cards) -->
+                <div class="analysis-section">
+                    <div class="analysis-section-header">
+                        <span class="analysis-section-title">5. Risk Assessment</span>
+                    </div>
+                    <div class="analysis-content padded">
+                        <div class="risk-list">
+                            <!-- Repeat for each risk: -->
+                            <div class="risk-item">
+                                <div class="risk-icon">⚠️</div>
+                                <div class="risk-content">
+                                    <strong>Risk Title</strong>
+                                    <p>Description...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 6. Conclusion -->
+                <div class="analysis-section">
+                    <div class="analysis-section-header">
+                        <span class="analysis-section-title">6. Final Determination</span>
+                    </div>
+                    <div class="analysis-content padded">
+                        <p>Conclusion text...</p>
+                    </div>
+                </div>
+            </div>`;
+
+            const parts = [{ text: promptText }];
+            fileObjects.forEach(f => { parts.push({ inlineData: { mimeType: f.mimeType, data: f.data } }); });
+
+            try {
+                const key = getEffectiveApiKey();
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ role: "user", parts: parts }] })
+                });
+                const json = await res.json();
+                let text = json.candidates[0].content.parts[0].text;
+                text = text.replace(/```html/g, '').replace(/```/g, '');
+                
+                resultBox.innerHTML = text;
+                resultBox.style.display = 'block';
+                
+                // Remove spinners and update status
+                fileObjects.forEach(f => {
+                    const statusEl = f.element.querySelector('.file-status');
+                    const spinner = f.element.querySelector('.loading-spinner');
+                    if(statusEl) { statusEl.innerText = "Complete"; statusEl.style.color = "#22c55e"; }
+                    if(spinner) spinner.remove();
+                });
+            } catch(e) { console.error(e); alert("Analysis failed"); resetUpload(); }
+        }
+
+        function resetUpload() {
+            document.getElementById('filePreviewContainer').style.display = 'none';
+            document.getElementById('docAnalysisResult').style.display = 'none';
+            document.getElementById('dropZone').style.display = 'block';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreviewContainer').innerHTML = ''; // Clear previews
+        }
+    </script>
+</body>
+</html>
