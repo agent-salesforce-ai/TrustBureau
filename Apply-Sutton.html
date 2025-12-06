@@ -30,8 +30,6 @@
         input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #1e293b; border-radius: 999px; }
         input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: #EAB308; cursor: pointer; -webkit-appearance: none; margin-top: -7px; box-shadow: 0 0 0 4px #0B1121, 0 0 15px rgba(234,179,8,0.5); border: 2px solid #ffffff; }
-        input[type=range]::-moz-range-track { width: 100%; height: 6px; cursor: pointer; background: #1e293b; border-radius: 999px; }
-        input[type=range]::-moz-range-thumb { height: 20px; width: 20px; border: 2px solid #ffffff; border-radius: 50%; background: #EAB308; cursor: pointer; box-shadow: 0 0 0 4px #0B1121, 0 0 15px rgba(234,179,8,0.5); }
 
         /* Glass Utilities */
         .pro-panel { background: #141b2d; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
@@ -69,6 +67,7 @@
             calcRate: 1.29, 
             payoffBalance: 42500,
             themeColor: 'yellow', 
+            // Model Weights Config
             modelWeights: { 
                 trade_history: 0.22, 
                 public_records: 0.15, 
@@ -91,11 +90,11 @@
         function formatCurrency(val) { if(!val) return '$0'; const num = val.toString().replace(/[\D\s\._\-]+/g, ""); if(!num) return '$0'; return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits:0 }).format(num); }
         function cleanNumber(val) { return val.toString().replace(/[^0-9]/g, ''); }
 
-        // --- PERREPUS.ai SCORING ENGINE (PORTED) ---
+        // --- PERREPUS.ai SCORING ENGINE ---
         const PERREPUS = {
             pd_a: 0.10, pd_b: 7.0, lgd_default: 0.40,
 
-            // Grade Definitions from Python Models A-D
+            // Grade Definitions from Python Models
             grades: {
                 'A': { min: 85.0, funding: [50000, 250000], term: [9, 18], factor: [1.09, 1.19], holdback: [8, 12], time: '24-48 hours', renewal: 'Every 6 months', collateral: 'None required', lgd: 0.40 },
                 'B': { min: 70.0, funding: [25000, 100000], term: [6, 12], factor: [1.20, 1.35], holdback: [10, 15], time: '2-3 business days', renewal: 'Quarterly', collateral: 'PG Optional', lgd: 0.40 },
@@ -108,10 +107,7 @@
             
             scoreAlternativeData: (utilOnTime, utilMonths, telOnTime, telMonths, rentOnTime, rentMonths, maxDbt) => {
                 const ratio = (ok, tot) => tot <= 0 ? 0.0 : PERREPUS.clamp01(ok / tot);
-                const rUtil = ratio(utilOnTime, utilMonths);
-                const rTel = ratio(telOnTime, telMonths);
-                const rRent = ratio(rentOnTime, rentMonths);
-                const base = (rUtil + rTel + rRent) / 3.0;
+                const base = (ratio(utilOnTime, utilMonths) + ratio(telOnTime, telMonths) + ratio(rentOnTime, rentMonths)) / 3.0;
                 const actualPen = 1.0 - PERREPUS.clamp01(maxDbt / 10.0);
                 return PERREPUS.clamp01(0.85 * base + 0.15 * (0.5 + 0.5 * actualPen));
             },
@@ -147,7 +143,6 @@
                 const score100 = 100.0 * PERREPUS.clamp01(composite);
                 const pd = 1.0 / (1.0 + Math.exp(PERREPUS.pd_a * score100 - PERREPUS.pd_b));
                 
-                // Determine Grade & Terms
                 let grade = 'E';
                 if (score100 >= PERREPUS.grades.A.min) grade = 'A';
                 else if (score100 >= PERREPUS.grades.B.min) grade = 'B';
@@ -175,10 +170,9 @@
             const debt = state.formData.hasDebt === 'Yes' ? 1 : 0;
             const yearsInBus = state.formData.startDate ? (new Date() - new Date(state.formData.startDate)) / (1000 * 60 * 60 * 24 * 365) : 2;
 
-            // 2. Simulate Factor Scores (0.0 - 1.0)
+            // Simulate Factors
             const tradeHistoryScore = Math.min(1, (fico - 500) / 350); 
             const publicRecordScore = debt ? 0.7 : 0.98;
-            
             const altDataScore = PERREPUS.scoreAlternativeData(11, 12, 9, 9, 12, 12, Math.max(0, 10 - yearsInBus));
             const digiScore = PERREPUS.scoreDigitalFootprint(Math.min(50000, revenue / 2), 0.03, 0.05, 4.2, Math.min(250, revenue / 1000));
 
@@ -227,57 +221,39 @@
 
         function calculateApproval() {
             const revenue = parseInt(cleanNumber(state.formData.revenue) || 0);
-            const debt = state.formData.hasDebt === 'Yes' ? parseInt(cleanNumber(state.formData.debtAmount) || 0) : 0;
-            const fico = parseInt(state.formData.owners[0].fico || 680);
-            const industry = state.formData.industry;
-            let factor = 1.0; 
-            if (fico >= 720) factor += 0.2; else if (fico >= 650) factor += 0.1; else if (fico < 600) factor -= 0.2;
-            if (industry === 'Construction' || industry === 'Transportation') factor -= 0.1;
-            if (industry === 'Healthcare') factor += 0.15;
-            if (state.formData.startDate) {
-                const start = new Date(state.formData.startDate);
-                const years = (new Date() - start) / (1000 * 60 * 60 * 24 * 365);
-                if (years > 5) factor += 0.1; else if (years < 1) factor -= 0.2;
-            }
-            let grossAmount = revenue * factor;
-            let netAmount = grossAmount - debt;
-            if (netAmount < 5000) netAmount = 5000; 
-            let maxAppr = Math.floor((netAmount * 1.1) / 1000) * 1000;
+            let maxAppr = Math.floor((revenue * 1.1) / 1000) * 1000;
             if (maxAppr > 999999) maxAppr = 999999;
             return {
-                min: Math.floor((netAmount * 0.9) / 1000) * 1000,
+                min: Math.floor((revenue * 0.8) / 1000) * 1000,
                 max: maxAppr,
-                score: Math.min(99, Math.max(10, Math.floor(factor * 85))),
-                factors: { fico, revenue, debt, industry }
+                score: 85 // simplified for overview
             };
         }
 
-        // --- CHARTING ENGINE ---
+        // --- CHARTING ---
         function generateMultiLineChart(width, height) {
-            const revenue = [30, 45, 40, 60, 55, 75, 70, 85, 90, 80, 95, 100];
-            const expenses = [20, 25, 22, 30, 28, 35, 32, 40, 38, 35, 42, 45];
-            const max = 120; const stepX = width / (revenue.length - 1);
-            const buildPath = (data) => {
-                let d = `M 0 ${height - (data[0] / max * height)}`;
-                data.forEach((val, i) => { d += ` L ${i * stepX} ${height - (val / max * height)}`; });
-                return d;
-            };
-            return `<svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" class="overflow-visible"><line x1="0" y1="${height}" x2="${width}" y2="${height}" stroke="#334155" stroke-width="1" /><line x1="0" y1="${height*0.5}" x2="${width}" y2="${height*0.5}" stroke="#334155" stroke-width="1" stroke-dasharray="2" opacity="0.3" /><path d="${buildPath(expenses)}" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.8" /><path d="${buildPath(revenue)}" fill="none" stroke="#3b82f6" stroke-width="2" /></svg>`;
+             const revenue = [30, 45, 40, 60, 55, 75, 70, 85, 90, 80, 95, 100];
+             const expenses = [20, 25, 22, 30, 28, 35, 32, 40, 38, 35, 42, 45];
+             const max = 120; const stepX = width / (revenue.length - 1);
+             const buildPath = (data) => {
+                 let d = `M 0 ${height - (data[0] / max * height)}`;
+                 data.forEach((val, i) => { d += ` L ${i * stepX} ${height - (val / max * height)}`; });
+                 return d;
+             };
+             return `<svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" class="overflow-visible"><line x1="0" y1="${height}" x2="${width}" y2="${height}" stroke="#334155" stroke-width="1" /><line x1="0" y1="${height*0.5}" x2="${width}" y2="${height*0.5}" stroke="#334155" stroke-width="1" stroke-dasharray="2" opacity="0.3" /><path d="${buildPath(expenses)}" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.8" /><path d="${buildPath(revenue)}" fill="none" stroke="#3b82f6" stroke-width="2" /></svg>`;
         }
-        
-        function renderDonutChart(principal, cost, size=160) {
-            const total = principal + cost;
-            const pPerc = principal / total;
-            const cPerc = cost / total;
-            const radius = size / 2 - 10;
-            const circ = 2 * Math.PI * radius;
-            const pOffset = circ * (1 - pPerc);
-            return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="transform -rotate-90"><circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#1e293b" stroke-width="12" fill="none" /><circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#3b82f6" stroke-width="12" fill="none" stroke-dasharray="${circ}" stroke-dashoffset="${pOffset}" /><circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#EAB308" stroke-width="12" fill="none" stroke-dasharray="${circ}" stroke-dashoffset="${circ * (1 - cPerc)}" style="transform-origin: center; transform: rotate(${pPerc * 360}deg)" /><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-family="sans-serif" font-weight="bold" font-size="14" transform="rotate(90 ${size/2} ${size/2})">Total</text></svg>`;
-        }
-
         function renderRadialProgress(percent, color = "#EAB308", size = 20) {
             const radius = 40; const circumference = 2 * Math.PI * radius; const offset = circumference - (percent / 100) * circumference;
             return `<div class="relative w-12 h-12 flex items-center justify-center"><svg class="w-full h-full transform -rotate-90"><circle cx="50%" cy="50%" r="20" stroke="#1e293b" stroke-width="4" fill="transparent" /><circle cx="50%" cy="50%" r="20" stroke="${color}" stroke-width="4" fill="transparent" stroke-dasharray="${2*Math.PI*20}" stroke-dashoffset="${2*Math.PI*20 - (percent/100 * 2*Math.PI*20)}" stroke-linecap="round" /></svg><span class="absolute text-[10px] font-bold text-white">${percent}%</span></div>`;
+        }
+        function renderDonutChart(principal, cost, size=160) {
+             const total = principal + cost;
+             const pPerc = principal / total;
+             const cPerc = cost / total;
+             const radius = size / 2 - 10;
+             const circ = 2 * Math.PI * radius;
+             const pOffset = circ * (1 - pPerc);
+             return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="transform -rotate-90"><circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#1e293b" stroke-width="12" fill="none" /><circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#3b82f6" stroke-width="12" fill="none" stroke-dasharray="${circ}" stroke-dashoffset="${pOffset}" /><circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#EAB308" stroke-width="12" fill="none" stroke-dasharray="${circ}" stroke-dashoffset="${circ * (1 - cPerc)}" style="transform-origin: center; transform: rotate(${pPerc * 360}deg)" /><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-family="sans-serif" font-weight="bold" font-size="14" transform="rotate(90 ${size/2} ${size/2})">Total</text></svg>`;
         }
 
         // --- RENDER ENGINE ---
@@ -303,105 +279,92 @@
         `;
         const SmallLogo = () => `<div class="flex items-center gap-3"><img src="https://i.imgur.com/MXMqYLc.png" class="h-8 w-auto"><span class="font-bold text-white font-serif tracking-wide text-lg" style="font-family: 'Playfair Display', serif">Sutton Funding</span></div>`;
 
-        // --- DASHBOARD LOGIC ---
+        // --- DASHBOARD ---
         function renderDashboardPro() {
             const activeTab = (name) => state.subView === name ? 'nav-item active bg-white/5 text-yellow-400' : 'nav-item text-slate-400 hover:bg-white/5 hover:text-white';
             
             app.innerHTML = `
                 <div class="min-h-screen text-slate-300 font-sans flex bg-[#0B1121]">
-                    
                     <!-- SIDEBAR -->
                     <div class="w-64 border-r border-white/5 flex flex-col hidden lg:flex sticky top-0 h-screen bg-[#0f1623] z-50">
                         <div class="h-20 border-b border-white/5 flex items-center px-6">${SmallLogo()}</div>
-                        
                         <div class="flex-1 py-6 space-y-8 overflow-y-auto px-0">
                             <div>
-                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Application Management</p>
+                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Underwriting</p>
                                 <div class="space-y-0.5">
-                                    <!-- AI SCORING LINK -->
                                     <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('scoring')}" onclick="state.subView='scoring'; render();"><i data-lucide="brain-circuit" class="w-4 h-4"></i> Risk Model <span class="bg-blue-600 text-white text-[8px] font-bold px-1.5 rounded-sm">NEW</span></button>
+                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('credit')}" onclick="state.subView='credit'; render();"><i data-lucide="activity" class="w-4 h-4"></i> Credit Analysis</button>
+                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('cashflow')}" onclick="state.subView='cashflow'; render();"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Cash Flow</button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Application</p>
+                                <div class="space-y-0.5">
                                     <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('overview')}" onclick="state.subView='overview'; render();"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview</button>
                                     <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('application')}" onclick="state.subView='application'; render();"><i data-lucide="file-text" class="w-4 h-4"></i> My Application</button>
                                     <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('docs')}" onclick="state.subView='docs'; render();"><i data-lucide="folder-open" class="w-4 h-4"></i> Documents</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('offers')}" onclick="state.subView='offers'; render();"><i data-lucide="wallet" class="w-4 h-4"></i> Lender Offers <span class="ml-auto bg-yellow-500 text-black text-[9px] font-bold px-1.5 rounded">3</span></button>
                                 </div>
                             </div>
-
                             <div>
-                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Financial Tools</p>
+                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Tools</p>
                                 <div class="space-y-0.5">
                                     <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('calculator')}" onclick="state.subView='calculator'; render();"><i data-lucide="calculator" class="w-4 h-4"></i> Loan Calculator</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('what_if')}" onclick="state.subView='what_if'; render();"><i data-lucide="sliders" class="w-4 h-4"></i> Scenario Modeling</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('payoff_calc')}" onclick="state.subView='payoff_calc'; render();"><i data-lucide="percent" class="w-4 h-4"></i> Payoff Calculator</button>
-                                </div>
-                            </div>
-                            
-                             <div>
-                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">System</p>
-                                <div class="space-y-0.5">
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('settings')}" onclick="state.subView='settings'; render();"><i data-lucide="settings" class="w-4 h-4"></i> Settings</button>
+                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('what_if')}" onclick="state.subView='what_if'; render();"><i data-lucide="sliders" class="w-4 h-4"></i> What-If Analysis</button>
                                 </div>
                             </div>
                         </div>
-
                         <div class="p-4 border-t border-white/5 bg-[#0a0f1a]">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">${state.formData.owners[0].name.charAt(0)}</div>
-                                <div class="overflow-hidden">
-                                    <p class="text-xs font-bold text-white truncate">${state.formData.owners[0].name}</p>
-                                    <p class="text-[10px] text-slate-500 truncate" title="${state.formData.owners[0].email}">${state.formData.owners[0].email || 'user@suttonfunding.com'}</p>
-                                </div>
+                                <div class="overflow-hidden"><p class="text-xs font-bold text-white truncate">${state.formData.owners[0].name}</p><p class="text-[10px] text-slate-500 truncate">${state.formData.owners[0].email || 'user@suttonfunding.com'}</p></div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- MAIN CONTENT -->
+                    <!-- MAIN -->
                     <div class="flex-1 h-screen overflow-y-auto relative bg-[#0B1121] scroll-smooth">
                         <div class="sticky top-0 z-40 bg-[#0B1121]/90 backdrop-blur-xl border-b border-white/5 px-8 h-16 flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <h2 class="text-sm font-bold text-white uppercase tracking-wide">${getViewTitle(state.subView)}</h2>
-                                <span class="h-4 w-px bg-slate-700"></span>
-                                <p class="text-xs text-slate-500">${state.formData.businessName || 'Acme Corp'}</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded text-[10px] font-medium text-green-500">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Live
-                                </div>
-                                <button onclick="setView('wizard'); setStep(1)" class="text-slate-400 hover:text-white"><i data-lucide="log-out" class="w-4 h-4"></i></button>
-                            </div>
+                            <h2 class="text-sm font-bold text-white uppercase tracking-wide">${getViewTitle(state.subView)}</h2>
+                            <button onclick="setView('wizard'); setStep(1)" class="text-slate-400 hover:text-white"><i data-lucide="log-out" class="w-4 h-4"></i></button>
                         </div>
-
-                        <div class="p-6 max-w-7xl mx-auto space-y-6 pb-20">
-                            ${renderSubView()}
-                        </div>
+                        <div class="p-6 max-w-7xl mx-auto space-y-6 pb-20">${renderSubView()}</div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function getViewTitle(view) {
-            const map = { 'overview': 'Dashboard', 'what_if': 'Scenario Analysis', 'offers': 'Marketplace', 'calculator': 'Calculator', 'docs': 'Vault', 'payoff_calc': 'Payoff Tool', 'application': 'My Application', 'scoring': 'Risk Model', 'settings': 'Settings' };
+            const map = { 'overview': 'Dashboard', 'scoring': 'Risk Model', 'credit': 'Credit Analysis', 'cashflow': 'Cash Flow Analysis', 'what_if': 'Scenario Analysis', 'offers': 'Marketplace', 'calculator': 'Calculator', 'docs': 'Vault', 'payoff_calc': 'Payoff Tool', 'application': 'My Application' };
             return map[view] || 'Dashboard';
         }
 
         function renderSubView() {
             if(state.subView === 'overview') return renderOverview();
             if(state.subView === 'scoring') return renderScoringModel();
+            if(state.subView === 'credit') return renderCreditAnalysis();
+            if(state.subView === 'cashflow') return renderCashFlow();
             if(state.subView === 'what_if') return renderWhatIf();
-            if(state.subView === 'offers') return renderOffers();
             if(state.subView === 'calculator') return renderCalculator();
             if(state.subView === 'docs') return renderDocs();
-            if(state.subView === 'payoff_calc') return renderPayoffCalculator();
             if(state.subView === 'application') return renderApplicationProfile();
-            if(state.subView === 'settings') return renderSettings();
             return renderOverview();
         }
-        
-        // --- SCORING MODEL VIEW (WITH TERMS) ---
+
+        // --- VIEWS ---
+        function renderOverview() {
+            const scoreData = runPerrepusModel();
+            return `
+                <div class="mb-6 animate-fade-in"><div onclick="state.subView='scoring'; render()" class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-blue-500/20 transition-colors"><div class="flex items-center gap-3"><div class="bg-blue-500/20 p-2 rounded-full"><i data-lucide="brain-circuit" class="w-5 h-5 text-blue-400"></i></div><div><h3 class="text-sm font-bold text-white">Risk Analysis Complete</h3><p class="text-xs text-slate-400">PERREPUS AI has generated a risk grade of <strong>${scoreData.grade}</strong>.</p></div></div><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="pro-panel p-5 rounded-xl border-l-2 border-yellow-500"><div class="flex justify-between items-start mb-2"><p class="data-label">Capacity</p><i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i></div><h3 class="text-xl font-bold text-white tracking-tight">$${(parseInt(cleanNumber(state.formData.revenue))*1.2).toLocaleString()}</h3></div>
+                    <div class="pro-panel p-5 rounded-xl border-l-2 border-blue-500 cursor-pointer" onclick="state.subView='scoring'; render()"><div class="flex justify-between items-start mb-2"><p class="data-label">Score</p><i data-lucide="activity" class="w-4 h-4 text-blue-500"></i></div><h3 class="text-xl font-bold text-white tracking-tight">${scoreData.score} <span class="text-sm font-normal text-slate-500">/ 100</span></h3><p class="text-[10px] text-slate-500 mt-1">Grade ${scoreData.grade}</p></div>
+                    <div class="pro-panel p-5 rounded-xl flex items-center justify-between"><div class="z-10"><p class="data-label text-yellow-500 mb-1">Status</p><h3 class="text-xl font-bold text-white">Underwriting</h3></div>${renderRadialProgress(85)}</div>
+                </div>
+                <div class="pro-panel rounded-xl p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-sm font-bold text-white">Revenue</h3><p class="text-[11px] text-slate-500">Trailing 12 Months</p></div><div class="h-48 w-full">${generateMultiLineChart(800, 200)}</div></div>
+            `;
+        }
+
         function renderScoringModel() {
             const scoreData = runPerrepusModel();
-            const terms = scoreData.terms; // Get Authorized Terms
-            
+            const terms = scoreData.terms;
             return `
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
                     <div class="lg:col-span-4 space-y-6">
@@ -409,127 +372,61 @@
                              <div class="absolute top-0 left-0 w-full h-full bg-yellow-500/5 pointer-events-none"></div>
                              <div class="mb-4 text-left w-full"><h3 class="text-sm font-bold text-white uppercase tracking-wider">PERREPUS.ai Risk Grade</h3><p class="text-[10px] text-slate-400">Model Version 2.4.1</p></div>
                              <div class="relative w-40 h-40 flex items-center justify-center mb-6">
-                                 <svg class="w-full h-full transform -rotate-90">
-                                    <circle cx="50%" cy="50%" r="70" stroke="#1e293b" stroke-width="12" fill="none"></circle>
-                                    <circle cx="50%" cy="50%" r="70" stroke="#EAB308" stroke-width="12" fill="none" stroke-dasharray="440" stroke-dashoffset="${440 - (scoreData.score/100)*440}" stroke-linecap="round"></circle>
-                                 </svg>
-                                 <div class="absolute text-center">
-                                     <span class="text-4xl font-bold text-white block">${scoreData.score}</span>
-                                     <span class="text-xs text-slate-500 font-bold">GRADE ${scoreData.grade}</span>
-                                 </div>
+                                 <svg class="w-full h-full transform -rotate-90"><circle cx="50%" cy="50%" r="70" stroke="#1e293b" stroke-width="12" fill="none"></circle><circle cx="50%" cy="50%" r="70" stroke="#EAB308" stroke-width="12" fill="none" stroke-dasharray="440" stroke-dashoffset="${440 - (scoreData.score/100)*440}" stroke-linecap="round"></circle></svg>
+                                 <div class="absolute text-center"><span class="text-4xl font-bold text-white block">${scoreData.score}</span><span class="text-xs text-slate-500 font-bold">GRADE ${scoreData.grade}</span></div>
                              </div>
-                             <div class="grid grid-cols-2 gap-4 w-full border-t border-white/5 pt-4">
-                                 <div><p class="data-label">12-Mo PD</p><p class="text-lg font-bold text-white">${(scoreData.pd * 100).toFixed(2)}%</p></div>
-                                 <div><p class="data-label">Est. Loss (ECL)</p><p class="text-lg font-bold text-white">$${scoreData.ecl}</p></div>
-                             </div>
+                             <div class="grid grid-cols-2 gap-4 w-full border-t border-white/5 pt-4"><div><p class="data-label">12-Mo PD</p><p class="text-lg font-bold text-white">${(scoreData.pd * 100).toFixed(2)}%</p></div><div><p class="data-label">Est. Loss</p><p class="text-lg font-bold text-white">$${scoreData.ecl}</p></div></div>
                         </div>
-                        
-                        <div class="pro-panel p-6 rounded-xl">
-                            <h3 class="text-xs font-bold text-white uppercase mb-4">Authorized Terms (Grade ${scoreData.grade})</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Funding Range</span><span class="text-white font-mono">$${terms.funding[0].toLocaleString()} - $${terms.funding[1].toLocaleString()}</span></div>
-                                <div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Factor Rate</span><span class="text-white font-mono text-yellow-500">${terms.factor[0]} - ${terms.factor[1]}</span></div>
-                                <div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Max Term</span><span class="text-white font-mono">${terms.term[1]} Months</span></div>
-                                <div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Holdback</span><span class="text-white font-mono">${terms.holdback[0]}% - ${terms.holdback[1]}%</span></div>
-                                <div class="flex justify-between text-xs"><span class="text-slate-400">Collateral</span><span class="text-green-400 font-mono">${terms.collateral}</span></div>
-                            </div>
-                        </div>
+                        <div class="pro-panel p-6 rounded-xl"><h3 class="text-xs font-bold text-white uppercase mb-4">Authorized Terms (Grade ${scoreData.grade})</h3><div class="space-y-3"><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Funding</span><span class="text-white font-mono">$${terms.funding[0].toLocaleString()} - $${terms.funding[1].toLocaleString()}</span></div><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Factor</span><span class="text-white font-mono text-yellow-500">${terms.factor[0]} - ${terms.factor[1]}</span></div><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Term</span><span class="text-white font-mono">${terms.term[1]} Months</span></div></div></div>
                     </div>
-                    
-                    <div class="lg:col-span-8">
-                        <div class="pro-panel p-6 rounded-xl h-full">
-                            <div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold text-white font-serif">Factor Weight Analysis</h3><button class="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 transition-colors">Export Report</button></div>
-                            <div class="space-y-6">
-                                ${scoreData.breakdown.map(f => `
-                                    <div>
-                                        <div class="flex justify-between mb-2">
-                                            <div><span class="text-xs font-bold text-white uppercase tracking-wide block">${f.name.replace('_', ' ')}</span><span class="text-[10px] text-slate-500">Weight: ${(f.weight * 100).toFixed(0)}%</span></div>
-                                            <div class="text-right"><span class="text-sm font-bold ${f.raw > 0.7 ? 'text-green-400' : f.raw > 0.4 ? 'text-yellow-500' : 'text-red-400'}">${(f.raw * 100).toFixed(0)}/100</span></div>
-                                        </div>
-                                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden flex"><div class="bg-blue-600 h-full" style="width: ${f.percent}%"></div><div class="bg-slate-800 h-full flex-1"></div></div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
+                    <div class="lg:col-span-8"><div class="pro-panel p-6 rounded-xl h-full"><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold text-white font-serif">Factor Weight Analysis</h3></div><div class="space-y-6">${scoreData.breakdown.map(f => `<div><div class="flex justify-between mb-2"><div><span class="text-xs font-bold text-white uppercase tracking-wide block">${f.name.replace('_', ' ')}</span><span class="text-[10px] text-slate-500">Weight: ${(f.weight * 100).toFixed(0)}%</span></div><div class="text-right"><span class="text-sm font-bold ${f.raw > 0.7 ? 'text-green-400' : 'text-yellow-500'}">${(f.raw * 100).toFixed(0)}/100</span></div></div><div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden flex"><div class="bg-blue-600 h-full" style="width: ${f.percent}%"></div><div class="bg-slate-800 h-full flex-1"></div></div></div>`).join('')}</div></div></div>
                 </div>
             `;
         }
-        
-        // --- 1. OVERVIEW ---
-        function renderOverview() {
-            const chart = generateMultiLineChart(800, 200);
-            const scoreData = runPerrepusModel();
-            const projection = calculateApproval();
+
+        function renderCreditAnalysis() {
             return `
-                <div class="mb-6 animate-fade-in">
-                    <div onclick="state.subView='scoring'; render()" class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-blue-500/20 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-blue-500/20 p-2 rounded-full"><i data-lucide="brain-circuit" class="w-5 h-5 text-blue-400"></i></div>
-                            <div><h3 class="text-sm font-bold text-white">Risk Analysis Complete</h3><p class="text-xs text-slate-400">PERREPUS AI has generated a risk grade of <strong>${scoreData.grade}</strong>. Click to view full underwriting breakdown.</p></div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="pro-panel p-5 rounded-xl border-l-2 border-yellow-500 relative overflow-hidden">
-                        <div class="flex justify-between items-start mb-2"><p class="data-label">Funding Capacity</p><i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i></div>
-                        <h3 class="text-xl font-bold text-white tracking-tight text-balance">${formatCurrency(projection.min)} - ${formatCurrency(projection.max)}</h3>
-                        <p class="text-[10px] text-green-500 mt-1 font-medium flex items-center gap-1">Based on Revenue</p>
-                    </div>
-                    <div class="pro-panel p-5 rounded-xl border-l-2 border-blue-500 cursor-pointer hover:bg-white/5 transition-colors" onclick="state.subView='scoring'; render()">
-                        <div class="flex justify-between items-start mb-2"><p class="data-label">PERREPUS Score</p><i data-lucide="activity" class="w-4 h-4 text-blue-500"></i></div>
-                        <h3 class="text-xl font-bold text-white tracking-tight">${scoreData.score} <span class="text-sm font-normal text-slate-500">/ 100</span></h3>
-                        <p class="text-[10px] text-slate-500 mt-1">Grade ${scoreData.grade} • PD ${(scoreData.pd * 100).toFixed(1)}%</p>
-                    </div>
-                    <div class="pro-panel p-5 rounded-xl md:col-span-2 flex items-center justify-between relative overflow-hidden">
-                        <div class="absolute left-0 top-0 w-1 h-full bg-yellow-500"></div>
-                        <div class="z-10">
-                            <p class="data-label text-yellow-500 mb-1">Application Status</p>
-                            <h3 class="text-xl font-bold text-white">Underwriting Review</h3>
-                            <p class="text-[11px] text-slate-400 mt-1">Estimated decision in <span class="text-white">3 hours</span>.</p>
-                        </div>
-                        <div class="flex items-center gap-4 pr-4">
-                            <div class="text-right hidden sm:block">
-                                <p class="data-label">Completion</p>
-                                <p class="text-white font-bold">85%</p>
-                            </div>
-                            ${renderRadialProgress(85)}
-                        </div>
-                    </div>
-                </div>
-                <!-- ... rest of overview (charts, logs) ... -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 pro-panel rounded-xl p-6 relative">
-                        <div class="flex justify-between items-center mb-6">
-                            <div><h3 class="text-sm font-bold text-white">Revenue vs. Expenses</h3><p class="text-[11px] text-slate-500">Trailing 12 Months</p></div>
-                        </div>
-                        <div class="h-48 w-full">${chart}</div>
-                    </div>
-                    <div class="pro-panel rounded-xl p-0 flex flex-col h-full">
-                        <div class="p-4 border-b border-white/5 bg-white/[0.02]"><h3 class="text-xs font-bold text-white uppercase tracking-wider">Underwriter Notes</h3></div>
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                            <div class="flex gap-3"><div class="w-6 h-6 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center text-[10px]">JD</div><div class="bg-white/5 p-3 rounded-lg rounded-tl-none border border-white/5"><p class="text-xs text-slate-300">Initial PERREPUS score is strong at ${scoreData.score}.</p><p class="text-[10px] text-slate-600 mt-1">John Doe • 10:42 AM</p></div></div>
-                        </div>
-                        <div class="p-3 border-t border-white/5"><input type="text" placeholder="Reply to underwriter..." class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-yellow-500"></div>
+                <div class="pro-panel rounded-xl p-8 animate-fade-in">
+                    <h2 class="text-lg font-bold text-white mb-6 font-serif">Credit Profile Analysis</h2>
+                    <div class="space-y-6">
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Payment History (35%)</span><span class="text-xs text-green-400 font-bold">100% On-Time</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-green-500 h-full w-full rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Utilization (30%)</span><span class="text-xs text-yellow-400 font-bold">32% Usage</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-yellow-500 h-full w-[32%] rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Credit Age (15%)</span><span class="text-xs text-blue-400 font-bold">4.2 Years Avg</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-blue-500 h-full w-[65%] rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Inquiries (10%)</span><span class="text-xs text-slate-200 font-bold">2 Recent</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-slate-500 h-full w-[80%] rounded-full"></div></div></div>
                     </div>
                 </div>
             `;
         }
 
-        // --- SETTINGS (CALIBRATION) ---
-        function renderSettings() {
-             const updateWeight = (key, val) => { state.modelWeights[key] = parseFloat(val); render(); };
-             return `<div class="pro-panel rounded-xl p-6 max-w-4xl mx-auto animate-fade-in"><div class="mb-8 border-b border-white/5 pb-6"><h2 class="text-lg font-bold text-white">Model Calibration</h2><p class="text-slate-400 text-xs">Adjust weights for PERREPUS.ai scoring.</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="space-y-6">${Object.keys(state.modelWeights).map(k => `<div><div class="flex justify-between mb-2"><span class="data-label">${k.replace('_', ' ')}</span><span class="text-xs font-mono text-white">${(state.modelWeights[k] * 100).toFixed(0)}%</span></div><input type="range" min="0" max="1" step="0.01" value="${state.modelWeights[k]}" oninput="state.modelWeights['${k}'] = parseFloat(this.value); document.querySelector('#val-${k}').innerText = (this.value*100).toFixed(0)+'%';" class="w-full"><span id="val-${k}" class="hidden"></span></div>`).join('')}</div><div class="bg-black/30 rounded-xl p-6 border border-white/5 flex flex-col justify-center items-center text-center"><i data-lucide="cpu" class="w-12 h-12 text-blue-500 mb-4"></i><h3 class="text-white font-bold mb-2">Live Impact Analysis</h3><p class="text-xs text-slate-400 mb-6">Adjusting weights recalculates the score.</p><button onclick="state.subView='scoring'; render()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg text-xs font-bold transition-all">View Dashboard</button></div></div></div>`;
+        function renderCashFlow() {
+             return `
+                <div class="pro-panel rounded-xl p-8 animate-fade-in">
+                    <h2 class="text-lg font-bold text-white mb-6 font-serif">Cash Flow Analysis</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5"><p class="text-xs text-slate-400 mb-1">Avg Daily Balance</p><p class="text-xl text-white font-bold">$12,450</p></div>
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5"><p class="text-xs text-slate-400 mb-1">Monthly Deposits</p><p class="text-xl text-white font-bold">14</p></div>
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5"><p class="text-xs text-slate-400 mb-1">NSF Count (90d)</p><p class="text-xl text-green-400 font-bold">0</p></div>
+                    </div>
+                </div>
+            `;
         }
 
-        // ... (Keep renderWhatIf, Calculator, Docs, Offers, Application Profile, Wizard, Success, PDF functions) ...
-        function renderWhatIf() { /* ... same as before ... */ return `<!-- Scenario Modeling HTML -->` + `<div class="animate-fade-in space-y-6"><div class="pro-panel rounded-xl p-6"><div class="flex flex-col md:flex-row md:items-center justify-between mb-6"><h3 class="text-sm font-bold text-white flex items-center gap-2 mb-4 md:mb-0"><i data-lucide="sliders" class="w-4 h-4 text-yellow-500"></i> Scenario Configurator</h3></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div><div class="flex justify-between mb-3"><span class="data-label">Amount</span><span class="text-sm font-bold text-white">${formatCurrency(state.calcAmount)}</span></div><input type="range" min="10000" max="1000000" step="1000" value="${state.calcAmount}" oninput="updateCalc('amount', this.value)" class="w-full"></div><div><div class="flex justify-between mb-3"><span class="data-label">Term</span><span class="text-sm font-bold text-white">${state.calcTerm} Mo</span></div><input type="range" min="3" max="24" step="1" value="${state.calcTerm}" oninput="updateCalc('term', this.value)" class="w-full"></div><div><div class="flex justify-between mb-3"><span class="data-label">Rate</span><span class="text-sm font-bold text-white">${state.calcRate}x</span></div><input type="range" min="1.1" max="1.5" step="0.01" value="${state.calcRate}" oninput="updateCalc('rate', this.value)" class="w-full"></div></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <!-- Scenario Cards ... --> </div></div>`; } 
-        function renderCalculator() { /* 5-in-1 Calc Logic */ const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate); const tabClass = (id) => state.calcType === id ? 'bg-yellow-500 text-black font-bold' : 'bg-white/5 text-slate-400 hover:bg-white/10'; return `<div class="pro-panel rounded-xl p-6 max-w-5xl mx-auto animate-fade-in"><div class="mb-8 border-b border-white/5 pb-6"><div class="flex flex-wrap gap-2 mb-6"><button onclick="switchCalcType('mca')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('mca')}">MCA</button><button onclick="switchCalcType('wc')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('wc')}">Working Cap</button><button onclick="switchCalcType('term')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('term')}">Term Loan</button></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-8"><div class="lg:col-span-7 space-y-8"><div><div class="flex justify-between mb-3 items-end"><span class="data-label">Amount</span><span class="text-xl text-white font-bold">${formatCurrency(state.calcAmount)}</span></div><input type="range" min="10000" max="999999" step="5000" value="${state.calcAmount}" oninput="updateCalc('amount',this.value)" class="w-full"></div><div><div class="flex justify-between mb-3 items-end"><span class="data-label">Term</span><span class="text-xl text-white font-bold">${state.calcTerm}</span></div><input type="range" min="1" max="300" step="1" value="${state.calcTerm}" oninput="updateCalc('term',this.value)" class="w-full"></div></div><div class="lg:col-span-5 bg-[#0a0f1a] rounded-lg border border-white/5 p-6 flex flex-col h-full"><div class="mb-auto"><p class="data-label mb-1">Payment</p><p class="text-3xl font-bold text-white mb-1 tracking-tight text-wrap-balance">${formatCurrency(results.monthly)}</p><p class="text-[10px] text-slate-500 mb-6">/ Month (Est.)</p></div><div class="space-y-0 border-t border-white/5 pt-2"><div class="flex justify-between items-center py-3 border-b border-white/5"><span class="text-xs text-slate-400">Total Cost</span><span class="text-sm font-mono text-yellow-500 font-bold">${formatCurrency(results.total)}</span></div></div></div></div></div>`; }
+        // --- OTHER MODULES ---
+        function renderWhatIf() { const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate); return `<div class="animate-fade-in space-y-6"><div class="pro-panel rounded-xl p-6"><h3 class="text-sm font-bold text-white mb-6">Scenario Configurator</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div><div class="flex justify-between mb-3"><span class="data-label">Amount</span><span class="text-sm font-bold text-white">${formatCurrency(state.calcAmount)}</span></div><input type="range" min="10000" max="1000000" step="1000" value="${state.calcAmount}" oninput="updateCalc('amount', this.value)" class="w-full"></div><div><div class="flex justify-between mb-3"><span class="data-label">Term</span><span class="text-sm font-bold text-white">${state.calcTerm} Mo</span></div><input type="range" min="3" max="24" step="1" value="${state.calcTerm}" oninput="updateCalc('term', this.value)" class="w-full"></div><div><div class="flex justify-between mb-3"><span class="data-label">Rate</span><span class="text-sm font-bold text-white">${state.calcRate}x</span></div><input type="range" min="1.1" max="1.5" step="0.01" value="${state.calcRate}" oninput="updateCalc('rate', this.value)" class="w-full"></div></div></div></div>`; } 
+        function renderCalculator() { const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate); const tabClass = (id) => state.calcType === id ? 'bg-yellow-500 text-black font-bold' : 'bg-white/5 text-slate-400 hover:bg-white/10'; return `<div class="pro-panel rounded-xl p-6 max-w-5xl mx-auto animate-fade-in"><div class="mb-8 border-b border-white/5 pb-6"><div class="flex flex-wrap gap-2 mb-6"><button onclick="switchCalcType('mca')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('mca')}">MCA</button><button onclick="switchCalcType('wc')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('wc')}">Working Cap</button><button onclick="switchCalcType('term')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('term')}">Term Loan</button></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-8"><div class="lg:col-span-7 space-y-8"><div><div class="flex justify-between mb-3 items-end"><span class="data-label">Amount</span><span class="text-xl text-white font-bold">${formatCurrency(state.calcAmount)}</span></div><input type="range" min="10000" max="999999" step="5000" value="${state.calcAmount}" oninput="updateCalc('amount',this.value)" class="w-full"></div><div><div class="flex justify-between mb-3 items-end"><span class="data-label">Term</span><span class="text-xl text-white font-bold">${state.calcTerm}</span></div><input type="range" min="1" max="300" step="1" value="${state.calcTerm}" oninput="updateCalc('term',this.value)" class="w-full"></div></div><div class="lg:col-span-5 bg-[#0a0f1a] rounded-lg border border-white/5 p-6 flex flex-col h-full"><div class="mb-auto"><p class="data-label mb-1">Payment</p><p class="text-3xl font-bold text-white mb-1 tracking-tight text-wrap-balance">${formatCurrency(results.monthly)}</p><p class="text-[10px] text-slate-500 mb-6">/ Month (Est.)</p></div><div class="space-y-0 border-t border-white/5 pt-2"><div class="flex justify-between items-center py-3 border-b border-white/5"><span class="text-xs text-slate-400">Total Cost</span><span class="text-sm font-mono text-yellow-500 font-bold">${formatCurrency(results.total)}</span></div></div></div></div></div>`; }
         function renderApplicationProfile(){return `<div class="pro-panel rounded-xl p-8 max-w-3xl mx-auto animate-fade-in"><h2 class="text-lg font-bold text-white mb-6">Profile</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${Object.keys(state.formData).map(k=> typeof state.formData[k] === 'string' && state.formData[k] ? `<div class="border-b border-white/5 pb-2"><p class="data-label mb-1">${k.replace(/([A-Z])/g, ' $1').trim()}</p><p class="text-sm text-white truncate">${state.formData[k]}</p></div>` : '').join('')}</div></div>`;}
         function renderPayoffCalculator(){const dailyRate=state.payoffBalance*0.0004;const total=state.payoffBalance+(dailyRate*10);return`<div class="pro-panel rounded-xl p-8 max-w-2xl mx-auto animate-fade-in"><div class="flex items-center gap-3 mb-8 border-b border-white/5 pb-6"><div class="p-3 bg-white/5 rounded-xl"><i data-lucide="percent" class="w-6 h-6 text-yellow-500"></i></div><div><h2 class="text-lg font-bold text-white">Payoff Calculator</h2><p class="text-slate-400 text-xs">Estimate payout amount.</p></div></div><div class="space-y-6"><div class="grid grid-cols-2 gap-6"><div class="p-4 bg-black/30 rounded-xl border border-white/5"><p class="data-label mb-1">Current Balance</p><p class="text-xl text-white">${formatCurrency(state.payoffBalance)}</p></div><div class="p-4 bg-black/30 rounded-xl border border-white/5"><p class="data-label mb-1">Per Diem</p><p class="text-xl text-white">${formatCurrency(dailyRate)}</p></div></div><div><div class="flex justify-between text-sm mb-2 font-medium"><span class="text-slate-400">Days until payoff</span><span class="text-white">10 Days</span></div><input type="range" min="1" max="30" value="10" class="w-full" oninput="this.nextElementSibling.innerText = formatCurrency(${state.payoffBalance} + (${dailyRate} * this.value))"><div class="mt-8 text-center p-6 bg-white/5 rounded-2xl border border-white/5"><p class="data-label mb-2">Estimated Total Payoff</p><p class="text-2xl font-bold text-white text-wrap-balance">${formatCurrency(total)}</p></div></div></div></div>`}
-        function renderOffers(hideHeader = false) {return `<div class="animate-fade-in"><div class="pro-panel rounded-xl overflow-hidden"><table class="w-full text-left text-sm text-slate-300"><thead class="bg-black/20 text-[10px] uppercase font-bold text-slate-500 tracking-wider border-b border-white/5"><tr><th class="p-4 pl-6">Lender</th><th class="p-4">Product</th><th class="p-4">Amount</th><th class="p-4">Rate</th><th class="p-4">Term</th><th class="p-4">Origination</th><th class="p-4 text-right pr-6">Action</th></tr></thead><tbody class="divide-y divide-white/5"><tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-bold text-white flex items-center gap-3"><div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center font-bold text-white text-xs">BV</div><div>BlueVine<span class="block text-[9px] text-slate-500 font-normal">Verified Partner</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">LOC</span></td><td class="p-4 text-white font-bold">$45,000</td><td class="p-4"><span class="text-green-400 text-xs">1.5% mo</span></td><td class="p-4 text-xs">12 Mo</td><td class="p-4 text-xs text-slate-400">2.5%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-bold transition-all">View</button></td></tr></tbody></table></div></div>`; }
+        
+        function renderOffers(hideHeader = false) {
+            const header = hideHeader ? '' : `<div class="mb-6"><h2 class="text-2xl font-bold text-white font-serif">Lender Marketplace</h2><p class="text-slate-400 text-sm">Real-time offers based on your profile.</p></div>`;
+            return `
+                <div class="animate-fade-in">
+                    ${header}
+                    <div class="pro-panel rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-black/20 text-[10px] uppercase font-bold text-slate-500 tracking-wider border-b border-white/5"><tr><th class="p-4 pl-6">Lender</th><th class="p-4">Product</th><th class="p-4">Amount</th><th class="p-4">Rate</th><th class="p-4">Term</th><th class="p-4">Origination</th><th class="p-4 text-right pr-6">Action</th></tr></thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-bold text-white flex items-center gap-3"><div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center font-bold text-white text-xs">BV</div><div>BlueVine<span class="block text-[9px] text-slate-500 font-normal">Verified Partner</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">LOC</span></td><td class="p-4 text-white font-bold">$45,000</td><td class="p-4"><span class="text-green-400 text-xs">1.5% mo</span></td><td class="p-4 text-xs">12 Mo</td><td class="p-4 text-xs text-slate-400">2.5%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-bold transition-all">View</button></td></tr><tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-bold text-white flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center font-bold text-white text-xs">OD</div> <div>OnDeck<span class="block text-[9px] text-slate-500 font-normal">Premier Lender</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">Term Loan</span></td><td class="p-4 text-white font-bold">$60,000</td><td class="p-4"><span class="text-yellow-500 text-xs">1.29 Factor</span></td><td class="p-4 text-xs">18 Mo</td><td class="p-4 text-xs text-slate-400">3.0%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-bold transition-all">View</button></td></tr></tbody></table></div></div>`; }
         function renderDocs() { return `<div class="pro-panel rounded-xl p-6 animate-fade-in"><div class="flex justify-between items-center mb-6"><h3 class="text-sm font-bold text-white">Document Vault</h3><button onclick="document.getElementById('dashboardUpload').click()" class="bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-white/10 transition-all flex items-center gap-2"><i data-lucide="upload-cloud" class="w-3 h-3"></i> Upload</button><input type="file" id="dashboardUpload" multiple class="hidden" onchange="handleFile(this)"></div>${state.formData.documents.length>0?`<div class="grid grid-cols-1 md:grid-cols-3 gap-4">${state.formData.documents.map((d,i)=>`<div class="flex items-start gap-3 p-3 rounded-lg bg-black/30 border border-white/5 hover:border-white/20 transition-colors group relative"><div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-400"><i data-lucide="file" class="w-4 h-4"></i></div><div class="overflow-hidden flex-1"><p class="text-xs font-bold text-white truncate">${d.name}</p><p class="text-[10px] text-slate-500 mt-0.5">${d.date} • <span class="text-yellow-500">Pending Review</span></p></div><button onclick="removeDoc(${i})" class="absolute top-2 right-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-3 h-3"></i></button></div>`).join('')}</div>`:`<div class="text-center py-12 border-2 border-dashed border-white/5 rounded-xl bg-black/20"><p class="text-xs text-slate-500">No documents uploaded.</p></div>`}</div>`; }
         function renderWizard() { renderWizardLogic(); }
         function renderWizardLogic() { const progress = (state.step/6)*100; let content=''; if(state.step===1) content=renderStep1(); else if(state.step===2) content=renderStep2(); else if(state.step===3) content=renderStep3(); else if(state.step===4) content=renderStep4(); else if(state.step===5) content=renderStep5(); else if(state.step===6) content=renderStep6(); app.innerHTML=`<div class="min-h-screen flex flex-col items-center pt-12 pb-6 px-4 relative overflow-x-hidden"><div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0"><div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]"></div></div><div class="w-full max-w-xl mb-8 px-2 relative z-10">${BridgeLogo()}</div><div class="w-full max-w-xl relative pro-panel rounded-[2rem] p-8 md:p-10 shadow-2xl z-10 animate-fade-in"><div class="w-full bg-white/10 h-1.5 rounded-full mb-8 overflow-hidden"><div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-300 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(234,179,8,0.5)]" style="width: ${progress}%"></div></div>${state.step>1?`<button onclick="setStep(${state.step-1})" class="absolute top-10 right-10 text-slate-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">Back</button>`:''}<div class="min-h-[400px] flex flex-col"><div class="flex-grow">${content}</div><div class="mt-8"><button onclick="handleNext()" class="w-full py-4 rounded-full font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${state.step===6&&!state.formData.termsAgreed?'bg-white/5 text-slate-500 cursor-not-allowed':'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)] transform hover:-translate-y-0.5'}" ${state.step===6&&!state.formData.termsAgreed?'disabled':''}>${state.step===6?'Submit Application':'Continue'}${state.step!==6?'<i data-lucide="arrow-right" class="w-5 h-5"></i>':''}</button></div></div></div></div>`; if(state.step===6) initCanvas(); }
@@ -539,7 +436,7 @@
         function renderStep1(){const options=['Expansion','Payroll','Hiring','Marketing','Equipment','Inventory'];return`<div class="space-y-8"><div class="text-center space-y-2"><h2 class="text-3xl font-bold text-white font-serif">Let's get started.</h2><p class="text-slate-400 text-lg">What brings you here today?</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4">${options.map(opt=>`<div onclick="updateForm('useOfFunds', '${opt}')" class="cursor-pointer relative w-full rounded-xl p-4 flex items-center gap-4 transition-all duration-300 ${state.formData.useOfFunds===opt?`bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 scale-[1.02]`:'pro-panel text-slate-300 hover:bg-white/5'}"><i data-lucide="trending-up" class="w-5 h-5 ${state.formData.useOfFunds===opt?'text-black':'text-yellow-500'}"></i><span class="font-semibold text-sm">${opt}</span><div class="ml-auto w-4 h-4 rounded-full border-2 flex items-center justify-center ${state.formData.useOfFunds===opt?'border-black':'border-slate-600'}">${state.formData.useOfFunds===opt?'<div class="w-2 h-2 rounded-full bg-black"></div>':''}</div></div>`).join('')}</div><div class="pt-4 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Requested Amount','text','25,000',state.formData.amount,'amount',true)}${renderSelect('When needed?',['Immediately','1 Week','1 Month'],state.formData.timeline,'timeline')}</div></div>`}
         function renderStep2(){return`<div class="space-y-6"><div class="text-center mb-8"><h2 class="text-2xl font-bold text-white font-serif">Tell us about your business</h2></div>${renderInput('Legal Business Name','text','Acme Corp',state.formData.businessName,'businessName')}<div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('DBA','text','Optional',state.formData.dba,'dba')}${renderInput('EIN','text','XX-XXXXXXX',state.formData.ein,'ein')}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Start Date','date','',state.formData.startDate,'startDate')}${renderSelect('Industry',['Construction','Retail','Tech','Health','Restaurant'],state.formData.industry,'industry')}</div>${renderInput('Address','text','123 Main St',state.formData.businessAddress,'businessAddress')}${renderInput('Monthly Revenue','text','40,000',state.formData.revenue,'revenue',true)}</div>`}
         function renderStep3(){return`<div class="space-y-8 animate-fade-in"><div class="text-center mb-6"><h2 class="text-2xl font-bold text-white font-serif">Current Financing</h2></div><div class="flex gap-4 justify-center"><button onclick="updateForm('hasDebt','No')" class="px-8 py-4 rounded-full font-bold transition-all ${state.formData.hasDebt==='No'?'bg-green-500 text-black':'pro-panel text-slate-300'}">No Debt</button><button onclick="updateForm('hasDebt','Yes')" class="px-8 py-4 rounded-full font-bold transition-all ${state.formData.hasDebt==='Yes'?'bg-yellow-500 text-black':'pro-panel text-slate-300'}">Yes Debt</button></div>${state.formData.hasDebt==='Yes'?`<div class="bg-black/30 p-6 rounded-xl border border-white/5 space-y-6 animate-fade-in">${renderInput('Balance','text','15,000',state.formData.debtAmount,'debtAmount',true)}${renderInput('Lender','text','Lender Name',state.formData.debtCreditor,'debtCreditor')}</div>`:''}</div>`}
-        function renderStep4(){const o=state.formData.owners[0];return`<div class="space-y-6"><div class="flex justify-between items-end mb-4"><h2 class="text-2xl font-bold text-white font-serif">Owners</h2></div><div class="pro-panel rounded-xl p-6 space-y-5 relative shadow-lg">${renderInput('Full Name','text','John Doe',o.name,'owners.0.name')}<div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Email','email','john@ex.com',o.email,'owners.0.email')}${renderInput('Phone','tel','(555)123-4567',o.phone,'owners.0.phone')}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('SSN','text','XXX-XX-XXXX',o.ssn,'owners.0.ssn')}${renderInput('Date of Birth','date','',o.dob,'owners.0.dob')}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Home Address','text','Street',o.address,'owners.0.address')}${renderInput('Approx. FICO','number','700',o.fico,'owners.0.fico')}</div><div class="w-full md:w-1/2">${renderInput('Ownership %','number','50',o.ownership,'owners.0.ownership')}</div></div></div>`}
+        function renderStep4(){return`<div class="space-y-6"><div class="flex justify-between items-end mb-4"><h2 class="text-2xl font-bold text-white font-serif">Business Owners</h2><button onclick="addOwner()" class="text-xs font-bold text-yellow-500 hover:text-white border border-yellow-500/30 hover:bg-yellow-500/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Add Owner</button></div><div class="space-y-6">${state.formData.owners.map((owner, index) => `<div class="pro-panel rounded-xl p-6 space-y-5 relative shadow-lg relative"><div class="flex justify-between items-center mb-2"><h3 class="text-yellow-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">${index === 0 ? 'Primary Owner' : `Owner ${index + 1}`}${index === 0 ? '<i data-lucide="lock" class="w-3 h-3 text-slate-500"></i>' : ''}</h3>${index > 0 ? `<button onclick="removeOwner(${index})" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>${renderInput('Full Name', 'text', 'John Doe', owner.name, `owners.${index}.name`)}<div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Email Address', 'email', 'john@example.com', owner.email, `owners.${index}.email`)}${renderInput('Mobile Phone', 'tel', '(555) 123-4567', owner.phone, `owners.${index}.phone`)}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('SSN', 'text', 'XXX-XX-XXXX', owner.ssn, `owners.${index}.ssn`)}${renderInput('Date of Birth', 'date', '', owner.dob, `owners.${index}.dob`)}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Home Address', 'text', 'Street, City, Zip', owner.address, `owners.${index}.address`)}${renderInput('Approx. FICO', 'number', '700', owner.fico, `owners.${index}.fico`)}</div><div class="w-full md:w-1/2">${renderInput('Ownership %', 'number', '50', owner.ownership, `owners.${index}.ownership`)}</div></div>`).join('')}</div></div>`;}
         function renderStep5(){return`<div class="space-y-6"><div class="text-center mb-6"><h2 class="text-2xl font-bold text-white font-serif">Uploads</h2></div><div class="border-2 border-dashed border-white/10 rounded-xl p-12 text-center pro-panel cursor-pointer" onclick="document.getElementById('fileInput').click()"><input type="file" id="fileInput" multiple class="hidden" onchange="handleFile(this)"><i data-lucide="upload-cloud" class="w-10 h-10 text-yellow-500 mx-auto mb-4"></i><p class="text-white">Click to Upload</p></div><div class="space-y-3">${state.formData.documents.map((d,i)=>`<div class="flex items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5"><span>${d.name}</span><button onclick="removeDoc(${i})" class="text-red-400"><i data-lucide="x" class="w-4 h-4"></i></button></div>`).join('')}</div></div>`}
         
         // Updated Step 6 with Date Input for Signature
