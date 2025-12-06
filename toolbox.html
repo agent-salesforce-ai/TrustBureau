@@ -2406,7 +2406,7 @@
       border: 2px solid var(--accent);
       border-radius: 24px;
       width: 100%;
-      max-width: 800px;
+      max-width: 1100px;
       max-height: 90vh;
       overflow: hidden;
       display: flex;
@@ -3182,12 +3182,18 @@
     /* Enhanced Stats Row */
     .enhanced-stats {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
     
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
+      .enhanced-stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 500px) {
       .enhanced-stats {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -3197,18 +3203,18 @@
       background: var(--bg-option-card);
       border: 1px solid var(--border-secondary);
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px 8px;
       text-align: center;
     }
     
     .enhanced-stat-value {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       color: var(--text-primary);
     }
     
     .enhanced-stat-label {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -3908,7 +3914,7 @@
       
       <!-- Title -->
       <h1 class="welcome-title">Approval Toolbox</h1>
-      <p class="welcome-subtitle">Create professional funding offers for your clients</p>
+      <p class="welcome-subtitle">&nbsp;</p>
       
       <!-- Mode Toggle -->
       <div class="welcome-mode-toggle">
@@ -4005,7 +4011,7 @@
         
         <!-- Title -->
         <h2 class="login-modal-title">Approval Toolbox</h2>
-        <p class="login-modal-subtitle">Create professional funding offers for your clients</p>
+        <p class="login-modal-subtitle">&nbsp;</p>
         
         <!-- Form -->
         <form class="login-form" id="loginForm">
@@ -8624,49 +8630,56 @@ Government Issued ID</textarea>
         const container = $('enhancedStats');
         if (!container) return;
         
-        // Calculate stats
-        const totalValue = offers.reduce((sum, o) => sum + (o.amount || 0), 0);
-        const avgDealSize = offers.length > 0 ? totalValue / offers.length : 0;
+        const total = offers.length;
+        if (total === 0) {
+            container.innerHTML = `
+                <div class="enhanced-stat"><div class="enhanced-stat-value">0</div><div class="enhanced-stat-label">ISO</div></div>
+                <div class="enhanced-stat"><div class="enhanced-stat-value">0%</div><div class="enhanced-stat-label">Re-share Rate</div></div>
+                <div class="enhanced-stat"><div class="enhanced-stat-value">0%</div><div class="enhanced-stat-label">Client Share Rate</div></div>
+                <div class="enhanced-stat"><div class="enhanced-stat-value">0%</div><div class="enhanced-stat-label">Client View Rate</div></div>
+                <div class="enhanced-stat"><div class="enhanced-stat-value">0%</div><div class="enhanced-stat-label">Acceptance Rate</div></div>
+            `;
+            return;
+        }
         
-        // Conversion rate: accepted / (accepted + declined)
-        let accepted = 0, declined = 0, viewed = 0;
+        // Calculate stats from tracking
+        let isoShares = 0, reShares = 0, clientShares = 0, clientViews = 0, clientAccepts = 0;
+        
         offers.forEach(o => {
             const t = o.tracking || {};
-            if (t.clientAccepted) accepted++;
-            if (t.clientDeclined) declined++;
-            if (t.clientViewed || t.isoViewed) viewed++;
+            if (t.isoShared) isoShares++;
+            if (t.reshareCount && t.reshareCount > 0) reShares++;
+            if (t.clientShared) clientShares++;
+            if (t.clientViewed) clientViews++;
+            if (t.clientAccepted) clientAccepts++;
         });
-        const conversionRate = (accepted + declined) > 0 ? Math.round((accepted / (accepted + declined)) * 100) : 0;
         
-        // Average response time (sent to viewed)
-        let totalResponseTime = 0, responseCount = 0;
-        offers.forEach(o => {
-            const t = o.tracking || {};
-            const sentTime = t.clientSharedAt || t.isoSharedAt;
-            const viewedTime = t.clientViewedAt || t.isoViewedAt;
-            if (sentTime && viewedTime) {
-                totalResponseTime += new Date(viewedTime) - new Date(sentTime);
-                responseCount++;
-            }
-        });
-        const avgResponseHours = responseCount > 0 ? Math.round((totalResponseTime / responseCount) / (1000 * 60 * 60)) : 0;
+        // Calculate rates
+        const reShareRate = total > 0 ? Math.round((reShares / total) * 100) : 0;
+        const clientShareRate = total > 0 ? Math.round((clientShares / total) * 100) : 0;
+        const clientViewRate = clientShares > 0 ? Math.round((clientViews / clientShares) * 100) : 0;
+        const acceptanceRate = clientViews > 0 ? Math.round((clientAccepts / clientViews) * 100) : 0;
         
         container.innerHTML = `
             <div class="enhanced-stat">
-                <div class="enhanced-stat-value">$${avgDealSize >= 1000 ? Math.round(avgDealSize / 1000) + 'K' : Math.round(avgDealSize).toLocaleString()}</div>
-                <div class="enhanced-stat-label">Avg Deal Size</div>
+                <div class="enhanced-stat-value">${isoShares}</div>
+                <div class="enhanced-stat-label">ISO</div>
             </div>
             <div class="enhanced-stat">
-                <div class="enhanced-stat-value">${conversionRate}%</div>
-                <div class="enhanced-stat-label">Win Rate</div>
+                <div class="enhanced-stat-value">${reShareRate}%</div>
+                <div class="enhanced-stat-label">Re-share Rate</div>
             </div>
             <div class="enhanced-stat">
-                <div class="enhanced-stat-value">${avgResponseHours}h</div>
-                <div class="enhanced-stat-label">Avg Response</div>
+                <div class="enhanced-stat-value">${clientShareRate}%</div>
+                <div class="enhanced-stat-label">Client Share Rate</div>
             </div>
             <div class="enhanced-stat">
-                <div class="enhanced-stat-value">$${totalValue >= 1000000 ? (totalValue / 1000000).toFixed(1) + 'M' : totalValue >= 1000 ? Math.round(totalValue / 1000) + 'K' : totalValue.toLocaleString()}</div>
-                <div class="enhanced-stat-label">Pipeline Value</div>
+                <div class="enhanced-stat-value">${clientViewRate}%</div>
+                <div class="enhanced-stat-label">Client View Rate</div>
+            </div>
+            <div class="enhanced-stat">
+                <div class="enhanced-stat-value">${acceptanceRate}%</div>
+                <div class="enhanced-stat-label">Acceptance Rate</div>
             </div>
         `;
     }
