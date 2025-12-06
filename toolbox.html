@@ -796,6 +796,55 @@
     }
 
     /* ============================================
+       INLINE EDITABLE VALUES
+       ============================================ */
+    .editable-value {
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 6px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      position: relative;
+    }
+
+    .editable-value:hover {
+      background: var(--accent-glow);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .editable-value:focus {
+      outline: none;
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .editable-value::after {
+      content: '✎';
+      position: absolute;
+      right: -18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      opacity: 0;
+      color: var(--accent);
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .editable-value:hover::after {
+      opacity: 0.7;
+    }
+
+    .editable-value:focus::after {
+      opacity: 0;
+    }
+
+    .amount-display.editable-value::after {
+      right: -24px;
+      font-size: 14px;
+    }
+
+    /* ============================================
        THEME PICKER
        ============================================ */
     .theme-picker {
@@ -4953,7 +5002,7 @@ Government Issued ID</textarea>
                             <div id="previewBusinessName" class="business-name-display mt-2 mb-4 hidden"></div>
                             
                             <span class="text-[11px] font-bold uppercase tracking-widest block mb-3" style="color: var(--text-muted);">You Get</span>
-                            <span id="previewAmount" class="amount-display block">$50,000</span>
+                            <span id="previewAmount" class="amount-display block editable-value" contenteditable="true" data-field="amount">$50,000</span>
                           </div>
                         </div>
                         
@@ -4986,17 +5035,17 @@ Government Issued ID</textarea>
                           <div class="stats-grid divide-x border-b" style="border-color: var(--border-secondary);">
                             <div class="stat-cell">
                               <span class="stat-label">Term Length</span>
-                              <span id="previewTermLength" class="stat-value">6 months</span>
+                              <span id="previewTermLength" class="stat-value editable-value" contenteditable="true" data-field="termLength">6 months</span>
                             </div>
                             <div class="stat-cell">
                               <span class="stat-label">Payments</span>
-                              <span id="previewTermPayments" class="stat-value">130</span>
+                              <span id="previewTermPayments" class="stat-value editable-value" contenteditable="true" data-field="payments">130</span>
                             </div>
                           </div>
                           <div class="stats-grid divide-x border-b" style="border-color: var(--border-secondary);">
                             <div class="stat-cell">
                               <span class="stat-label">Factor Rate</span>
-                              <span id="previewFactor" class="stat-value font-mono">1.19x</span>
+                              <span id="previewFactor" class="stat-value font-mono editable-value" contenteditable="true" data-field="factor">1.19x</span>
                             </div>
                             <div class="stat-cell">
                               <span class="stat-label">Total Cost</span>
@@ -6574,9 +6623,9 @@ Government Issued ID</textarea>
         const sellRate = parseFloat($('isoSellRate')?.value) || lenderBuyRate;
         const fundingAmount = parseFloat($('calcAmount').value.replace(/[,$]/g, '')) || 0;
         
-        // Use lender buy rate if locked (from URL) or in preview mode (lender viewing ISO mode)
-        // Only default to 1.00 if ISO is working standalone with no lender involvement
-        const effectiveBuyRate = (window.lenderLocked || window.isoPreviewMode) ? lenderBuyRate : 1.00;
+        // If lender lock is enabled, use the locked buy rate; otherwise ISO buys at 1.00 (cost)
+        const lenderLockEnabled = $('lenderLockToggle')?.checked || window.lenderLocked;
+        const effectiveBuyRate = lenderLockEnabled ? (parseFloat($('lenderBuyRate')?.value) || lenderBuyRate || 1.15) : 1.00;
         
         const spread = sellRate - effectiveBuyRate;
         const isoProfit = fundingAmount * spread;
@@ -7458,6 +7507,95 @@ Government Issued ID</textarea>
         const pp = c.totalPayback > 0 ? (c.amount / c.totalPayback) * 100 : 0; 
         $('previewCircle').setAttribute('stroke-dasharray', `${pp}, ${100 - pp}`);
     }
+
+    // ============================================
+    // INLINE EDITING ON PREVIEW CARD
+    // ============================================
+    function initInlineEditing() {
+        const editableFields = document.querySelectorAll('.editable-value[data-field]');
+        
+        editableFields.forEach(el => {
+            // Prevent newlines
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    el.blur();
+                }
+                if (e.key === 'Escape') {
+                    el.blur();
+                    updatePreview(); // Reset to form values
+                }
+            });
+            
+            // Handle blur - sync back to form
+            el.addEventListener('blur', () => {
+                const field = el.dataset.field;
+                const rawValue = el.textContent.trim();
+                
+                syncInlineEdit(field, rawValue);
+            });
+            
+            // Select all on focus for easy replacement
+            el.addEventListener('focus', () => {
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            });
+        });
+    }
+    
+    function syncInlineEdit(field, rawValue) {
+        let numVal;
+        
+        switch(field) {
+            case 'amount':
+                // Parse currency: remove $, commas
+                numVal = parseFloat(rawValue.replace(/[$,]/g, '')) || 0;
+                if (numVal > 0) {
+                    $('calcAmount').value = numVal;
+                    $('calcAmountSlider').value = Math.min(numVal, 500000);
+                }
+                break;
+                
+            case 'termLength':
+                // Could be "6 months" or just "6" - extract number
+                numVal = parseInt(rawValue.replace(/[^\d]/g, '')) || 6;
+                // Check for term override (if it has text like "months")
+                if (rawValue.toLowerCase().includes('month') || rawValue.toLowerCase().includes('week')) {
+                    $('toggleTermOverride').checked = true;
+                    $('termOverrideContainer').classList.remove('hidden');
+                    $('calcTermOverride').value = rawValue;
+                } else {
+                    // Just a number - use as term
+                    $('calcTerm').value = numVal;
+                    $('calcTermSlider').value = Math.min(numVal, 365);
+                }
+                break;
+                
+            case 'payments':
+                numVal = parseInt(rawValue.replace(/[^\d]/g, '')) || 130;
+                $('calcTerm').value = numVal;
+                $('calcTermSlider').value = Math.min(numVal, 365);
+                break;
+                
+            case 'factor':
+                // Parse factor: "1.19x" or "1.19"
+                numVal = parseFloat(rawValue.replace(/[x×]/gi, '')) || 1.19;
+                if (numVal > 0 && numVal < 3) {
+                    $('calcFactor').value = numVal;
+                    $('calcFactorSlider').value = numVal;
+                }
+                break;
+        }
+        
+        // Recalculate and update preview
+        updatePreview();
+    }
+    
+    // Initialize inline editing on load
+    setTimeout(initInlineEditing, 100);
 
     // ============================================
     // CLIENT VIEW
