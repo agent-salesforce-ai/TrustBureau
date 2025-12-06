@@ -6149,6 +6149,9 @@ Government Issued ID</textarea>
     function setClientMode(mode) {
         currentClientMode = mode;
         
+        // Save to localStorage for persistence
+        localStorage.setItem('trustbureau_client_mode', mode);
+        
         // Update mode toggle buttons
         const isoBtn = $('isoModeBtn');
         const lenderBtn = $('lenderModeBtn');
@@ -7116,12 +7119,24 @@ Government Issued ID</textarea>
 
     function loadAuthState() {
         const savedUser = localStorage.getItem('fundingCalcUser');
+        const savedMode = localStorage.getItem('trustbureau_client_mode');
         
         if (savedUser) {
             currentUser = savedUser;
             // Load favorite theme for logged-in users
             loadFavoriteTheme();
         }
+        
+        // Set saved mode for use after welcome screen
+        if (savedMode) {
+            window.pendingClientMode = savedMode;
+            // Also update welcome screen toggle buttons to reflect saved mode
+            const welcomeIsoBtn = $('welcomeIsoModeBtn');
+            const welcomeLenderBtn = $('welcomeLenderModeBtn');
+            if (welcomeIsoBtn) welcomeIsoBtn.classList.toggle('active', savedMode === 'iso');
+            if (welcomeLenderBtn) welcomeLenderBtn.classList.toggle('active', savedMode === 'lender');
+        }
+        
         // Welcome screen always shows on page load
         // User must sign in or continue as free each session
         
