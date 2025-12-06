@@ -1,0 +1,719 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  ArrowRight, 
+  ArrowLeft, 
+  Briefcase, 
+  Users, 
+  TrendingUp, 
+  Truck, 
+  Megaphone, 
+  Package, 
+  HelpCircle,
+  UploadCloud,
+  CheckCircle,
+  X,
+  FileText,
+  PenTool,
+  Building2,
+  DollarSign,
+  Copy,
+  Printer,
+  ExternalLink,
+  Share2,
+  Calendar,
+  MapPin,
+  CreditCard,
+  Plus,
+  Trash2,
+  UserPlus
+} from 'lucide-react';
+
+// --- Components ---
+
+const BridgeLogo = ({ className = "h-12" }) => (
+  <div className={`flex items-center gap-3 ${className}`}>
+    <img 
+      src="https://i.imgur.com/MXMqYLc.png" 
+      alt="Sutton Funding" 
+      className="h-full w-auto object-contain"
+    />
+    <div className="flex flex-col justify-center">
+      <span className="text-yellow-500 font-serif font-bold text-2xl tracking-wide leading-none">Sutton</span>
+      <span className="text-gray-500 text-[10px] tracking-[0.2em] font-medium uppercase mt-1">Funding</span>
+    </div>
+  </div>
+);
+
+const CardOption = ({ icon: Icon, label, selected, onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`
+      cursor-pointer relative w-full rounded-xl p-4 flex items-center justify-between transition-all duration-200 border
+      ${selected 
+        ? 'bg-yellow-900/20 border-yellow-500 text-yellow-500' 
+        : 'bg-gray-800/40 border-gray-700 text-gray-400 hover:border-gray-600 hover:bg-gray-800'}
+    `}
+  >
+    <div className="flex items-center gap-3 z-10">
+      <Icon size={20} className={selected ? 'text-yellow-500' : 'text-gray-500'} />
+      <span className={`font-semibold text-base ${selected ? 'text-yellow-500' : 'text-gray-200'}`}>{label}</span>
+    </div>
+
+    <div className={`
+      w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+      ${selected ? 'border-yellow-500' : 'border-gray-600'}
+    `}>
+      {selected && <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />}
+    </div>
+  </div>
+);
+
+const InputField = ({ label, type = "text", placeholder, value, onChange, icon, className }) => (
+  <div className={`flex flex-col gap-2 w-full ${className}`}>
+    <label className="text-gray-400 font-medium text-xs uppercase tracking-wide ml-1 flex gap-1">
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={type}
+        className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg p-3 pl-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder-gray-600 text-sm"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+      />
+      {icon && <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">{icon}</div>}
+    </div>
+  </div>
+);
+
+const SelectField = ({ label, options, value, onChange }) => (
+  <div className="flex flex-col gap-2 w-full">
+    <label className="text-gray-400 font-medium text-xs uppercase tracking-wide ml-1 flex gap-1">
+      {label}
+    </label>
+    <div className="relative">
+      <select
+        className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg p-3 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all appearance-none cursor-pointer text-sm"
+        value={value}
+        onChange={onChange}
+      >
+        <option value="" disabled>Select an option</option>
+        {options.map(opt => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500">
+        <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+    </div>
+  </div>
+);
+
+const SignaturePad = ({ onSave }) => {
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasSignature, setHasSignature] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = 150;
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#EAB308';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+    }
+  }, []);
+
+  const startDrawing = (e) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    setHasSignature(true);
+    if(onSave) onSave(canvas.toDataURL()); 
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSignature(false);
+    if(onSave) onSave(null);
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-2">
+      <label className="text-gray-300 font-medium text-xs uppercase tracking-wide ml-1">Sign Here</label>
+      <div className="border border-gray-700 rounded-lg overflow-hidden bg-gray-800 relative">
+        <canvas
+          ref={canvasRef}
+          className="w-full bg-gray-800 touch-none cursor-crosshair"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+        <div className="absolute bottom-2 right-2 text-[10px] text-gray-600 pointer-events-none">
+          Use mouse or finger
+        </div>
+      </div>
+      <button 
+        type="button"
+        onClick={clearSignature}
+        className={`text-xs text-red-400 hover:text-red-300 self-end ${!hasSignature && 'invisible'}`}
+      >
+        Clear Signature
+      </button>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+
+export default function App() {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    useOfFunds: '',
+    amount: '',
+    timeline: '',
+    businessName: '',
+    dba: '',
+    industry: '',
+    ein: '',
+    startDate: '',
+    businessAddress: '',
+    revenue: '',
+    hasDebt: '',
+    debtAmount: '',
+    debtCreditor: '',
+    owners: [{ name: '', ssn: '', dob: '', address: '', ownership: '' }],
+    documents: [],
+    signature: null,
+    submissionDate: '',
+    ipAddress: ''
+  });
+  
+  const [appId] = useState('SF-' + Math.floor(1000 + Math.random() * 9000));
+  const totalSteps = 7; 
+
+  useEffect(() => {
+    const mockIP = `68.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+    updateForm('ipAddress', mockIP);
+  }, []);
+
+  const handleNext = () => {
+    if (step === 6) {
+        updateForm('submissionDate', new Date().toLocaleString('en-US', { 
+            dateStyle: 'long', 
+            timeStyle: 'short' 
+        }));
+    }
+    if (step < totalSteps) setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    if (step === 8) {
+        setStep(7);
+        return;
+    }
+    if (step > 1) setStep(step - 1);
+  };
+
+  const updateForm = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const updateOwner = (index, field, value) => {
+    const newOwners = [...formData.owners];
+    newOwners[index][field] = value;
+    updateForm('owners', newOwners);
+  };
+
+  const addOwner = () => {
+    updateForm('owners', [...formData.owners, { name: '', ssn: '', dob: '', address: '', ownership: '' }]);
+  };
+
+  const removeOwner = (index) => {
+    if (formData.owners.length > 1) {
+      const newOwners = [...formData.owners];
+      newOwners.splice(index, 1);
+      updateForm('owners', newOwners);
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const newDocs = files.map(file => ({
+      name: file.name,
+      size: (file.size / 1024 / 1024).toFixed(2) + ' MB'
+    }));
+    updateForm('documents', [...formData.documents, ...newDocs]);
+  };
+
+  const removeDoc = (index) => {
+    const newDocs = [...formData.documents];
+    newDocs.splice(index, 1);
+    updateForm('documents', newDocs);
+  };
+
+  const useOfFundsIcons = {
+    'Expansion': TrendingUp,
+    'Payroll': Users,
+    'Hiring': UserPlus,
+    'Marketing': Megaphone,
+    'Equipment': Truck,
+    'Inventory': Package
+  };
+
+  const renderStep = () => {
+    switch(step) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Funding Request</h2>
+            
+            <InputField 
+                label="Requested Amount" 
+                type="number" 
+                placeholder="25000" 
+                icon={<DollarSign size={16} />}
+                value={formData.amount}
+                onChange={(e) => updateForm('amount', e.target.value)}
+            />
+
+            <div className="space-y-3">
+              <label className="text-gray-400 font-medium text-xs uppercase tracking-wide ml-1">Primary Use of Funds</label>
+              <div className="grid grid-cols-2 gap-3">
+                {['Expansion', 'Payroll', 'Hiring', 'Marketing', 'Equipment', 'Inventory'].map(opt => (
+                    <CardOption 
+                        key={opt}
+                        icon={useOfFundsIcons[opt]} 
+                        label={opt}
+                        selected={formData.useOfFunds === opt}
+                        onClick={() => updateForm('useOfFunds', opt)}
+                    />
+                ))}
+              </div>
+            </div>
+
+            <SelectField 
+                label="When are funds needed?" 
+                options={['Immediately', 'Within 1 Week', 'Within 1 Month', 'Flexible']}
+                value={formData.timeline}
+                onChange={(e) => updateForm('timeline', e.target.value)}
+            />
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-5">
+            <h2 className="text-2xl font-bold text-white mb-2">Business Profile</h2>
+            
+            <InputField 
+                label="Legal Business Name" 
+                placeholder="e.g. Acme Corp LLC" 
+                value={formData.businessName}
+                onChange={(e) => updateForm('businessName', e.target.value)}
+                icon={<Building2 size={16} />}
+            />
+            
+            <InputField 
+                label="DBA (Doing Business As)" 
+                placeholder="Optional" 
+                value={formData.dba}
+                onChange={(e) => updateForm('dba', e.target.value)}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+                <InputField 
+                    label="Federal EIN" 
+                    placeholder="XX-XXXXXXX" 
+                    value={formData.ein}
+                    onChange={(e) => updateForm('ein', e.target.value)}
+                />
+                 <InputField 
+                    label="Business Start Date" 
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => updateForm('startDate', e.target.value)}
+                />
+            </div>
+
+            <InputField 
+                label="Business Address" 
+                placeholder="123 Main St, City, State, Zip" 
+                icon={<MapPin size={16} />}
+                value={formData.businessAddress}
+                onChange={(e) => updateForm('businessAddress', e.target.value)}
+            />
+
+             <SelectField 
+                label="Industry" 
+                options={['Construction', 'Retail', 'Transportation', 'Healthcare', 'Technology', 'Restaurant', 'Other']}
+                value={formData.industry}
+                onChange={(e) => updateForm('industry', e.target.value)}
+             />
+
+             <InputField 
+                label="Gross Monthly Revenue" 
+                type="number" 
+                placeholder="e.g. 40000" 
+                icon={<DollarSign size={16} />}
+                value={formData.revenue}
+                onChange={(e) => updateForm('revenue', e.target.value)}
+             />
+          </div>
+        );
+
+      case 3:
+        return (
+             <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Existing Financing</h2>
+                
+                <div className="space-y-3">
+                    <label className="text-gray-400 font-medium text-xs uppercase tracking-wide ml-1">Do you have existing business debt?</label>
+                    <div className="grid grid-cols-2 gap-4">
+                         <div 
+                            onClick={() => updateForm('hasDebt', 'No')}
+                            className={`p-4 rounded-lg border cursor-pointer text-center font-bold transition-all ${formData.hasDebt === 'No' ? 'bg-green-900/20 border-green-500 text-green-500' : 'bg-gray-800 border-gray-700 text-gray-400'}`}
+                         >
+                            No
+                         </div>
+                         <div 
+                            onClick={() => updateForm('hasDebt', 'Yes')}
+                            className={`p-4 rounded-lg border cursor-pointer text-center font-bold transition-all ${formData.hasDebt === 'Yes' ? 'bg-yellow-900/20 border-yellow-500 text-yellow-500' : 'bg-gray-800 border-gray-700 text-gray-400'}`}
+                         >
+                            Yes
+                         </div>
+                    </div>
+                </div>
+
+                {formData.hasDebt === 'Yes' && (
+                    <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 space-y-4">
+                        <InputField 
+                            label="Current Balance ($)" 
+                            type="number"
+                            placeholder="e.g. 15000" 
+                            value={formData.debtAmount}
+                            onChange={(e) => updateForm('debtAmount', e.target.value)}
+                        />
+                         <InputField 
+                            label="Lender / Creditor Name" 
+                            placeholder="e.g. OnDeck, Kabbage" 
+                            value={formData.debtCreditor}
+                            onChange={(e) => updateForm('debtCreditor', e.target.value)}
+                        />
+                    </div>
+                )}
+             </div>
+        );
+
+      case 4:
+        return (
+            <div className="space-y-6">
+                 <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold text-white">Business Owners</h2>
+                    <button onClick={addOwner} className="text-yellow-500 text-sm font-bold flex items-center gap-1 hover:text-yellow-400">
+                        <Plus size={16} /> Add Owner
+                    </button>
+                 </div>
+
+                 {formData.owners.map((owner, index) => (
+                    <div key={index} className="bg-gray-800/30 border border-gray-700 rounded-xl p-5 space-y-4 relative">
+                        {formData.owners.length > 1 && (
+                            <button onClick={() => removeOwner(index)} className="absolute top-4 right-4 text-gray-500 hover:text-red-400">
+                                <Trash2 size={18} />
+                            </button>
+                        )}
+                        <h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest">Owner {index + 1}</h3>
+                        
+                        <InputField 
+                            label="Full Name" 
+                            placeholder="John Doe" 
+                            value={owner.name}
+                            onChange={(e) => updateOwner(index, 'name', e.target.value)}
+                        />
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <InputField 
+                                label="SSN" 
+                                placeholder="XXX-XX-XXXX" 
+                                value={owner.ssn}
+                                onChange={(e) => updateOwner(index, 'ssn', e.target.value)}
+                            />
+                            <InputField 
+                                label="Date of Birth" 
+                                type="date"
+                                value={owner.dob}
+                                onChange={(e) => updateOwner(index, 'dob', e.target.value)}
+                            />
+                        </div>
+
+                         <InputField 
+                            label="Home Address" 
+                            placeholder="Street, City, State, Zip" 
+                            icon={<MapPin size={16} />}
+                            value={owner.address}
+                            onChange={(e) => updateOwner(index, 'address', e.target.value)}
+                        />
+                        
+                        <div className="w-1/2">
+                             <InputField 
+                                label="Ownership %" 
+                                type="number"
+                                placeholder="50" 
+                                icon={<span className="text-gray-500">%</span>}
+                                value={owner.ownership}
+                                onChange={(e) => updateOwner(index, 'ownership', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                 ))}
+            </div>
+        );
+
+      case 5:
+         return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Upload Documents</h2>
+            <p className="text-gray-400 text-sm mb-4">Please upload recent bank statements (last 3 months) or voided check.</p>
+
+            <div className="border-2 border-dashed border-gray-700 rounded-xl p-8 flex flex-col items-center justify-center text-center bg-gray-800/30 hover:bg-gray-800/50 transition-colors relative">
+               <input 
+                 type="file" 
+                 multiple 
+                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                 onChange={handleFileUpload}
+               />
+               <UploadCloud size={48} className="text-yellow-500 mb-4" />
+               <p className="text-white font-medium">Click or Drag files to upload</p>
+            </div>
+
+            <div className="space-y-2 mt-4">
+              {formData.documents.map((doc, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-gray-800 p-3 rounded-lg border border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <FileText size={16} className="text-blue-400" />
+                    <span className="text-white text-sm">{doc.name}</span>
+                  </div>
+                  <button onClick={() => removeDoc(idx)} className="text-gray-500 hover:text-red-400">
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+         );
+
+      case 6:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Authorization</h2>
+            
+            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 space-y-4">
+               <p className="text-xs text-gray-400 leading-relaxed text-justify">
+                 By signing below, the Owner(s) authorize Sutton Funding and its assigns to obtain consumer and/or business investigative reports and credit reports from any credit bureau. I certify that all information provided in this application is true and correct to the best of my knowledge.
+               </p>
+               <SignaturePad onSave={(sig) => updateForm('signature', sig)} />
+            </div>
+          </div>
+        );
+
+      case 7:
+        return (
+          <div className="flex flex-col items-center justify-center text-center py-6 w-full">
+             <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6 border border-green-500/20">
+                <CheckCircle size={40} className="text-green-500" />
+             </div>
+             <h2 className="text-2xl font-bold text-white mb-2">Application Received</h2>
+             <p className="text-gray-400 text-sm mb-8">
+               ID: <span className="text-white font-mono">{appId}</span>
+             </p>
+
+             <button 
+               onClick={() => setStep(8)}
+               className="w-full bg-white hover:bg-gray-100 text-black py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg"
+             >
+               <ExternalLink size={20} />
+               View PDF Application
+             </button>
+          </div>
+        );
+
+      case 8:
+        return (
+            <div className="w-full bg-white rounded-sm shadow-2xl overflow-hidden text-black p-0 relative">
+               <div className="bg-gray-50 border-b border-gray-200 p-8 flex justify-between items-center">
+                  <BridgeLogo className="h-10" />
+                  <div className="text-right">
+                    <p className="font-mono text-gray-500 text-xs">App ID: {appId}</p>
+                    <p className="text-xs text-gray-400">{formData.submissionDate}</p>
+                  </div>
+               </div>
+
+               <div className="p-8 space-y-6">
+                  <div className="border-b border-gray-100 pb-4">
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Funding Request</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                       <div><p className="text-xs text-gray-500">Amount</p><p className="font-bold text-sm">${formData.amount || '—'}</p></div>
+                       <div><p className="text-xs text-gray-500">Use</p><p className="font-bold text-sm">{formData.useOfFunds || '—'}</p></div>
+                       <div><p className="text-xs text-gray-500">Timeline</p><p className="font-bold text-sm">{formData.timeline || '—'}</p></div>
+                    </div>
+                  </div>
+
+                  <div className="border-b border-gray-100 pb-4">
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Business Details</h3>
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm">
+                       <div><p className="text-xs text-gray-500">Legal Name</p><p className="font-semibold">{formData.businessName || '—'}</p></div>
+                       <div><p className="text-xs text-gray-500">DBA</p><p className="font-semibold">{formData.dba || 'N/A'}</p></div>
+                       <div><p className="text-xs text-gray-500">EIN</p><p className="font-semibold font-mono">{formData.ein || '—'}</p></div>
+                       <div><p className="text-xs text-gray-500">Start Date</p><p className="font-semibold">{formData.startDate || '—'}</p></div>
+                       <div className="col-span-2"><p className="text-xs text-gray-500">Address</p><p className="font-semibold">{formData.businessAddress || '—'}</p></div>
+                       <div><p className="text-xs text-gray-500">Industry</p><p className="font-semibold">{formData.industry || '—'}</p></div>
+                       <div><p className="text-xs text-gray-500">Monthly Revenue</p><p className="font-semibold">${formData.revenue || '—'}</p></div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-100 pb-4">
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Existing Debt</h3>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                       <div><p className="text-xs text-gray-500">Has Debt?</p><p className="font-semibold">{formData.hasDebt || 'No'}</p></div>
+                       {formData.hasDebt === 'Yes' && (
+                         <>
+                            <div><p className="text-xs text-gray-500">Creditor</p><p className="font-semibold">{formData.debtCreditor || '—'}</p></div>
+                            <div><p className="text-xs text-gray-500">Balance</p><p className="font-semibold">${formData.debtAmount || '—'}</p></div>
+                         </>
+                       )}
+                    </div>
+                  </div>
+
+                  <div className="border-b border-gray-100 pb-4">
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Owners</h3>
+                    {formData.owners.map((owner, i) => (
+                        <div key={i} className="mb-3 bg-gray-50 p-3 rounded border border-gray-100 text-sm">
+                            <p className="font-bold text-gray-800 mb-1">{owner.name || 'Owner Name'} <span className="text-gray-400 font-normal">({owner.ownership || '0'}% Owner)</span></p>
+                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                                <span>SSN: {owner.ssn || '—'}</span>
+                                <span>DOB: {owner.dob || '—'}</span>
+                                <span className="col-span-2">Addr: {owner.address || '—'}</span>
+                            </div>
+                        </div>
+                    ))}
+                  </div>
+
+                  <div>
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Signature</h3>
+                    <div className="bg-gray-50 p-4 rounded border border-gray-200 flex justify-between items-end">
+                       {formData.signature ? (
+                         <div className="relative">
+                            <img src={formData.signature} alt="Signature" className="h-12 object-contain opacity-90" style={{filter: 'invert(1) sepia(1) saturate(5) hue-rotate(10deg)'}} />
+                            <div className="border-t border-gray-300 w-48 mt-1"></div>
+                            <p className="text-[10px] text-gray-400 mt-1">Electronically Signed by Applicant</p>
+                         </div>
+                       ) : <p className="text-red-500 text-xs font-bold">NOT SIGNED</p>}
+
+                       <div className="text-right border-l border-gray-200 pl-4">
+                          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Digital Timestamp</p>
+                          <p className="text-[10px] font-mono text-gray-600">{formData.submissionDate}</p>
+                          <p className="text-[10px] font-mono text-gray-600">IP: {formData.ipAddress}</p>
+                       </div>
+                    </div>
+                  </div>
+
+               </div>
+               
+               <div className="bg-gray-100 p-4 flex justify-between items-center border-t border-gray-200">
+                  <button onClick={handleBack} className="text-gray-600 hover:text-black font-medium text-sm">
+                    ← Back to Edit
+                  </button>
+                  <button 
+                      onClick={() => window.print()}
+                      className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded text-sm font-medium hover:bg-gray-800 shadow-sm"
+                    >
+                      <Printer size={16} /> Print
+                  </button>
+               </div>
+            </div>
+        );
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black flex flex-col items-center py-6 px-4 font-sans selection:bg-yellow-500 selection:text-black">
+      
+      {step !== 8 && (
+        <div className="w-full max-w-xl flex justify-between items-center mb-6 px-2">
+           <BridgeLogo className="h-10" />
+        </div>
+      )}
+
+      <div className={`w-full max-w-xl relative ${step === 8 ? 'max-w-3xl' : 'bg-transparent'}`}>
+        
+        {step < 7 && (
+          <div className="flex justify-center gap-2 mb-6">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div 
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i <= step ? 'bg-yellow-500 w-8' : 'bg-gray-800 w-4'}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {step > 1 && step < 7 && (
+          <button 
+            onClick={handleBack}
+            className="absolute -top-10 right-0 text-gray-500 hover:text-white transition-colors"
+          >
+            <span className="text-xs font-medium uppercase tracking-wider">Back</span>
+          </button>
+        )}
+
+        <div className={`min-h-[500px] flex flex-col ${step === 8 ? 'min-h-auto' : ''}`}>
+           <div className="flex-grow">
+             {renderStep()}
+           </div>
+
+           {step < 7 && (
+             <div className="mt-8 pb-10">
+               <button
+                 onClick={handleNext}
+                 className="w-full bg-white hover:bg-gray-100 text-black py-4 rounded-lg font-bold text-lg transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+               >
+                 {step === 6 ? 'Submit Application' : 'Next'}
+               </button>
+             </div>
+           )}
+        </div>
+      </div>
+    </div>
+  );
+}
