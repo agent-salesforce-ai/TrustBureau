@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sutton Funding | Enterprise Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -30,6 +30,8 @@
         input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #1e293b; border-radius: 999px; }
         input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: #EAB308; cursor: pointer; -webkit-appearance: none; margin-top: -7px; box-shadow: 0 0 0 4px #0B1121, 0 0 15px rgba(234,179,8,0.5); border: 2px solid #ffffff; }
+        input[type=range]::-moz-range-track { width: 100%; height: 6px; cursor: pointer; background: #1e293b; border-radius: 999px; }
+        input[type=range]::-moz-range-thumb { height: 20px; width: 20px; border: 2px solid #ffffff; border-radius: 50%; background: #EAB308; cursor: pointer; box-shadow: 0 0 0 4px #0B1121, 0 0 15px rgba(234,179,8,0.5); }
 
         /* Glass Utilities */
         .pro-panel { background: #141b2d; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
@@ -48,11 +50,30 @@
         /* Data Grid Utilities */
         .data-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; }
         .data-value { font-size: 13px; color: #e2e8f0; font-weight: 500; }
+        
+        /* Form Label Styling */
+        .form-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; }
+        
+        /* Date Input Calendar Icon Fix */
+        input[type="date"] { color-scheme: dark; }
+        input[type="date"]::-webkit-calendar-picker-indicator { 
+            filter: invert(0.7) sepia(1) saturate(5) hue-rotate(10deg); 
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     </style>
 </head>
 <body class="text-slate-300 selection:bg-yellow-500 selection:text-black min-h-screen overflow-x-hidden text-sm">
 
-    <div id="app"></div>
+    <div id="app">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px;">
+            <div style="width: 40px; height: 40px; border: 3px solid #1e293b; border-top-color: #EAB308; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <p style="color: #64748b; font-size: 14px;">Loading...</p>
+        </div>
+        <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+    </div>
 
     <script>
         // --- STATE MANAGEMENT ---
@@ -66,20 +87,14 @@
             calcTerm: 12, 
             calcRate: 1.29, 
             payoffBalance: 42500,
+            payoffDays: 10,
             themeColor: 'yellow', 
-            // Model Weights Config
-            modelWeights: { 
-                trade_history: 0.22, 
-                public_records: 0.15, 
-                alternative_data: 0.28, 
-                digital_footprint: 0.12, 
-                banking_signals: 0.08, 
-                inquiry_profile: 0.05, 
-                other: 0.10 
-            },
+            modelWeights: { trade_history: 0.22, public_records: 0.15, alternative_data: 0.28, digital_footprint: 0.12, banking_signals: 0.08, inquiry_profile: 0.05, other: 0.10 },
             formData: {
-                useOfFunds: '', amount: '', timeline: '', businessName: '', dba: '', industry: '', ein: '', startDate: '', businessAddress: '', revenue: '', hasDebt: '', debtAmount: '', debtCreditor: '',
-                owners: [{ name: '', email: '', phone: '', ssn: '', dob: '', address: '', ownership: '', fico: '' }],
+                useOfFunds: '', amount: '', timeline: '', businessName: '', dba: '', industry: '', ein: '', startDate: '', 
+                businessStreet: '', businessCity: '', businessState: '', businessZip: '',
+                revenue: '', hasDebt: '', debtAmount: '', debtCreditor: '',
+                owners: [{ name: '', email: '', phone: '', ssn: '', dob: '', street: '', city: '', state: '', zip: '', ownership: '', fico: '' }],
                 documents: [], signature: null, signDate: '', termsAgreed: false, submissionDate: '', ipAddress: '', docHash: generateDocHash(), userAgent: navigator.userAgent.substring(0, 30) + '...', generatedPassword: ''
             }
         };
@@ -93,8 +108,6 @@
         // --- PERREPUS.ai SCORING ENGINE ---
         const PERREPUS = {
             pd_a: 0.10, pd_b: 7.0, lgd_default: 0.40,
-
-            // Grade Definitions from Python Models
             grades: {
                 'A': { min: 85.0, funding: [50000, 250000], term: [9, 18], factor: [1.09, 1.19], holdback: [8, 12], time: '24-48 hours', renewal: 'Every 6 months', collateral: 'None required', lgd: 0.40 },
                 'B': { min: 70.0, funding: [25000, 100000], term: [6, 12], factor: [1.20, 1.35], holdback: [10, 15], time: '2-3 business days', renewal: 'Quarterly', collateral: 'PG Optional', lgd: 0.40 },
@@ -102,16 +115,13 @@
                 'D': { min: 40.0, funding: [5000, 25000], term: [3, 6], factor: [1.51, 1.65], holdback: [15, 25], time: '5-7 business days', renewal: 'Weekly Monitor', collateral: 'PG + UCC-1', lgd: 0.45 },
                 'E': { min: 0.0, funding: [0, 0], term: [0, 0], factor: [0, 0], holdback: [0, 0], time: 'N/A', renewal: 'N/A', collateral: 'N/A', lgd: 0.50 }
             },
-
             clamp01: (x) => Math.max(0.0, Math.min(1.0, x)),
-            
             scoreAlternativeData: (utilOnTime, utilMonths, telOnTime, telMonths, rentOnTime, rentMonths, maxDbt) => {
                 const ratio = (ok, tot) => tot <= 0 ? 0.0 : PERREPUS.clamp01(ok / tot);
                 const base = (ratio(utilOnTime, utilMonths) + ratio(telOnTime, telMonths) + ratio(rentOnTime, rentMonths)) / 3.0;
                 const actualPen = 1.0 - PERREPUS.clamp01(maxDbt / 10.0);
                 return PERREPUS.clamp01(0.85 * base + 0.15 * (0.5 + 0.5 * actualPen));
             },
-
             scoreDigitalFootprint: (visits, convRate, engageRate, reviewScore, reviewCount) => {
                 const visitsComp = Math.min(visits, 50000) / 50000.0;
                 const convComp = Math.min(convRate, 0.05) / 0.05;
@@ -122,14 +132,11 @@
                 const score = 0.35 * visitsComp + 0.25 * convComp + 0.20 * engageComp + 0.20 * reviewsComp;
                 return PERREPUS.clamp01(score);
             },
-
             computeScore: (factors01, exposure = 10000) => {
                 let composite = 0.0;
                 let weightSum = 0;
                 const weights = state.modelWeights;
-                
                 for (let k in weights) weightSum += weights[k];
-                
                 const factorBreakdown = [];
                 for (let k in factors01) {
                     if (weights[k] !== undefined) {
@@ -139,84 +146,93 @@
                         factorBreakdown.push({ name: k, contribution: (w * val), raw: val, weight: w });
                     }
                 }
-
                 const score100 = 100.0 * PERREPUS.clamp01(composite);
                 const pd = 1.0 / (1.0 + Math.exp(PERREPUS.pd_a * score100 - PERREPUS.pd_b));
-                
                 let grade = 'E';
                 if (score100 >= PERREPUS.grades.A.min) grade = 'A';
                 else if (score100 >= PERREPUS.grades.B.min) grade = 'B';
                 else if (score100 >= PERREPUS.grades.C.min) grade = 'C';
                 else if (score100 >= PERREPUS.grades.D.min) grade = 'D';
-                
                 const terms = PERREPUS.grades[grade];
                 const ecl = pd * terms.lgd * exposure;
-
-                return {
-                    score: score100.toFixed(1),
-                    grade: grade,
-                    pd: pd.toFixed(4),
-                    ecl: ecl.toFixed(2),
-                    terms: terms,
-                    breakdown: factorBreakdown.map(f => ({ ...f, percent: ((f.contribution / composite) * 100).toFixed(1) }))
-                };
+                return { score: score100.toFixed(1), grade: grade, pd: pd.toFixed(4), ecl: ecl.toFixed(2), terms: terms, breakdown: factorBreakdown.map(f => ({ ...f, percent: ((f.contribution / composite) * 100).toFixed(1) })) };
             }
         };
 
         function runPerrepusModel() {
-            // 1. Infer Inputs from Form Data
             const fico = parseInt(state.formData.owners[0].fico) || 680;
             const revenue = parseInt(cleanNumber(state.formData.revenue)) || 50000;
             const debt = state.formData.hasDebt === 'Yes' ? 1 : 0;
             const yearsInBus = state.formData.startDate ? (new Date() - new Date(state.formData.startDate)) / (1000 * 60 * 60 * 24 * 365) : 2;
-
-            // Simulate Factors
             const tradeHistoryScore = Math.min(1, (fico - 500) / 350); 
             const publicRecordScore = debt ? 0.7 : 0.98;
             const altDataScore = PERREPUS.scoreAlternativeData(11, 12, 9, 9, 12, 12, Math.max(0, 10 - yearsInBus));
             const digiScore = PERREPUS.scoreDigitalFootprint(Math.min(50000, revenue / 2), 0.03, 0.05, 4.2, Math.min(250, revenue / 1000));
-
-            const factors = {
-                "trade_history": tradeHistoryScore,
-                "public_records": publicRecordScore,
-                "alternative_data": altDataScore,
-                "digital_footprint": digiScore,
-                "banking_signals": 0.85, 
-                "inquiry_profile": 0.90,
-                "other": 0.75
-            };
-
+            const factors = { "trade_history": tradeHistoryScore, "public_records": publicRecordScore, "alternative_data": altDataScore, "digital_footprint": digiScore, "banking_signals": 0.85, "inquiry_profile": 0.90, "other": 0.75 };
             const exposure = parseInt(cleanNumber(state.formData.amount)) || 25000;
             return PERREPUS.computeScore(factors, exposure);
         }
 
         // --- CALCULATION LOGIC ---
         function calculateLoan(type, amount, term, rate) {
-            if(amount > 999999) amount = 999999;
-            let monthly = 0, total = 0, cost = 0;
-            if (type === 'mca' || type === 'wc') { total = amount * rate; cost = total - amount; monthly = total / term; } 
-            else if (type === 'term' || type === 'sba') { 
-                let n = term; if(type === 'sba') n = term * 12; 
+            if(amount > 2000000) amount = 2000000;
+            let monthly = 0, total = 0, cost = 0, daily = 0, weekly = 0, apr = 0, originationFee = 0;
+            
+            if (type === 'mca' || type === 'wc') { 
+                total = amount * rate; 
+                cost = total - amount; 
+                monthly = total / term;
+                daily = total / (term * 22); // ~22 business days per month
+                weekly = total / (term * 4.33);
+                originationFee = amount * 0.025;
+                // APR approximation for factor rate
+                apr = ((cost / amount) / (term / 12)) * 100;
+            } 
+            else if (type === 'term' || type === 'sba' || type === 'equip') { 
+                let n = term; 
+                if(type === 'sba') n = term * 12; 
                 let r = (rate / 100) / 12; 
-                if(r === 0) monthly = amount / n; else monthly = amount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1); 
-                total = monthly * n; cost = total - amount; 
-            } else if (type === 'loc') { let monthlyInterest = amount * (rate / 100 / 12); monthly = monthlyInterest + (amount * 0.05); total = monthly * term; cost = monthlyInterest * term; }
+                if(r === 0) monthly = amount / n; 
+                else monthly = amount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1); 
+                total = monthly * n; 
+                cost = total - amount;
+                daily = monthly / 22;
+                weekly = monthly / 4.33;
+                apr = rate;
+                originationFee = type === 'sba' ? amount * 0.02 : amount * 0.03;
+            } 
+            else if (type === 'loc') { 
+                let monthlyInterest = amount * (rate / 100 / 12); 
+                monthly = monthlyInterest + (amount * 0.05); 
+                total = monthly * term; 
+                cost = monthlyInterest * term;
+                daily = monthly / 22;
+                weekly = monthly / 4.33;
+                apr = rate;
+                originationFee = amount * 0.015;
+            }
+            
             if(total > 5000000) total = 5000000;
             if(!isFinite(monthly) || isNaN(monthly)) monthly = 0;
             if(!isFinite(total) || isNaN(total)) total = 0;
             if(!isFinite(cost) || isNaN(cost)) cost = 0;
-            return { monthly: Math.round(monthly), total: Math.round(total), cost: Math.round(cost) };
-        }
-
-        function getLoanRequirements(type) {
-            const reqs = {
-                'mca': { fico: '500+', tib: '6 Mo+', rev: '$15k+', other: 'Negative Days OK' },
-                'wc': { fico: '600+', tib: '1 Yr+', rev: '$25k+', other: 'No Open Bankruptcies' },
-                'term': { fico: '660+', tib: '2 Yrs+', rev: '$30k+', other: 'Positive Cash Flow' },
-                'loc': { fico: '650+', tib: '2 Yrs+', rev: '$25k+', other: 'Avg Daily Bal > $5k' },
-                'sba': { fico: '680+', tib: '2 Yrs+', rev: 'Profitable', other: 'Tax Returns Required' }
+            if(!isFinite(apr) || isNaN(apr)) apr = 0;
+            
+            // Cost per dollar borrowed
+            const costPerDollar = amount > 0 ? (cost / amount) : 0;
+            
+            return { 
+                monthly: Math.round(monthly), 
+                total: Math.round(total), 
+                cost: Math.round(cost),
+                daily: Math.round(daily),
+                weekly: Math.round(weekly),
+                apr: apr.toFixed(1),
+                originationFee: Math.round(originationFee),
+                costPerDollar: costPerDollar.toFixed(2),
+                principalPct: amount > 0 ? Math.round((amount / total) * 100) : 0,
+                costPct: amount > 0 ? Math.round((cost / total) * 100) : 0
             };
-            return reqs[type] || reqs['mca'];
         }
 
         function calculateApproval() {
@@ -226,8 +242,20 @@
             return {
                 min: Math.floor((revenue * 0.8) / 1000) * 1000,
                 max: maxAppr,
-                score: 85 // simplified for overview
+                score: 85
             };
+        }
+
+        function getLoanRequirements(type) {
+            const reqs = {
+                'mca': { fico: '500+', tib: '6 Mo+', rev: '$15k+', other: 'Negative Days OK' },
+                'wc': { fico: '600+', tib: '1 Yr+', rev: '$25k+', other: 'No Open Bankruptcies' },
+                'term': { fico: '660+', tib: '2 Yrs+', rev: '$30k+', other: 'Positive Cash Flow' },
+                'loc': { fico: '650+', tib: '2 Yrs+', rev: '$25k+', other: 'Avg Daily Bal > $5k' },
+                'sba': { fico: '680+', tib: '2 Yrs+', rev: 'Profitable', other: 'Tax Returns Required' },
+                'equip': { fico: '620+', tib: '1 Yr+', rev: '$20k+', other: 'Equipment Quote Required' }
+            };
+            return reqs[type] || reqs['mca'];
         }
 
         // --- CHARTING ---
@@ -264,7 +292,9 @@
             else if (state.view === 'success') renderSuccess();
             else if (state.view === 'dashboard') renderDashboardPro();
             else if (state.view === 'pdf') renderPDF();
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
 
         // --- COMPONENTS ---
@@ -273,66 +303,116 @@
                 <img src="https://i.imgur.com/MXMqYLc.png" alt="Sutton Logo" class="h-24 w-auto object-contain drop-shadow-2xl">
                 <div class="flex flex-col items-center justify-center">
                     <span class="font-bold text-3xl tracking-wide leading-none ${theme === 'light' ? 'text-yellow-600' : 'text-white'}" style="font-family: 'Playfair Display', serif">Sutton Funding</span>
-                    <span class="text-[9px] tracking-[0.3em] font-medium uppercase mt-1 opacity-80 ${theme === 'light' ? 'text-blue-900' : 'text-blue-200'}" style="font-family: 'Manrope', sans-serif">Tomorrow's Money Today</span>
+                    <span class="text-[9px] tracking-[0.3em] font-medium uppercase mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}">Tomorrow's Money Today</span>
                 </div>
             </div>
         `;
-        const SmallLogo = () => `<div class="flex items-center gap-3"><img src="https://i.imgur.com/MXMqYLc.png" class="h-8 w-auto"><span class="font-bold text-white font-serif tracking-wide text-lg" style="font-family: 'Playfair Display', serif">Sutton Funding</span></div>`;
+        const SmallLogo = () => `<div class="flex items-center gap-3"><img src="https://i.imgur.com/MXMqYLc.png" class="h-8 w-auto"><span class="font-bold text-white tracking-wide text-lg" style="font-family: 'Playfair Display', serif">Sutton Funding</span></div>`;
 
         // --- DASHBOARD ---
         function renderDashboardPro() {
             const activeTab = (name) => state.subView === name ? 'nav-item active bg-white/5 text-yellow-400' : 'nav-item text-slate-400 hover:bg-white/5 hover:text-white';
             
-            app.innerHTML = `
-                <div class="min-h-screen text-slate-300 font-sans flex bg-[#0B1121]">
-                    <!-- SIDEBAR -->
-                    <div class="w-64 border-r border-white/5 flex flex-col hidden lg:flex sticky top-0 h-screen bg-[#0f1623] z-50">
-                        <div class="h-20 border-b border-white/5 flex items-center px-6">${SmallLogo()}</div>
-                        <div class="flex-1 py-6 space-y-8 overflow-y-auto px-0">
-                            <div>
-                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Underwriting</p>
-                                <div class="space-y-0.5">
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('scoring')}" onclick="state.subView='scoring'; render();"><i data-lucide="brain-circuit" class="w-4 h-4"></i> Risk Model <span class="bg-blue-600 text-white text-[8px] font-bold px-1.5 rounded-sm">NEW</span></button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('credit')}" onclick="state.subView='credit'; render();"><i data-lucide="activity" class="w-4 h-4"></i> Credit Analysis</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('cashflow')}" onclick="state.subView='cashflow'; render();"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Cash Flow</button>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Application</p>
-                                <div class="space-y-0.5">
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('overview')}" onclick="state.subView='overview'; render();"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('application')}" onclick="state.subView='application'; render();"><i data-lucide="file-text" class="w-4 h-4"></i> My Application</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('docs')}" onclick="state.subView='docs'; render();"><i data-lucide="folder-open" class="w-4 h-4"></i> Documents</button>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-2">Tools</p>
-                                <div class="space-y-0.5">
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('calculator')}" onclick="state.subView='calculator'; render();"><i data-lucide="calculator" class="w-4 h-4"></i> Loan Calculator</button>
-                                    <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('what_if')}" onclick="state.subView='what_if'; render();"><i data-lucide="sliders" class="w-4 h-4"></i> What-If Analysis</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-4 border-t border-white/5 bg-[#0a0f1a]">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">${state.formData.owners[0].name.charAt(0)}</div>
-                                <div class="overflow-hidden"><p class="text-xs font-bold text-white truncate">${state.formData.owners[0].name}</p><p class="text-[10px] text-slate-500 truncate">${state.formData.owners[0].email || 'user@suttonfunding.com'}</p></div>
-                            </div>
+            // Inline SVG icons for sidebar
+            const icons = {
+                brain: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>`,
+                activity: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`,
+                chart: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>`,
+                grid: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>`,
+                file: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`,
+                folder: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path></svg>`,
+                calc: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>`,
+                sliders: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>`
+            };
+            
+            const sidebarContent = `
+                <div class="flex-1 py-6 space-y-8 overflow-y-auto px-0">
+                    <div>
+                        <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Underwriting</p>
+                        <div class="space-y-0.5">
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('scoring')}" onclick="state.subView='scoring'; closeMobileMenu(); render();">${icons.brain} Risk Model <span class="bg-blue-600 text-white text-[8px] font-bold px-1.5 rounded-sm ml-1">NEW</span></button>
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('credit')}" onclick="state.subView='credit'; closeMobileMenu(); render();">${icons.activity} Credit Analysis</button>
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('cashflow')}" onclick="state.subView='cashflow'; closeMobileMenu(); render();">${icons.chart} Cash Flow</button>
                         </div>
                     </div>
+                    <div>
+                        <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Application</p>
+                        <div class="space-y-0.5">
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('overview')}" onclick="state.subView='overview'; closeMobileMenu(); render();">${icons.grid} Overview</button>
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('application')}" onclick="state.subView='application'; closeMobileMenu(); render();">${icons.file} My Application</button>
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('docs')}" onclick="state.subView='docs'; closeMobileMenu(); render();">${icons.folder} Documents</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="px-6 text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tools</p>
+                        <div class="space-y-0.5">
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('calculator')}" onclick="state.subView='calculator'; closeMobileMenu(); render();">${icons.calc} Loan Calculator</button>
+                            <button class="w-full text-left px-6 py-2.5 text-xs font-medium flex items-center gap-3 transition-all ${activeTab('what_if')}" onclick="state.subView='what_if'; closeMobileMenu(); render();">${icons.sliders} What-If Analysis</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-white/5 bg-[#0a0f1a]">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">${(state.formData.owners[0].name || 'U').charAt(0).toUpperCase()}</div>
+                        <div class="overflow-hidden"><p class="text-xs font-medium text-white truncate">${state.formData.owners[0].name || 'User'}</p><p class="text-[10px] text-slate-500 truncate">${state.formData.owners[0].email || 'user@suttonfunding.com'}</p></div>
+                    </div>
+                </div>
+            `;
+            
+            app.innerHTML = `
+                <div class="min-h-screen text-slate-300 font-sans flex bg-[#0B1121]">
+                    <!-- MOBILE OVERLAY -->
+                    <div id="mobileOverlay" class="fixed inset-0 bg-black/60 z-40 lg:hidden hidden" onclick="closeMobileMenu()"></div>
+                    
+                    <!-- MOBILE SIDEBAR -->
+                    <div id="mobileSidebar" class="fixed left-0 top-0 w-72 h-full border-r border-white/5 flex flex-col bg-[#0f1623] z-50 lg:hidden transform -translate-x-full transition-transform duration-300">
+                        <div class="h-16 border-b border-white/5 flex items-center justify-between px-4">
+                            ${SmallLogo()}
+                            <button onclick="closeMobileMenu()" class="text-slate-400 hover:text-white p-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        ${sidebarContent}
+                    </div>
+                    
+                    <!-- DESKTOP SIDEBAR -->
+                    <div class="w-64 border-r border-white/5 flex-col hidden lg:flex sticky top-0 h-screen bg-[#0f1623] z-30">
+                        <div class="h-20 border-b border-white/5 flex items-center px-6">${SmallLogo()}</div>
+                        ${sidebarContent}
+                    </div>
+                    
                     <!-- MAIN -->
                     <div class="flex-1 h-screen overflow-y-auto relative bg-[#0B1121] scroll-smooth">
-                        <div class="sticky top-0 z-40 bg-[#0B1121]/90 backdrop-blur-xl border-b border-white/5 px-8 h-16 flex justify-between items-center">
-                            <h2 class="text-sm font-bold text-white uppercase tracking-wide">${getViewTitle(state.subView)}</h2>
-                            <button onclick="setView('wizard'); setStep(1)" class="text-slate-400 hover:text-white"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+                        <div class="sticky top-0 z-30 bg-[#0B1121]/90 backdrop-blur-xl border-b border-white/5 px-4 lg:px-8 h-16 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <button onclick="openMobileMenu()" class="lg:hidden text-slate-400 hover:text-white p-2 -ml-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                                </button>
+                                <h2 class="text-sm font-semibold text-white uppercase tracking-wide">${getViewTitle(state.subView)}</h2>
+                            </div>
+                            <button onclick="setView('wizard'); setStep(1)" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2 text-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                <span class="hidden sm:inline">Exit</span>
+                            </button>
                         </div>
-                        <div class="p-6 max-w-7xl mx-auto space-y-6 pb-20">${renderSubView()}</div>
+                        <div class="p-4 lg:p-6 max-w-7xl mx-auto space-y-6 pb-20">${renderSubView()}</div>
                     </div>
                 </div>`;
         }
+        
+        function openMobileMenu() {
+            document.getElementById('mobileSidebar').classList.remove('-translate-x-full');
+            document.getElementById('mobileOverlay').classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        
+        function closeMobileMenu() {
+            document.getElementById('mobileSidebar').classList.add('-translate-x-full');
+            document.getElementById('mobileOverlay').classList.add('hidden');
+        }
 
         function getViewTitle(view) {
-            const map = { 'overview': 'Dashboard', 'scoring': 'Risk Model', 'credit': 'Credit Analysis', 'cashflow': 'Cash Flow Analysis', 'what_if': 'Scenario Analysis', 'offers': 'Marketplace', 'calculator': 'Calculator', 'docs': 'Vault', 'payoff_calc': 'Payoff Tool', 'application': 'My Application' };
+            const map = { 'overview': 'Dashboard', 'scoring': 'Risk Model', 'credit': 'Credit Analysis', 'cashflow': 'Cash Flow Analysis', 'what_if': 'Scenario Analysis', 'offers': 'Marketplace', 'calculator': 'Calculator', 'docs': 'Document Vault', 'payoff_calc': 'Payoff Tool', 'application': 'My Application' };
             return map[view] || 'Dashboard';
         }
 
@@ -352,13 +432,13 @@
         function renderOverview() {
             const scoreData = runPerrepusModel();
             return `
-                <div class="mb-6 animate-fade-in"><div onclick="state.subView='scoring'; render()" class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-blue-500/20 transition-colors"><div class="flex items-center gap-3"><div class="bg-blue-500/20 p-2 rounded-full"><i data-lucide="brain-circuit" class="w-5 h-5 text-blue-400"></i></div><div><h3 class="text-sm font-bold text-white">Risk Analysis Complete</h3><p class="text-xs text-slate-400">PERREPUS AI has generated a risk grade of <strong>${scoreData.grade}</strong>.</p></div></div><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></div></div>
+                <div class="mb-6 animate-fade-in"><div onclick="state.subView='scoring'; render()" class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-blue-500/20 transition-colors"><div class="flex items-center gap-3"><div class="bg-blue-500/20 p-2 rounded-full"><i data-lucide="brain-circuit" class="w-5 h-5 text-blue-400"></i></div><div><h3 class="text-sm font-semibold text-white">Risk Analysis Complete</h3><p class="text-xs text-slate-400">PERREPUS AI has generated a risk grade of <span class="text-yellow-500 font-semibold">${scoreData.grade}</span>.</p></div></div><i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i></div></div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div class="pro-panel p-5 rounded-xl border-l-2 border-yellow-500"><div class="flex justify-between items-start mb-2"><p class="data-label">Capacity</p><i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i></div><h3 class="text-xl font-bold text-white tracking-tight">$${(parseInt(cleanNumber(state.formData.revenue))*1.2).toLocaleString()}</h3></div>
+                    <div class="pro-panel p-5 rounded-xl border-l-2 border-yellow-500"><div class="flex justify-between items-start mb-2"><p class="data-label">Capacity</p><i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i></div><h3 class="text-xl font-bold text-white tracking-tight">$${(parseInt(cleanNumber(state.formData.revenue) || 50000)*1.2).toLocaleString()}</h3></div>
                     <div class="pro-panel p-5 rounded-xl border-l-2 border-blue-500 cursor-pointer" onclick="state.subView='scoring'; render()"><div class="flex justify-between items-start mb-2"><p class="data-label">Score</p><i data-lucide="activity" class="w-4 h-4 text-blue-500"></i></div><h3 class="text-xl font-bold text-white tracking-tight">${scoreData.score} <span class="text-sm font-normal text-slate-500">/ 100</span></h3><p class="text-[10px] text-slate-500 mt-1">Grade ${scoreData.grade}</p></div>
                     <div class="pro-panel p-5 rounded-xl flex items-center justify-between"><div class="z-10"><p class="data-label text-yellow-500 mb-1">Status</p><h3 class="text-xl font-bold text-white">Underwriting</h3></div>${renderRadialProgress(85)}</div>
                 </div>
-                <div class="pro-panel rounded-xl p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-sm font-bold text-white">Revenue</h3><p class="text-[11px] text-slate-500">Trailing 12 Months</p></div><div class="h-48 w-full">${generateMultiLineChart(800, 200)}</div></div>
+                <div class="pro-panel rounded-xl p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-sm font-semibold text-white">Revenue Trend</h3><p class="text-[11px] text-slate-500">Trailing 12 Months</p></div><div class="h-48 w-full">${generateMultiLineChart(800, 200)}</div></div>
             `;
         }
 
@@ -370,16 +450,16 @@
                     <div class="lg:col-span-4 space-y-6">
                         <div class="pro-panel p-6 rounded-xl flex flex-col items-center justify-center text-center border-t-4 border-yellow-500 relative overflow-hidden">
                              <div class="absolute top-0 left-0 w-full h-full bg-yellow-500/5 pointer-events-none"></div>
-                             <div class="mb-4 text-left w-full"><h3 class="text-sm font-bold text-white uppercase tracking-wider">PERREPUS.ai Risk Grade</h3><p class="text-[10px] text-slate-400">Model Version 2.4.1</p></div>
+                             <div class="mb-4 text-left w-full"><h3 class="text-sm font-semibold text-white uppercase tracking-wider">PERREPUS.ai Risk Grade</h3><p class="text-[10px] text-slate-500">Model Version 2.4.1</p></div>
                              <div class="relative w-40 h-40 flex items-center justify-center mb-6">
                                  <svg class="w-full h-full transform -rotate-90"><circle cx="50%" cy="50%" r="70" stroke="#1e293b" stroke-width="12" fill="none"></circle><circle cx="50%" cy="50%" r="70" stroke="#EAB308" stroke-width="12" fill="none" stroke-dasharray="440" stroke-dashoffset="${440 - (scoreData.score/100)*440}" stroke-linecap="round"></circle></svg>
-                                 <div class="absolute text-center"><span class="text-4xl font-bold text-white block">${scoreData.score}</span><span class="text-xs text-slate-500 font-bold">GRADE ${scoreData.grade}</span></div>
+                                 <div class="absolute text-center"><span class="text-4xl font-bold text-white block">${scoreData.score}</span><span class="text-xs text-slate-400 font-semibold">GRADE ${scoreData.grade}</span></div>
                              </div>
                              <div class="grid grid-cols-2 gap-4 w-full border-t border-white/5 pt-4"><div><p class="data-label">12-Mo PD</p><p class="text-lg font-bold text-white">${(scoreData.pd * 100).toFixed(2)}%</p></div><div><p class="data-label">Est. Loss</p><p class="text-lg font-bold text-white">$${scoreData.ecl}</p></div></div>
                         </div>
-                        <div class="pro-panel p-6 rounded-xl"><h3 class="text-xs font-bold text-white uppercase mb-4">Authorized Terms (Grade ${scoreData.grade})</h3><div class="space-y-3"><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Funding</span><span class="text-white font-mono">$${terms.funding[0].toLocaleString()} - $${terms.funding[1].toLocaleString()}</span></div><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Factor</span><span class="text-white font-mono text-yellow-500">${terms.factor[0]} - ${terms.factor[1]}</span></div><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Term</span><span class="text-white font-mono">${terms.term[1]} Months</span></div></div></div>
+                        <div class="pro-panel p-6 rounded-xl"><h3 class="text-xs font-semibold text-white uppercase mb-4">Authorized Terms (Grade ${scoreData.grade})</h3><div class="space-y-3"><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Funding Range</span><span class="text-white font-mono">$${terms.funding[0].toLocaleString()} - $${terms.funding[1].toLocaleString()}</span></div><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Factor Rate</span><span class="text-yellow-500 font-mono font-semibold">${terms.factor[0]} - ${terms.factor[1]}</span></div><div class="flex justify-between text-xs border-b border-white/5 pb-2"><span class="text-slate-400">Max Term</span><span class="text-white font-mono">${terms.term[1]} Months</span></div></div></div>
                     </div>
-                    <div class="lg:col-span-8"><div class="pro-panel p-6 rounded-xl h-full"><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold text-white font-serif">Factor Weight Analysis</h3></div><div class="space-y-6">${scoreData.breakdown.map(f => `<div><div class="flex justify-between mb-2"><div><span class="text-xs font-bold text-white uppercase tracking-wide block">${f.name.replace('_', ' ')}</span><span class="text-[10px] text-slate-500">Weight: ${(f.weight * 100).toFixed(0)}%</span></div><div class="text-right"><span class="text-sm font-bold ${f.raw > 0.7 ? 'text-green-400' : 'text-yellow-500'}">${(f.raw * 100).toFixed(0)}/100</span></div></div><div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden flex"><div class="bg-blue-600 h-full" style="width: ${f.percent}%"></div><div class="bg-slate-800 h-full flex-1"></div></div></div>`).join('')}</div></div></div>
+                    <div class="lg:col-span-8"><div class="pro-panel p-6 rounded-xl h-full"><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-semibold text-white" style="font-family: 'Playfair Display', serif">Factor Weight Analysis</h3></div><div class="space-y-6">${scoreData.breakdown.map(f => `<div><div class="flex justify-between mb-2"><div><span class="text-xs font-semibold text-white uppercase tracking-wide block">${f.name.replace(/_/g, ' ')}</span><span class="text-[10px] text-slate-500">Weight: ${(f.weight * 100).toFixed(0)}%</span></div><div class="text-right"><span class="text-sm font-bold ${f.raw > 0.7 ? 'text-green-400' : 'text-yellow-500'}">${(f.raw * 100).toFixed(0)}/100</span></div></div><div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden flex"><div class="bg-blue-600 h-full rounded-full" style="width: ${f.percent}%"></div></div></div>`).join('')}</div></div></div>
                 </div>
             `;
         }
@@ -387,12 +467,12 @@
         function renderCreditAnalysis() {
             return `
                 <div class="pro-panel rounded-xl p-8 animate-fade-in">
-                    <h2 class="text-lg font-bold text-white mb-6 font-serif">Credit Profile Analysis</h2>
+                    <h2 class="text-lg font-semibold text-white mb-6" style="font-family: 'Playfair Display', serif">Credit Profile Analysis</h2>
                     <div class="space-y-6">
-                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Payment History (35%)</span><span class="text-xs text-green-400 font-bold">100% On-Time</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-green-500 h-full w-full rounded-full"></div></div></div>
-                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Utilization (30%)</span><span class="text-xs text-yellow-400 font-bold">32% Usage</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-yellow-500 h-full w-[32%] rounded-full"></div></div></div>
-                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Credit Age (15%)</span><span class="text-xs text-blue-400 font-bold">4.2 Years Avg</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-blue-500 h-full w-[65%] rounded-full"></div></div></div>
-                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Inquiries (10%)</span><span class="text-xs text-slate-200 font-bold">2 Recent</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-slate-500 h-full w-[80%] rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Payment History (35%)</span><span class="text-xs text-green-400 font-semibold">100% On-Time</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-green-500 h-full w-full rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Utilization (30%)</span><span class="text-xs text-yellow-400 font-semibold">32% Usage</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-yellow-500 h-full w-[32%] rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Credit Age (15%)</span><span class="text-xs text-blue-400 font-semibold">4.2 Years Avg</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-blue-500 h-full w-[65%] rounded-full"></div></div></div>
+                        <div><div class="flex justify-between mb-1"><span class="text-xs text-slate-400">Inquiries (10%)</span><span class="text-xs text-slate-300 font-semibold">2 Recent</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div class="bg-slate-500 h-full w-[80%] rounded-full"></div></div></div>
                     </div>
                 </div>
             `;
@@ -401,7 +481,7 @@
         function renderCashFlow() {
              return `
                 <div class="pro-panel rounded-xl p-8 animate-fade-in">
-                    <h2 class="text-lg font-bold text-white mb-6 font-serif">Cash Flow Analysis</h2>
+                    <h2 class="text-lg font-semibold text-white mb-6" style="font-family: 'Playfair Display', serif">Cash Flow Analysis</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5"><p class="text-xs text-slate-400 mb-1">Avg Daily Balance</p><p class="text-xl text-white font-bold">$12,450</p></div>
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5"><p class="text-xs text-slate-400 mb-1">Monthly Deposits</p><p class="text-xl text-white font-bold">14</p></div>
@@ -412,58 +492,913 @@
         }
 
         // --- OTHER MODULES ---
-        function renderWhatIf() { const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate); return `<div class="animate-fade-in space-y-6"><div class="pro-panel rounded-xl p-6"><h3 class="text-sm font-bold text-white mb-6">Scenario Configurator</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div><div class="flex justify-between mb-3"><span class="data-label">Amount</span><span class="text-sm font-bold text-white">${formatCurrency(state.calcAmount)}</span></div><input type="range" min="10000" max="1000000" step="1000" value="${state.calcAmount}" oninput="updateCalc('amount', this.value)" class="w-full"></div><div><div class="flex justify-between mb-3"><span class="data-label">Term</span><span class="text-sm font-bold text-white">${state.calcTerm} Mo</span></div><input type="range" min="3" max="24" step="1" value="${state.calcTerm}" oninput="updateCalc('term', this.value)" class="w-full"></div><div><div class="flex justify-between mb-3"><span class="data-label">Rate</span><span class="text-sm font-bold text-white">${state.calcRate}x</span></div><input type="range" min="1.1" max="1.5" step="0.01" value="${state.calcRate}" oninput="updateCalc('rate', this.value)" class="w-full"></div></div></div></div>`; } 
-        function renderCalculator() { const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate); const tabClass = (id) => state.calcType === id ? 'bg-yellow-500 text-black font-bold' : 'bg-white/5 text-slate-400 hover:bg-white/10'; return `<div class="pro-panel rounded-xl p-6 max-w-5xl mx-auto animate-fade-in"><div class="mb-8 border-b border-white/5 pb-6"><div class="flex flex-wrap gap-2 mb-6"><button onclick="switchCalcType('mca')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('mca')}">MCA</button><button onclick="switchCalcType('wc')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('wc')}">Working Cap</button><button onclick="switchCalcType('term')" class="px-4 py-2 rounded-lg text-xs transition-all ${tabClass('term')}">Term Loan</button></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-8"><div class="lg:col-span-7 space-y-8"><div><div class="flex justify-between mb-3 items-end"><span class="data-label">Amount</span><span class="text-xl text-white font-bold">${formatCurrency(state.calcAmount)}</span></div><input type="range" min="10000" max="999999" step="5000" value="${state.calcAmount}" oninput="updateCalc('amount',this.value)" class="w-full"></div><div><div class="flex justify-between mb-3 items-end"><span class="data-label">Term</span><span class="text-xl text-white font-bold">${state.calcTerm}</span></div><input type="range" min="1" max="300" step="1" value="${state.calcTerm}" oninput="updateCalc('term',this.value)" class="w-full"></div></div><div class="lg:col-span-5 bg-[#0a0f1a] rounded-lg border border-white/5 p-6 flex flex-col h-full"><div class="mb-auto"><p class="data-label mb-1">Payment</p><p class="text-3xl font-bold text-white mb-1 tracking-tight text-wrap-balance">${formatCurrency(results.monthly)}</p><p class="text-[10px] text-slate-500 mb-6">/ Month (Est.)</p></div><div class="space-y-0 border-t border-white/5 pt-2"><div class="flex justify-between items-center py-3 border-b border-white/5"><span class="text-xs text-slate-400">Total Cost</span><span class="text-sm font-mono text-yellow-500 font-bold">${formatCurrency(results.total)}</span></div></div></div></div></div>`; }
-        function renderApplicationProfile(){return `<div class="pro-panel rounded-xl p-8 max-w-3xl mx-auto animate-fade-in"><h2 class="text-lg font-bold text-white mb-6">Profile</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${Object.keys(state.formData).map(k=> typeof state.formData[k] === 'string' && state.formData[k] ? `<div class="border-b border-white/5 pb-2"><p class="data-label mb-1">${k.replace(/([A-Z])/g, ' $1').trim()}</p><p class="text-sm text-white truncate">${state.formData[k]}</p></div>` : '').join('')}</div></div>`;}
-        function renderPayoffCalculator(){const dailyRate=state.payoffBalance*0.0004;const total=state.payoffBalance+(dailyRate*10);return`<div class="pro-panel rounded-xl p-8 max-w-2xl mx-auto animate-fade-in"><div class="flex items-center gap-3 mb-8 border-b border-white/5 pb-6"><div class="p-3 bg-white/5 rounded-xl"><i data-lucide="percent" class="w-6 h-6 text-yellow-500"></i></div><div><h2 class="text-lg font-bold text-white">Payoff Calculator</h2><p class="text-slate-400 text-xs">Estimate payout amount.</p></div></div><div class="space-y-6"><div class="grid grid-cols-2 gap-6"><div class="p-4 bg-black/30 rounded-xl border border-white/5"><p class="data-label mb-1">Current Balance</p><p class="text-xl text-white">${formatCurrency(state.payoffBalance)}</p></div><div class="p-4 bg-black/30 rounded-xl border border-white/5"><p class="data-label mb-1">Per Diem</p><p class="text-xl text-white">${formatCurrency(dailyRate)}</p></div></div><div><div class="flex justify-between text-sm mb-2 font-medium"><span class="text-slate-400">Days until payoff</span><span class="text-white">10 Days</span></div><input type="range" min="1" max="30" value="10" class="w-full" oninput="this.nextElementSibling.innerText = formatCurrency(${state.payoffBalance} + (${dailyRate} * this.value))"><div class="mt-8 text-center p-6 bg-white/5 rounded-2xl border border-white/5"><p class="data-label mb-2">Estimated Total Payoff</p><p class="text-2xl font-bold text-white text-wrap-balance">${formatCurrency(total)}</p></div></div></div></div>`}
+        function renderWhatIf() { 
+            const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate);
+            const isFactor = (state.calcType === 'mca' || state.calcType === 'wc');
+            const rateDisplay = isFactor ? `${state.calcRate}x` : `${state.calcRate}%`;
+            const rateLabel = isFactor ? 'Factor Rate' : 'APR';
+            
+            return `
+            <div class="animate-fade-in space-y-6">
+                <div class="pro-panel rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">Scenario Configurator</h3>
+                            <p class="text-xs text-slate-400">Model different funding scenarios</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="state.calcType='mca';state.calcRate=1.29;render();" class="px-3 py-1.5 rounded-lg text-[10px] transition-all ${state.calcType === 'mca' ? 'bg-yellow-500 text-black font-bold' : 'bg-white/5 text-slate-400'}">MCA</button>
+                            <button onclick="state.calcType='term';state.calcRate=14;render();" class="px-3 py-1.5 rounded-lg text-[10px] transition-all ${state.calcType === 'term' ? 'bg-yellow-500 text-black font-bold' : 'bg-white/5 text-slate-400'}">Term</button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">Amount</span>
+                                <span class="text-sm font-bold text-white">${formatCurrency(state.calcAmount)}</span>
+                            </div>
+                            <input type="range" min="10000" max="500000" step="5000" value="${state.calcAmount}" oninput="updateCalc('amount', this.value)" class="w-full accent-yellow-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">Term</span>
+                                <span class="text-sm font-bold text-white">${state.calcTerm} Mo</span>
+                            </div>
+                            <input type="range" min="3" max="24" step="1" value="${state.calcTerm}" oninput="updateCalc('term', this.value)" class="w-full accent-yellow-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">${rateLabel}</span>
+                                <span class="text-sm font-bold text-white">${rateDisplay}</span>
+                            </div>
+                            <input type="range" min="${isFactor ? '1.1' : '8'}" max="${isFactor ? '1.5' : '25'}" step="${isFactor ? '0.01' : '0.5'}" value="${state.calcRate}" oninput="updateCalc('rate', this.value)" class="w-full accent-yellow-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/5">
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[10px] text-slate-500 uppercase mb-1">Monthly</p>
+                            <p class="text-lg text-white font-bold">${formatCurrency(results.monthly)}</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[10px] text-slate-500 uppercase mb-1">Total</p>
+                            <p class="text-lg text-white font-bold">${formatCurrency(results.total)}</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[10px] text-slate-500 uppercase mb-1">Cost</p>
+                            <p class="text-lg text-yellow-500 font-bold">${formatCurrency(results.cost)}</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[10px] text-slate-500 uppercase mb-1">Daily</p>
+                            <p class="text-lg text-white font-bold">${formatCurrency(results.daily)}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>`; 
+        } 
+        
+        function renderCalculator() { 
+            const results = calculateLoan(state.calcType, state.calcAmount, state.calcTerm, state.calcRate);
+            const reqs = getLoanRequirements(state.calcType);
+            const tabClass = (id) => state.calcType === id ? 'bg-yellow-500 text-black font-bold' : 'bg-white/5 text-slate-400 hover:bg-white/10';
+            
+            const productInfo = {
+                'mca': { name: 'Merchant Cash Advance', desc: 'Fast funding based on future sales', rateLabel: 'Factor Rate', rateUnit: 'x', minRate: 1.15, maxRate: 1.55, step: 0.01, minTerm: 3, maxTerm: 18, termUnit: 'Mo', speed: '24-48 hrs', icon: 'bolt' },
+                'wc': { name: 'Working Capital', desc: 'Short-term business funding', rateLabel: 'Factor Rate', rateUnit: 'x', minRate: 1.10, maxRate: 1.45, step: 0.01, minTerm: 3, maxTerm: 24, termUnit: 'Mo', speed: '1-3 days', icon: 'wallet' },
+                'term': { name: 'Term Loan', desc: 'Fixed monthly payments', rateLabel: 'APR', rateUnit: '%', minRate: 8, maxRate: 30, step: 0.5, minTerm: 6, maxTerm: 60, termUnit: 'Mo', speed: '3-7 days', icon: 'calendar' },
+                'loc': { name: 'Line of Credit', desc: 'Revolving credit facility', rateLabel: 'APR', rateUnit: '%', minRate: 10, maxRate: 35, step: 0.5, minTerm: 6, maxTerm: 24, termUnit: 'Mo', speed: '3-5 days', icon: 'credit-card' },
+                'sba': { name: 'SBA Loan', desc: 'Government-backed financing', rateLabel: 'APR', rateUnit: '%', minRate: 5, maxRate: 12, step: 0.25, minTerm: 5, maxTerm: 25, termUnit: 'Yrs', speed: '30-90 days', icon: 'building' },
+                'equip': { name: 'Equipment Finance', desc: 'Finance equipment purchases', rateLabel: 'APR', rateUnit: '%', minRate: 6, maxRate: 20, step: 0.5, minTerm: 12, maxTerm: 84, termUnit: 'Mo', speed: '5-10 days', icon: 'truck' }
+            };
+            
+            const p = productInfo[state.calcType] || productInfo['mca'];
+            const isFactor = (state.calcType === 'mca' || state.calcType === 'wc');
+            const termDisplay = state.calcType === 'sba' ? `${state.calcTerm} Years` : `${state.calcTerm} Months`;
+            const rateDisplay = isFactor ? `${state.calcRate}x` : `${state.calcRate}%`;
+            
+            // Payment schedule preview (first 6 months)
+            let scheduleRows = '';
+            if(!isFactor) {
+                const r = (state.calcRate / 100) / 12;
+                let balance = state.calcAmount;
+                for(let i = 1; i <= Math.min(6, state.calcType === 'sba' ? state.calcTerm * 12 : state.calcTerm); i++) {
+                    const interest = balance * r;
+                    const principal = results.monthly - interest;
+                    balance -= principal;
+                    if(balance < 0) balance = 0;
+                    scheduleRows += `<tr class="border-b border-white/5 text-xs"><td class="py-2 text-slate-400">${i}</td><td class="py-2 text-white">${formatCurrency(results.monthly)}</td><td class="py-2 text-slate-400">${formatCurrency(principal)}</td><td class="py-2 text-slate-400">${formatCurrency(interest)}</td><td class="py-2 text-white">${formatCurrency(balance)}</td></tr>`;
+                }
+            } else {
+                const paymentPerMonth = results.total / state.calcTerm;
+                let balance = results.total;
+                for(let i = 1; i <= Math.min(6, state.calcTerm); i++) {
+                    balance -= paymentPerMonth;
+                    if(balance < 0) balance = 0;
+                    scheduleRows += `<tr class="border-b border-white/5 text-xs"><td class="py-2 text-slate-400">${i}</td><td class="py-2 text-white">${formatCurrency(paymentPerMonth)}</td><td class="py-2 text-slate-400">—</td><td class="py-2 text-slate-400">—</td><td class="py-2 text-white">${formatCurrency(balance)}</td></tr>`;
+                }
+            }
+            
+            return `
+            <div class="max-w-6xl mx-auto animate-fade-in space-y-6">
+                <!-- Product Type Tabs -->
+                <div class="pro-panel rounded-xl p-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="switchCalcType('mca')" class="px-4 py-2.5 rounded-lg text-xs transition-all flex items-center gap-2 ${tabClass('mca')}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            MCA
+                        </button>
+                        <button onclick="switchCalcType('wc')" class="px-4 py-2.5 rounded-lg text-xs transition-all flex items-center gap-2 ${tabClass('wc')}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            Working Capital
+                        </button>
+                        <button onclick="switchCalcType('term')" class="px-4 py-2.5 rounded-lg text-xs transition-all flex items-center gap-2 ${tabClass('term')}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Term Loan
+                        </button>
+                        <button onclick="switchCalcType('loc')" class="px-4 py-2.5 rounded-lg text-xs transition-all flex items-center gap-2 ${tabClass('loc')}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            Line of Credit
+                        </button>
+                        <button onclick="switchCalcType('sba')" class="px-4 py-2.5 rounded-lg text-xs transition-all flex items-center gap-2 ${tabClass('sba')}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            SBA Loan
+                        </button>
+                        <button onclick="switchCalcType('equip')" class="px-4 py-2.5 rounded-lg text-xs transition-all flex items-center gap-2 ${tabClass('equip')}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            Equipment
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left: Input Controls -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="pro-panel rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white">${p.name}</h3>
+                                    <p class="text-xs text-slate-400">${p.desc}</p>
+                                </div>
+                                <div class="bg-yellow-500/10 border border-yellow-500/20 px-3 py-1.5 rounded-full">
+                                    <span class="text-[10px] text-yellow-500 font-semibold uppercase tracking-wider">⚡ ${p.speed}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <!-- Amount Slider -->
+                                <div>
+                                    <div class="flex justify-between mb-3 items-end">
+                                        <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">Funding Amount</span>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-2xl text-white font-bold">${formatCurrency(state.calcAmount)}</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" min="10000" max="2000000" step="5000" value="${state.calcAmount}" oninput="updateCalc('amount',this.value)" class="w-full accent-yellow-500">
+                                    <div class="flex justify-between mt-2 text-[10px] text-slate-500">
+                                        <span>$10,000</span>
+                                        <span>$2,000,000</span>
+                                    </div>
+                                </div>
+
+                                <!-- Term Slider -->
+                                <div>
+                                    <div class="flex justify-between mb-3 items-end">
+                                        <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">Repayment Term</span>
+                                        <span class="text-2xl text-white font-bold">${termDisplay}</span>
+                                    </div>
+                                    <input type="range" min="${p.minTerm}" max="${p.maxTerm}" step="1" value="${state.calcTerm}" oninput="updateCalc('term',this.value)" class="w-full accent-yellow-500">
+                                    <div class="flex justify-between mt-2 text-[10px] text-slate-500">
+                                        <span>${p.minTerm} ${p.termUnit}</span>
+                                        <span>${p.maxTerm} ${p.termUnit}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Rate Slider -->
+                                <div>
+                                    <div class="flex justify-between mb-3 items-end">
+                                        <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">${p.rateLabel}</span>
+                                        <span class="text-2xl text-white font-bold">${rateDisplay}</span>
+                                    </div>
+                                    <input type="range" min="${p.minRate}" max="${p.maxRate}" step="${p.step}" value="${state.calcRate}" oninput="updateCalc('rate',this.value)" class="w-full accent-yellow-500">
+                                    <div class="flex justify-between mt-2 text-[10px] text-slate-500">
+                                        <span>${p.minRate}${p.rateUnit}</span>
+                                        <span>${p.maxRate}${p.rateUnit}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Schedule Preview -->
+                        <div class="pro-panel rounded-xl p-6">
+                            <h4 class="text-xs font-semibold text-yellow-500 uppercase tracking-widest mb-4">Payment Schedule Preview</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-white/10">
+                                            <th class="text-left py-2 font-medium">Month</th>
+                                            <th class="text-left py-2 font-medium">Payment</th>
+                                            <th class="text-left py-2 font-medium">Principal</th>
+                                            <th class="text-left py-2 font-medium">Interest</th>
+                                            <th class="text-left py-2 font-medium">Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${scheduleRows}</tbody>
+                                </table>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-3 text-center">Showing first 6 payments</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Results Panel -->
+                    <div class="space-y-6">
+                        <!-- Primary Results -->
+                        <div class="pro-panel rounded-xl p-6 bg-gradient-to-br from-[#0d1321] to-[#0a0f1a] border border-yellow-500/20">
+                            <p class="text-xs font-semibold text-yellow-500 uppercase tracking-widest mb-2">Estimated Payment</p>
+                            <p class="text-4xl font-bold text-white mb-1 tracking-tight">${formatCurrency(results.monthly)}</p>
+                            <p class="text-xs text-slate-400 mb-6">per month</p>
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+                                    <p class="text-[10px] text-slate-500 mb-1">Daily</p>
+                                    <p class="text-sm text-white font-semibold">${formatCurrency(results.daily)}</p>
+                                </div>
+                                <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+                                    <p class="text-[10px] text-slate-500 mb-1">Weekly</p>
+                                    <p class="text-sm text-white font-semibold">${formatCurrency(results.weekly)}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 border-t border-white/10 pt-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-slate-400">Total Repayment</span>
+                                    <span class="text-sm font-mono text-white font-semibold">${formatCurrency(results.total)}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-slate-400">Cost of Capital</span>
+                                    <span class="text-sm font-mono text-yellow-500 font-semibold">${formatCurrency(results.cost)}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-slate-400">Origination Fee</span>
+                                    <span class="text-sm font-mono text-slate-300">${formatCurrency(results.originationFee)}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-slate-400">${isFactor ? 'Est. APR' : 'APR'}</span>
+                                    <span class="text-sm font-mono text-slate-300">${results.apr}%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-slate-400">Cost per $1 Borrowed</span>
+                                    <span class="text-sm font-mono text-slate-300">$${results.costPerDollar}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Breakdown -->
+                        <div class="pro-panel rounded-xl p-6">
+                            <h4 class="text-xs font-semibold text-yellow-500 uppercase tracking-widest mb-4">Cost Breakdown</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-400">Principal</span>
+                                        <span class="text-white">${results.principalPct}%</span>
+                                    </div>
+                                    <div class="h-3 bg-black/30 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full transition-all duration-500" style="width: ${results.principalPct}%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-400">Interest/Fees</span>
+                                        <span class="text-yellow-500">${results.costPct}%</span>
+                                    </div>
+                                    <div class="h-3 bg-black/30 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full transition-all duration-500" style="width: ${results.costPct}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="pro-panel rounded-xl p-6">
+                            <h4 class="text-xs font-semibold text-yellow-500 uppercase tracking-widest mb-4">Qualification Requirements</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span class="text-xs text-slate-400">Credit Score</span>
+                                    <span class="text-xs text-white font-semibold">${reqs.fico}</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span class="text-xs text-slate-400">Time in Business</span>
+                                    <span class="text-xs text-white font-semibold">${reqs.tib}</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span class="text-xs text-slate-400">Monthly Revenue</span>
+                                    <span class="text-xs text-white font-semibold">${reqs.rev}</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <span class="text-xs text-slate-400">Other</span>
+                                    <span class="text-xs text-white font-semibold">${reqs.other}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTA -->
+                        <button onclick="prefillApplication()" class="w-full py-4 rounded-xl font-bold text-sm bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            Apply for ${formatCurrency(state.calcAmount)}
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>`; 
+        }
+        
+        function renderApplicationProfile(){
+            return `<div class="pro-panel rounded-xl p-8 max-w-3xl mx-auto animate-fade-in"><h2 class="text-lg font-semibold text-white mb-6" style="font-family: 'Playfair Display', serif">Application Details</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${Object.keys(state.formData).map(k=> typeof state.formData[k] === 'string' && state.formData[k] ? `<div class="border-b border-white/5 pb-2"><p class="data-label mb-1">${k.replace(/([A-Z])/g, ' $1').trim()}</p><p class="text-sm text-white truncate">${state.formData[k]}</p></div>` : '').join('')}</div></div>`;
+        }
+        
+        function renderPayoffCalculator(){
+            const dailyRate = state.payoffBalance * 0.0004;
+            const daysToPayoff = state.payoffDays || 10;
+            const total = state.payoffBalance + (dailyRate * daysToPayoff);
+            const savings10 = dailyRate * (30 - 10);
+            const savings20 = dailyRate * (30 - 20);
+            
+            return `
+            <div class="max-w-3xl mx-auto animate-fade-in space-y-6">
+                <div class="pro-panel rounded-xl p-6">
+                    <div class="flex items-center gap-4 mb-6 pb-6 border-b border-white/5">
+                        <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-white">Early Payoff Calculator</h2>
+                            <p class="text-slate-400 text-xs">Calculate your payoff amount and see potential savings</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Balance Input -->
+                    <div class="mb-8">
+                        <div class="flex justify-between mb-3 items-end">
+                            <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">Current Balance</span>
+                            <span class="text-2xl text-white font-bold">${formatCurrency(state.payoffBalance)}</span>
+                        </div>
+                        <input type="range" min="5000" max="500000" step="1000" value="${state.payoffBalance}" oninput="state.payoffBalance=parseInt(this.value);render();" class="w-full accent-yellow-500">
+                        <div class="flex justify-between mt-2 text-[10px] text-slate-500">
+                            <span>$5,000</span>
+                            <span>$500,000</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Days Slider -->
+                    <div class="mb-8">
+                        <div class="flex justify-between mb-3 items-end">
+                            <span class="text-xs font-semibold text-yellow-500 uppercase tracking-widest">Days Until Payoff</span>
+                            <span class="text-2xl text-white font-bold">${daysToPayoff} Days</span>
+                        </div>
+                        <input type="range" min="1" max="60" step="1" value="${daysToPayoff}" oninput="state.payoffDays=parseInt(this.value);render();" class="w-full accent-yellow-500">
+                        <div class="flex justify-between mt-2 text-[10px] text-slate-500">
+                            <span>1 Day</span>
+                            <span>60 Days</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Principal</p>
+                            <p class="text-lg text-white font-bold">${formatCurrency(state.payoffBalance)}</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Per Diem</p>
+                            <p class="text-lg text-yellow-500 font-bold">${formatCurrency(dailyRate)}</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Accrued Interest</p>
+                            <p class="text-lg text-white font-bold">${formatCurrency(dailyRate * daysToPayoff)}</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 rounded-xl p-4 border border-yellow-500/30">
+                            <p class="text-[10px] text-yellow-500 uppercase tracking-wider mb-1">Total Payoff</p>
+                            <p class="text-lg text-white font-bold">${formatCurrency(total)}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Savings Comparison -->
+                    <div class="bg-black/20 rounded-xl p-5 border border-white/5">
+                        <h4 class="text-xs font-semibold text-yellow-500 uppercase tracking-widest mb-4">Early Payoff Savings</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between py-3 border-b border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-white font-medium">Pay in 10 days</p>
+                                        <p class="text-[10px] text-slate-500">vs 30-day payoff</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-green-400 font-bold">Save ${formatCurrency(dailyRate * 20)}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between py-3 border-b border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-white font-medium">Pay in 20 days</p>
+                                        <p class="text-[10px] text-slate-500">vs 30-day payoff</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-blue-400 font-bold">Save ${formatCurrency(dailyRate * 10)}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-white font-medium">Monthly interest rate</p>
+                                        <p class="text-[10px] text-slate-500">Based on per diem</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-purple-400 font-bold">${((dailyRate * 30 / state.payoffBalance) * 100).toFixed(2)}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-[10px] text-slate-500">Contact your funding advisor for an official payoff quote</p>
+                </div>
+            </div>`;
+        }
         
         function renderOffers(hideHeader = false) {
-            const header = hideHeader ? '' : `<div class="mb-6"><h2 class="text-2xl font-bold text-white font-serif">Lender Marketplace</h2><p class="text-slate-400 text-sm">Real-time offers based on your profile.</p></div>`;
+            const header = hideHeader ? '' : `<div class="mb-6"><h2 class="text-2xl font-semibold text-white" style="font-family: 'Playfair Display', serif">Lender Marketplace</h2><p class="text-slate-400 text-sm">Real-time offers based on your profile.</p></div>`;
             return `
                 <div class="animate-fade-in">
                     ${header}
                     <div class="pro-panel rounded-xl overflow-hidden">
                         <table class="w-full text-left text-sm text-slate-300">
-                            <thead class="bg-black/20 text-[10px] uppercase font-bold text-slate-500 tracking-wider border-b border-white/5"><tr><th class="p-4 pl-6">Lender</th><th class="p-4">Product</th><th class="p-4">Amount</th><th class="p-4">Rate</th><th class="p-4">Term</th><th class="p-4">Origination</th><th class="p-4 text-right pr-6">Action</th></tr></thead>
+                            <thead class="bg-black/20 text-[10px] uppercase font-semibold text-slate-500 tracking-wider border-b border-white/5"><tr><th class="p-4 pl-6">Lender</th><th class="p-4">Product</th><th class="p-4">Amount</th><th class="p-4">Rate</th><th class="p-4">Term</th><th class="p-4">Origination</th><th class="p-4 text-right pr-6">Action</th></tr></thead>
                             <tbody class="divide-y divide-white/5">
-                                <tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-bold text-white flex items-center gap-3"><div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center font-bold text-white text-xs">BV</div><div>BlueVine<span class="block text-[9px] text-slate-500 font-normal">Verified Partner</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">LOC</span></td><td class="p-4 text-white font-bold">$45,000</td><td class="p-4"><span class="text-green-400 text-xs">1.5% mo</span></td><td class="p-4 text-xs">12 Mo</td><td class="p-4 text-xs text-slate-400">2.5%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-bold transition-all">View</button></td></tr><tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-bold text-white flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center font-bold text-white text-xs">OD</div> <div>OnDeck<span class="block text-[9px] text-slate-500 font-normal">Premier Lender</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">Term Loan</span></td><td class="p-4 text-white font-bold">$60,000</td><td class="p-4"><span class="text-yellow-500 text-xs">1.29 Factor</span></td><td class="p-4 text-xs">18 Mo</td><td class="p-4 text-xs text-slate-400">3.0%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-bold transition-all">View</button></td></tr></tbody></table></div></div>`; }
-        function renderDocs() { return `<div class="pro-panel rounded-xl p-6 animate-fade-in"><div class="flex justify-between items-center mb-6"><h3 class="text-sm font-bold text-white">Document Vault</h3><button onclick="document.getElementById('dashboardUpload').click()" class="bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-white/10 transition-all flex items-center gap-2"><i data-lucide="upload-cloud" class="w-3 h-3"></i> Upload</button><input type="file" id="dashboardUpload" multiple class="hidden" onchange="handleFile(this)"></div>${state.formData.documents.length>0?`<div class="grid grid-cols-1 md:grid-cols-3 gap-4">${state.formData.documents.map((d,i)=>`<div class="flex items-start gap-3 p-3 rounded-lg bg-black/30 border border-white/5 hover:border-white/20 transition-colors group relative"><div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-400"><i data-lucide="file" class="w-4 h-4"></i></div><div class="overflow-hidden flex-1"><p class="text-xs font-bold text-white truncate">${d.name}</p><p class="text-[10px] text-slate-500 mt-0.5">${d.date} • <span class="text-yellow-500">Pending Review</span></p></div><button onclick="removeDoc(${i})" class="absolute top-2 right-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-3 h-3"></i></button></div>`).join('')}</div>`:`<div class="text-center py-12 border-2 border-dashed border-white/5 rounded-xl bg-black/20"><p class="text-xs text-slate-500">No documents uploaded.</p></div>`}</div>`; }
+                                <tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-semibold text-white flex items-center gap-3"><div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center font-bold text-white text-xs">BV</div><div>BlueVine<span class="block text-[9px] text-slate-500 font-normal">Verified Partner</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">LOC</span></td><td class="p-4 text-white font-semibold">$45,000</td><td class="p-4"><span class="text-green-400 text-xs">1.5% mo</span></td><td class="p-4 text-xs">12 Mo</td><td class="p-4 text-xs text-slate-400">2.5%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-semibold transition-all">View</button></td></tr><tr class="hover:bg-white/5 transition-colors group"><td class="p-4 pl-6 font-semibold text-white flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center font-bold text-white text-xs">OD</div> <div>OnDeck<span class="block text-[9px] text-slate-500 font-normal">Premier Lender</span></div></td><td class="p-4"><span class="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px]">Term Loan</span></td><td class="p-4 text-white font-semibold">$60,000</td><td class="p-4"><span class="text-yellow-500 text-xs">1.29 Factor</span></td><td class="p-4 text-xs">18 Mo</td><td class="p-4 text-xs text-slate-400">3.0%</td><td class="p-4 pr-6 text-right"><button class="bg-white text-black hover:bg-slate-200 px-4 py-1.5 rounded text-xs font-semibold transition-all">View</button></td></tr></tbody></table></div></div>`; 
+        }
+        
+        function renderDocs() { 
+            return `<div class="pro-panel rounded-xl p-6 animate-fade-in"><div class="flex justify-between items-center mb-6"><h3 class="text-sm font-semibold text-white">Document Vault</h3><button onclick="document.getElementById('dashboardUpload').click()" class="bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-semibold border border-white/10 transition-all flex items-center gap-2"><i data-lucide="upload-cloud" class="w-3 h-3"></i> Upload</button><input type="file" id="dashboardUpload" multiple class="hidden" onchange="handleFile(this)"></div>${state.formData.documents.length>0?`<div class="grid grid-cols-1 md:grid-cols-3 gap-4">${state.formData.documents.map((d,i)=>`<div class="flex items-start gap-3 p-3 rounded-lg bg-black/30 border border-white/5 hover:border-white/20 transition-colors group relative"><div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-400"><i data-lucide="file" class="w-4 h-4"></i></div><div class="overflow-hidden flex-1"><p class="text-xs font-semibold text-white truncate">${d.name}</p><p class="text-[10px] text-slate-500 mt-0.5">${d.date} • <span class="text-yellow-500">Pending Review</span></p></div><button onclick="removeDoc(${i})" class="absolute top-2 right-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-3 h-3"></i></button></div>`).join('')}</div>`:`<div class="text-center py-12 border-2 border-dashed border-white/10 rounded-xl bg-black/20"><i data-lucide="folder-open" class="w-10 h-10 text-slate-600 mx-auto mb-3"></i><p class="text-xs text-slate-500">No documents uploaded yet.</p></div>`}</div>`; 
+        }
+        
         function renderWizard() { renderWizardLogic(); }
-        function renderWizardLogic() { const progress = (state.step/6)*100; let content=''; if(state.step===1) content=renderStep1(); else if(state.step===2) content=renderStep2(); else if(state.step===3) content=renderStep3(); else if(state.step===4) content=renderStep4(); else if(state.step===5) content=renderStep5(); else if(state.step===6) content=renderStep6(); app.innerHTML=`<div class="min-h-screen flex flex-col items-center pt-12 pb-6 px-4 relative overflow-x-hidden"><div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0"><div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]"></div></div><div class="w-full max-w-xl mb-8 px-2 relative z-10">${BridgeLogo()}</div><div class="w-full max-w-xl relative pro-panel rounded-[2rem] p-8 md:p-10 shadow-2xl z-10 animate-fade-in"><div class="w-full bg-white/10 h-1.5 rounded-full mb-8 overflow-hidden"><div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-300 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(234,179,8,0.5)]" style="width: ${progress}%"></div></div>${state.step>1?`<button onclick="setStep(${state.step-1})" class="absolute top-10 right-10 text-slate-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">Back</button>`:''}<div class="min-h-[400px] flex flex-col"><div class="flex-grow">${content}</div><div class="mt-8"><button onclick="handleNext()" class="w-full py-4 rounded-full font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${state.step===6&&!state.formData.termsAgreed?'bg-white/5 text-slate-500 cursor-not-allowed':'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)] transform hover:-translate-y-0.5'}" ${state.step===6&&!state.formData.termsAgreed?'disabled':''}>${state.step===6?'Submit Application':'Continue'}${state.step!==6?'<i data-lucide="arrow-right" class="w-5 h-5"></i>':''}</button></div></div></div></div>`; if(state.step===6) initCanvas(); }
-        function renderSuccess(){app.innerHTML=`<div class="min-h-screen flex flex-col items-center justify-center py-6 px-4 font-sans text-center relative overflow-hidden bg-[#020410]"><h2 class="text-4xl font-bold text-white mb-3 font-serif relative z-10">Application Received</h2><div class="w-full max-w-sm pro-panel rounded-xl p-8 mb-6 text-left relative overflow-hidden shadow-2xl z-10"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Portal Credentials</h3><div class="space-y-4"><div><p class="data-label mb-1">Username</p><div class="bg-black/40 rounded p-3 border border-white/5 text-white font-mono text-sm">${state.formData.owners[0].email || 'user@suttonfunding.com'}</div></div><div><p class="data-label mb-1">Password</p><div class="bg-black/40 rounded p-3 border border-white/5 text-yellow-500 font-mono text-lg font-bold">${state.formData.generatedPassword}</div></div></div></div><button onclick="setView('dashboard')" class="w-full max-w-sm bg-yellow-500 hover:bg-yellow-400 text-black py-3 rounded-lg font-bold text-sm shadow-lg relative z-10">Enter Portal</button></div>`;}
-        function renderPDF(){app.innerHTML=`<div class="min-h-screen bg-black flex flex-col items-center pt-12 pb-6 px-4 font-sans print:bg-white print:p-0"><div class="w-full max-w-xl flex justify-center items-center mb-6 px-2">${BridgeLogo('dark')}</div><div class="animate-fade-in w-full max-w-[8.5in] bg-white rounded-sm shadow-2xl overflow-hidden text-slate-900 p-10 relative min-h-[11in] flex flex-col border border-slate-200 print:shadow-none print:w-full print:border-none print:m-0"><div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden"><img src="https://i.imgur.com/MXMqYLc.png" class="w-[60%] opacity-[0.04] grayscale"></div><div class="bg-slate-50 border-b border-slate-200 p-8 flex justify-between items-center z-10 relative"><div class="flex flex-col items-start gap-1">${BridgeLogo('light')}</div><div class="text-right flex flex-col items-end gap-2"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://suttonfunding.com/${state.appId}&color=0f172a&bgcolor=f8fafc&margin=2" class="w-16 h-16 rounded border border-slate-200"><div><p class="font-mono text-slate-500 text-xs">App ID: ${state.appId}</p></div></div></div><div class="p-8 space-y-6 z-10 relative flex-grow text-sm"><div class="border-b border-slate-200 pb-4"><h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Funding Request</h3><div class="grid grid-cols-3 gap-4"><div><p class="text-xs text-slate-500">Amount</p><p class="font-bold text-slate-900 text-lg">${formatCurrency(state.formData.amount)}</p></div><div><p class="text-xs text-slate-500">Use</p><p class="font-bold text-slate-900 text-lg">${state.formData.useOfFunds}</p></div></div></div><div class="bg-slate-50 p-4 rounded border border-slate-200 flex justify-between items-end"><div class="relative">${state.formData.signature?`<img src="${state.formData.signature}" class="h-12 object-contain opacity-90">`:'<p class="text-red-600 font-bold text-xs">NOT SIGNED</p>'}<div class="border-t border-slate-400 w-48 mt-1"></div><p class="text-[10px] text-slate-500 mt-1">Electronically Signed on ${state.formData.signDate || new Date().toLocaleDateString()}</p></div></div></div></div><div class="fixed bottom-6 z-50 flex gap-4 bg-[#020617]/90 backdrop-blur border border-blue-900/30 p-2 rounded-full shadow-2xl print:hidden"><button onclick="setView('dashboard')" class="flex items-center gap-2 text-slate-300 hover:text-white px-4 py-2 rounded-full font-medium text-sm transition-colors">← Back to Portal</button><button onclick="window.print()" class="flex items-center gap-2 bg-yellow-500 text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-yellow-400 shadow-lg"><i data-lucide="printer" class="w-4 h-4"></i> Print Official PDF</button></div></div>`;}
         
-        function renderStep1(){const options=['Expansion','Payroll','Hiring','Marketing','Equipment','Inventory'];return`<div class="space-y-8"><div class="text-center space-y-2"><h2 class="text-3xl font-bold text-white font-serif">Let's get started.</h2><p class="text-slate-400 text-lg">What brings you here today?</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4">${options.map(opt=>`<div onclick="updateForm('useOfFunds', '${opt}')" class="cursor-pointer relative w-full rounded-xl p-4 flex items-center gap-4 transition-all duration-300 ${state.formData.useOfFunds===opt?`bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 scale-[1.02]`:'pro-panel text-slate-300 hover:bg-white/5'}"><i data-lucide="trending-up" class="w-5 h-5 ${state.formData.useOfFunds===opt?'text-black':'text-yellow-500'}"></i><span class="font-semibold text-sm">${opt}</span><div class="ml-auto w-4 h-4 rounded-full border-2 flex items-center justify-center ${state.formData.useOfFunds===opt?'border-black':'border-slate-600'}">${state.formData.useOfFunds===opt?'<div class="w-2 h-2 rounded-full bg-black"></div>':''}</div></div>`).join('')}</div><div class="pt-4 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Requested Amount','text','25,000',state.formData.amount,'amount',true)}${renderSelect('When needed?',['Immediately','1 Week','1 Month'],state.formData.timeline,'timeline')}</div></div>`}
-        function renderStep2(){return`<div class="space-y-6"><div class="text-center mb-8"><h2 class="text-2xl font-bold text-white font-serif">Tell us about your business</h2></div>${renderInput('Legal Business Name','text','Acme Corp',state.formData.businessName,'businessName')}<div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('DBA','text','Optional',state.formData.dba,'dba')}${renderInput('EIN','text','XX-XXXXXXX',state.formData.ein,'ein')}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Start Date','date','',state.formData.startDate,'startDate')}${renderSelect('Industry',['Construction','Retail','Tech','Health','Restaurant'],state.formData.industry,'industry')}</div>${renderInput('Address','text','123 Main St',state.formData.businessAddress,'businessAddress')}${renderInput('Monthly Revenue','text','40,000',state.formData.revenue,'revenue',true)}</div>`}
-        function renderStep3(){return`<div class="space-y-8 animate-fade-in"><div class="text-center mb-6"><h2 class="text-2xl font-bold text-white font-serif">Current Financing</h2></div><div class="flex gap-4 justify-center"><button onclick="updateForm('hasDebt','No')" class="px-8 py-4 rounded-full font-bold transition-all ${state.formData.hasDebt==='No'?'bg-green-500 text-black':'pro-panel text-slate-300'}">No Debt</button><button onclick="updateForm('hasDebt','Yes')" class="px-8 py-4 rounded-full font-bold transition-all ${state.formData.hasDebt==='Yes'?'bg-yellow-500 text-black':'pro-panel text-slate-300'}">Yes Debt</button></div>${state.formData.hasDebt==='Yes'?`<div class="bg-black/30 p-6 rounded-xl border border-white/5 space-y-6 animate-fade-in">${renderInput('Balance','text','15,000',state.formData.debtAmount,'debtAmount',true)}${renderInput('Lender','text','Lender Name',state.formData.debtCreditor,'debtCreditor')}</div>`:''}</div>`}
-        function renderStep4(){return`<div class="space-y-6"><div class="flex justify-between items-end mb-4"><h2 class="text-2xl font-bold text-white font-serif">Business Owners</h2><button onclick="addOwner()" class="text-xs font-bold text-yellow-500 hover:text-white border border-yellow-500/30 hover:bg-yellow-500/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Add Owner</button></div><div class="space-y-6">${state.formData.owners.map((owner, index) => `<div class="pro-panel rounded-xl p-6 space-y-5 relative shadow-lg relative"><div class="flex justify-between items-center mb-2"><h3 class="text-yellow-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">${index === 0 ? 'Primary Owner' : `Owner ${index + 1}`}${index === 0 ? '<i data-lucide="lock" class="w-3 h-3 text-slate-500"></i>' : ''}</h3>${index > 0 ? `<button onclick="removeOwner(${index})" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>${renderInput('Full Name', 'text', 'John Doe', owner.name, `owners.${index}.name`)}<div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Email Address', 'email', 'john@example.com', owner.email, `owners.${index}.email`)}${renderInput('Mobile Phone', 'tel', '(555) 123-4567', owner.phone, `owners.${index}.phone`)}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('SSN', 'text', 'XXX-XX-XXXX', owner.ssn, `owners.${index}.ssn`)}${renderInput('Date of Birth', 'date', '', owner.dob, `owners.${index}.dob`)}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${renderInput('Home Address', 'text', 'Street, City, Zip', owner.address, `owners.${index}.address`)}${renderInput('Approx. FICO', 'number', '700', owner.fico, `owners.${index}.fico`)}</div><div class="w-full md:w-1/2">${renderInput('Ownership %', 'number', '50', owner.ownership, `owners.${index}.ownership`)}</div></div>`).join('')}</div></div>`;}
-        function renderStep5(){return`<div class="space-y-6"><div class="text-center mb-6"><h2 class="text-2xl font-bold text-white font-serif">Uploads</h2></div><div class="border-2 border-dashed border-white/10 rounded-xl p-12 text-center pro-panel cursor-pointer" onclick="document.getElementById('fileInput').click()"><input type="file" id="fileInput" multiple class="hidden" onchange="handleFile(this)"><i data-lucide="upload-cloud" class="w-10 h-10 text-yellow-500 mx-auto mb-4"></i><p class="text-white">Click to Upload</p></div><div class="space-y-3">${state.formData.documents.map((d,i)=>`<div class="flex items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5"><span>${d.name}</span><button onclick="removeDoc(${i})" class="text-red-400"><i data-lucide="x" class="w-4 h-4"></i></button></div>`).join('')}</div></div>`}
+        function renderWizardLogic() { 
+            const progress = (state.step/6)*100; 
+            let content=''; 
+            if(state.step===1) content=renderStep1(); 
+            else if(state.step===2) content=renderStep2(); 
+            else if(state.step===3) content=renderStep3(); 
+            else if(state.step===4) content=renderStep4(); 
+            else if(state.step===5) content=renderStep5(); 
+            else if(state.step===6) content=renderStep6(); 
+            
+            const arrowLeft = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`;
+            const arrowRight = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+            
+            app.innerHTML=`<div class="min-h-screen flex flex-col items-center pt-12 pb-6 px-4 relative overflow-x-hidden"><div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0"><div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]"></div></div><div class="w-full max-w-xl mb-8 px-2 relative z-10">${BridgeLogo()}</div><div class="w-full max-w-xl relative pro-panel rounded-[2rem] p-8 md:p-10 shadow-2xl z-10 animate-fade-in"><div class="w-full bg-white/10 h-1.5 rounded-full mb-8 overflow-hidden"><div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-300 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(234,179,8,0.5)]" style="width: ${progress}%"></div></div>${state.step>1?`<button onclick="setStep(${state.step-1})" class="absolute top-10 right-10 text-slate-400 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider flex items-center gap-1">${arrowLeft} Back</button>`:''}<div class="min-h-[400px] flex flex-col"><div class="flex-grow">${content}</div><div class="mt-8"><button onclick="handleNext()" class="w-full py-4 rounded-full font-bold text-base transition-all shadow-lg flex items-center justify-center gap-2 ${state.step===6&&!state.formData.termsAgreed?'bg-white/5 text-slate-500 cursor-not-allowed':'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)] transform hover:-translate-y-0.5'}" ${state.step===6&&!state.formData.termsAgreed?'disabled':''}>${state.step===6?'Submit Application':'Continue'}${state.step!==6?arrowRight:''}</button></div></div></div><p class="text-[10px] text-slate-600 mt-6">Step ${state.step} of 6</p></div>`; 
+            if(state.step===6) initCanvas(); 
+        }
         
-        // Updated Step 6 with Date Input for Signature
-        function renderStep6(){return`<div class="space-y-6"><div class="text-center mb-6"><h2 class="text-2xl font-bold text-white font-serif">Sign & Date</h2></div><div class="pro-panel p-8 rounded-xl space-y-6"><div class="border border-white/10 rounded-xl overflow-hidden bg-black/40 h-40 relative"><canvas id="sigCanvas" class="w-full h-full cursor-crosshair"></canvas></div><div class="flex justify-between items-center"><button onclick="clearCanvas()" class="text-xs text-red-400 underline">Clear</button>${renderInput('Date', 'date', '', state.formData.signDate, 'signDate')}</div></div><div onclick="toggleTerms()" class="flex items-start gap-4 p-5 pro-panel rounded-xl cursor-pointer"><div class="mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center ${state.formData.termsAgreed?`bg-yellow-500 border-yellow-500`:'border-slate-500'}">${state.formData.termsAgreed?'<i data-lucide="check" class="w-3 h-3 text-black"></i>':''}</div><p class="text-xs text-slate-300 pt-1">I agree to Terms.</p></div></div>`}
+        function renderSuccess(){
+            const checkIcon = `<svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            app.innerHTML=`<div class="min-h-screen flex flex-col items-center justify-center py-6 px-4 text-center relative overflow-hidden bg-[#020410]"><div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0"><div class="absolute top-[20%] left-[30%] w-[40%] h-[40%] bg-green-600/10 rounded-full blur-[120px]"></div></div><div class="relative z-10"><div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">${checkIcon}</div><h2 class="text-3xl font-bold text-white mb-2" style="font-family: 'Playfair Display', serif">Application Received</h2><p class="text-slate-400 mb-8">Your portal credentials are below.</p></div><div class="w-full max-w-sm pro-panel rounded-xl p-6 mb-6 text-left relative overflow-hidden shadow-2xl z-10"><h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Portal Credentials</h3><div class="space-y-4"><div><p class="data-label mb-1">Username</p><div class="bg-black/40 rounded-lg p-3 border border-white/5 text-white font-mono text-sm">${state.formData.owners[0].email || 'user@suttonfunding.com'}</div></div><div><p class="data-label mb-1">Temporary Password</p><div class="bg-black/40 rounded-lg p-3 border border-white/5 text-yellow-500 font-mono text-lg font-bold tracking-wider">${state.formData.generatedPassword}</div></div></div></div><button onclick="setView('dashboard')" class="w-full max-w-sm bg-yellow-500 hover:bg-yellow-400 text-black py-3 rounded-lg font-bold text-sm shadow-lg relative z-10 transition-colors">Enter Portal</button></div>`;
+        }
+        
+        function renderPDF(){
+            const printerIcon = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>`;
+            app.innerHTML=`<div class="min-h-screen bg-black flex flex-col items-center pt-12 pb-6 px-4 print:bg-white print:p-0"><div class="w-full max-w-xl flex justify-center items-center mb-6 px-2">${BridgeLogo('dark')}</div><div class="animate-fade-in w-full max-w-[8.5in] bg-white rounded-sm shadow-2xl overflow-hidden text-slate-900 p-10 relative min-h-[11in] flex flex-col border border-slate-200 print:shadow-none print:w-full print:border-none print:m-0"><div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden"><img src="https://i.imgur.com/MXMqYLc.png" class="w-[60%] opacity-[0.04] grayscale"></div><div class="bg-slate-50 border-b border-slate-200 p-8 flex justify-between items-center z-10 relative"><div class="flex flex-col items-start gap-1">${BridgeLogo('light')}</div><div class="text-right flex flex-col items-end gap-2"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://suttonfunding.com/${state.appId}&color=0f172a&bgcolor=f8fafc&margin=2" class="w-16 h-16 rounded border border-slate-200"><div><p class="font-mono text-slate-500 text-xs">App ID: ${state.appId}</p></div></div></div><div class="p-8 space-y-6 z-10 relative flex-grow text-sm"><div class="border-b border-slate-200 pb-4"><h3 class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Funding Request</h3><div class="grid grid-cols-3 gap-4"><div><p class="text-xs text-slate-500">Amount</p><p class="font-bold text-slate-900 text-lg">${formatCurrency(state.formData.amount)}</p></div><div><p class="text-xs text-slate-500">Use</p><p class="font-bold text-slate-900 text-lg">${state.formData.useOfFunds}</p></div></div></div><div class="bg-slate-50 p-4 rounded border border-slate-200 flex justify-between items-end"><div class="relative">${state.formData.signature?`<img src="${state.formData.signature}" class="h-12 object-contain opacity-90">`:'<p class="text-red-600 font-bold text-xs">NOT SIGNED</p>'}<div class="border-t border-slate-400 w-48 mt-1"></div><p class="text-[10px] text-slate-500 mt-1">Electronically Signed on ${state.formData.signDate || new Date().toLocaleDateString()}</p></div></div></div></div><div class="fixed bottom-6 z-50 flex gap-4 bg-[#020617]/90 backdrop-blur border border-white/10 p-2 rounded-full shadow-2xl print:hidden"><button onclick="setView('dashboard')" class="flex items-center gap-2 text-slate-300 hover:text-white px-4 py-2 rounded-full font-medium text-sm transition-colors">← Back to Portal</button><button onclick="window.print()" class="flex items-center gap-2 bg-yellow-500 text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-yellow-400 shadow-lg transition-colors">${printerIcon} Print PDF</button></div></div>`;
+        }
+        
+        // --- WIZARD STEPS ---
+        function renderStep1(){
+            const options=['Expansion','Payroll','Hiring','Marketing','Equipment','Inventory'];
+            const trendIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>`;
+            const checkIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+            return`<div class="space-y-6">
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl font-bold text-white" style="font-family: 'Playfair Display', serif">Let's get started</h2>
+                    <p class="text-slate-400">What brings you here today?</p>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Use of Funds</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${options.map(opt=>`<div onclick="updateForm('useOfFunds', '${opt}')" class="cursor-pointer relative w-full rounded-xl p-4 flex items-center gap-4 transition-all duration-300 ${state.formData.useOfFunds===opt?'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 scale-[1.02]':'bg-black/30 border border-white/10 text-slate-300 hover:bg-white/5 hover:border-white/20'}">
+                            <span class="${state.formData.useOfFunds===opt?'text-black/70':'text-yellow-500'}">${trendIcon}</span>
+                            <span class="font-medium text-sm">${opt}</span>
+                            <div class="ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${state.formData.useOfFunds===opt?'border-black/50 bg-black/20':'border-slate-600'}">
+                                ${state.formData.useOfFunds===opt?checkIcon:''}
+                            </div>
+                        </div>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Funding Request</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${renderInput('Requested Amount','text','25,000',state.formData.amount,'amount',true)}
+                        ${renderSelect('When needed?',['Immediately','1 Week','1 Month'],state.formData.timeline,'timeline')}
+                    </div>
+                </div>
+            </div>`;
+        }
+        
+        function renderStep2(){
+            return`<div class="space-y-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white" style="font-family: 'Playfair Display', serif">Tell us about your business</h2>
+                    <p class="text-slate-400 text-sm mt-1">Basic company information</p>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Company Details</h3>
+                    ${renderInput('Legal Business Name','text','Acme Corp',state.formData.businessName,'businessName')}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${renderInput('DBA (Optional)','text','Trade name',state.formData.dba,'dba')}
+                        ${renderInput('EIN','text','XX-XXXXXXX',state.formData.ein,'ein')}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${renderInput('Start Date','date','',state.formData.startDate,'startDate')}
+                        ${renderSelect('Industry',['Construction','Retail','Technology','Healthcare','Restaurant','Transportation','Manufacturing','Professional Services','Other'],state.formData.industry,'industry')}
+                    </div>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Business Address</h3>
+                    ${renderInput('Street Address','text','123 Main Street',state.formData.businessStreet,'businessStreet')}
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderInput('City','text','New York',state.formData.businessCity,'businessCity')}
+                        ${renderSelect('State',['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'],state.formData.businessState,'businessState')}
+                        ${renderInput('ZIP Code','text','10001',state.formData.businessZip,'businessZip')}
+                    </div>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Financials</h3>
+                    ${renderInput('Monthly Revenue','text','40,000',state.formData.revenue,'revenue',true)}
+                </div>
+            </div>`;
+        }
+        
+        function renderStep3(){
+            const checkIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            const alertIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            return`<div class="space-y-6 animate-fade-in">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white" style="font-family: 'Playfair Display', serif">Current Financing</h2>
+                    <p class="text-slate-400 text-sm mt-2">Do you have any existing business debt?</p>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Existing Debt</h3>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="updateForm('hasDebt','No')" class="flex-1 px-6 py-5 rounded-xl font-semibold transition-all flex items-center justify-center gap-3 ${state.formData.hasDebt==='No'?'bg-green-500 text-black shadow-lg shadow-green-500/20 scale-[1.02]':'bg-black/30 border border-white/10 text-slate-300 hover:bg-white/5 hover:border-white/20'}">${checkIcon}<span>No Debt</span></button>
+                        <button onclick="updateForm('hasDebt','Yes')" class="flex-1 px-6 py-5 rounded-xl font-semibold transition-all flex items-center justify-center gap-3 ${state.formData.hasDebt==='Yes'?'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 scale-[1.02]':'bg-black/30 border border-white/10 text-slate-300 hover:bg-white/5 hover:border-white/20'}">${alertIcon}<span>Yes</span></button>
+                    </div>
+                </div>
+                
+                ${state.formData.hasDebt==='Yes'?`
+                <div class="pro-panel rounded-xl p-5 space-y-4 animate-fade-in">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Debt Details</h3>
+                    ${renderInput('Current Balance','text','15,000',state.formData.debtAmount,'debtAmount',true)}
+                    ${renderInput('Lender / Creditor','text','Lender name',state.formData.debtCreditor,'debtCreditor')}
+                </div>`:''}
+            </div>`;
+        }
+        
+        function renderStep4(){
+            const plusIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
+            const userIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>`;
+            const trashIcon = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+            const chevronDownIcon = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+            const stateOptions = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
+            return`<div class="space-y-6">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white" style="font-family: 'Playfair Display', serif">Business Owners</h2>
+                        <p class="text-slate-400 text-sm mt-1">Add all owners with 20%+ stake</p>
+                    </div>
+                    <button onclick="addOwner()" class="text-xs font-semibold text-yellow-500 hover:text-yellow-400 border border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">${plusIcon} Add Owner</button>
+                </div>
+                <div class="space-y-6">
+                    ${state.formData.owners.map((owner, index) => `
+                        <div class="pro-panel rounded-xl p-6 space-y-5 relative">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest flex items-center gap-2">${userIcon} ${index === 0 ? 'Primary Owner' : `Owner ${index + 1}`}</h3>
+                                ${index > 0 ? `<button onclick="removeOwner(${index})" class="text-red-400 hover:text-red-300 transition-colors">${trashIcon}</button>` : ''}
+                            </div>
+                            
+                            <div class="bg-black/20 rounded-xl p-5 space-y-4 border border-white/5">
+                                <h4 class="text-slate-400 text-xs font-semibold uppercase tracking-widest">Personal Information</h4>
+                                ${renderInput('Full Name', 'text', 'John Doe', owner.name, `owners.${index}.name`)}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${renderInput('Email Address', 'email', 'john@example.com', owner.email, `owners.${index}.email`)}
+                                    ${renderInput('Mobile Phone', 'tel', '(555) 123-4567', owner.phone, `owners.${index}.phone`)}
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black/20 rounded-xl p-5 space-y-4 border border-white/5">
+                                <h4 class="text-slate-400 text-xs font-semibold uppercase tracking-widest">Identity Verification</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${renderInput('SSN', 'text', 'XXX-XX-XXXX', owner.ssn, `owners.${index}.ssn`)}
+                                    ${renderInput('Date of Birth', 'date', '', owner.dob, `owners.${index}.dob`)}
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black/20 rounded-xl p-5 space-y-4 border border-white/5">
+                                <h4 class="text-slate-400 text-xs font-semibold uppercase tracking-widest">Home Address</h4>
+                                ${renderInput('Street Address', 'text', '123 Main Street', owner.street, `owners.${index}.street`)}
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    ${renderInput('City', 'text', 'New York', owner.city, `owners.${index}.city`)}
+                                    <div class="flex flex-col gap-2 w-full">
+                                        <label class="form-label ml-1">State</label>
+                                        <div class="relative">
+                                            <select onchange="updateForm('owners.${index}.state',this.value)" class="w-full bg-black/30 border border-white/10 text-white rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 outline-none transition-all appearance-none cursor-pointer text-sm hover:border-white/20">
+                                                <option value="" disabled ${!owner.state?'selected':''} class="bg-slate-900">State</option>
+                                                ${stateOptions.map(s=>`<option value="${s}" ${owner.state===s?'selected':''} class="bg-slate-900">${s}</option>`).join('')}
+                                            </select>
+                                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-400">${chevronDownIcon}</div>
+                                        </div>
+                                    </div>
+                                    ${renderInput('ZIP', 'text', '10001', owner.zip, `owners.${index}.zip`)}
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black/20 rounded-xl p-5 space-y-4 border border-white/5">
+                                <h4 class="text-slate-400 text-xs font-semibold uppercase tracking-widest">Ownership Details</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${renderInput('Approx. FICO Score', 'number', '700', owner.fico, `owners.${index}.fico`)}
+                                    ${renderInput('Ownership %', 'number', '50', owner.ownership, `owners.${index}.ownership`)}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        }
+        
+        function renderStep5(){
+            const uploadIcon = `<svg class="w-12 h-12 text-yellow-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>`;
+            const fileIcon = `<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`;
+            const xIcon = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            return`<div class="space-y-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white" style="font-family: 'Playfair Display', serif">Upload Documents</h2>
+                    <p class="text-slate-400 text-sm mt-1">Bank statements, ID, and supporting docs</p>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Document Upload</h3>
+                    <div class="border-2 border-dashed border-white/10 rounded-xl p-10 text-center cursor-pointer hover:border-yellow-500/30 hover:bg-white/[0.02] transition-all bg-black/20" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" multiple class="hidden" onchange="handleFile(this)">
+                        ${uploadIcon}
+                        <p class="text-white font-medium mb-1">Click to upload files</p>
+                        <p class="text-slate-500 text-xs">or drag and drop</p>
+                    </div>
+                </div>
+                
+                ${state.formData.documents.length > 0 ? `
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Uploaded Files</h3>
+                    <div class="space-y-3">
+                        ${state.formData.documents.map((d,i)=>`
+                        <div class="flex items-center justify-between bg-black/30 p-4 rounded-xl border border-white/5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center">${fileIcon}</div>
+                                <div>
+                                    <span class="text-white text-sm font-medium">${d.name}</span>
+                                    <p class="text-slate-500 text-xs">${d.size} • ${d.date}</p>
+                                </div>
+                            </div>
+                            <button onclick="removeDoc(${i})" class="text-red-400 hover:text-red-300 transition-colors">${xIcon}</button>
+                        </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
+            </div>`;
+        }
+        
+        function renderStep6(){
+            const eraserIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+            const checkIcon = `<svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+            const externalIcon = `<svg class="w-3 h-3 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>`;
+            return`<div class="space-y-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white" style="font-family: 'Playfair Display', serif">Sign & Submit</h2>
+                    <p class="text-slate-400 text-sm mt-1">Review and sign your application</p>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Electronic Signature</h3>
+                    <p class="text-xs text-slate-400">Please sign below using your mouse or finger</p>
+                    <div class="border border-white/10 rounded-xl overflow-hidden bg-black/40 h-40 relative">
+                        <canvas id="sigCanvas" class="w-full h-full cursor-crosshair"></canvas>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+                        <div class="w-full sm:w-48">${renderInput('Signature Date', 'date', '', state.formData.signDate, 'signDate')}</div>
+                        <button onclick="clearCanvas()" class="text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 px-3 py-2 rounded-lg transition-colors flex items-center gap-2 border border-red-500/20">${eraserIcon} Clear Signature</button>
+                    </div>
+                </div>
+                
+                <div class="pro-panel rounded-xl p-5 space-y-4">
+                    <h3 class="text-yellow-500 text-xs font-semibold uppercase tracking-widest">Agreement</h3>
+                    <div onclick="toggleTerms()" class="flex items-start gap-4 p-4 bg-black/20 rounded-xl cursor-pointer hover:bg-black/30 transition-colors border border-white/5">
+                        <div class="mt-0.5 w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${state.formData.termsAgreed?'bg-yellow-500 border-yellow-500':'border-slate-500 hover:border-slate-400'}">${state.formData.termsAgreed?checkIcon:''}</div>
+                        <div>
+                            <p class="text-sm text-white font-medium">I agree to the Terms & Conditions and Privacy Policy</p>
+                            <p class="text-xs text-slate-500 mt-1">By checking this box, you authorize Sutton Funding to verify your information and agree to the terms.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <a href="#" onclick="showModal('terms'); return false;" class="text-xs text-yellow-500 hover:text-yellow-400 transition-colors">Terms & Conditions${externalIcon}</a>
+                        <a href="#" onclick="showModal('privacy'); return false;" class="text-xs text-yellow-500 hover:text-yellow-400 transition-colors">Privacy Policy${externalIcon}</a>
+                    </div>
+                </div>
+            </div>`;
+        }
 
-        function renderInput(label,type,ph,val,key,isCurrency=false){const onInput=`updateForm('${key}',this.value,'${isCurrency}')`;let displayVal=val;if(isCurrency)displayVal=formatCurrency(val);return`<div class="flex flex-col gap-2 w-full"><label class="text-blue-200/80 font-medium text-xs uppercase tracking-wide ml-4 font-sans">${label}</label><div class="relative group"><input type="${type==='currency'?'text':type}" value="${displayVal}" oninput="${onInput}" class="w-full bg-black/20 border border-white/10 text-white rounded-full py-3.5 ${isCurrency?'pl-12':'pl-6'} pr-4 focus:ring-2 focus:ring-${state.themeColor}-500 focus:border-transparent outline-none transition-all placeholder-slate-500 text-sm shadow-inner group-hover:bg-black/30" placeholder="${ph}">${isCurrency?`<div class="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-400"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>`:''}</div></div>`;}
-        function renderSelect(label,options,val,key){return`<div class="flex flex-col gap-2 w-full"><label class="text-blue-200/80 font-medium text-xs uppercase tracking-wide ml-4 font-sans">${label}</label><div class="relative"><select onchange="updateForm('${key}',this.value)" class="w-full bg-black/20 border border-white/10 text-white rounded-full py-3.5 pl-6 pr-10 focus:ring-2 focus:ring-${state.themeColor}-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-sm shadow-inner hover:bg-black/30"><option value="" disabled ${!val?'selected':''}>Select option</option>${options.map(opt=>`<option value="${opt}" ${val===opt?'selected':''}>${opt}</option>`).join('')}</select><div class="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-400"><i data-lucide="chevron-down" class="w-5 h-5"></i></div></div></div>`;}
-        function updateForm(key,value,isCurrency){if(key.includes('.')){const parts=key.split('.');state.formData[parts[0]][parts[1]][parts[2]]=value}else{if(isCurrency==='true'){const num=value.toString().replace(/[^0-9]/g,'');state.formData[key]=num}else{state.formData[key]=value}}if(['useOfFunds','hasDebt','termsAgreed'].includes(key)){render()}}
-        function setStep(s){state.step=s;render()}
-        function setView(v){state.view=v;render()}
-        function handleNext(){if(state.step===6){if(!state.formData.termsAgreed)return;state.formData.generatedPassword=generatePassword();state.formData.submissionDate=new Date().toLocaleString();state.view='success'}else{state.step++}render()}
-        function addOwner(){state.formData.owners.push({name:'',email:'',phone:'',ssn:'',dob:'',address:'',ownership:''});render()}
-        function removeOwner(idx){if(state.formData.owners.length>1){state.formData.owners.splice(idx,1);render()}}
-        function handleFile(input){const files=Array.from(input.files);const newDocs=files.map(file=>({name:file.name,size:(file.size/1024/1024).toFixed(2)+' MB',date:new Date().toLocaleDateString()}));state.formData.documents=[...state.formData.documents,...newDocs];render()}
-        function removeDoc(idx){state.formData.documents.splice(idx,1);render()}
-        function toggleTerms(){state.formData.termsAgreed=!state.formData.termsAgreed;render()}
-        function updateCalc(type,val){if(type==='amount')state.calcAmount=parseInt(val);if(type==='term')state.calcTerm=parseFloat(val);if(type==='rate')state.calcRate=parseFloat(val);render()}
-        function switchCalcType(t){state.calcType=t;if(t==='mca'||t==='wc'){state.calcTerm=9;state.calcRate=1.29}if(t==='term'){state.calcTerm=12;state.calcRate=10}if(t==='loc'){state.calcTerm=12;state.calcRate=15}if(t==='sba'){state.calcTerm=10;state.calcRate=7.5}render()}
+        // --- FORM COMPONENTS ---
+        const dollarIcon = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        const chevronIcon = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
         
+        function renderInput(label,type,ph,val,key,isCurrency=false){
+            const onInput=`updateForm('${key}',this.value,'${isCurrency}')`;
+            let displayVal=val;
+            if(isCurrency) displayVal=formatCurrency(val);
+            return`<div class="flex flex-col gap-2 w-full"><label class="form-label ml-1">${label}</label><div class="relative group"><input type="${type==='currency'?'text':type}" value="${displayVal}" oninput="${onInput}" class="w-full bg-black/30 border border-white/10 text-white rounded-xl py-3 ${isCurrency?'pl-10':'pl-4'} pr-4 focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 outline-none transition-all placeholder-slate-500 text-sm hover:border-white/20" placeholder="${ph}">${isCurrency?`<div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">${dollarIcon}</div>`:''}</div></div>`;
+        }
+        
+        function renderSelect(label,options,val,key){
+            return`<div class="flex flex-col gap-2 w-full"><label class="form-label ml-1">${label}</label><div class="relative"><select onchange="updateForm('${key}',this.value)" class="w-full bg-black/30 border border-white/10 text-white rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 outline-none transition-all appearance-none cursor-pointer text-sm hover:border-white/20"><option value="" disabled ${!val?'selected':''} class="bg-slate-900">Select option</option>${options.map(opt=>`<option value="${opt}" ${val===opt?'selected':''} class="bg-slate-900">${opt}</option>`).join('')}</select><div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-400">${chevronIcon}</div></div></div>`;
+        }
+        
+        function updateForm(key,value,isCurrency){
+            if(key.includes('.')){
+                const parts=key.split('.');
+                state.formData[parts[0]][parts[1]][parts[2]]=value;
+            }else{
+                if(isCurrency==='true'){
+                    const num=value.toString().replace(/[^0-9]/g,'');
+                    state.formData[key]=num;
+                }else{
+                    state.formData[key]=value;
+                }
+            }
+            if(['useOfFunds','hasDebt','termsAgreed'].includes(key)){
+                render();
+            }
+        }
+        
+        function setStep(s){state.step=s;render();}
+        function setView(v){state.view=v;render();}
+        
+        function handleNext(){
+            if(state.step===6){
+                if(!state.formData.termsAgreed) return;
+                state.formData.generatedPassword=generatePassword();
+                state.formData.submissionDate=new Date().toLocaleString();
+                state.view='success';
+            }else{
+                state.step++;
+            }
+            render();
+        }
+        
+        function addOwner(){state.formData.owners.push({name:'',email:'',phone:'',ssn:'',dob:'',street:'',city:'',state:'',zip:'',ownership:'',fico:''});render();}
+        function removeOwner(idx){if(state.formData.owners.length>1){state.formData.owners.splice(idx,1);render();}}
+        function handleFile(input){const files=Array.from(input.files);const newDocs=files.map(file=>({name:file.name,size:(file.size/1024/1024).toFixed(2)+' MB',date:new Date().toLocaleDateString()}));state.formData.documents=[...state.formData.documents,...newDocs];render();}
+        function removeDoc(idx){state.formData.documents.splice(idx,1);render();}
+        function toggleTerms(){state.formData.termsAgreed=!state.formData.termsAgreed;render();}
+        
+        function showModal(type) {
+            const termsContent = `
+                <h3 class="text-xl font-bold text-white mb-4" style="font-family: 'Playfair Display', serif">Terms & Conditions</h3>
+                <div class="space-y-4 text-sm text-slate-300">
+                    <p><strong class="text-white">1. Application Agreement.</strong> By submitting this application, you authorize Sutton Funding ("Lender") to obtain credit reports, verify employment, income, and banking information, and contact references provided.</p>
+                    <p><strong class="text-white">2. Funding Terms.</strong> If approved, specific terms including advance amount, factor rate, holdback percentage, and payment schedule will be provided in a separate funding agreement. This application does not guarantee approval or specific terms.</p>
+                    <p><strong class="text-white">3. Personal Guarantee.</strong> All owners with 20% or greater ownership may be required to provide a personal guarantee for any funding received.</p>
+                    <p><strong class="text-white">4. UCC Filing.</strong> Lender may file a UCC-1 financing statement as security for any funding provided.</p>
+                    <p><strong class="text-white">5. Accuracy of Information.</strong> You certify that all information provided is true, complete, and accurate. Providing false information may result in denial of funding and potential legal action.</p>
+                    <p><strong class="text-white">6. Electronic Consent.</strong> You consent to receive communications electronically, including disclosures, notices, and agreements related to your application and any funding.</p>
+                    <p><strong class="text-white">7. Governing Law.</strong> This agreement shall be governed by and construed in accordance with the laws of the State of New York.</p>
+                    <p><strong class="text-white">8. Amendment.</strong> Lender reserves the right to modify these terms at any time. Continued use of our services constitutes acceptance of modified terms.</p>
+                </div>
+            `;
+            const privacyContent = `
+                <h3 class="text-xl font-bold text-white mb-4" style="font-family: 'Playfair Display', serif">Privacy Policy</h3>
+                <div class="space-y-4 text-sm text-slate-300">
+                    <p><strong class="text-white">Information We Collect.</strong> We collect personal and business information you provide, including names, addresses, Social Security numbers, tax identification numbers, financial statements, and banking information.</p>
+                    <p><strong class="text-white">How We Use Your Information.</strong> Your information is used to evaluate your funding application, verify your identity, assess creditworthiness, and service your account if approved.</p>
+                    <p><strong class="text-white">Information Sharing.</strong> We may share your information with credit bureaus, banking partners, service providers, and as required by law. We do not sell your personal information to third parties for marketing purposes.</p>
+                    <p><strong class="text-white">Data Security.</strong> We implement industry-standard security measures to protect your information, including encryption, secure servers, and access controls.</p>
+                    <p><strong class="text-white">Data Retention.</strong> We retain your information for as long as necessary to fulfill the purposes outlined in this policy, unless a longer retention period is required by law.</p>
+                    <p><strong class="text-white">Your Rights.</strong> You may request access to, correction of, or deletion of your personal information by contacting us. Some information may be retained as required by law or for legitimate business purposes.</p>
+                    <p><strong class="text-white">Contact Us.</strong> For questions about this Privacy Policy, please contact us at privacy@suttonfunding.com.</p>
+                </div>
+            `;
+            const content = type === 'terms' ? termsContent : privacyContent;
+            const modal = document.createElement('div');
+            modal.id = 'legalModal';
+            modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in';
+            modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+            modal.innerHTML = `
+                <div class="bg-slate-900 border border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden shadow-2xl">
+                    <div class="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
+                        ${content}
+                    </div>
+                    <div class="border-t border-white/10 p-4 flex justify-end">
+                        <button onclick="document.getElementById('legalModal').remove()" class="px-6 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg transition-colors text-sm">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function updateCalc(type,val){if(type==='amount')state.calcAmount=parseInt(val);if(type==='term')state.calcTerm=parseFloat(val);if(type==='rate')state.calcRate=parseFloat(val);render();}
+        function switchCalcType(t){
+            state.calcType=t;
+            if(t==='mca'){state.calcTerm=9;state.calcRate=1.29;state.calcAmount=Math.min(state.calcAmount,500000);}
+            if(t==='wc'){state.calcTerm=12;state.calcRate=1.25;state.calcAmount=Math.min(state.calcAmount,500000);}
+            if(t==='term'){state.calcTerm=24;state.calcRate=14;}
+            if(t==='loc'){state.calcTerm=12;state.calcRate=18;}
+            if(t==='sba'){state.calcTerm=10;state.calcRate=7.5;}
+            if(t==='equip'){state.calcTerm=48;state.calcRate=9;}
+            render();
+        }
+        function prefillApplication(){
+            state.formData.amount=state.calcAmount;
+            state.view='wizard';
+            state.step=1;
+            render();
+        }
+        
+        // --- SIGNATURE CANVAS ---
         let canvas,ctx,isDrawing=false;
-        function initCanvas(){canvas=document.getElementById('sigCanvas');if(!canvas)return;canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;ctx=canvas.getContext('2d');ctx.strokeStyle='#EAB308';ctx.lineWidth=3;ctx.lineCap='round';canvas.addEventListener('mousedown',startDraw);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',stopDraw);canvas.addEventListener('mouseleave',stopDraw);canvas.addEventListener('touchstart',(e)=>startDraw(e.touches[0]));canvas.addEventListener('touchmove',(e)=>{e.preventDefault();draw(e.touches[0])});canvas.addEventListener('touchend',stopDraw)}
+        function initCanvas(){
+            canvas=document.getElementById('sigCanvas');
+            if(!canvas)return;
+            canvas.width=canvas.offsetWidth;
+            canvas.height=canvas.offsetHeight;
+            ctx=canvas.getContext('2d');
+            ctx.strokeStyle='#EAB308';
+            ctx.lineWidth=3;
+            ctx.lineCap='round';
+            canvas.addEventListener('mousedown',startDraw);
+            canvas.addEventListener('mousemove',draw);
+            canvas.addEventListener('mouseup',stopDraw);
+            canvas.addEventListener('mouseleave',stopDraw);
+            canvas.addEventListener('touchstart',(e)=>startDraw(e.touches[0]));
+            canvas.addEventListener('touchmove',(e)=>{e.preventDefault();draw(e.touches[0])});
+            canvas.addEventListener('touchend',stopDraw);
+        }
         function startDraw(e){const rect=canvas.getBoundingClientRect();ctx.beginPath();ctx.moveTo(e.clientX-rect.left,e.clientY-rect.top);isDrawing=true}
-        function draw(e){if(!isDrawing)return;const rect=canvas.getBoundingClientRect();ctx.lineTo(e.clientX-rect.left,e.clientY-rect.top);ctx.stroke()}
-        function stopDraw(){if(isDrawing){isDrawing=false;state.formData.signature=canvas.toDataURL()}}
-        function clearCanvas(){ctx.clearRect(0,0,canvas.width,canvas.height);state.formData.signature=null}
+        function draw(e){if(!isDrawing)return;const rect=canvas.getBoundingClientRect();ctx.lineTo(e.clientX-rect.left,e.clientY-rect.top);ctx.stroke();}
+        function stopDraw(){if(isDrawing){isDrawing=false;state.formData.signature=canvas.toDataURL();}}
+        function clearCanvas(){
+            if(ctx && canvas) {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                state.formData.signature=null;
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
 
-        render();
+        // Wait for Lucide to load before first render
+        let initAttempts = 0;
+        function init() {
+            initAttempts++;
+            if (typeof lucide !== 'undefined') {
+                try {
+                    render();
+                } catch(e) {
+                    console.error('Render error:', e);
+                    document.getElementById('app').innerHTML = '<div style="color:red;padding:20px;">Error: ' + e.message + '</div>';
+                }
+            } else if (initAttempts < 100) {
+                setTimeout(init, 50);
+            } else {
+                // Fallback - render anyway without icons
+                console.warn('Lucide failed to load, rendering without icons');
+                try {
+                    render();
+                } catch(e) {
+                    console.error('Render error:', e);
+                    document.getElementById('app').innerHTML = '<div style="color:red;padding:20px;">Error: ' + e.message + '</div>';
+                }
+            }
+        }
+        init();
 
     </script>
 </body>
