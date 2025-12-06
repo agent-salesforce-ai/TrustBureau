@@ -2417,7 +2417,6 @@
       padding: 16px;
       scrollbar-width: thin;
       scrollbar-color: var(--accent) transparent;
-      background: var(--bg-card-inner);
     }
     
     .dashboard-body::-webkit-scrollbar { width: 6px; }
@@ -2520,6 +2519,665 @@
     .metric-card.pending::before { background: #f59e0b; }
     .metric-card.pending .metric-value { color: #f59e0b; }
     
+    /* View Toggle & Toolbar */
+    .pipeline-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .view-toggle {
+      display: flex;
+      background: var(--bg-toggle);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid var(--border-secondary);
+    }
+    
+    .view-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .view-toggle-btn:hover {
+      color: var(--text-primary);
+    }
+    
+    .view-toggle-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.4);
+    }
+    
+    .view-toggle-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .toolbar-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-option-card);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .toolbar-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .toolbar-btn.active {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .toolbar-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    /* Kanban Board */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      min-height: 400px;
+    }
+    
+    @media (max-width: 900px) {
+      .kanban-board {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .kanban-board {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .kanban-column {
+        max-height: 300px;
+      }
+    }
+    
+    .kanban-column {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-option-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: 14px;
+      min-height: 200px;
+      max-height: 500px;
+    }
+    
+    .kanban-column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-secondary);
+      position: sticky;
+      top: 0;
+      background: var(--bg-option-card);
+      border-radius: 14px 14px 0 0;
+      z-index: 1;
+    }
+    
+    .kanban-column-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .kanban-column-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .kanban-column-name {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+    
+    .kanban-column-count {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      background: var(--bg-toggle);
+      border-radius: 10px;
+      color: var(--text-muted);
+    }
+    
+    .kanban-column-body {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .kanban-column-body::-webkit-scrollbar { width: 4px; }
+    .kanban-column-body::-webkit-scrollbar-track { background: transparent; }
+    .kanban-column-body::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 2px; }
+    
+    /* Kanban Card (compact) */
+    .kanban-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .kanban-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .kanban-card.starred {
+      border-color: #fbbf24;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
+    }
+    
+    .kanban-card.stale {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.05);
+    }
+    
+    .kanban-card.archived {
+      opacity: 0.5;
+    }
+    
+    .kanban-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    
+    .kanban-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .kanban-card-star {
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    
+    .kanban-card-star:hover {
+      color: #fbbf24;
+      transform: scale(1.1);
+    }
+    
+    .kanban-card-star.active {
+      color: #fbbf24;
+      filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+    }
+    
+    .kanban-card-star svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .kanban-card-amount {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    
+    .kanban-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    
+    .kanban-card-date {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    
+    .kanban-card-stale {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-radius: 4px;
+    }
+    
+    /* Tags System */
+    .offer-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    
+    .offer-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: default;
+    }
+    
+    .offer-tag.hot-lead {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .offer-tag.renewal {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .offer-tag.referral {
+      background: rgba(139, 92, 246, 0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    
+    .offer-tag.follow-up {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    
+    .offer-tag.vip {
+      background: rgba(236, 72, 153, 0.15);
+      color: #f472b6;
+      border: 1px solid rgba(236, 72, 153, 0.3);
+    }
+    
+    /* Tag Picker Dropdown */
+    .tag-picker {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tag-picker-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1px dashed var(--border-secondary);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .tag-picker-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      border-style: solid;
+    }
+    
+    .tag-picker-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .tag-picker-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 10px;
+      padding: 6px;
+      min-width: 120px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 100;
+      display: none;
+    }
+    
+    .tag-picker-dropdown.show {
+      display: block;
+    }
+    
+    .tag-picker-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    
+    .tag-picker-option:hover {
+      background: var(--bg-option-card);
+    }
+    
+    .tag-picker-option.selected {
+      background: var(--accent-glow);
+    }
+    
+    /* Star Button in List View */
+    .offer-star-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .offer-star-btn:hover {
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+    }
+    
+    .offer-star-btn.active {
+      color: #fbbf24;
+    }
+    
+    .offer-star-btn.active svg {
+      fill: #fbbf24;
+    }
+    
+    /* Archive Button */
+    .offer-action-btn.archive {
+      color: #8b5cf6;
+    }
+    
+    .offer-action-btn.archive:hover {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: #8b5cf6;
+    }
+    
+    /* Stale Indicator on List View */
+    .stale-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-radius: 6px;
+      margin-left: 8px;
+    }
+    
+    .stale-indicator svg {
+      width: 12px;
+      height: 12px;
+    }
+    
+    /* Activity Timeline */
+    .activity-timeline {
+      padding: 12px 0;
+      border-top: 1px solid var(--border-secondary);
+      margin-top: 8px;
+    }
+    
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      position: relative;
+    }
+    
+    .timeline-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 28px;
+      bottom: -8px;
+      width: 2px;
+      background: var(--border-secondary);
+    }
+    
+    .timeline-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--bg-toggle);
+      border: 2px solid var(--border-secondary);
+    }
+    
+    .timeline-dot svg {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .timeline-dot.created { border-color: var(--text-muted); color: var(--text-muted); }
+    .timeline-dot.sent { border-color: #8b5cf6; color: #8b5cf6; }
+    .timeline-dot.viewed { border-color: #06b6d4; color: #06b6d4; }
+    .timeline-dot.accepted { border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.15); }
+    .timeline-dot.declined { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+    
+    .timeline-content {
+      flex: 1;
+    }
+    
+    .timeline-event {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .timeline-time {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    
+    /* Volume Chart */
+    .volume-chart-container {
+      border-radius: 14px;
+      padding: 16px 0;
+      margin-bottom: 16px;
+    }
+    
+    .volume-chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .volume-chart-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+    
+    .volume-chart-period {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .volume-chart-period button {
+      padding: 4px 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .volume-chart-period button:hover {
+      color: var(--text-primary);
+    }
+    
+    .volume-chart-period button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+    
+    .volume-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+      height: 80px;
+    }
+    
+    .volume-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .volume-bar {
+      width: 100%;
+      max-width: 40px;
+      background: var(--accent);
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: height 0.3s ease;
+      position: relative;
+    }
+    
+    .volume-bar:hover {
+      filter: brightness(1.2);
+    }
+    
+    .volume-bar-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    
+    .volume-bar-value {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-primary);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .volume-bar-wrap:hover .volume-bar-value {
+      opacity: 1;
+    }
+    
+    /* Enhanced Stats Row */
+    .enhanced-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    @media (max-width: 600px) {
+      .enhanced-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .enhanced-stat {
+      background: var(--bg-option-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    
+    .enhanced-stat-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    
+    .enhanced-stat-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    
+    /* Funded status */
+    .offer-status-badge.funded {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+    
+    .metric-card.funded::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
+    .metric-card.funded .metric-value { color: #10b981; }
+    
     /* Search Bar */
     .dashboard-search-wrap {
       position: relative;
@@ -2618,6 +3276,18 @@
       color: var(--accent);
       border-radius: 20px;
       border: 1px solid rgba(var(--accent-rgb), 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .offer-card-title .lender-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 8px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border-radius: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -3353,7 +4023,10 @@
     <div class="dashboard-content">
       <div class="dashboard-header">
         <div class="dashboard-title">
-          <div class="section-indicator"></div>
+          <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            <path d="M9 12l2 2 4-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <h2>Offer Pipeline</h2>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -3371,9 +4044,55 @@
         </div>
       </div>
       <div class="dashboard-body">
-        <!-- Metrics Section -->
-        <div id="pipelineMetrics" class="pipeline-metrics">
+        <!-- Enhanced Stats Row -->
+        <div id="enhancedStats" class="enhanced-stats">
           <!-- Populated by JS -->
+        </div>
+        
+        <!-- Volume Chart -->
+        <div id="volumeChartContainer" class="volume-chart-container">
+          <div class="volume-chart-header">
+            <span class="volume-chart-title">Offer Volume</span>
+            <div class="volume-chart-period">
+              <button onclick="setChartPeriod('week')" class="active">Week</button>
+              <button onclick="setChartPeriod('month')">Month</button>
+            </div>
+          </div>
+          <div id="volumeChart" class="volume-chart">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Toolbar -->
+        <div class="pipeline-toolbar">
+          <div class="view-toggle">
+            <button onclick="setPipelineView('list')" class="view-toggle-btn active" id="listViewBtn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              List
+            </button>
+            <button onclick="setPipelineView('kanban')" class="view-toggle-btn" id="kanbanViewBtn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+              Kanban
+            </button>
+          </div>
+          <div class="toolbar-actions">
+            <button onclick="toggleShowArchived()" class="toolbar-btn" id="showArchivedBtn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              Archived
+            </button>
+            <button onclick="toggleShowStarred()" class="toolbar-btn" id="showStarredBtn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+              Starred
+            </button>
+          </div>
         </div>
         
         <div class="dashboard-search-wrap">
@@ -3382,8 +4101,64 @@
           </svg>
           <input type="text" id="dashboardSearch" placeholder="Search offers..." oninput="filterDashboardOffers()">
         </div>
+        
+        <!-- List View Container -->
         <div id="offersTableContainer" class="offer-list">
           <!-- Offers rendered by JS -->
+        </div>
+        
+        <!-- Kanban View Container -->
+        <div id="kanbanContainer" class="kanban-board hidden">
+          <div class="kanban-column" data-stage="draft">
+            <div class="kanban-column-header">
+              <div class="kanban-column-title">
+                <div class="kanban-column-dot" style="background: var(--text-muted);"></div>
+                <span class="kanban-column-name">Draft</span>
+              </div>
+              <span class="kanban-column-count" id="kanban-count-draft">0</span>
+            </div>
+            <div class="kanban-column-body" id="kanban-draft"></div>
+          </div>
+          <div class="kanban-column" data-stage="sent">
+            <div class="kanban-column-header">
+              <div class="kanban-column-title">
+                <div class="kanban-column-dot" style="background: #8b5cf6;"></div>
+                <span class="kanban-column-name">Sent</span>
+              </div>
+              <span class="kanban-column-count" id="kanban-count-sent">0</span>
+            </div>
+            <div class="kanban-column-body" id="kanban-sent"></div>
+          </div>
+          <div class="kanban-column" data-stage="viewed">
+            <div class="kanban-column-header">
+              <div class="kanban-column-title">
+                <div class="kanban-column-dot" style="background: #06b6d4;"></div>
+                <span class="kanban-column-name">Viewed</span>
+              </div>
+              <span class="kanban-column-count" id="kanban-count-viewed">0</span>
+            </div>
+            <div class="kanban-column-body" id="kanban-viewed"></div>
+          </div>
+          <div class="kanban-column" data-stage="accepted">
+            <div class="kanban-column-header">
+              <div class="kanban-column-title">
+                <div class="kanban-column-dot" style="background: #10b981;"></div>
+                <span class="kanban-column-name">Accepted</span>
+              </div>
+              <span class="kanban-column-count" id="kanban-count-accepted">0</span>
+            </div>
+            <div class="kanban-column-body" id="kanban-accepted"></div>
+          </div>
+          <div class="kanban-column" data-stage="funded">
+            <div class="kanban-column-header">
+              <div class="kanban-column-title">
+                <div class="kanban-column-dot" style="background: linear-gradient(135deg, #10b981, #06b6d4);"></div>
+                <span class="kanban-column-name">Funded</span>
+              </div>
+              <span class="kanban-column-count" id="kanban-count-funded">0</span>
+            </div>
+            <div class="kanban-column-body" id="kanban-funded"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -3405,7 +4180,7 @@
           </button>
           
           <!-- HEADER -->
-          <header class="header-main flex flex-wrap items-center justify-between gap-3 mb-4 py-2 sticky top-0 z-30" style="background: var(--bg-secondary); position: relative;">
+          <header class="header-main flex flex-wrap items-center justify-between gap-3 mb-4 py-2 sticky top-0 z-30" style="background: var(--bg-card); position: relative;">
                 <!-- Logo and Title -->
                 <div class="header-brand flex items-center gap-2">
                     <a href="index.html" class="transition-transform hover:scale-105" title="Back to Home">
@@ -3716,7 +4491,7 @@
                         </div>
                     </div>
                     <div class="section-content mt-6 space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold mb-2 ml-1" style="color: var(--text-muted);">Business Name</label>
                                 <input id="calcBusinessName" type="text" class="w-full p-3.5 border rounded-xl input-field text-sm font-medium" placeholder="e.g. Acme Corporation LLC" value="Acme Corporation LLC" />
@@ -3724,10 +4499,6 @@
                             <div>
                                 <label class="block text-xs font-semibold mb-2 ml-1" style="color: var(--text-muted);">Contact Name</label>
                                 <input id="calcContactName" type="text" class="w-full p-3.5 border rounded-xl input-field text-sm font-medium" placeholder="First Last" value="First Last" />
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold mb-2 ml-1" style="color: var(--text-muted);">ISO Name <span style="opacity: 0.5;">(optional)</span></label>
-                                <input id="calcISOName" type="text" class="w-full p-3.5 border rounded-xl input-field text-sm font-medium" placeholder="e.g. ABC Funding" />
                             </div>
                         </div>
                     </div>
@@ -4056,6 +4827,40 @@
 Government Issued ID</textarea>
                     </div>
                 </div>
+                
+                <!-- ISO Name Card -->
+                <div class="card p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="section-indicator" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"></div>
+                            <span class="text-sm font-semibold" style="color: var(--text-primary);">ISO Name</span>
+                        </div>
+                        <label class="switch">
+                            <input id="toggleISO" type="checkbox" onchange="toggleSection('ISO', this.checked); updatePreview()">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                    <div id="secISO" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
+                        <input id="calcISOName" type="text" class="w-full border rounded-lg p-2 text-sm font-medium" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" placeholder="e.g. ABC Funding" oninput="updatePreview()" />
+                    </div>
+                </div>
+                
+                <!-- Lender Name Card -->
+                <div class="card p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="section-indicator" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);"></div>
+                            <span class="text-sm font-semibold" style="color: var(--text-primary);">Lender Name</span>
+                        </div>
+                        <label class="switch">
+                            <input id="toggleLender" type="checkbox" onchange="toggleSection('Lender', this.checked); updatePreview()">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                    <div id="secLender" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
+                        <input id="calcLenderName" type="text" class="w-full border rounded-lg p-2 text-sm font-medium" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" placeholder="e.g. XYZ Capital" oninput="updatePreview()" />
+                    </div>
+                </div>
                 </div> <!-- end 2x3 grid -->
                     </div> <!-- end section-content -->
                 </div> <!-- end offerOptionsCard -->
@@ -4264,6 +5069,19 @@ Government Issued ID</textarea>
                           </div>
                       </div>
                       
+                      <div id="previewSourceSection" class="mt-4 rounded-2xl p-4 hidden" style="background: var(--bg-card); border: 1px solid var(--border-primary);">
+                          <div class="flex items-center gap-3">
+                              <div class="section-indicator" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"></div>
+                              <div class="flex-1">
+                                  <h4 class="font-bold text-xs uppercase tracking-wider mb-2" style="color: var(--text-muted);">Source Info</h4>
+                                  <div class="flex flex-wrap gap-2">
+                                      <span id="previewISOTag" class="hidden text-xs font-bold px-3 py-1 rounded-full" style="background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.3);"></span>
+                                      <span id="previewLenderTag" class="hidden text-xs font-bold px-3 py-1 rounded-full" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3);"></span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
                   </div>
               </div>
           </div>
@@ -4460,6 +5278,20 @@ Government Issued ID</textarea>
                           <p class="text-sm" style="color: var(--text-secondary);">This offer expires on <span id="clientExpiryDate" class="font-bold" style="color: var(--accent);">December 31, 2024</span></p>
                       </div>
                   </div>
+                  
+                  <!-- Source Info Section -->
+                  <div id="clientSourceSection" class="rounded-2xl p-5 hidden" style="background: var(--bg-card); border: 1px solid var(--border-primary);">
+                      <div class="flex items-center gap-3">
+                          <div class="section-indicator" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"></div>
+                          <div class="flex-1">
+                              <h4 class="font-bold text-xs uppercase tracking-wider mb-2" style="color: var(--text-muted);">Source Info</h4>
+                              <div class="flex flex-wrap gap-2">
+                                  <span id="clientISOTag" class="hidden text-xs font-bold px-3 py-1 rounded-full" style="background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.3);"></span>
+                                  <span id="clientLenderTag" class="hidden text-xs font-bold px-3 py-1 rounded-full" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3);"></span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
 
               </div>
 
@@ -4553,7 +5385,7 @@ Government Issued ID</textarea>
     <div class="flex items-start justify-center h-full p-4 pt-16 overflow-y-auto">
       <!-- Preview Frame -->
       <div class="relative w-full max-w-2xl">
-        <div class="rounded-2xl overflow-hidden" style="background: var(--bg-secondary); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);">
+        <div class="rounded-2xl overflow-hidden" style="background: #121212; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);">
           <!-- Screen -->
           <div id="floatingPreviewContent" class="overflow-y-auto" style="max-height: 80vh;">
             <!-- Client view content will be injected here -->
@@ -6598,6 +7430,31 @@ Government Issued ID</textarea>
             $('previewDocsSection').classList.add('hidden');
         }
         
+        // Source Info Section (ISO/Lender)
+        const hasISO = $('toggleISO').checked;
+        const hasLender = $('toggleLender').checked;
+        const isoName = getVal('calcISOName');
+        const lenderName = getVal('calcLenderName');
+        if ((hasISO && isoName) || (hasLender && lenderName)) {
+            $('previewSourceSection').classList.remove('hidden');
+            const isoTag = $('previewISOTag');
+            const lenderTag = $('previewLenderTag');
+            if (hasISO && isoName) {
+                isoTag.textContent = isoName;
+                isoTag.classList.remove('hidden');
+            } else {
+                isoTag.classList.add('hidden');
+            }
+            if (hasLender && lenderName) {
+                lenderTag.textContent = lenderName;
+                lenderTag.classList.remove('hidden');
+            } else {
+                lenderTag.classList.add('hidden');
+            }
+        } else {
+            $('previewSourceSection').classList.add('hidden');
+        }
+        
         const pp = c.totalPayback > 0 ? (c.amount / c.totalPayback) * 100 : 0; 
         $('previewCircle').setAttribute('stroke-dasharray', `${pp}, ${100 - pp}`);
     }
@@ -6609,6 +7466,8 @@ Government Issued ID</textarea>
         saveState(activeCalcTab);
         return {
             b: getVal('calcBusinessName'), c: getVal('calcContactName'),
+            iso: $('toggleISO').checked ? getVal('calcISOName') : null,
+            ln: $('toggleLender').checked ? getVal('calcLenderName') : null,
             ex: $('toggleExpiry').checked ? getVal('calcExpiryDate') : null,
             logo: currentLogoUrl,
             companyName: currentCompanyName,
@@ -6686,6 +7545,27 @@ Government Issued ID</textarea>
             $('clientExpiryDate').textContent = new Date(data.ex).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
         } else {
             $('clientExpirySection').classList.add('hidden');
+        }
+        
+        // Handle Source Info (ISO/Lender)
+        if (data.iso || data.ln) {
+            $('clientSourceSection').classList.remove('hidden');
+            const isoTag = $('clientISOTag');
+            const lenderTag = $('clientLenderTag');
+            if (data.iso) {
+                isoTag.textContent = data.iso;
+                isoTag.classList.remove('hidden');
+            } else {
+                isoTag.classList.add('hidden');
+            }
+            if (data.ln) {
+                lenderTag.textContent = data.ln;
+                lenderTag.classList.remove('hidden');
+            } else {
+                lenderTag.classList.add('hidden');
+            }
+        } else {
+            $('clientSourceSection').classList.add('hidden');
         }
         
         // Handle logo
@@ -6968,6 +7848,27 @@ Government Issued ID</textarea>
             $('clientExpirySection').classList.remove('hidden');
             $('clientExpiryDate').textContent = new Date(data.ex).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
         }
+        
+        // Handle Source Info (ISO/Lender)
+        if (data.iso || data.ln) {
+            $('clientSourceSection').classList.remove('hidden');
+            const isoTag = $('clientISOTag');
+            const lenderTag = $('clientLenderTag');
+            if (data.iso) {
+                isoTag.textContent = data.iso;
+                isoTag.classList.remove('hidden');
+            } else {
+                isoTag.classList.add('hidden');
+            }
+            if (data.ln) {
+                lenderTag.textContent = data.ln;
+                lenderTag.classList.remove('hidden');
+            } else {
+                lenderTag.classList.add('hidden');
+            }
+        } else {
+            $('clientSourceSection').classList.add('hidden');
+        }
 
         // Handle logo in client view
         const cLogoContainer = $('cPreviewLogoContainer');
@@ -7228,8 +8129,9 @@ Government Issued ID</textarea>
     function resetCalculator() { 
         calcOptions = [initDefaultOption()]; 
         activeCalcTab = 0; 
-        setVal('calcBusinessName',''); setVal('calcContactName',''); setVal('calcISOName',''); 
-        ['toggleFee','togglePrepay','toggleOverride','toggleExpiry','toggleNotes','toggleDocs'].forEach(id => { 
+        setVal('calcBusinessName',''); setVal('calcContactName',''); 
+        setVal('calcISOName',''); setVal('calcLenderName','');
+        ['toggleFee','togglePrepay','toggleOverride','toggleExpiry','toggleNotes','toggleDocs','toggleISO','toggleLender'].forEach(id => { 
             const el = $(id); if(el) { el.checked = false; toggleSection(id.replace('toggle',''), false); }
         });
         updateTabsUI(); loadState(0); updatePreview(); updateSliders(); 
@@ -7244,7 +8146,9 @@ Government Issued ID</textarea>
     function getLink() {
         saveState(activeCalcTab);
         const d = { 
-            b: getVal('calcBusinessName'), c: getVal('calcContactName'), iso: getVal('calcISOName'),
+            b: getVal('calcBusinessName'), c: getVal('calcContactName'), 
+            iso: $('toggleISO').checked ? getVal('calcISOName') : null, 
+            ln: $('toggleLender').checked ? getVal('calcLenderName') : null,
             ex: $('toggleExpiry').checked ? getVal('calcExpiryDate') : null,
             logo: currentLogoUrl,
             companyName: currentCompanyName,
@@ -7310,16 +8214,18 @@ Government Issued ID</textarea>
         const offers = getStoredOffers();
         const businessName = getVal('calcBusinessName') || 'Unnamed Business';
         const contactName = getVal('calcContactName') || '';
-        const isoName = getVal('calcISOName') || ''; // Get ISO name from form
+        const isoName = getVal('calcISOName') || '';
+        const lenderName = getVal('calcLenderName') || '';
         
         // Check if offer with this link already exists
         const existingOffer = offers.find(o => o.link === link);
         if (existingOffer) {
-            // Update business name and ISO name if changed
+            // Update business name and ISO/Lender name if changed
             if (businessName && businessName !== 'Unnamed Business') {
                 existingOffer.businessName = businessName;
             }
             if (isoName) existingOffer.isoName = isoName;
+            if (lenderName) existingOffer.lenderName = lenderName;
             if (contactName) existingOffer.contactName = contactName;
             // Update tracking on existing offer
             updateOfferTracking(existingOffer.id, trackingEvent);
@@ -7338,7 +8244,8 @@ Government Issued ID</textarea>
             id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
             businessName: businessName,
             contactName: contactName,
-            isoName: isoName, // Add ISO name
+            isoName: isoName,
+            lenderName: lenderName,
             amount: opt.amount || 0,
             factor: opt.factor || 1.0,
             term: opt.term || 0,
@@ -7486,6 +8393,22 @@ Government Issued ID</textarea>
         updateOfferCount();
     }
     
+    // Pipeline view state
+    window.pipelineView = 'list';
+    window.showArchived = false;
+    window.showStarredOnly = false;
+    window.chartPeriod = 'week';
+    window.currentMetricFilter = 'all';
+    
+    const STALE_DAYS = 3; // Days before an offer is considered stale
+    const AVAILABLE_TAGS = [
+        { id: 'hot-lead', label: 'Hot Lead', color: '#f87171' },
+        { id: 'renewal', label: 'Renewal', color: '#34d399' },
+        { id: 'referral', label: 'Referral', color: '#a78bfa' },
+        { id: 'follow-up', label: 'Follow Up', color: '#fbbf24' },
+        { id: 'vip', label: 'VIP', color: '#f472b6' }
+    ];
+    
     function openDashboard() {
         renderOffersDashboard();
         $('dashboardModal').classList.remove('hidden');
@@ -7510,25 +8433,259 @@ Government Issued ID</textarea>
     }
     
     function renderOffersDashboard(searchFilter = '') {
-        const offers = getStoredOffers();
-        const container = $('offersTableContainer');
-        const metricsContainer = $('pipelineMetrics');
+        const allOffers = getStoredOffers();
         
-        // Calculate metrics
-        const metrics = calculatePipelineMetrics(offers);
-        renderPipelineMetrics(metricsContainer, metrics, offers.length);
+        // Filter archived unless showing
+        let offers = window.showArchived 
+            ? allOffers 
+            : allOffers.filter(o => !o.archived);
+        
+        // Render enhanced stats
+        renderEnhancedStats(offers);
+        
+        // Render volume chart
+        renderVolumeChart(allOffers);
         
         // Filter by search
         let filtered = searchFilter 
             ? offers.filter(o => (o.businessName || '').toLowerCase().includes(searchFilter.toLowerCase()) ||
                                  (o.isoName || '').toLowerCase().includes(searchFilter.toLowerCase()) ||
+                                 (o.lenderName || '').toLowerCase().includes(searchFilter.toLowerCase()) ||
                                  (o.contactName || '').toLowerCase().includes(searchFilter.toLowerCase()))
             : offers;
         
-        // Apply metric filter
-        filtered = applyMetricFilter(filtered);
+        // Filter starred only
+        if (window.showStarredOnly) {
+            filtered = filtered.filter(o => o.starred);
+        }
         
-        if (offers.length === 0) {
+        // Sort: starred first, then by date
+        filtered.sort((a, b) => {
+            if (a.starred && !b.starred) return -1;
+            if (!a.starred && b.starred) return 1;
+            return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        });
+        
+        // Render based on view
+        if (window.pipelineView === 'kanban') {
+            $('offersTableContainer').classList.add('hidden');
+            $('kanbanContainer').classList.remove('hidden');
+            renderKanbanBoard(filtered);
+        } else {
+            $('offersTableContainer').classList.remove('hidden');
+            $('kanbanContainer').classList.add('hidden');
+            renderListView(filtered, offers.length, searchFilter);
+        }
+        
+        // Update toolbar button states
+        $('showArchivedBtn').classList.toggle('active', window.showArchived);
+        $('showStarredBtn').classList.toggle('active', window.showStarredOnly);
+    }
+    
+    function renderEnhancedStats(offers) {
+        const container = $('enhancedStats');
+        if (!container) return;
+        
+        // Calculate stats
+        const totalValue = offers.reduce((sum, o) => sum + (o.amount || 0), 0);
+        const avgDealSize = offers.length > 0 ? totalValue / offers.length : 0;
+        
+        // Conversion rate: accepted / (accepted + declined)
+        let accepted = 0, declined = 0, viewed = 0;
+        offers.forEach(o => {
+            const t = o.tracking || {};
+            if (t.clientAccepted) accepted++;
+            if (t.clientDeclined) declined++;
+            if (t.clientViewed || t.isoViewed) viewed++;
+        });
+        const conversionRate = (accepted + declined) > 0 ? Math.round((accepted / (accepted + declined)) * 100) : 0;
+        
+        // Average response time (sent to viewed)
+        let totalResponseTime = 0, responseCount = 0;
+        offers.forEach(o => {
+            const t = o.tracking || {};
+            const sentTime = t.clientSharedAt || t.isoSharedAt;
+            const viewedTime = t.clientViewedAt || t.isoViewedAt;
+            if (sentTime && viewedTime) {
+                totalResponseTime += new Date(viewedTime) - new Date(sentTime);
+                responseCount++;
+            }
+        });
+        const avgResponseHours = responseCount > 0 ? Math.round((totalResponseTime / responseCount) / (1000 * 60 * 60)) : 0;
+        
+        container.innerHTML = `
+            <div class="enhanced-stat">
+                <div class="enhanced-stat-value">$${avgDealSize >= 1000 ? Math.round(avgDealSize / 1000) + 'K' : Math.round(avgDealSize).toLocaleString()}</div>
+                <div class="enhanced-stat-label">Avg Deal Size</div>
+            </div>
+            <div class="enhanced-stat">
+                <div class="enhanced-stat-value">${conversionRate}%</div>
+                <div class="enhanced-stat-label">Win Rate</div>
+            </div>
+            <div class="enhanced-stat">
+                <div class="enhanced-stat-value">${avgResponseHours}h</div>
+                <div class="enhanced-stat-label">Avg Response</div>
+            </div>
+            <div class="enhanced-stat">
+                <div class="enhanced-stat-value">$${totalValue >= 1000000 ? (totalValue / 1000000).toFixed(1) + 'M' : totalValue >= 1000 ? Math.round(totalValue / 1000) + 'K' : totalValue.toLocaleString()}</div>
+                <div class="enhanced-stat-label">Pipeline Value</div>
+            </div>
+        `;
+    }
+    
+    function renderVolumeChart(offers) {
+        const container = $('volumeChart');
+        if (!container) return;
+        
+        const now = new Date();
+        const isWeek = window.chartPeriod === 'week';
+        const periods = isWeek ? 7 : 4;
+        const data = [];
+        
+        for (let i = periods - 1; i >= 0; i--) {
+            let start, end, label;
+            if (isWeek) {
+                start = new Date(now);
+                start.setDate(now.getDate() - i);
+                start.setHours(0, 0, 0, 0);
+                end = new Date(start);
+                end.setHours(23, 59, 59, 999);
+                label = start.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0);
+            } else {
+                start = new Date(now);
+                start.setDate(now.getDate() - (i * 7) - 6);
+                start.setHours(0, 0, 0, 0);
+                end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                end.setHours(23, 59, 59, 999);
+                label = 'W' + (periods - i);
+            }
+            
+            const count = offers.filter(o => {
+                const created = new Date(o.createdAt || 0);
+                return created >= start && created <= end;
+            }).length;
+            
+            data.push({ label, count });
+        }
+        
+        const maxCount = Math.max(...data.map(d => d.count), 1);
+        
+        container.innerHTML = data.map(d => `
+            <div class="volume-bar-wrap">
+                <div class="volume-bar" style="height: ${Math.max((d.count / maxCount) * 60, 4)}px;">
+                    <span class="volume-bar-value">${d.count}</span>
+                </div>
+                <span class="volume-bar-label">${d.label}</span>
+            </div>
+        `).join('');
+        
+        // Update period buttons
+        document.querySelectorAll('.volume-chart-period button').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.toLowerCase() === window.chartPeriod);
+        });
+    }
+    
+    function setChartPeriod(period) {
+        window.chartPeriod = period;
+        renderVolumeChart(getStoredOffers());
+    }
+    
+    function setPipelineView(view) {
+        window.pipelineView = view;
+        $('listViewBtn').classList.toggle('active', view === 'list');
+        $('kanbanViewBtn').classList.toggle('active', view === 'kanban');
+        renderOffersDashboard($('dashboardSearch')?.value || '');
+    }
+    
+    function toggleShowArchived() {
+        window.showArchived = !window.showArchived;
+        renderOffersDashboard($('dashboardSearch')?.value || '');
+    }
+    
+    function toggleShowStarred() {
+        window.showStarredOnly = !window.showStarredOnly;
+        renderOffersDashboard($('dashboardSearch')?.value || '');
+    }
+    
+    function getOfferStage(offer) {
+        const t = offer.tracking || {};
+        if (offer.funded || t.funded) return 'funded';
+        if (t.clientAccepted) return 'accepted';
+        if (t.clientViewed || t.isoViewed) return 'viewed';
+        if (t.clientShared || t.isoShared) return 'sent';
+        return 'draft';
+    }
+    
+    function isOfferStale(offer) {
+        const t = offer.tracking || {};
+        const sentTime = t.clientSharedAt || t.isoSharedAt;
+        if (!sentTime) return false;
+        if (t.clientViewed || t.isoViewed) return false;
+        
+        const daysSinceSent = (Date.now() - new Date(sentTime)) / (1000 * 60 * 60 * 24);
+        return daysSinceSent >= STALE_DAYS;
+    }
+    
+    function renderKanbanBoard(offers) {
+        const stages = ['draft', 'sent', 'viewed', 'accepted', 'funded'];
+        const grouped = { draft: [], sent: [], viewed: [], accepted: [], funded: [] };
+        
+        offers.forEach(offer => {
+            const stage = getOfferStage(offer);
+            if (grouped[stage]) grouped[stage].push(offer);
+        });
+        
+        stages.forEach(stage => {
+            const container = $(`kanban-${stage}`);
+            const countEl = $(`kanban-count-${stage}`);
+            if (!container) return;
+            
+            countEl.textContent = grouped[stage].length;
+            
+            if (grouped[stage].length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:11px;">No offers</div>`;
+                return;
+            }
+            
+            container.innerHTML = grouped[stage].map(offer => renderKanbanCard(offer)).join('');
+        });
+    }
+    
+    function renderKanbanCard(offer) {
+        const isStale = isOfferStale(offer);
+        const date = offer.createdAt ? new Date(offer.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+        const amount = offer.amount ? '$' + offer.amount.toLocaleString() : '';
+        const tags = offer.tags || [];
+        
+        return `
+            <div class="kanban-card ${offer.starred ? 'starred' : ''} ${isStale ? 'stale' : ''} ${offer.archived ? 'archived' : ''}" onclick="openOfferLink('${offer.id}')">
+                <div class="kanban-card-header">
+                    <span class="kanban-card-title">${escapeHtml(offer.businessName || 'Unnamed')}</span>
+                    <span class="kanban-card-star ${offer.starred ? 'active' : ''}" onclick="event.stopPropagation(); toggleStar('${offer.id}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${offer.starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                    </span>
+                </div>
+                ${amount ? `<div class="kanban-card-amount">${amount}</div>` : ''}
+                <div class="kanban-card-meta">
+                    <span class="kanban-card-date">${date}</span>
+                    ${isStale ? '<span class="kanban-card-stale">⚠ Stale</span>' : ''}
+                </div>
+                ${tags.length > 0 ? `
+                    <div class="offer-tags">
+                        ${tags.map(tag => `<span class="offer-tag ${tag}">${AVAILABLE_TAGS.find(t => t.id === tag)?.label || tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    function renderListView(filtered, totalCount, searchFilter) {
+        const container = $('offersTableContainer');
+        
+        if (totalCount === 0) {
             container.innerHTML = `
                 <div class="dashboard-empty">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
@@ -7542,34 +8699,82 @@ Government Issued ID</textarea>
         }
         
         if (filtered.length === 0) {
-            const filterNames = { all: 'any', shared: 'shared', viewed: 'viewed', accepted: 'accepted', declined: 'declined', pending: 'in progress' };
-            const filterName = filterNames[window.currentMetricFilter] || 'matching';
-            const msg = searchFilter 
-                ? `No offers found for "${escapeHtml(searchFilter)}"` 
-                : (window.currentMetricFilter && window.currentMetricFilter !== 'all' 
-                    ? `No ${filterName} offers` 
-                    : 'No matching offers');
             container.innerHTML = `
                 <div class="dashboard-empty">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <h3>No matches</h3>
-                    <p>${msg}</p>
-                    ${window.currentMetricFilter !== 'all' ? '<button onclick="filterOffersByMetric(\'all\')" style="margin-top:12px;padding:8px 16px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:600;">Show All Offers</button>' : ''}
+                    <p>${searchFilter ? `No offers found for "${escapeHtml(searchFilter)}"` : 'No matching offers'}</p>
                 </div>
             `;
             return;
         }
         
-        let html = '';
-        filtered.forEach(offer => {
-            if (!offer || !offer.id) return;
-            html += renderOfferCard(offer);
-        });
-        
-        container.innerHTML = html;
+        container.innerHTML = filtered.map(offer => renderOfferCard(offer)).join('');
     }
+    
+    function toggleStar(offerId) {
+        const offers = getStoredOffers();
+        const offer = offers.find(o => o.id === offerId);
+        if (offer) {
+            offer.starred = !offer.starred;
+            localStorage.setItem('trustbureau_offers', JSON.stringify(offers));
+            renderOffersDashboard($('dashboardSearch')?.value || '');
+        }
+    }
+    
+    function archiveOffer(offerId) {
+        const offers = getStoredOffers();
+        const offer = offers.find(o => o.id === offerId);
+        if (offer) {
+            offer.archived = !offer.archived;
+            localStorage.setItem('trustbureau_offers', JSON.stringify(offers));
+            renderOffersDashboard($('dashboardSearch')?.value || '');
+        }
+    }
+    
+    function markAsFunded(offerId) {
+        const offers = getStoredOffers();
+        const offer = offers.find(o => o.id === offerId);
+        if (offer) {
+            offer.funded = !offer.funded;
+            if (!offer.tracking) offer.tracking = {};
+            offer.tracking.funded = offer.funded;
+            offer.tracking.fundedAt = offer.funded ? new Date().toISOString() : null;
+            localStorage.setItem('trustbureau_offers', JSON.stringify(offers));
+            renderOffersDashboard($('dashboardSearch')?.value || '');
+        }
+    }
+    
+    function toggleOfferTag(offerId, tagId) {
+        const offers = getStoredOffers();
+        const offer = offers.find(o => o.id === offerId);
+        if (offer) {
+            if (!offer.tags) offer.tags = [];
+            const idx = offer.tags.indexOf(tagId);
+            if (idx >= 0) {
+                offer.tags.splice(idx, 1);
+            } else {
+                offer.tags.push(tagId);
+            }
+            localStorage.setItem('trustbureau_offers', JSON.stringify(offers));
+            renderOffersDashboard($('dashboardSearch')?.value || '');
+        }
+    }
+    
+    function showTagPicker(offerId, event) {
+        event.stopPropagation();
+        // Close any open pickers
+        document.querySelectorAll('.tag-picker-dropdown.show').forEach(el => el.classList.remove('show'));
+        const dropdown = document.getElementById(`tag-picker-${offerId}`);
+        if (dropdown) dropdown.classList.toggle('show');
+    }
+    
+    // Close tag picker when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.tag-picker-dropdown.show').forEach(el => el.classList.remove('show'));
+    });
     
     function calculatePipelineMetrics(offers) {
         const metrics = {
@@ -7704,11 +8909,14 @@ Government Issued ID</textarea>
     function renderOfferCard(offer) {
         const t = offer.tracking || {};
         const isISO = offer.isISOShare;
+        const isStale = isOfferStale(offer);
+        const tags = offer.tags || [];
         
         // Determine current status (furthest stage reached)
         let statusClass = 'draft';
         let statusLabel = 'Draft';
-        if (t.clientAccepted) { statusClass = 'accepted'; statusLabel = 'Accepted'; }
+        if (offer.funded || t.funded) { statusClass = 'funded'; statusLabel = 'Funded'; }
+        else if (t.clientAccepted) { statusClass = 'accepted'; statusLabel = 'Accepted'; }
         else if (t.clientDeclined) { statusClass = 'declined'; statusLabel = 'Declined'; }
         else if (t.clientViewed) { statusClass = 'viewed'; statusLabel = 'Client Viewed'; }
         else if (t.clientShared) { statusClass = 'sent'; statusLabel = 'With Client'; }
@@ -7719,20 +8927,66 @@ Government Issued ID</textarea>
         // Date display with time
         const date = offer.createdAt ? new Date(offer.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
         
+        // Star button HTML
+        const starBtn = `
+            <button class="offer-star-btn ${offer.starred ? 'active' : ''}" onclick="event.stopPropagation(); toggleStar('${offer.id}')" title="${offer.starred ? 'Unstar' : 'Star'} this offer">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${offer.starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+            </button>
+        `;
+        
+        // Stale indicator
+        const staleHtml = isStale ? `
+            <span class="stale-indicator">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                ${STALE_DAYS}+ days
+            </span>
+        ` : '';
+        
+        // Tags HTML
+        const tagsHtml = `
+            <div class="offer-tags" style="margin-top: 8px;">
+                ${tags.map(tag => `<span class="offer-tag ${tag}">${AVAILABLE_TAGS.find(t => t.id === tag)?.label || tag}</span>`).join('')}
+                <div class="tag-picker">
+                    <button class="tag-picker-btn" onclick="showTagPicker('${offer.id}', event)" title="Add tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                    <div class="tag-picker-dropdown" id="tag-picker-${offer.id}">
+                        ${AVAILABLE_TAGS.map(tag => `
+                            <div class="tag-picker-option ${tags.includes(tag.id) ? 'selected' : ''}" onclick="event.stopPropagation(); toggleOfferTag('${offer.id}', '${tag.id}')">
+                                <span class="offer-tag ${tag.id}" style="margin:0;">${tag.label}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
         if (isISO) {
             // ISO Rate Share card
             return `
-                <div class="offer-card" data-offer-id="${offer.id}">
+                <div class="offer-card ${offer.archived ? 'archived' : ''}" data-offer-id="${offer.id}" style="${offer.archived ? 'opacity:0.5;' : ''}">
                     <div class="offer-card-header">
-                        <div class="offer-card-title">
-                            <h3>
-                                <span style="color: var(--accent);">⚡ ISO Rate Share</span>
-                                ${offer.isoName ? `<span class="iso-tag">${escapeHtml(offer.isoName)}</span>` : ''}
-                            </h3>
-                            <div class="sub-info">${(offer.buyRate || 0).toFixed(2)}x → ${(offer.factor || 0).toFixed(2)}x • ${date}</div>
+                        <div style="display:flex;align-items:flex-start;gap:8px;">
+                            ${starBtn}
+                            <div class="offer-card-title">
+                                <h3>
+                                    <span style="color: var(--accent);">⚡ ISO Rate Share</span>
+                                    ${offer.isoName ? `<span class="iso-tag">${escapeHtml(offer.isoName)}</span>` : ''}
+                                    ${staleHtml}
+                                </h3>
+                                <div class="sub-info">${(offer.buyRate || 0).toFixed(2)}x → ${(offer.factor || 0).toFixed(2)}x • ${date}</div>
+                            </div>
                         </div>
                         <span class="offer-status-badge ${statusClass}">${statusLabel}</span>
                     </div>
+                    
+                    ${tagsHtml}
                     
                     <div class="offer-tracking">
                         ${renderTrackingProgress(offer, true)}
@@ -7746,6 +9000,9 @@ Government Issued ID</textarea>
                         <button class="offer-action-btn" onclick="openOfferLink('${offer.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                             Open
+                        </button>
+                        <button class="offer-action-btn archive" onclick="archiveOffer('${offer.id}')" title="${offer.archived ? 'Unarchive' : 'Archive'}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
                         </button>
                         <button class="offer-action-btn delete" onclick="deleteOffer('${offer.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -7778,17 +9035,24 @@ Government Issued ID</textarea>
         }
         
         return `
-            <div class="offer-card" data-offer-id="${offer.id}">
+            <div class="offer-card ${offer.archived ? 'archived' : ''}" data-offer-id="${offer.id}" style="${offer.archived ? 'opacity:0.5;' : ''}">
                 <div class="offer-card-header">
-                    <div class="offer-card-title">
-                        <h3>
-                            ${escapeHtml(offer.businessName || 'Unnamed')}
-                            ${offer.isoName ? `<span class="iso-tag">${escapeHtml(offer.isoName)}</span>` : ''}
-                        </h3>
-                        <div class="sub-info">${offer.contactName ? escapeHtml(offer.contactName) + ' • ' : ''}${date}</div>
+                    <div style="display:flex;align-items:flex-start;gap:8px;">
+                        ${starBtn}
+                        <div class="offer-card-title">
+                            <h3>
+                                ${escapeHtml(offer.businessName || 'Unnamed')}
+                                ${offer.isoName ? `<span class="iso-tag">${escapeHtml(offer.isoName)}</span>` : ''}
+                                ${offer.lenderName ? `<span class="lender-tag">${escapeHtml(offer.lenderName)}</span>` : ''}
+                                ${staleHtml}
+                            </h3>
+                            <div class="sub-info">${offer.contactName ? escapeHtml(offer.contactName) + ' • ' : ''}${date}</div>
+                        </div>
                     </div>
                     <span class="offer-status-badge ${statusClass}">${statusLabel}</span>
                 </div>
+                
+                ${tagsHtml}
                 
                 <div class="offer-stats">
                     <div class="offer-stat">
@@ -7814,7 +9078,7 @@ Government Issued ID</textarea>
                 
                 <button id="tracking-toggle-${offer.id}" class="tracking-toggle" onclick="toggleTrackingDetails('${offer.id}')">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                    View Details
+                    View Timeline
                 </button>
                 
                 <div id="tracking-detail-${offer.id}" class="tracking-detailed">
@@ -7829,6 +9093,15 @@ Government Issued ID</textarea>
                     <button class="offer-action-btn" onclick="openOfferLink('${offer.id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                         Open
+                    </button>
+                    ${statusClass === 'accepted' ? `
+                        <button class="offer-action-btn ${offer.funded ? 'active' : ''}" onclick="markAsFunded('${offer.id}')" title="${offer.funded ? 'Unmark as funded' : 'Mark as funded'}" style="${offer.funded ? 'background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #10b981;' : ''}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            ${offer.funded ? 'Funded' : 'Fund'}
+                        </button>
+                    ` : ''}
+                    <button class="offer-action-btn archive" onclick="archiveOffer('${offer.id}')" title="${offer.archived ? 'Unarchive' : 'Archive'}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
                     </button>
                     <button class="offer-action-btn delete" onclick="deleteOffer('${offer.id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
