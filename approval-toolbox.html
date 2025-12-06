@@ -4906,6 +4906,40 @@
                     </div>
                 </div>
                 
+                <!-- ISO Name Card -->
+                <div class="card p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="section-indicator" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"></div>
+                            <span class="text-sm font-semibold" style="color: var(--text-primary);">ISO Name</span>
+                        </div>
+                        <label class="switch">
+                            <input id="toggleISO" type="checkbox" onchange="toggleSection('ISO', this.checked); updatePreview()">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                    <div id="secISO" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
+                        <input id="calcISOName" type="text" class="w-full border rounded-lg p-2 text-sm font-medium" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" placeholder="e.g. ABC Funding" oninput="updatePreview()" />
+                    </div>
+                </div>
+                
+                <!-- Lender Name Card -->
+                <div class="card p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="section-indicator" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);"></div>
+                            <span class="text-sm font-semibold" style="color: var(--text-primary);">Lender Name</span>
+                        </div>
+                        <label class="switch">
+                            <input id="toggleLender" type="checkbox" onchange="toggleSection('Lender', this.checked); updatePreview()">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                    <div id="secLender" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
+                        <input id="calcLenderName" type="text" class="w-full border rounded-lg p-2 text-sm font-medium" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" placeholder="e.g. XYZ Capital" oninput="updatePreview()" />
+                    </div>
+                </div>
+                
                 <!-- Offer Notes Card -->
                 <div class="card p-4">
                     <div class="flex items-center justify-between">
@@ -4938,40 +4972,6 @@
                     <div id="secDocs" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
                         <textarea id="calcDocs" class="w-full border rounded-lg p-2 text-sm font-medium resize-none" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" rows="3" oninput="updatePreview()">Voided Check
 Government Issued ID</textarea>
-                    </div>
-                </div>
-                
-                <!-- ISO Name Card -->
-                <div class="card p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <div class="section-indicator" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"></div>
-                            <span class="text-sm font-semibold" style="color: var(--text-primary);">ISO Name</span>
-                        </div>
-                        <label class="switch">
-                            <input id="toggleISO" type="checkbox" onchange="toggleSection('ISO', this.checked); updatePreview()">
-                            <span class="switch-slider"></span>
-                        </label>
-                    </div>
-                    <div id="secISO" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
-                        <input id="calcISOName" type="text" class="w-full border rounded-lg p-2 text-sm font-medium" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" placeholder="e.g. ABC Funding" oninput="updatePreview()" />
-                    </div>
-                </div>
-                
-                <!-- Lender Name Card -->
-                <div class="card p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <div class="section-indicator" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);"></div>
-                            <span class="text-sm font-semibold" style="color: var(--text-primary);">Lender Name</span>
-                        </div>
-                        <label class="switch">
-                            <input id="toggleLender" type="checkbox" onchange="toggleSection('Lender', this.checked); updatePreview()">
-                            <span class="switch-slider"></span>
-                        </label>
-                    </div>
-                    <div id="secLender" class="hidden mt-3 pt-3 border-t" style="border-color: var(--border-secondary);">
-                        <input id="calcLenderName" type="text" class="w-full border rounded-lg p-2 text-sm font-medium" style="background: var(--bg-option-card); border-color: var(--border-primary); color: var(--text-primary);" placeholder="e.g. XYZ Capital" oninput="updatePreview()" />
                     </div>
                 </div>
                 </div> <!-- end 2x3 grid -->
@@ -5580,6 +5580,35 @@ Government Issued ID</textarea>
     const parseNumber = (v) => parseFloat(v.toString().replace(/[\$,]/g, '')) || 0;
     const formatNumber = (n) => new Intl.NumberFormat('en-US').format(n);
     const getLetter = (i) => String.fromCharCode(65 + i);
+    
+    // Animate number spin up
+    function animateNumber(element, targetValue, duration = 1500, formatter = formatCurrency) {
+        const startValue = 0;
+        const startTime = performance.now();
+        const isInteger = Number.isInteger(targetValue);
+        
+        function easeOutExpo(t) {
+            return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        }
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easedProgress = easeOutExpo(progress);
+            let currentValue = startValue + (targetValue - startValue) * easedProgress;
+            
+            // Only round for integer targets (amounts, counts), preserve decimals for factors
+            if (isInteger) currentValue = Math.round(currentValue);
+            
+            element.textContent = formatter(currentValue);
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+        
+        requestAnimationFrame(update);
+    }
 
     // ============================================
     // THEME MANAGEMENT
@@ -7521,7 +7550,7 @@ Government Issued ID</textarea>
         }
     }
 
-    function updatePreview() {
+    function updatePreview(animate = false) {
         const a = getVal('calcAmount', true); 
         const f = getVal('calcFactor', true) || 1.15; 
         const t = getVal('calcTerm', true) || 130;
@@ -7551,20 +7580,27 @@ Government Issued ID</textarea>
             $('previewLabelContainer').classList.add('hidden');
         }
 
-        $('previewAmount').textContent = formatCurrency(c.amount); 
-        $('previewPaybackChart').textContent = formatCurrency(c.totalPayback);
+        // Animate all numeric values
+        animateNumber($('previewAmount'), c.amount, 1200);
+        animateNumber($('previewPaybackChart'), c.totalPayback, 1200);
         
         const to = $('toggleOverride').checked ? getVal('calcTermOverride') : '';
         $('previewTermLength').textContent = getTermDisplay(t, fr, to); 
-        $('previewTermPayments').textContent = c.term; 
-        $('previewFactor').textContent = c.factor.toFixed(2) + 'x'; 
-        $('previewCost').textContent = formatCurrency(c.totalCost);
+        animateNumber($('previewTermPayments'), c.term, 1200, (n) => Math.round(n).toString());
+        animateNumber($('previewFactor'), c.factor, 1200, (n) => n.toFixed(2) + 'x');
+        animateNumber($('previewCost'), c.totalCost, 1200);
         
         const pLabel = fr === 'weekly' ? 'Weekly Payment' : fr === 'monthly' ? 'Monthly Payment' : 'Daily Payment';
         $('previewPaymentLabel').textContent = pLabel;
-        $('previewPayment').textContent = formatCurrency(c.payment);
+        animateNumber($('previewPayment'), c.payment, 1200);
         
-        if (fe > 0) { $('previewFeeRow').classList.remove('hidden'); $('previewFeeAmount').textContent = formatCurrency(c.feeAmount); $('previewNet').textContent = formatCurrency(c.net); } else { $('previewFeeRow').classList.add('hidden'); }
+        if (fe > 0) { 
+            $('previewFeeRow').classList.remove('hidden'); 
+            animateNumber($('previewFeeAmount'), c.feeAmount, 1200); 
+            animateNumber($('previewNet'), c.net, 1200); 
+        } else { 
+            $('previewFeeRow').classList.add('hidden'); 
+        }
         
         // Prepay discount
         const prepayVal = $('togglePrepay').checked ? getVal('calcPrepay', true) : 0;
@@ -7926,6 +7962,30 @@ Government Issued ID</textarea>
         const clientPanel = $('clientPanel');
         if (container && clientPanel) {
             container.innerHTML = clientPanel.innerHTML;
+            
+            // Animate all numeric values in the cloned modal
+            if (clientData && clientData.o && clientData.o[0]) {
+                const opt = clientData.o[0];
+                const calc = calculate(opt.a, opt.f, opt.t, opt.q, opt.fe);
+                
+                const clonedAmount = container.querySelector('#cPreviewAmount');
+                const clonedPayback = container.querySelector('#cPreviewPayback');
+                const clonedCount = container.querySelector('#cPreviewCount');
+                const clonedFactor = container.querySelector('#cPreviewFactor');
+                const clonedCost = container.querySelector('#cPreviewCost');
+                const clonedPayment = container.querySelector('#cPreviewPayment');
+                const clonedFee = container.querySelector('#cPreviewFee');
+                const clonedNet = container.querySelector('#cPreviewNet');
+                
+                if (clonedAmount) animateNumber(clonedAmount, calc.amount, 1200);
+                if (clonedPayback) animateNumber(clonedPayback, calc.totalPayback, 1200);
+                if (clonedCount) animateNumber(clonedCount, calc.term, 1200, (n) => Math.round(n).toString());
+                if (clonedFactor) animateNumber(clonedFactor, calc.factor, 1200, (n) => n.toFixed(2) + 'x');
+                if (clonedCost) animateNumber(clonedCost, calc.totalCost, 1200);
+                if (clonedPayment) animateNumber(clonedPayment, calc.payment, 1200);
+                if (clonedFee && calc.fee > 0) animateNumber(clonedFee, calc.feeAmount, 1200);
+                if (clonedNet && calc.fee > 0) animateNumber(clonedNet, calc.net, 1200);
+            }
         }
         
         // Restore panel states - show admin, hide client
@@ -8027,9 +8087,9 @@ Government Issued ID</textarea>
                 updateSliderFill(calcFactorSlider);
             }
             
-            // Update ISO profit display and recalculate
+            // Update ISO profit display and recalculate with animation
             updateIsoUpsell();
-            updatePreview();
+            updatePreview(true);
             
             // Show ISO preview bar
             const previewBar = $('isoPreviewBar');
@@ -8343,10 +8403,10 @@ Government Issued ID</textarea>
             termsContainer.classList.add('hidden');
         }
 
-        updateClientPreview();
+        updateClientPreview(true);
     }
 
-    function updateClientPreview() {
+    function updateClientPreview(animate = false) {
         const opt = clientData.o[clientActiveIdx];
         const amt = clientSelectedAmount;
         
@@ -8358,18 +8418,19 @@ Government Issued ID</textarea>
              $('cPreviewLabelContainer').classList.add('hidden');
         }
 
-        $('cPreviewAmount').textContent = formatCurrency(calc.amount);
-        $('cPreviewPayback').textContent = formatCurrency(calc.totalPayback);
+        // Animate all numeric values
+        animateNumber($('cPreviewAmount'), calc.amount, 1200);
+        animateNumber($('cPreviewPayback'), calc.totalPayback, 1200);
         
         $('cPreviewTerm').textContent = getTermDisplay(opt.t, opt.q, opt.to);
-        $('cPreviewCount').textContent = calc.term;
-        $('cPreviewFactor').textContent = calc.factor.toFixed(2) + 'x';
-        $('cPreviewCost').textContent = formatCurrency(calc.totalCost);
+        animateNumber($('cPreviewCount'), calc.term, 1200, (n) => Math.round(n).toString());
+        animateNumber($('cPreviewFactor'), calc.factor, 1200, (n) => n.toFixed(2) + 'x');
+        animateNumber($('cPreviewCost'), calc.totalCost, 1200);
         
         if(calc.fee > 0) {
             $('cPreviewFeeRow').classList.remove('hidden');
-            $('cPreviewFee').textContent = formatCurrency(calc.feeAmount);
-            $('cPreviewNet').textContent = formatCurrency(calc.net);
+            animateNumber($('cPreviewFee'), calc.feeAmount, 1200);
+            animateNumber($('cPreviewNet'), calc.net, 1200);
         } else {
             $('cPreviewFeeRow').classList.add('hidden');
         }
@@ -8388,7 +8449,7 @@ Government Issued ID</textarea>
         
         const pLabel = opt.q === 'weekly' ? 'Weekly Payment' : opt.q === 'monthly' ? 'Monthly Payment' : 'Daily Payment';
         $('cPreviewPaymentLabel').textContent = pLabel;
-        $('cPreviewPayment').textContent = formatCurrency(calc.payment);
+        animateNumber($('cPreviewPayment'), calc.payment, 1200);
         
         const pp = calc.totalPayback > 0 ? (calc.amount / calc.totalPayback) * 100 : 0; 
         $('cPreviewCircle').setAttribute('stroke-dasharray', `${pp}, ${100 - pp}`);
@@ -9080,6 +9141,20 @@ Government Issued ID</textarea>
         }
         
         container.innerHTML = filtered.map(offer => renderOfferCard(offer)).join('');
+        
+        // Animate all numeric values in the rendered cards
+        container.querySelectorAll('.animate-amount').forEach(el => {
+            const amount = parseFloat(el.dataset.amount) || 0;
+            if (amount > 0) animateNumber(el, amount, 1200);
+        });
+        container.querySelectorAll('.animate-factor').forEach(el => {
+            const factor = parseFloat(el.dataset.factor) || 0;
+            if (factor > 0) animateNumber(el, factor, 1200, (n) => n.toFixed(2) + 'x');
+        });
+        container.querySelectorAll('.animate-profit').forEach(el => {
+            const profit = parseFloat(el.dataset.profit) || 0;
+            if (profit > 0) animateNumber(el, profit, 1200, (n) => '+$' + Math.round(n).toLocaleString());
+        });
     }
     
     function toggleStar(offerId) {
@@ -9388,15 +9463,16 @@ Government Issued ID</textarea>
         
         // Calculate profit
         let profitHtml = '';
+        let profitAmount = 0;
         if (offer.amount && offer.factor) {
             const buyRate = offer.buyRate || 1.00;
-            const profit = offer.amount * (offer.factor - buyRate);
-            if (profit > 0) {
+            profitAmount = offer.amount * (offer.factor - buyRate);
+            if (profitAmount > 0) {
                 profitHtml = `
                     <div class="offer-stat-divider"></div>
                     <div class="offer-stat">
                         <span class="offer-stat-label">Profit</span>
-                        <span class="offer-stat-value profit">+$${Math.round(profit).toLocaleString()}</span>
+                        <span class="offer-stat-value profit animate-profit" data-profit="${Math.round(profitAmount)}">+$${Math.round(profitAmount).toLocaleString()}</span>
                     </div>
                 `;
             }
@@ -9425,12 +9501,12 @@ Government Issued ID</textarea>
                 <div class="offer-stats">
                     <div class="offer-stat">
                         <span class="offer-stat-label">Amount</span>
-                        <span class="offer-stat-value">${amountStr}</span>
+                        <span class="offer-stat-value animate-amount" data-amount="${offer.amount || 0}">${amountStr}</span>
                     </div>
                     <div class="offer-stat-divider"></div>
                     <div class="offer-stat">
                         <span class="offer-stat-label">Factor</span>
-                        <span class="offer-stat-value">${factorStr}</span>
+                        <span class="offer-stat-value animate-factor" data-factor="${offer.factor || 0}">${factorStr}</span>
                     </div>
                     <div class="offer-stat-divider"></div>
                     <div class="offer-stat">
