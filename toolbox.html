@@ -1960,6 +1960,14 @@
       color: var(--text-primary);
     }
 
+    .share-option:hover {
+      border-color: var(--accent) !important;
+      transform: translateY(-2px);
+    }
+    .share-option:hover > div:first-child {
+      transform: scale(1.1);
+    }
+
     @keyframes modalSlideIn {
       from {
         opacity: 0;
@@ -2422,17 +2430,28 @@
       border-bottom: 1px solid var(--border-secondary);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       flex-shrink: 0;
       background: var(--preview-header-bg);
       position: relative;
+    }
+    
+    .dashboard-header .header-actions {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
     }
     
     .dashboard-header::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 30% 50%, rgba(var(--accent-rgb), 0.1) 0%, transparent 50%);
+      background: radial-gradient(circle at 50% 50%, rgba(var(--accent-rgb), 0.1) 0%, transparent 50%);
       pointer-events: none;
     }
     
@@ -3133,6 +3152,7 @@
       justify-content: space-between;
       gap: 6px;
       height: 80px;
+      padding-top: 20px;
     }
     
     .volume-bar-wrap {
@@ -3171,12 +3191,10 @@
       font-size: 10px;
       font-weight: 700;
       color: var(--text-primary);
-      opacity: 0;
-      transition: opacity 0.2s;
     }
     
     .volume-bar-wrap:hover .volume-bar-value {
-      opacity: 1;
+      color: var(--accent);
     }
     
     /* Enhanced Stats Row */
@@ -4084,7 +4102,7 @@
           </svg>
           <h2>Offer Pipeline</h2>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="header-actions">
           <button type="button" id="clearAllBtn" class="offer-action-btn delete" style="padding: 6px 10px; font-size: 10px;">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -5406,23 +5424,42 @@ Government Issued ID</textarea>
 
   <!-- Share Modal -->
   <div id="shareModal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div class="modal-content rounded-2xl w-full max-w-md p-8 text-center" style="border: 2px solid var(--accent); box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.25), 0 0 80px rgba(var(--accent-rgb), 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-      <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg" style="background: linear-gradient(135deg, var(--accent-light), var(--accent));">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+    <div class="modal-content rounded-2xl w-full max-w-lg p-6 text-center" style="background: var(--bg-card); border: 1px solid var(--border-primary); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-bold" style="color: var(--text-primary);">Share Offer</h3>
+        <button onclick="$('shareModal').classList.add('hidden')" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style="background: var(--bg-card-inner); color: var(--text-muted);" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
       </div>
-      <h3 class="text-xl font-extrabold mb-2" style="color: var(--text-primary);">Share Offer</h3>
-      <p class="text-sm mb-8" style="color: var(--text-muted);">Create a link to send this funding scenario to your client.</p>
-      <div class="grid grid-cols-2 gap-4 mb-6">
-          <button onclick="copyLink()" class="btn btn-secondary py-4 rounded-xl flex flex-col items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg> 
-              <span class="text-xs font-bold">Copy Link</span>
+      <div class="grid grid-cols-3 gap-3">
+          <button onclick="copyLink()" class="share-option group p-4 rounded-xl flex flex-col items-center justify-center gap-3 transition-all" style="background: var(--bg-card-inner); border: 1px solid var(--border-primary);">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold mb-0.5" style="color: var(--text-primary);">Link</p>
+                <p class="text-[10px]" style="color: var(--text-muted);">Copy URL</p>
+              </div>
           </button>
-          <button onclick="copyText()" class="btn btn-secondary py-4 rounded-xl flex flex-col items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> 
-              <span class="text-xs font-bold">Email Template</span>
+          <button onclick="copySMS()" class="share-option group p-4 rounded-xl flex flex-col items-center justify-center gap-3 transition-all" style="background: var(--bg-card-inner); border: 1px solid var(--border-primary);">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold mb-0.5" style="color: var(--text-primary);">SMS</p>
+                <p class="text-[10px]" style="color: var(--text-muted);">Text message</p>
+              </div>
+          </button>
+          <button onclick="copyText()" class="share-option group p-4 rounded-xl flex flex-col items-center justify-center gap-3 transition-all" style="background: var(--bg-card-inner); border: 1px solid var(--border-primary);">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold mb-0.5" style="color: var(--text-primary);">Email</p>
+                <p class="text-[10px]" style="color: var(--text-muted);">HTML template</p>
+              </div>
           </button>
       </div>
-      <button onclick="$('shareModal').classList.add('hidden')" class="text-sm font-semibold transition-colors" style="color: var(--text-muted);">Cancel</button>
     </div>
   </div>
 
@@ -7132,6 +7169,24 @@ Government Issued ID</textarea>
         const net = a - fa; 
         return { amount: a, factor: f, term: t, frequency: fr, fee: fe, feeAmount: fa, net: net, totalPayback: tp, totalCost: tc, payment: p }; 
     }
+    
+    // Shared term display calculation for consistency across Link, SMS, Email
+    function getTermDisplay(term, frequency, termOverride) {
+        if (termOverride && termOverride.trim()) {
+            return termOverride.trim();
+        }
+        let months;
+        if (frequency === 'daily') {
+            months = Math.round((term / 21) * 2) / 2; // 21 business days, round to .5
+        } else if (frequency === 'weekly') {
+            months = Math.round((term / 4.33) * 2) / 2; // 4.33 weeks per month, round to .5
+        } else {
+            months = term; // monthly = term is already months
+        }
+        // Format: "6 months" or "6.5 months"
+        const label = months === 1 ? 'month' : 'months';
+        return months + ' ' + label;
+    }
 
     // ============================================
     // ADMIN LOGIC
@@ -7392,10 +7447,7 @@ Government Issued ID</textarea>
         $('previewPaybackChart').textContent = formatCurrency(c.totalPayback);
         
         const to = $('toggleOverride').checked ? getVal('calcTermOverride') : '';
-        let tm = t; if(fr === 'weekly') tm = t / 4.33; else if (fr === 'daily') tm = t / 21;
-        const monthLabel = Math.round(tm * 2) / 2 + ' months';
-
-        $('previewTermLength').textContent = to ? to : monthLabel; 
+        $('previewTermLength').textContent = getTermDisplay(t, fr, to); 
         $('previewTermPayments').textContent = c.term; 
         $('previewFactor').textContent = c.factor.toFixed(2) + 'x'; 
         $('previewCost').textContent = formatCurrency(c.totalCost);
@@ -8201,10 +8253,7 @@ Government Issued ID</textarea>
         $('cPreviewAmount').textContent = formatCurrency(calc.amount);
         $('cPreviewPayback').textContent = formatCurrency(calc.totalPayback);
         
-        const to = opt.to;
-        let tm = opt.t; if(opt.q === 'weekly') tm = opt.t / 4.33; else if (opt.q === 'daily') tm = opt.t / 21;
-        const monthLabel = Math.round(tm * 2) / 2 + ' months';
-        $('cPreviewTerm').textContent = to ? to : monthLabel;
+        $('cPreviewTerm').textContent = getTermDisplay(opt.t, opt.q, opt.to);
         $('cPreviewCount').textContent = calc.term;
         $('cPreviewFactor').textContent = calc.factor.toFixed(2) + 'x';
         $('cPreviewCost').textContent = formatCurrency(calc.totalCost);
@@ -8334,6 +8383,66 @@ Government Issued ID</textarea>
         
         if (navigator.clipboard) { navigator.clipboard.writeText(l).then(() => showToast('Link copied!')).catch(() => prompt("Copy Link:", l)); } else { prompt("Copy Link:", l); }
         $('shareModal').classList.add('hidden');
+    }
+    
+    function copySMS() {
+        // Check lite usage limit
+        if (!canUseLiteShare()) {
+            showUpgradeModal();
+            return;
+        }
+        
+        // Build minimal link for SMS (shorter URL)
+        const smsLink = getSMSLink();
+        saveOfferToDashboard(smsLink, 'smsShare');
+        
+        // Mark as shared and update UI
+        window.clientLinkShared = true;
+        updateModeStatusIcons();
+        
+        // Increment usage for lite users
+        if (!currentUser) {
+            incrementLiteUsage();
+        }
+        
+        // Build compact SMS message
+        const opt = calcOptions[0];
+        const cal = calculate(opt.amount, opt.factor, opt.term, opt.frequency, opt.fee);
+        
+        // Format amount (50K or $50,000)
+        const amt = opt.amount >= 1000 ? '$' + Math.round(opt.amount / 1000) + 'K' : '$' + opt.amount;
+        
+        // Get business or contact name
+        const businessName = getVal('calcBusinessName') || '';
+        const contactName = getVal('calcContactName') || '';
+        const name = businessName || contactName || 'Your Business';
+        
+        // Build message: [Amount] Approval for [Name] - View or Accept: [URL]
+        const sms = `${amt} Approval for ${name} - View or Accept: ${smsLink}`;
+        
+        if (navigator.clipboard) { 
+            navigator.clipboard.writeText(sms).then(() => showToast('SMS copied!')).catch(() => prompt("Copy SMS:", sms)); 
+        } else { 
+            prompt("Copy SMS:", sms); 
+        }
+        $('shareModal').classList.add('hidden');
+    }
+    
+    function getSMSLink() {
+        // Generate minimal link for SMS (excludes non-essential data)
+        saveState(activeCalcTab);
+        const d = { 
+            b: getVal('calcBusinessName'), 
+            c: getVal('calcContactName'),
+            theme: currentTheme,
+            accent: currentAccent,
+            o: calcOptions.map(op => ({ 
+                a: op.amount, f: op.factor, t: op.term, q: op.frequency, to: op.termOverride
+            }))
+        };
+        const json = JSON.stringify(d);
+        const enc = LZString.compressToEncodedURIComponent(json);
+        return `${window.location.origin}${window.location.pathname}?d=${enc}`;
     }
     
     // ============================================
@@ -9500,19 +9609,8 @@ Government Issued ID</textarea>
             const cal = calculate(opt.amount, opt.factor, opt.term, opt.frequency, opt.fee);
             const freqLabel = opt.frequency.charAt(0).toUpperCase() + opt.frequency.slice(1);
             
-            // Calculate term length display
-            let termLengthDisplay = opt.termOverride || '';
-            if (!termLengthDisplay) {
-                if (opt.frequency === 'daily') {
-                    const months = Math.round(opt.term / 22);
-                    termLengthDisplay = months + (months === 1 ? ' month' : ' months');
-                } else if (opt.frequency === 'weekly') {
-                    const months = Math.round(opt.term / 4.33);
-                    termLengthDisplay = months + (months === 1 ? ' month' : ' months');
-                } else {
-                    termLengthDisplay = opt.term + (opt.term === 1 ? ' month' : ' months');
-                }
-            }
+            // Calculate term length display using shared helper
+            const termLengthDisplay = getTermDisplay(opt.term, opt.frequency, opt.termOverride);
             
             // Calculate principal percentage for visual
             const principalPct = Math.round((opt.amount / cal.totalPayback) * 100);
@@ -9705,6 +9803,17 @@ Government Issued ID</textarea>
                             ${docsHtml}
                             
                         </div>
+                        
+                        <!-- URL Below Card -->
+                        <table border="0" cellspacing="0" cellpadding="0" style="margin: 16px auto 0 auto;">
+                            <tr>
+                                <td align="center">
+                                    <p style="${fontMain} font-size: 12px; color: #64748b; margin: 0;">
+                                        View or accept this offer: <a href="${l}" target="_blank" style="color: #10b981; text-decoration: underline; font-weight: 600;">Click Here</a>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             </table>`;
@@ -9776,21 +9885,6 @@ Government Issued ID</textarea>
                         
                         ${expiryHtml}
 
-                        <table border="0" cellspacing="0" cellpadding="0" style="margin-top: 30px;">
-                            <tr>
-                                <td align="center">
-                                    <a href="${l}" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 12px; padding: 18px 40px; background: linear-gradient(135deg, #10b981, #059669); display: inline-block; font-weight: bold; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);">
-                                        View & Accept Offer
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center" style="padding-top: 24px;">
-                                    <p style="margin: 0; font-size: 12px; color: #94a3b8;"><a href="${l}" style="color: #94a3b8; text-decoration: underline;">Open in Browser</a></p>
-                                </td>
-                            </tr>
-                        </table>
-                        
                     </td>
                 </tr>
             </table>
