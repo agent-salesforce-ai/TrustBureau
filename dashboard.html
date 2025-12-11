@@ -809,8 +809,17 @@
       const bn = document.getElementById('calcBusinessName').value.trim(); if (!bn) { showToast('Please enter a business name'); document.getElementById('calcBusinessName').focus(); return; }
       saveInputsToState(activeCalcTab);
       const hasExpiration = document.getElementById('toggleExpiry').checked;
-      let ea; if(hasExpiration) { const dv = document.getElementById('calcExpiryDate').value; if (dv) ea = new Date(dv).getTime(); } 
-      if (!ea || isNaN(ea)) ea = Date.now() + (settings.defaultExpiry * 24 * 60 * 60 * 1000);
+      let ea = null;
+      if (hasExpiration) {
+        const dv = document.getElementById('calcExpiryDate').value;
+        if (dv) {
+          ea = new Date(dv).getTime();
+        }
+        // Only set default expiration if toggle is ON but no date was entered
+        if (!ea || isNaN(ea)) {
+          ea = Date.now() + (settings.defaultExpiry * 24 * 60 * 60 * 1000);
+        }
+      }
       const finalOpts = calcOptions.map((o, i) => { const c = calculateOffer(o.amount, o.factor, o.term, o.frequency, o.fee); return { id: i, amount: o.amount, factor: o.factor, term: o.term, frequency: o.frequency, fee: o.fee, prepayDiscount: o.prepay, termOverride: o.termOverride, notes: o.notes, ...c }; });
       if (editingOfferId) { const idx = offers.findIndex(o => o.id === editingOfferId); if (idx !== -1) { offers[idx] = { ...offers[idx], businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, expiresAt: ea, hasExpiration: hasExpiration, showApr: settings.showApr }; saveOffers(); showToast('Offer updated!'); cancelEdit(); setTimeout(() => openOfferDetail(editingOfferId), 300); return; } }
       const newOffer = { id: generateId(), businessName: bn, contactName: document.getElementById('calcContactName').value.trim(), email: document.getElementById('calcEmail').value.trim(), options: finalOpts, status: 'pending', createdAt: Date.now(), expiresAt: ea, hasExpiration: hasExpiration, repName: settings.repName, repEmail: settings.repEmail, repPhone: settings.repPhone, companyName: settings.companyName, logoUrl: settings.logoUrl, accent: settings.accent, showApr: settings.showApr };
@@ -881,6 +890,17 @@
       const pct = (amt / c.totalPayback) * 100;
       const donut = document.getElementById('clientMainDonut');
       if(donut) donut.setAttribute('stroke-dasharray', `${pct}, 100`);
+      
+      // UPDATE SLIDER FILL
+      const slider = document.getElementById('clientAmountSlider');
+      if (slider) {
+        const minVal = parseFloat(slider.min);
+        const maxVal = parseFloat(slider.max);
+        const range = maxVal - minVal;
+        // When range is 0, slider is at its only possible value, so show full fill
+        const pctFill = range > 0 ? ((amt - minVal) / range) * 100 : 100;
+        slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${pctFill}%, var(--bg-slider-track) ${pctFill}%, var(--bg-slider-track) 100%)`;
+      }
       
       calculateMainClientSavings();
     }
@@ -1030,6 +1050,11 @@
     }
   
     function switchView(view) {
+      // Clean up client timer when switching views
+      if (clientTimerId) {
+        clearInterval(clientTimerId);
+        clientTimerId = null;
+      }
       currentView = view; 
       if (window.innerWidth <= 768) { const sb = document.getElementById('sidebar'); if(sb) sb.classList.remove('open'); }
       document.querySelectorAll('.nav-item').forEach(i => { i.classList.remove('active'); if (i.dataset.view === view) i.classList.add('active'); });
@@ -1084,6 +1109,11 @@
     }
     
     function showClientView(offerId) {
+      // Clean up any existing timer
+      if (clientTimerId) {
+        clearInterval(clientTimerId);
+        clientTimerId = null;
+      }
       const o = offers.find(x => x.id === offerId);
       if (!o) { alert('Offer not found'); return; }
       
