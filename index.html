@@ -1,507 +1,585 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrustBureau.ai | Intelligence Suite</title>
-  <meta name="description" content="Access the TrustBureau intelligence suite: DeepScrub, Approval Toolbox, and Perrepus.">
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22white%22 opacity=%220.1%22/><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 stroke=%22white%22 stroke-width=%221.5%22 fill=%22none%22/><path d=%22M9 12l2 2 4-4%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustBureau — The AI Credit Bureau for Business</title>
+<meta name="description" content="TrustBureau is an AI-native commercial credit reporting agency. One call returns the file: registrations, UCC positions, litigation, contributed tradelines, and bank-verified cash flow — synthesized into a defensible TrustScore.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22><rect width=%2224%22 height=%2224%22 rx=%224%22 fill=%22%230C1210%22/><path d=%22M12 3L5 6v5c0 4.4 3 8.4 7 9.5 4-1.1 7-5.1 7-9.5V6l-7-3z%22 stroke=%22%23F5F1E6%22 stroke-width=%221.4%22 fill=%22none%22/><path d=%22M9 11.5l2 2 4-4.5%22 stroke=%22%232FA36B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0C1210;
+    --ink-2:#121A17;
+    --ink-3:#1A2420;
+    --paper:#F5F1E6;
+    --paper-2:#ECE6D4;
+    --paper-3:#E2DAC4;
+    --line-ink:rgba(245,241,230,.14);
+    --line-paper:rgba(12,18,16,.16);
+    --green:#1F7A4D;
+    --green-bright:#2FA36B;
+    --stamp:#B3402E;
+    --muted-ink:rgba(245,241,230,.62);
+    --muted-paper:rgba(12,18,16,.6);
+    --serif:'Fraunces',Georgia,serif;
+    --sans:'Archivo',-apple-system,sans-serif;
+    --mono:'Spline Sans Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:var(--ink);
+    color:var(--paper);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--green);color:var(--paper)}
 
-    :root {
-        /* Dark Theme (Default) */
-        --bg-body: #0a0a0a;
-        --bg-aurora: #2c2c2c;
-        --bg-card: rgba(20, 20, 20, 0.6);
-        --bg-card-hover: rgba(30, 30, 30, 0.8);
-        --border-primary: rgba(255, 255, 255, 0.1);
-        --border-hover: rgba(255, 255, 255, 0.2);
-        --text-primary: #ffffff;
-        --text-secondary: #a1a1aa;
-        --text-muted: #888888;
-        --accent-green: #15803d;
-        --accent-yellow: #eab308;
-        --accent-glow: 120, 120, 120;
-    }
+  /* ————— texture ————— */
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
-    [data-theme="light"] {
-        --bg-body: #ffffff;
-        --bg-aurora: #f3f4f6;
-        --bg-card: #ffffff;
-        --bg-card-hover: #f9fafb;
-        --border-primary: #e5e7eb;
-        --border-hover: #d1d5db;
-        --text-primary: #111827; 
-        --text-secondary: #4b5563; 
-        --text-muted: #9ca3af; 
-        --accent-green: #15803d;
-        --accent-yellow: #ca8a04;
-        --accent-glow: 100, 100, 100;
-    }
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+  .mono{font-family:var(--mono)}
 
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-body);
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
+  /* ————— top bar ————— */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(12,18,16,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line-ink);
+  }
+  .bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--paper)}
+  .brand svg{width:26px;height:26px;flex-shrink:0}
+  .brand-name{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.14em}
+  .brand-name em{font-style:normal;color:var(--muted-ink)}
+  nav.primary{display:flex;gap:28px}
+  nav.primary a{color:var(--muted-ink);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}
+  nav.primary a:hover{color:var(--paper)}
+  .bar-actions{display:flex;align-items:center;gap:18px}
+  .signin{color:var(--muted-ink);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.05em;transition:color .2s}
+  .signin:hover{color:var(--paper)}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:var(--sans);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    padding:12px 22px;border-radius:2px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:transform .2s,background .2s,color .2s,border-color .2s;
+  }
+  .btn-solid{background:var(--paper);color:var(--ink)}
+  .btn-solid:hover{background:var(--green-bright);color:var(--ink);transform:translateY(-1px)}
+  .btn-ghost{border-color:var(--line-ink);color:var(--paper)}
+  .btn-ghost:hover{border-color:var(--paper)}
+  .btn-ink{background:var(--ink);color:var(--paper)}
+  .btn-ink:hover{background:var(--green);transform:translateY(-1px)}
 
-    /* Aurora Background */
-    body::before {
-        content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: radial-gradient(ellipse 120% 80% at 50% 20%, var(--bg-aurora) 0%, transparent 50%);
-        pointer-events: none; z-index: -3; animation: auroraPulse 10s infinite;
-        transition: background 0.3s ease;
-    }
-    @keyframes auroraPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
-    
-    .noise-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; opacity: 0.04;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    }
+  /* ————— hero ————— */
+  .hero{position:relative;padding:88px 0 96px;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 50% at 78% 30%, rgba(47,163,107,.10), transparent 60%),
+      radial-gradient(ellipse 50% 60% at 8% 85%, rgba(47,163,107,.05), transparent 60%);}
+  .hero-rule{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--line-ink);opacity:.4;pointer-events:none}
+  .hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--green-bright);display:flex;align-items:center;gap:14px;margin-bottom:28px}
+  .eyebrow::before{content:'';width:34px;height:1px;background:var(--green-bright)}
+  h1{
+    font-family:var(--serif);font-optical-sizing:auto;font-weight:500;
+    font-size:clamp(44px,5.6vw,76px);line-height:1.02;letter-spacing:-.015em;
+  }
+  h1 .flourish{font-style:italic;font-weight:400;color:var(--green-bright)}
+  .hero-sub{margin-top:26px;max-width:520px;color:var(--muted-ink);font-size:17px;line-height:1.65}
+  .hero-sub strong{color:var(--paper);font-weight:600}
+  .hero-ctas{margin-top:38px;display:flex;gap:16px;flex-wrap:wrap}
+  .hero-meta{margin-top:56px;display:flex;gap:40px;flex-wrap:wrap}
+  .metric b{display:block;font-family:var(--serif);font-size:30px;font-weight:500;letter-spacing:-.01em}
+  .metric span{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-ink)}
 
-    /* Header */
-    header {
-        padding: 1.5rem 2rem;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        z-index: 20;
-    }
+  /* ————— specimen report ————— */
+  .specimen{position:relative;transform:rotate(.6deg)}
+  .file{
+    position:relative;background:var(--paper);color:var(--ink);border-radius:3px;
+    box-shadow:0 1px 0 rgba(245,241,230,.08), 0 30px 80px rgba(0,0,0,.55), 0 4px 18px rgba(0,0,0,.4);
+    padding:26px 28px 22px;
+  }
+  .file::before{ /* file tab */
+    content:'COMMERCIAL FILE';font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;
+    position:absolute;top:-24px;left:18px;background:var(--paper);color:var(--ink);
+    padding:5px 14px 3px;border-radius:3px 3px 0 0;
+  }
+  .file-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:14px}
+  .file-brand{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.16em}
+  .file-brand svg{width:16px;height:16px}
+  .file-no{font-family:var(--mono);font-size:10px;color:var(--muted-paper);text-align:right;line-height:1.7;letter-spacing:.08em}
+  .subject{padding:16px 0 12px;border-bottom:1px solid var(--line-paper)}
+  .subject-name{font-family:var(--serif);font-size:24px;font-weight:600;letter-spacing:-.01em}
+  .subject-line{font-family:var(--mono);font-size:10.5px;color:var(--muted-paper);margin-top:6px;letter-spacing:.06em}
+  .file-body{display:grid;grid-template-columns:118px 1fr;gap:22px;padding-top:16px}
+  .score-block{text-align:center}
+  .score-ring{position:relative;width:112px;height:112px}
+  .score-ring svg{transform:rotate(-90deg)}
+  .score-ring .track{stroke:var(--paper-3)}
+  .score-ring .arc{stroke:var(--green);stroke-linecap:butt;transition:stroke-dashoffset 1.4s cubic-bezier(.6,0,.2,1)}
+  .score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .score-num b{font-family:var(--serif);font-size:36px;font-weight:600;line-height:1}
+  .score-num span{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;color:var(--muted-paper);margin-top:4px}
+  .score-grade{margin-top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--green);font-weight:600}
+  .ledger{list-style:none}
+  .ledger li{
+    display:flex;justify-content:space-between;gap:14px;align-items:baseline;
+    font-family:var(--mono);font-size:11.5px;padding:7px 0;border-bottom:1px dashed var(--line-paper);
+    opacity:0;transform:translateY(6px);
+  }
+  .ledger li.on{animation:lineIn .5s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes lineIn{to{opacity:1;transform:none}}
+  .ledger .k{color:var(--muted-paper);letter-spacing:.04em}
+  .ledger .v{font-weight:600;text-align:right}
+  .v.ok{color:var(--green)}
+  .v.warn{color:var(--stamp)}
+  .file-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:2px solid var(--ink)}
+  .barcode{display:flex;gap:2px;align-items:flex-end;height:22px}
+  .barcode i{display:block;width:2px;background:var(--ink)}
+  .file-foot .mono{font-size:9px;letter-spacing:.2em;color:var(--muted-paper)}
+  .stamp{
+    position:absolute;right:-16px;top:34%;z-index:3;
+    font-family:var(--mono);font-weight:600;font-size:20px;letter-spacing:.34em;
+    color:var(--stamp);border:3px double var(--stamp);border-radius:4px;
+    padding:10px 18px 9px;transform:rotate(-12deg) scale(2.4);opacity:0;
+    mix-blend-mode:multiply;
+  }
+  .stamp.on{animation:stampIn .45s cubic-bezier(.2,1.4,.3,1) forwards .9s}
+  @keyframes stampIn{
+    0%{opacity:0;transform:rotate(-12deg) scale(2.4)}
+    70%{opacity:1;transform:rotate(-12deg) scale(.94)}
+    100%{opacity:.9;transform:rotate(-12deg) scale(1)}
+  }
+  .specimen-note{margin-top:18px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted-ink)}
 
-    .hero-logo { 
-        display: flex; 
-        align-items: center; 
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    
-    .hero-logo-icon { width: 44px; height: 44px; color: var(--text-primary); transition: color 0.3s; }
-    .hero-logo-text { font-size: 1.875rem; font-weight: 800; letter-spacing: 0.1em; color: var(--text-primary); text-transform: uppercase; transition: color 0.3s; }
-    .hero-logo-text span { color: var(--text-muted); font-weight: 400; transition: color 0.3s; }
-    
-    .header-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
+  /* ————— ticker ————— */
+  .ticker{border-top:1px solid var(--line-ink);border-bottom:1px solid var(--line-ink);overflow:hidden;background:var(--ink-2)}
+  .ticker-track{display:flex;width:max-content;animation:tick 36s linear infinite}
+  .ticker:hover .ticker-track{animation-play-state:paused}
+  .ticker-track span{
+    font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--muted-ink);padding:14px 0;white-space:nowrap;
+  }
+  .ticker-track span::after{content:'§';color:var(--green-bright);margin:0 28px}
+  @keyframes tick{to{transform:translateX(-50%)}}
 
-    /* Main Layout */
-    main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem;
-        padding-bottom: 6rem;
-        position: relative;
-        z-index: 10;
-        width: 100%;
-    }
+  /* ————— sections ————— */
+  section{position:relative}
+  .paper-section{background:var(--paper);color:var(--ink)}
+  .ink-section{background:var(--ink);color:var(--paper)}
+  .sec-pad{padding:110px 0}
+  .sec-head{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:baseline;margin-bottom:64px}
+  .sec-no{font-family:var(--mono);font-size:12px;letter-spacing:.2em;padding:6px 10px;border:1px solid currentColor;border-radius:2px;opacity:.75}
+  h2{font-family:var(--serif);font-weight:500;font-size:clamp(32px,3.6vw,52px);letter-spacing:-.015em;line-height:1.08}
+  h2 .flourish{font-style:italic;font-weight:400;color:var(--green)}
+  .ink-section h2 .flourish{color:var(--green-bright)}
+  .sec-intro{max-width:640px;font-size:16.5px;line-height:1.7;margin-top:-40px;margin-bottom:56px}
+  .paper-section .sec-intro{color:var(--muted-paper)}
+  .ink-section .sec-intro{color:var(--muted-ink)}
 
-    .hub-title {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        margin-bottom: 2.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.2em;
-        opacity: 0;
-        animation: fadeIn 0.8s ease-out forwards 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .hub-title::before, .hub-title::after {
-        content: ''; height: 1px; width: 40px;
-        background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
-    }
+  /* reveal on scroll */
+  .rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.3,1)}
+  .rv.in{opacity:1;transform:none}
 
-    /* Accordion Container */
-    .cards-container {
-        display: flex;
-        width: 100%;
-        max-width: 1200px;
-        height: 500px; /* Fixed height for the accordion effect */
-        gap: 1rem;
-        padding: 0 1rem;
-    }
+  /* ————— report anatomy grid ————— */
+  .modules{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line-paper);border-left:1px solid var(--line-paper)}
+  .module{
+    border-right:1px solid var(--line-paper);border-bottom:1px solid var(--line-paper);
+    padding:34px 30px 38px;position:relative;background:var(--paper);
+    transition:background .25s,transform .25s,box-shadow .25s;
+  }
+  .module:hover{background:#FBF8F0;transform:translateY(-4px);box-shadow:0 18px 40px rgba(12,18,16,.12);z-index:2}
+  .module-no{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--muted-paper)}
+  .module h3{font-family:var(--serif);font-size:22px;font-weight:600;margin:14px 0 10px;letter-spacing:-.01em}
+  .module p{font-size:14px;line-height:1.65;color:var(--muted-paper)}
+  .module .tag{
+    display:inline-block;margin-top:16px;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--green);border:1px solid rgba(31,122,77,.4);padding:4px 8px;border-radius:2px;
+  }
 
-    /* Accordion Card */
-    .tool-card {
-        flex: 1; /* Start with equal width */
-        background: var(--bg-card);
-        border: 1px solid var(--border-primary);
-        border-radius: 20px;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        transition: flex 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.3s, box-shadow 0.3s;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start; /* Align to top */
-        align-items: center;
-        padding-top: 6rem; /* Fixed top padding for icon alignment */
-        text-decoration: none;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 0 30px rgba(0,0,0,0.02);
-    }
+  /* ————— trustscore ————— */
+  .score-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:72px;align-items:center}
+  .big-score{position:relative;text-align:center}
+  .big-score .huge{
+    font-family:var(--serif);font-size:clamp(140px,16vw,220px);font-weight:600;line-height:.9;letter-spacing:-.04em;
+    background:linear-gradient(160deg,var(--paper) 30%,var(--green-bright));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .big-score .of{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--muted-ink);display:block;margin-top:10px}
+  .reasons{list-style:none;border-top:1px solid var(--line-ink)}
+  .reasons li{display:grid;grid-template-columns:30px 1fr auto;gap:16px;align-items:baseline;padding:17px 0;border-bottom:1px solid var(--line-ink)}
+  .reasons .sign{font-family:var(--mono);font-weight:600;font-size:15px}
+  .sign.pos{color:var(--green-bright)}
+  .sign.neg{color:var(--stamp)}
+  .reasons .txt{font-size:15px;line-height:1.5}
+  .reasons .src{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted-ink);text-transform:uppercase;white-space:nowrap}
+  .score-note{margin-top:26px;font-size:14.5px;line-height:1.7;color:var(--muted-ink)}
+  .score-note strong{color:var(--paper)}
 
-    /* Hover Expansion */
-    .tool-card:hover {
-        flex: 3; /* Grow on hover */
-        background: var(--bg-card-hover);
-        border-color: var(--border-hover);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-    }
+  /* ————— network ————— */
+  .net-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:step}
+  .step{padding:36px 34px;border-left:1px solid var(--line-paper);position:relative}
+  .step:first-child{border-left:none;padding-left:0}
+  .step::before{
+    counter-increment:step;content:counter(step,decimal-leading-zero);
+    font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--green);
+    display:block;margin-bottom:18px;
+  }
+  .step h3{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em}
+  .step p{font-size:14.5px;line-height:1.65;color:var(--muted-paper)}
+  .net-callout{
+    margin-top:70px;border:1px solid var(--ink);border-radius:3px;padding:34px 38px;
+    display:flex;justify-content:space-between;align-items:center;gap:30px;
+    background:linear-gradient(120deg,transparent 60%,rgba(31,122,77,.07));
+  }
+  .net-callout .mono{font-size:11px;letter-spacing:.2em;color:var(--green);text-transform:uppercase}
+  .net-callout h3{font-family:var(--serif);font-size:26px;font-weight:600;margin-top:8px;letter-spacing:-.01em}
 
-    /* Icon Styling */
-    .icon-wrapper {
-        width: 64px;
-        height: 64px;
-        border-radius: 16px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--border-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.5rem; /* Constant margin */
-        transition: all 0.5s ease;
-        z-index: 2;
-        flex-shrink: 0;
-    }
-    
-    .tool-card:hover .icon-wrapper {
-        transform: scale(1.1);
-        border-color: var(--text-primary);
-        background: rgba(255,255,255,0.08);
-    }
+  /* ————— API ————— */
+  .api-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:70px;align-items:start}
+  .api-points{list-style:none;margin-top:34px}
+  .api-points li{display:flex;gap:16px;padding:15px 0;border-bottom:1px solid var(--line-ink);font-size:15px;line-height:1.55;color:var(--muted-ink)}
+  .api-points li b{color:var(--paper);font-weight:600}
+  .api-points .tick{color:var(--green-bright);font-family:var(--mono)}
+  .terminal{
+    background:#070B0A;border:1px solid var(--line-ink);border-radius:4px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  .term-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line-ink)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--ink-3)}
+  .term-bar .mono{margin-left:8px;font-size:10px;letter-spacing:.18em;color:var(--muted-ink)}
+  .terminal pre{
+    padding:22px 24px;font-family:var(--mono);font-size:12.5px;line-height:1.75;overflow-x:auto;color:#C9D6CE;
+  }
+  .c-k{color:#8FA69B}.c-s{color:var(--green-bright)}.c-n{color:#E8C476}.c-c{color:#5E7268;font-style:italic}.c-r{color:#E0705A}
 
-    .tool-icon { width: 32px; height: 32px; color: var(--text-primary); }
+  /* ————— CTA ————— */
+  .cta-sec{text-align:center;padding:120px 0}
+  .cta-sec .eyebrow{justify-content:center}
+  .cta-sec .eyebrow::before{display:none}
+  .cta-sec h2{max-width:760px;margin:0 auto}
+  .cta-sec p{max-width:560px;margin:24px auto 0;color:var(--muted-paper);font-size:16.5px;line-height:1.7}
+  .cta-row{margin-top:44px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
 
-    /* Collapsed Title (Horizontal) */
-    .collapsed-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        white-space: nowrap;
-        opacity: 1;
-        transform: translateY(0);
-        transition: all 0.3s ease;
-        position: absolute;
-        top: calc(6rem + 64px + 1.5rem); /* padding-top + icon height + margin */
-    }
+  /* ————— footer ————— */
+  footer{border-top:1px solid var(--line-ink);padding:64px 0 40px;background:var(--ink)}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
+  .foot-brand p{margin-top:16px;font-size:13.5px;line-height:1.7;color:var(--muted-ink);max-width:300px}
+  .foot-col h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted-ink);margin-bottom:18px}
+  .foot-col a{display:block;color:var(--paper);opacity:.8;text-decoration:none;font-size:14px;padding:5px 0;transition:opacity .2s,color .2s}
+  .foot-col a:hover{opacity:1;color:var(--green-bright)}
+  .legal{margin-top:56px;padding-top:26px;border-top:1px solid var(--line-ink);display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
+  .legal p{font-size:11.5px;line-height:1.7;color:var(--muted-ink);max-width:780px}
+  .legal .mono{font-size:10px;letter-spacing:.18em;color:var(--muted-ink);white-space:nowrap}
 
-    /* Hide collapsed title on hover */
-    .tool-card:hover .collapsed-title {
-        opacity: 0;
-        transform: translateY(10px);
-        pointer-events: none;
-    }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:.01ms !important}
+    .ticker-track{animation:none}
+    .ledger li,.stamp{opacity:1;transform:rotate(-12deg)}
+    .ledger li{transform:none}
+  }
 
-    /* Content Styling (Hidden by default, shown on hover) */
-    .tool-content {
-        opacity: 0;
-        max-height: 0; /* Animate height */
-        overflow: hidden;
-        transform: translateY(20px);
-        transition: all 0.5s ease;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        padding: 0 2rem;
-    }
-
-    .tool-card:hover .tool-content {
-        opacity: 1;
-        transform: translateY(0);
-        max-height: 300px; /* Reveal content */
-    }
-
-    .tool-name {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-        white-space: nowrap;
-    }
-
-    .tool-desc {
-        font-size: 0.95rem;
-        color: var(--text-muted);
-        line-height: 1.6;
-        max-width: 300px;
-    }
-
-    .action-link {
-        margin-top: 1.5rem;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--accent-green);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.4s ease 0.1s;
-    }
-
-    .tool-card:hover .action-link {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Auto-expanded state */
-    .tool-card.expanded {
-        flex: 3;
-        background: var(--bg-card-hover);
-        border-color: var(--border-hover);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-    }
-    .tool-card.expanded .icon-wrapper {
-        transform: scale(1.1);
-        border-color: var(--text-primary);
-        background: rgba(255,255,255,0.08);
-    }
-    .tool-card.expanded .collapsed-title {
-        opacity: 0;
-        transform: translateY(10px);
-        pointer-events: none;
-    }
-    .tool-card.expanded .tool-content {
-        opacity: 1;
-        transform: translateY(0);
-        max-height: 300px;
-    }
-    .tool-card.expanded .action-link {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Footer & Controls */
-    footer {
-        padding: 2rem;
-        width: 100%;
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 0.8125rem;
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-    }
-    
-    footer a { color: var(--text-muted); text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; }
-    footer a:hover { color: var(--text-primary); }
-
-    .theme-toggle {
-        width: 36px;
-        height: 36px;
-        border: 1px solid var(--border-primary);
-        border-radius: 8px;
-        background: var(--bg-card);
-        color: var(--text-secondary);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        z-index: 20;
-    }
-    .theme-toggle:hover { color: var(--text-primary); border-color: var(--text-primary); background: var(--bg-card-hover); }
-    .theme-toggle .sun-icon { display: none; }
-    .theme-toggle .moon-icon { display: block; }
-    [data-theme="light"] .theme-toggle .sun-icon { display: block; }
-    [data-theme="light"] .theme-toggle .moon-icon { display: none; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Mobile Responsive: Switch to Vertical Stack */
-    @media (max-width: 900px) {
-        .cards-container {
-            flex-direction: column;
-            height: auto;
-            max-width: 500px;
-        }
-        .tool-card {
-            width: 100%;
-            min-height: 100px; /* Collapsed height */
-            height: auto;
-            flex: none;
-            flex-direction: row;
-            padding: 0 2rem;
-            padding-top: 0;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .tool-card:hover {
-            flex: none;
-            min-height: 320px; /* Expanded height */
-            height: auto;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-        
-        .icon-wrapper { margin-bottom: 0; }
-        .tool-card:hover .icon-wrapper { margin-bottom: 1.5rem; }
-        .tool-content { padding: 0; }
-        .tool-card:hover .tool-content { max-height: none; }
-        
-        /* Adjust collapsed title for mobile row layout */
-        .collapsed-title {
-            position: static;
-            margin-top: 0;
-            font-size: 1.2rem;
-        }
-        .tool-card:hover .collapsed-title { display: none; }
-    }
-  </style>
+  /* ————— responsive ————— */
+  @media (max-width:1020px){
+    .hero-grid{grid-template-columns:1fr;gap:70px}
+    .hero-rule{display:none}
+    .specimen{max-width:560px;margin:0 auto;transform:none}
+    .modules{grid-template-columns:repeat(2,1fr)}
+    .score-grid,.api-grid{grid-template-columns:1fr;gap:56px}
+    .net-grid{grid-template-columns:1fr}
+    .step{border-left:none;padding-left:0;border-top:1px solid var(--line-paper);padding-top:30px}
+    .step:first-child{border-top:none}
+    .foot-grid{grid-template-columns:1fr 1fr}
+    nav.primary{display:none}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 20px}
+    .sec-pad{padding:80px 0}
+    .modules{grid-template-columns:1fr}
+    .file-body{grid-template-columns:1fr}
+    .score-block{display:flex;align-items:center;gap:20px;text-align:left}
+    .stamp{right:-6px;font-size:15px;padding:8px 12px}
+    .net-callout{flex-direction:column;align-items:flex-start}
+    .foot-grid{grid-template-columns:1fr}
+    .signin{display:none}
+  }
+</style>
 </head>
 <body>
+<div class="grain"></div>
 
-  <div class="aurora-bg"></div>
-  <div class="noise-overlay"></div>
-
-  <header>
-    <div class="header-actions">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-            <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        </button>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5.5v5.7c0 5 3.4 9.6 8 10.8 4.6-1.2 8-5.8 8-10.8V5.5L12 2z" stroke="currentColor" stroke-width="1.5"/><path d="M8.8 12l2.2 2.2L15.5 9.5" stroke="#2FA36B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="brand-name">TRUST<em>BUREAU</em></span>
+    </a>
+    <nav class="primary">
+      <a href="#report">The Report</a>
+      <a href="#score">TrustScore</a>
+      <a href="#network">The Network</a>
+      <a href="#api">API</a>
+    </nav>
+    <div class="bar-actions">
+      <a class="signin" href="/login/">Sign in</a>
+      <a class="btn btn-solid" href="/signup/">Request Access</a>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main>
-    <div class="hero-logo">
-      <svg class="hero-logo-icon" viewBox="0 0 24 24" fill="none">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="currentColor" opacity="0.1"/>
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="hero-logo-text">TRUST<span>BUREAU</span></span>
+<!-- ————————— HERO ————————— -->
+<section class="hero">
+  <div class="hero-rule"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">The AI Verification Standard</div>
+      <h1>The credit bureau,<br>rebuilt for the<br><span class="flourish">machine age.</span></h1>
+      <p class="hero-sub">Every business has a file. TrustBureau writes it in real time — <strong>registrations, UCC positions, litigation, contributed tradelines, bank-verified cash flow</strong> — read from primary sources by AI and synthesized into one defensible score.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-solid" href="/signup/">Request Early Access</a>
+        <a class="btn btn-ghost" href="#report">Inspect the Specimen ↓</a>
+      </div>
+      <div class="hero-meta">
+        <div class="metric"><b>34M+</b><span>US entities indexed</span></div>
+        <div class="metric"><b>6</b><span>evidence classes / file</span></div>
+        <div class="metric"><b>&lt;60s</b><span>fresh file, any subject</span></div>
+      </div>
     </div>
-    <div class="hub-title">Select Intelligence Module</div>
 
-    <div class="cards-container">
-      
-      <!-- 1. DeepScrub -->
-      <a href="https://trustbureau.ai/deep-scrub.html" class="tool-card">
-        <div class="icon-wrapper">
-          <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(180deg);">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
+    <div class="specimen">
+      <div class="stamp" id="stamp">SPECIMEN</div>
+      <div class="file">
+        <div class="file-head">
+          <div class="file-brand">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5.5v5.7c0 5 3.4 9.6 8 10.8 4.6-1.2 8-5.8 8-10.8V5.5L12 2z" stroke="currentColor" stroke-width="1.5"/><path d="M8.8 12l2.2 2.2L15.5 9.5" stroke="#1F7A4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            TRUSTBUREAU
+          </div>
+          <div class="file-no">FILE № TB-2026-081447<br>PULLED 2026-08-01 09:41 ET</div>
         </div>
-        <div class="collapsed-title">DeepScrub</div>
-        <div class="tool-content">
-          <div class="tool-name">DeepScrub</div>
-          <div class="tool-desc">Automated forensic due diligence and business verification. Instant background checks and risk analysis. <br><span style="color:var(--accent-yellow); font-size: 0.85em; font-weight: 600; margin-top: 0.5rem; display: inline-block;">(Requires Gemini API Key)</span></div>
-          <div class="action-link">Launch Module &rarr;</div>
+        <div class="subject">
+          <div class="subject-name">Meridian Coastal Provisions LLC</div>
+          <div class="subject-line">FL · EST. 2019 · SPECIALTY FOOD DISTRIBUTION · EIN ██-███1982</div>
         </div>
-      </a>
-
-      <!-- 2. Vision -->
-      <a href="https://trustbureau.ai/vision.html" class="tool-card">
-        <div class="icon-wrapper">
-          <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="6" cy="12" r="5"></circle>
-            <circle cx="18" cy="12" r="5"></circle>
-            <line x1="11" y1="12" x2="13" y2="12"></line>
-          </svg>
+        <div class="file-body">
+          <div class="score-block">
+            <div class="score-ring">
+              <svg width="112" height="112" viewBox="0 0 112 112">
+                <circle class="track" cx="56" cy="56" r="50" fill="none" stroke-width="7"/>
+                <circle class="arc" id="arc" cx="56" cy="56" r="50" fill="none" stroke-width="7"
+                        stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+              </svg>
+              <div class="score-num"><b id="scoreNum">0</b><span>TRUSTSCORE</span></div>
+            </div>
+            <div class="score-grade">B · STABLE</div>
+          </div>
+          <ul class="ledger" id="ledger">
+            <li><span class="k">SOS REGISTRATION</span><span class="v ok">ACTIVE · FL P19000041207</span></li>
+            <li><span class="k">UCC POSITIONS</span><span class="v">2 OPEN · 1ST FILED 2024-11</span></li>
+            <li><span class="k">LITIGATION (5YR)</span><span class="v ok">NONE FOUND</span></li>
+            <li><span class="k">CONTRIBUTED TRADELINES</span><span class="v">4 · SLOW-PAY ×1 (2025-Q3)</span></li>
+            <li><span class="k">VERIFIED AVG BALANCE (90D)</span><span class="v ok">$41,338 · 3 NSF DAYS</span></li>
+            <li><span class="k">STATEMENT FORENSICS</span><span class="v ok">NO TAMPER SIGNALS</span></li>
+            <li><span class="k">DIGITAL FOOTPRINT</span><span class="v warn">DOMAIN 14 MO · REVIEWS 3.9★</span></li>
+          </ul>
         </div>
-        <div class="collapsed-title">Vision</div>
-        <div class="tool-content">
-          <div class="tool-name">Vision</div>
-          <div class="tool-desc">AI-powered document intelligence. Extract financial data and analyze bank statements instantly. <br><span style="color:var(--accent-yellow); font-size: 0.85em; font-weight: 600; margin-top: 0.5rem; display: inline-block;">(Requires Gemini API Key)</span></div>
-          <div class="action-link">Launch Module &rarr;</div>
+        <div class="file-foot">
+          <div class="barcode" aria-hidden="true"></div>
+          <span class="mono">COMMERCIAL DATA · NOT A CONSUMER REPORT</span>
         </div>
-      </a>
-
-      <!-- 3. Approval ToolBox -->
-      <a href="https://trustbureau.ai/xxxapproval-toolbox.html" class="tool-card expanded">
-        <div class="icon-wrapper">
-          <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path>
-            <path d="M8 14l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        </div>
-        <div class="collapsed-title">ToolBox</div>
-        <div class="tool-content">
-          <div class="tool-name">Approval ToolBox</div>
-          <div class="tool-desc">Funding calculators, approval generation, and term sheet management tools.</div>
-          <div class="action-link">Open ToolBox &rarr;</div>
-        </div>
-      </a>
-
-      <!-- 4. ables.ai -->
-      <a href="#" class="tool-card">
-        <div class="icon-wrapper">
-          <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M16 12v1a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"></path>
-          </svg>
-        </div>
-        <div class="collapsed-title">ables.ai</div>
-        <div class="tool-content">
-          <div class="tool-name">ables.ai</div>
-          <div class="tool-desc">(LLuwM) Next-gen underwriting modal. Currently in private beta.</div>
-          <div class="action-link">Request Access &rarr;</div>
-        </div>
-      </a>
-
+      </div>
+      <div class="specimen-note">SPECIMEN FILE · SYNTHETIC SUBJECT · ILLUSTRATIVE ONLY</div>
     </div>
-  </main>
+  </div>
+</section>
 
-  <footer>
-    <a href="#">Documentation</a>
-    <a href="#">Status</a>
-    <a href="#">Support</a>
-  </footer>
+<!-- ————————— TICKER ————————— -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span>Secretary of State Registries</span><span>UCC-1 Filings</span><span>Court Dockets &amp; Judgments</span><span>Contributed Tradelines</span><span>Bank-Verified Cash Flow</span><span>Statement Forensics</span><span>Licensing Boards</span><span>Digital Footprint</span>
+  </div>
+</div>
 
-  <script>
-    // Theme Toggle Logic
-    const themeToggle = document.getElementById('themeToggle');
-    
-    function initTheme() {
-        const savedTheme = localStorage.getItem('trustbureau_theme') || 'light'; 
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-    initTheme();
-    
-    themeToggle.addEventListener('click', () => {
-      const html = document.documentElement;
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('trustbureau_theme', newTheme);
+<!-- ————————— THE REPORT ————————— -->
+<section class="paper-section sec-pad" id="report">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="sec-no">SEC. 01</span><h2>Anatomy of a <span class="flourish">TrustBureau file.</span></h2></div>
+    <p class="sec-intro rv">Six evidence classes, pulled fresh on every request. Not a stale database row — an investigation, run by AI that reads the primary record and cites it.</p>
+    <div class="modules">
+      <div class="module rv"><div class="module-no">EXHIBIT 01</div><h3>Identity &amp; Registration</h3><p>Legal name resolution, DBA mapping, Secretary of State standing across all 50 states, officers, registered agents, incorporation history.</p><span class="tag">Primary-source cited</span></div>
+      <div class="module rv"><div class="module-no">EXHIBIT 02</div><h3>Public-Record Risk</h3><p>UCC-1 positions and terminations, tax liens, judgments, bankruptcies, court dockets — the stacking picture competitors miss.</p><span class="tag">Position detection</span></div>
+      <div class="module rv"><div class="module-no">EXHIBIT 03</div><h3>Contributed Tradelines</h3><p>Payment performance, defaults, and slow-pays reported by the funders who actually hold the paper. Give-to-get access.</p><span class="tag">Network exclusive</span></div>
+      <div class="module rv"><div class="module-no">EXHIBIT 04</div><h3>Verified Cash Flow</h3><p>Bank-statement intelligence: true revenue, balances, NSF days, existing debt service — with document forensics that flag tampered PDFs.</p><span class="tag">Tamper detection</span></div>
+      <div class="module rv"><div class="module-no">EXHIBIT 05</div><h3>Digital Footprint</h3><p>Web presence, domain age, review velocity, licensing, adverse media. The open-web signals that catch shells and resurrections early.</p><span class="tag">Live-crawled</span></div>
+      <div class="module rv"><div class="module-no">EXHIBIT 06</div><h3>TrustScore™</h3><p>One 0–100 score synthesized across every exhibit — delivered with reason codes, so an underwriter can defend the decision it informs.</p><span class="tag">Reason-coded</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ————————— TRUSTSCORE ————————— -->
+<section class="ink-section sec-pad" id="score">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="sec-no">SEC. 02</span><h2>A score you can <span class="flourish">defend.</span></h2></div>
+    <div class="score-grid">
+      <div class="big-score rv"><span class="huge">71</span><span class="of">/ 100 · GRADE B · STABLE</span></div>
+      <div class="rv">
+        <ul class="reasons">
+          <li><span class="sign pos">+</span><span class="txt">Six-year filing history; two UCC positions cleanly terminated at payoff</span><span class="src">SOS / UCC</span></li>
+          <li><span class="sign pos">+</span><span class="txt">Verified 90-day average balance covers 1.8× current debt service</span><span class="src">Bank-verified</span></li>
+          <li><span class="sign neg">−</span><span class="txt">One contributed slow-pay, 2025-Q3, cured in 40 days</span><span class="src">Tradeline</span></li>
+          <li><span class="sign neg">−</span><span class="txt">Web domain registered 14 months ago — younger than stated vintage</span><span class="src">Footprint</span></li>
+        </ul>
+        <p class="score-note">Every point is traceable to a primary source. No black boxes, no "proprietary blend" hand-waving — <strong>reason codes on every file</strong>, because a score an underwriter can't explain is a score they can't use.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ————————— NETWORK ————————— -->
+<section class="paper-section sec-pad" id="network">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="sec-no">SEC. 03</span><h2>Data in. <span class="flourish">Access out.</span></h2></div>
+    <p class="sec-intro rv">The contributory model built every great bureau. Ours is the first where AI does the reading — matching, verifying, and structuring what the network reports.</p>
+    <div class="net-grid">
+      <div class="step rv"><h3>Contribute performance</h3><p>Funders report payment history, defaults, and slow-pays on their book — standardized on the way in, matched to the entity graph automatically.</p></div>
+      <div class="step rv"><h3>Verified &amp; matched</h3><p>Every submission is entity-resolved against registrations, EINs, and prior filings. Bad matches die here, not in your underwriting.</p></div>
+      <div class="step rv"><h3>Unlock the full file</h3><p>Contributors get network tradelines on every pull. Non-contributors see the public record. The best data goes to those who feed it.</p></div>
+    </div>
+    <div class="net-callout rv">
+      <div>
+        <span class="mono">Founding Contributor Program · Now Forming</span>
+        <h3>First 20 funders lock lifetime contributor terms.</h3>
+      </div>
+      <a class="btn btn-ink" href="/signup/">Join the Network</a>
+    </div>
+  </div>
+</section>
+
+<!-- ————————— API ————————— -->
+<section class="ink-section sec-pad" id="api">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="sec-no">SEC. 04</span><h2>One call. <span class="flourish">The whole file.</span></h2></div>
+    <div class="api-grid">
+      <div class="rv">
+        <p class="sec-intro" style="margin:0 0 8px">Wire TrustBureau into your LOS, CRM, or submission flow. Pull files at intake, re-score at renewal, and monitor the book in between.</p>
+        <ul class="api-points">
+          <li><span class="tick">→</span><span><b>REST API</b> — file, score, and exhibits as structured JSON</span></li>
+          <li><span class="tick">→</span><span><b>Monitoring</b> — webhooks on new UCCs, judgments, and network defaults across your portfolio</span></li>
+          <li><span class="tick">→</span><span><b>Batch</b> — score a whole pipeline overnight</span></li>
+          <li><span class="tick">→</span><span><b>Early access</b> — API keys ship with the founding cohort</span></li>
+        </ul>
+      </div>
+      <div class="terminal rv">
+        <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="mono">api.trustbureau.ai</span></div>
+<pre><span class="c-c">$ curl https://api.trustbureau.ai/v1/files \
+    -d '{"name":"Meridian Coastal Provisions","state":"FL"}'</span>
+
+{
+  <span class="c-k">"file_no"</span>: <span class="c-s">"TB-2026-081447"</span>,
+  <span class="c-k">"subject"</span>: <span class="c-s">"MERIDIAN COASTAL PROVISIONS LLC"</span>,
+  <span class="c-k">"trust_score"</span>: <span class="c-n">71</span>,
+  <span class="c-k">"grade"</span>: <span class="c-s">"B"</span>,
+  <span class="c-k">"reason_codes"</span>: [<span class="c-s">"R11"</span>, <span class="c-s">"R24"</span>, <span class="c-r">"R41"</span>, <span class="c-r">"R63"</span>],
+  <span class="c-k">"ucc_positions"</span>: { <span class="c-k">"open"</span>: <span class="c-n">2</span>, <span class="c-k">"first_filed"</span>: <span class="c-s">"2024-11-02"</span> },
+  <span class="c-k">"tradelines"</span>: { <span class="c-k">"count"</span>: <span class="c-n">4</span>, <span class="c-k">"derogatory"</span>: <span class="c-n">1</span> },
+  <span class="c-k">"cash_flow"</span>: { <span class="c-k">"avg_balance_90d"</span>: <span class="c-n">41338</span>, <span class="c-k">"nsf_days"</span>: <span class="c-n">3</span> },
+  <span class="c-k">"exhibits"</span>: <span class="c-s">"https://trustbureau.ai/files/TB-2026-081447"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ————————— CTA ————————— -->
+<section class="paper-section cta-sec">
+  <div class="wrap">
+    <div class="eyebrow rv">Founding Cohort · Fall 2026</div>
+    <h2 class="rv">The file on every business.<br><span class="flourish">Written by machines. Defensible by you.</span></h2>
+    <p class="rv">TrustBureau is onboarding a founding cohort of funders, brokers, and platforms. Early access includes the report console, contributor terms, and first API keys.</p>
+    <div class="cta-row rv">
+      <a class="btn btn-ink" href="/signup/">Request Early Access</a>
+      <a class="btn btn-ghost" style="border-color:var(--line-paper);color:var(--ink)" href="/login/">Sign In</a>
+    </div>
+  </div>
+</section>
+
+<!-- ————————— FOOTER ————————— -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/">
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M12 2L4 5.5v5.7c0 5 3.4 9.6 8 10.8 4.6-1.2 8-5.8 8-10.8V5.5L12 2z" stroke="currentColor" stroke-width="1.5"/><path d="M8.8 12l2.2 2.2L15.5 9.5" stroke="#2FA36B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="brand-name">TRUST<em>BUREAU</em></span>
+        </a>
+        <p>An AI-native commercial credit reporting agency. The file on every US business — sourced, scored, and cited in real time.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Bureau</h4>
+        <a href="#report">The Report</a>
+        <a href="#score">TrustScore</a>
+        <a href="#network">The Network</a>
+        <a href="#api">API</a>
+      </div>
+      <div class="foot-col">
+        <h4>Current Suite</h4>
+        <a href="/deep-scrub.html">DeepScrub</a>
+        <a href="/vision.html">Vision</a>
+        <a href="/xxxapproval-toolbox.html">Approval ToolBox</a>
+      </div>
+      <div class="foot-col">
+        <h4>Account</h4>
+        <a href="/signup/">Request Access</a>
+        <a href="/login/">Sign In</a>
+      </div>
+    </div>
+    <div class="legal">
+      <p>TrustBureau provides commercial business information for legitimate business purposes only. TrustBureau reports are not "consumer reports" as defined by the Fair Credit Reporting Act (FCRA), and may not be used, in whole or in part, to determine an individual's eligibility for personal credit, insurance, employment, housing, or any other purpose covered by the FCRA. Specimen data shown is synthetic and illustrative.</p>
+      <span class="mono">© 2026 TRUSTBUREAU.AI</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // barcode
+  (function(){
+    const bc=document.querySelector('.barcode');
+    const seed=[3,1,2,1,3,2,1,1,2,3,1,2,2,1,3,1,1,2,1,3,2,1,3,1,2,1,1,3];
+    seed.forEach((w,i)=>{const b=document.createElement('i');b.style.width=w+'px';b.style.height=(12+((i*7)%11))+'px';bc.appendChild(b);});
+  })();
+
+  // duplicate ticker for seamless loop
+  (function(){
+    const t=document.getElementById('tickerTrack');
+    t.innerHTML+=t.innerHTML;
+  })();
+
+  // specimen assembly: ledger lines, score count-up, arc, stamp
+  (function(){
+    const lines=[...document.querySelectorAll('#ledger li')];
+    lines.forEach((li,i)=>{li.style.animationDelay=(0.25+i*0.13)+'s';li.classList.add('on');});
+    document.getElementById('stamp').classList.add('on');
+    const target=71,dur=1300,start=performance.now();
+    const num=document.getElementById('scoreNum'),arc=document.getElementById('arc');
+    const C=314.16;
+    requestAnimationFrame(function tick(now){
+      const p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
+      num.textContent=Math.round(e*target);
+      arc.style.strokeDashoffset=C-(C*e*target/100);
+      if(p<1)requestAnimationFrame(tick);
     });
+  })();
 
-    // Remove expanded class when hovering any card
-    document.querySelectorAll('.tool-card').forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        document.querySelectorAll('.tool-card.expanded').forEach(c => c.classList.remove('expanded'));
-      });
-    });
-  </script>
-
+  // scroll reveals
+  (function(){
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+    document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+  })();
+</script>
 </body>
 </html>
