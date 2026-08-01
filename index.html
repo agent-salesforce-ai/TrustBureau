@@ -118,35 +118,36 @@
   .subject{padding:18px 0 14px;border-bottom:1px solid var(--hairline)}
   .subject-name{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.015em}
   .subject-line{font-size:12.5px;font-weight:500;color:var(--gray-3);margin-top:6px}
-  .report-body{display:grid;grid-template-columns:116px 1fr;gap:26px;padding-top:18px;align-items:start}
-  .score-ring{position:relative;width:110px;height:110px}
-  .score-ring svg{transform:rotate(-90deg)}
-  .score-ring .track{stroke:#eef1f6}
-  .score-ring .arc{stroke:var(--blue);stroke-linecap:round}
+  .report-body{display:grid;grid-template-columns:128px 1fr;gap:30px;padding-top:20px;align-items:start}
+  .score-ring{position:relative;width:118px;height:118px;margin:0 auto}
+  .score-ring svg{transform:rotate(-90deg);display:block}
+  .score-ring .track{stroke:#eceff5}
+  .score-ring .arc{stroke:url(#arcGrad);stroke-linecap:round;filter:drop-shadow(0 2px 7px rgba(37,99,235,.35))}
   .score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .score-center b{font-size:32px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em}
-  .score-center span{font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--gray-3);margin-top:4px}
-  .score-grade{margin:12px auto 0;width:fit-content;font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:999px;padding:4px 12px}
+  .score-center b{font-size:37px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.03em}
+  .score-center b small{font-size:13px;font-weight:700;color:var(--gray-3);letter-spacing:0;margin-left:2px}
+  .score-label{text-align:center;margin-top:12px;font-size:9.5px;font-weight:700;letter-spacing:.22em;color:var(--gray-3);text-transform:uppercase}
+  .score-grade{margin:8px auto 0;width:fit-content;font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:999px;padding:4px 12px;white-space:nowrap}
   .rows{list-style:none}
   .rows li{
-    display:flex;justify-content:space-between;gap:16px;align-items:baseline;
-    padding:8.5px 0;border-bottom:1px solid var(--hairline);
+    display:flex;justify-content:space-between;gap:16px;align-items:center;
+    padding:9.5px 0;border-bottom:1px solid var(--hairline);
     font-size:13px;opacity:0;transform:translateY(5px);
   }
   .rows li:last-child{border-bottom:none}
   .rows li.on{animation:rowIn .5s ease forwards}
   @keyframes rowIn{to{opacity:1;transform:none}}
-  .rows .k{color:var(--gray-2);font-weight:500;display:flex;align-items:center;gap:8px}
+  .rows .k{color:var(--gray-2);font-weight:500;display:flex;align-items:center;gap:9px;white-space:nowrap}
   .rows .k::before{content:'';width:6px;height:6px;border-radius:999px;background:var(--hairline-2);flex-shrink:0}
   .rows li.ok .k::before{background:var(--green)}
   .rows li.warn .k::before{background:var(--amber)}
-  .rows .v{font-weight:700;color:var(--ink);text-align:right;white-space:nowrap}
+  .rows .v{font-weight:600;color:var(--ink);text-align:right;white-space:nowrap;font-size:12.5px}
   .rows .v.dim{color:var(--gray-2)}
-  .report-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .report-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--hairline)}
   .report-foot span{font-size:11px;font-weight:600;color:var(--gray-3)}
   /* floating monitoring alert */
   .alert-card{
-    position:absolute;z-index:3;right:-18px;bottom:-34px;
+    position:absolute;z-index:3;right:-20px;bottom:-46px;
     background:var(--white);border:1px solid var(--hairline-2);border-radius:14px;
     box-shadow:0 10px 34px rgba(17,17,17,.1);
     padding:14px 18px;display:flex;gap:12px;align-items:flex-start;max-width:300px;
@@ -389,28 +390,35 @@
         <div class="report-body">
           <div>
             <div class="score-ring">
-              <svg width="110" height="110" viewBox="0 0 110 110">
-                <circle class="track" cx="55" cy="55" r="49" fill="none" stroke-width="8"/>
-                <circle class="arc" id="arc" cx="55" cy="55" r="49" fill="none" stroke-width="8"
-                        stroke-dasharray="307.9" stroke-dashoffset="307.9"/>
+              <svg width="118" height="118" viewBox="0 0 118 118">
+                <defs>
+                  <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1d4ed8"/>
+                    <stop offset="55%" stop-color="#2563eb"/>
+                    <stop offset="100%" stop-color="#60a5fa"/>
+                  </linearGradient>
+                </defs>
+                <circle class="track" cx="59" cy="59" r="52" fill="none" stroke-width="7"/>
+                <circle class="arc" id="arc" cx="59" cy="59" r="52" fill="none" stroke-width="7"
+                        stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
               </svg>
-              <div class="score-center"><b id="scoreNum">0</b><span>TRUSTSCORE</span></div>
+              <div class="score-center"><b><span id="scoreNum">0</span><small>/100</small></b></div>
             </div>
-            <div class="score-grade">Grade B · Stable</div>
+            <div class="score-label">TrustScore</div>
+            <div class="score-grade">B · Stable</div>
           </div>
           <ul class="rows" id="rows">
             <li class="ok"><span class="k">Registration</span><span class="v">Active · FL P19000041207</span></li>
             <li><span class="k">UCC positions</span><span class="v">2 open · first filed Nov 2024</span></li>
-            <li class="ok"><span class="k">Litigation, 5 yr</span><span class="v dim">None found</span></li>
-            <li><span class="k">Contributed tradelines</span><span class="v">4 · one slow-pay, Q3 2025</span></li>
-            <li class="ok"><span class="k">Verified avg balance, 90 d</span><span class="v">$41,338 · 3 NSF days</span></li>
-            <li class="ok"><span class="k">Statement forensics</span><span class="v dim">No tamper signals</span></li>
-            <li class="warn"><span class="k">Digital footprint</span><span class="v">Domain 14 mo · reviews 3.9</span></li>
+            <li class="ok"><span class="k">Litigation (5 yr)</span><span class="v dim">None found</span></li>
+            <li><span class="k">Tradelines</span><span class="v">4 · one slow-pay, Q3 2025</span></li>
+            <li class="ok"><span class="k">Avg balance (90 d)</span><span class="v">$41,338 · 3 NSF days</span></li>
+            <li class="ok"><span class="k">Forensics</span><span class="v dim">No tamper signals</span></li>
+            <li class="warn"><span class="k">Web footprint</span><span class="v">Domain 14 mo · reviews 3.9</span></li>
           </ul>
         </div>
         <div class="report-foot">
-          <span>Synthetic sample — illustrative only</span>
-          <span>Commercial data · not a consumer report</span>
+          <span>Synthetic sample · Commercial data — not a consumer report</span>
         </div>
       </div>
       <div class="alert-card">
@@ -606,7 +614,7 @@
       li.style.animationDelay=(0.3+i*0.12)+'s';li.classList.add('on');
     });
     var target=71,dur=1200,start=performance.now();
-    var num=document.getElementById('scoreNum'),arc=document.getElementById('arc'),C=307.9;
+    var num=document.getElementById('scoreNum'),arc=document.getElementById('arc'),C=326.7;
     requestAnimationFrame(function tick(now){
       var p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
       num.textContent=Math.round(e*target);
