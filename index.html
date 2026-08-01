@@ -5,349 +5,251 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TrustBureau — The AI Credit Bureau for Business</title>
 <meta name="description" content="TrustBureau is an AI-native commercial credit reporting agency. One call returns the file: registrations, UCC positions, litigation, contributed tradelines, and bank-verified cash flow — synthesized into a defensible TrustScore.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 fill=%22white%22 opacity=%220.1%22/><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 stroke=%22white%22 stroke-width=%221.5%22 fill=%22none%22/><path d=%22M9 12l2 2 4-4%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 stroke=%22%23111111%22 stroke-width=%221.5%22 fill=%22none%22/><path d=%22M9 12l2 2 4-4%22 stroke=%22%23111111%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0a;
-    --bg-aurora:#2c2c2c;
-    --surface:rgba(20,20,20,.6);
-    --surface-solid:#111111;
-    --surface-hover:rgba(30,30,30,.8);
-    --card:#141414;
-    --line:rgba(255,255,255,.1);
-    --line-strong:rgba(255,255,255,.22);
-    --text:#ffffff;
-    --text-2:#a1a1aa;
-    --text-3:#71717a;
-    --paper:#f4f4f2;
-    --paper-2:#e6e6e2;
-    --ink:#0a0a0a;
-    --ink-soft:rgba(10,10,10,.55);
-    --ink-line:rgba(10,10,10,.16);
-    --sans:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
-    --mono:'IBM Plex Mono',ui-monospace,monospace;
-  }
-  [data-theme="light"]{
-    --bg:#fafafa;
-    --bg-aurora:#e8e8e6;
-    --surface:#ffffff;
-    --surface-solid:#ffffff;
-    --surface-hover:#f4f4f4;
-    --card:#ffffff;
-    --line:rgba(10,10,10,.12);
-    --line-strong:rgba(10,10,10,.26);
-    --text:#0a0a0a;
-    --text-2:#52525b;
-    --text-3:#a1a1aa;
+    --ink:#111111;
+    --gray-1:#4b4b52;
+    --gray-2:#7d7d85;
+    --gray-3:#a8a8af;
+    --hairline:#ebebed;
+    --hairline-2:#dedee1;
+    --panel:#fafafa;
+    --white:#ffffff;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    font-family:var(--sans);background:var(--bg);color:var(--text-2);
+    font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:var(--white);color:var(--gray-1);
     -webkit-font-smoothing:antialiased;overflow-x:hidden;
-    transition:background-color .3s,color .3s;
+    font-feature-settings:'tnum';
   }
-  ::selection{background:var(--text);color:var(--bg)}
-  .wrap{max-width:1220px;margin:0 auto;padding:0 32px}
-  .mono{font-family:var(--mono)}
+  ::selection{background:var(--ink);color:var(--white)}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 32px}
 
-  /* ————— atmosphere (from the original hub) ————— */
-  body::before{
-    content:'';position:fixed;inset:0;pointer-events:none;z-index:-3;
-    background:radial-gradient(ellipse 120% 80% at 50% 15%, var(--bg-aurora) 0%, transparent 55%);
-    animation:auroraPulse 10s infinite;transition:background .3s;
-  }
-  @keyframes auroraPulse{0%,100%{opacity:1}50%{opacity:.85}}
-  .noise{position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.04;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");}
+  .label{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gray-3)}
 
   /* ————— header ————— */
   header{
     position:sticky;top:0;z-index:50;
-    background:color-mix(in srgb, var(--bg) 82%, transparent);
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hairline);
   }
-  .bar{display:flex;align-items:center;justify-content:space-between;height:72px}
-  .brand{display:flex;align-items:center;gap:13px;text-decoration:none}
-  .brand-icon{width:30px;height:30px;color:var(--text);flex-shrink:0}
-  .brand-text{font-size:19px;font-weight:800;letter-spacing:.1em;color:var(--text);text-transform:uppercase;line-height:1}
-  .brand-text span{color:var(--text-3);font-weight:400}
-  .brand-sub{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.32em;color:var(--text-3);margin-top:4px;text-transform:uppercase}
-  nav.primary{display:flex;gap:30px}
-  nav.primary a{
-    color:var(--text-2);text-decoration:none;font-size:12px;font-weight:600;
-    letter-spacing:.14em;text-transform:uppercase;padding:6px 0;position:relative;transition:color .2s;
-  }
-  nav.primary a::after{content:'';position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--text);transition:right .25s}
-  nav.primary a:hover{color:var(--text)}
-  nav.primary a:hover::after{right:0}
-  .bar-actions{display:flex;align-items:center;gap:18px}
-  .signin{color:var(--text-2);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
-  .signin:hover{color:var(--text)}
-  .theme-toggle{
-    width:36px;height:36px;border:1px solid var(--line);border-radius:8px;background:transparent;
-    color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;
-  }
-  .theme-toggle:hover{color:var(--text);border-color:var(--line-strong)}
-  .theme-toggle .sun{display:none}
-  [data-theme="light"] .theme-toggle .sun{display:block}
-  [data-theme="light"] .theme-toggle .moon{display:none}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand-icon{width:28px;height:28px;color:var(--ink);flex-shrink:0}
+  .brand-text{font-size:17px;font-weight:800;letter-spacing:.1em;color:var(--ink);text-transform:uppercase;line-height:1}
+  .brand-text span{color:var(--gray-3);font-weight:500}
+  nav.primary{display:flex;gap:34px}
+  nav.primary a{color:var(--gray-2);text-decoration:none;font-size:14px;font-weight:600;transition:color .2s}
+  nav.primary a:hover{color:var(--ink)}
+  .bar-actions{display:flex;align-items:center;gap:22px}
+  .signin{color:var(--gray-1);text-decoration:none;font-size:14px;font-weight:600;transition:color .2s}
+  .signin:hover{color:var(--ink)}
   .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:10px;
-    font-family:var(--sans);font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
-    padding:14px 26px;border-radius:10px;text-decoration:none;cursor:pointer;border:1px solid transparent;
-    transition:transform .18s,background .2s,color .2s,border-color .2s,box-shadow .2s;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:14px;padding:13px 26px;border-radius:999px;
+    text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:background .2s,color .2s,border-color .2s,transform .15s;
   }
-  .btn-solid{background:var(--text);color:var(--bg)}
-  .btn-solid:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
-  .btn-line{border-color:var(--line-strong);color:var(--text);background:transparent}
-  .btn-line:hover{border-color:var(--text)}
+  .btn-dark{background:var(--ink);color:var(--white)}
+  .btn-dark:hover{background:#2a2a2e;transform:translateY(-1px)}
+  .btn-ghost{border-color:var(--hairline-2);color:var(--ink);background:transparent}
+  .btn-ghost:hover{border-color:var(--ink)}
+  header .btn{padding:10px 20px;font-size:13.5px}
 
   /* ————— hero ————— */
-  .hero{position:relative;padding:96px 0 108px;overflow:hidden}
-  .hero-grid{position:relative;display:grid;grid-template-columns:1.04fr .96fr;gap:70px;align-items:center}
-  .kicker{display:flex;align-items:center;gap:16px;margin-bottom:30px}
-  .kicker .rule{height:1px;width:44px;background:var(--text-3)}
-  .kicker span{font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--text-2)}
-  h1{
-    font-weight:800;color:var(--text);
-    font-size:clamp(42px,5.3vw,72px);line-height:1.03;letter-spacing:-.025em;
-  }
-  h1 .dim{color:var(--text-3);font-weight:300}
-  .hero-sub{margin-top:28px;max-width:530px;font-size:16.5px;font-weight:400;line-height:1.75;color:var(--text-2)}
-  .hero-sub strong{color:var(--text);font-weight:700}
-  .hero-ctas{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap}
-  .hero-meta{margin-top:58px;display:flex;border-top:1px solid var(--line);max-width:560px}
-  .metric{padding:22px 34px 4px 0;margin-right:34px;border-right:1px solid var(--line)}
-  .metric:last-child{border-right:none;margin-right:0}
-  .metric b{display:block;font-weight:800;font-size:30px;color:var(--text);letter-spacing:-.02em}
-  .metric span{display:block;margin-top:6px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3)}
+  .hero{padding:110px 0 120px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;align-items:center}
+  h1{font-size:clamp(40px,4.9vw,64px);font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1.06}
+  h1 .soft{color:var(--gray-3)}
+  .hero .label{margin-bottom:26px;display:block}
+  .hero-sub{margin-top:28px;max-width:500px;font-size:17px;line-height:1.75;color:var(--gray-1)}
+  .hero-sub strong{color:var(--ink);font-weight:700}
+  .hero-ctas{margin-top:38px;display:flex;gap:14px;flex-wrap:wrap}
+  .hero-stats{margin-top:64px;display:flex;gap:0;border-top:1px solid var(--hairline);max-width:520px}
+  .stat{padding:24px 36px 0 0;margin-right:36px;border-right:1px solid var(--hairline)}
+  .stat:last-child{border-right:none;margin-right:0;padding-right:0}
+  .stat b{display:block;font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+  .stat span{display:block;margin-top:6px;font-size:12.5px;font-weight:500;color:var(--gray-3);line-height:1.45}
 
-  /* ————— specimen file ————— */
-  .specimen{position:relative;transform:rotate(.5deg)}
-  .file{
-    position:relative;background:var(--paper);color:var(--ink);border-radius:6px;
-    box-shadow:0 0 0 1px var(--line-strong), 0 34px 90px rgba(0,0,0,.45), 0 6px 22px rgba(0,0,0,.3);
-    padding:26px 28px 20px;
+  /* ————— sample report ————— */
+  .report{
+    background:var(--white);border:1px solid var(--hairline-2);border-radius:16px;
+    box-shadow:0 1px 2px rgba(17,17,17,.03),0 12px 40px rgba(17,17,17,.06);
+    padding:28px 30px 22px;position:relative;
   }
-  .file::before{
-    content:'COMMERCIAL FILE';font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;font-weight:600;
-    position:absolute;top:-25px;left:16px;background:var(--paper);color:var(--ink);
-    padding:6px 16px 3px;border-radius:6px 6px 0 0;box-shadow:0 0 0 1px var(--line-strong);
+  .report-tag{
+    position:absolute;top:22px;right:24px;
+    font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gray-3);border:1px solid var(--hairline-2);border-radius:999px;padding:5px 12px;background:var(--white);
   }
-  .file-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:13px}
-  .file-brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
-  .file-brand svg{width:17px;height:17px}
-  .file-no{font-family:var(--mono);font-size:9.5px;color:var(--ink-soft);text-align:right;line-height:1.75;letter-spacing:.08em}
-  .subject{padding:15px 0 12px;border-bottom:1px solid var(--ink-line)}
-  .subject-name{font-size:22px;font-weight:800;letter-spacing:-.015em}
-  .subject-line{font-family:var(--mono);font-size:10px;color:var(--ink-soft);margin-top:6px;letter-spacing:.07em}
-  .file-body{display:grid;grid-template-columns:118px 1fr;gap:22px;padding-top:15px}
-  .score-block{text-align:center}
-  .score-ring{position:relative;width:112px;height:112px}
+  .report-head{display:flex;align-items:center;gap:10px;padding-bottom:18px;border-bottom:1px solid var(--hairline)}
+  .report-head svg{width:18px;height:18px;color:var(--ink)}
+  .report-head b{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+  .report-head b span{color:var(--gray-3);font-weight:500}
+  .subject{padding:18px 0 14px;border-bottom:1px solid var(--hairline)}
+  .subject-name{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.015em}
+  .subject-line{font-size:12.5px;font-weight:500;color:var(--gray-3);margin-top:6px}
+  .report-body{display:grid;grid-template-columns:116px 1fr;gap:26px;padding-top:18px;align-items:start}
+  .score-ring{position:relative;width:110px;height:110px}
   .score-ring svg{transform:rotate(-90deg)}
-  .score-ring .track{stroke:var(--paper-2)}
-  .score-ring .arc{stroke:var(--ink);stroke-linecap:butt}
-  .score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .score-num b{font-size:36px;font-weight:800;line-height:1;letter-spacing:-.02em}
-  .score-num span{font-family:var(--mono);font-size:8px;letter-spacing:.24em;color:var(--ink-soft);margin-top:4px}
-  .score-grade{margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink);font-weight:600}
-  .ledger{list-style:none}
-  .ledger li{
-    display:flex;justify-content:space-between;gap:14px;align-items:baseline;
-    font-family:var(--mono);font-size:11px;padding:7px 0;border-bottom:1px dashed var(--ink-line);
-    opacity:0;transform:translateY(6px);
+  .score-ring .track{stroke:#f0f0f2}
+  .score-ring .arc{stroke:var(--ink);stroke-linecap:round}
+  .score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .score-center b{font-size:32px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em}
+  .score-center span{font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--gray-3);margin-top:4px}
+  .score-grade{text-align:center;margin-top:10px;font-size:12px;font-weight:700;color:var(--gray-2)}
+  .rows{list-style:none}
+  .rows li{
+    display:flex;justify-content:space-between;gap:16px;align-items:baseline;
+    padding:8.5px 0;border-bottom:1px solid var(--hairline);
+    font-size:13px;opacity:0;transform:translateY(5px);
   }
-  .ledger li.on{animation:lineIn .5s cubic-bezier(.2,.7,.3,1) forwards}
-  @keyframes lineIn{to{opacity:1;transform:none}}
-  .ledger .k{color:var(--ink-soft);letter-spacing:.03em}
-  .ledger .v{font-weight:600;text-align:right;color:var(--ink)}
-  .v.flag{background:var(--ink);color:var(--paper);padding:1px 6px}
-  .file-foot{display:flex;justify-content:space-between;align-items:center;margin-top:15px;padding-top:12px;border-top:2px solid var(--ink)}
-  .barcode{display:flex;gap:2px;align-items:flex-end;height:22px}
-  .barcode i{display:block;width:2px;background:var(--ink)}
-  .file-foot .mono{font-size:8.5px;letter-spacing:.18em;color:var(--ink-soft)}
-  .stamp{
-    position:absolute;right:-14px;top:33%;z-index:3;
-    font-family:var(--mono);font-weight:600;font-size:19px;letter-spacing:.34em;
-    color:var(--ink);border:3px double var(--ink);border-radius:4px;
-    padding:10px 18px 9px;transform:rotate(-11deg) scale(2.2);opacity:0;
-  }
-  .stamp.on{animation:stampIn .45s cubic-bezier(.2,1.4,.3,1) forwards .95s}
-  @keyframes stampIn{
-    0%{opacity:0;transform:rotate(-11deg) scale(2.2)}
-    70%{opacity:.75;transform:rotate(-11deg) scale(.94)}
-    100%{opacity:.55;transform:rotate(-11deg) scale(1)}
-  }
-  .specimen-note{margin-top:18px;text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--text-3)}
+  .rows li:last-child{border-bottom:none}
+  .rows li.on{animation:rowIn .5s ease forwards}
+  @keyframes rowIn{to{opacity:1;transform:none}}
+  .rows .k{color:var(--gray-2);font-weight:500}
+  .rows .v{font-weight:700;color:var(--ink);text-align:right;white-space:nowrap}
+  .rows .v.dim{color:var(--gray-2)}
+  .report-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .report-foot span{font-size:11px;font-weight:600;color:var(--gray-3)}
 
-  /* ————— ticker ————— */
-  .ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:var(--surface-solid)}
-  .ticker-track{display:flex;width:max-content;animation:tick 38s linear infinite;padding:15px 0}
-  .ticker:hover .ticker-track{animation-play-state:paused}
-  .ticker-track span{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--text-3);white-space:nowrap}
-  .ticker-track span::after{content:'◆';color:var(--text);margin:0 30px;font-size:6px;vertical-align:2px;opacity:.5}
-  @keyframes tick{to{transform:translateX(-50%)}}
+  /* ————— sources ————— */
+  .sources{border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);background:var(--panel)}
+  .sources .wrap{display:flex;flex-wrap:wrap;justify-content:center;column-gap:14px;row-gap:10px;padding:26px 32px}
+  .sources span{font-size:12.5px;font-weight:600;color:var(--gray-2);white-space:nowrap}
+  .sources span+span::before{content:'·';color:var(--gray-3);margin-right:14px}
 
   /* ————— sections ————— */
-  .sec{padding:112px 0;position:relative}
-  .sec.alt{background:var(--surface-solid);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  [data-theme="light"] .sec.alt{background:#f1f1ef}
-  .sec-index{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--text-3)}
-  .sec-index::after{content:'';display:inline-block;width:44px;height:1px;background:var(--line-strong);vertical-align:4px;margin-left:16px}
-  h2{font-weight:800;color:var(--text);font-size:clamp(30px,3.4vw,48px);letter-spacing:-.025em;line-height:1.08;margin-top:18px}
-  h2 .dim{color:var(--text-3);font-weight:300}
-  .sec-intro{max-width:620px;font-size:16px;line-height:1.75;color:var(--text-2);margin:18px 0 60px}
+  .sec{padding:130px 0}
+  .sec.panel{background:var(--panel);border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}
+  .sec-head{max-width:640px}
+  h2{font-size:clamp(30px,3.3vw,44px);font-weight:800;color:var(--ink);letter-spacing:-.025em;line-height:1.12;margin-top:16px}
+  h2 .soft{color:var(--gray-3)}
+  .sec-intro{margin-top:20px;font-size:16.5px;line-height:1.75;color:var(--gray-1)}
 
-  .rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.3,1)}
+  .rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
   .rv.in{opacity:1;transform:none}
 
-  /* ————— exhibits ————— */
-  .modules{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--line);gap:1px;border-radius:14px;overflow:hidden}
-  .module{background:var(--bg);padding:34px 30px 38px;position:relative;transition:background .25s}
-  .sec.alt .module{background:var(--surface-solid)}
-  [data-theme="light"] .module,[data-theme="light"] .sec.alt .module{background:#ffffff}
-  .module::before{content:'';position:absolute;top:0;left:0;right:100%;height:2px;background:var(--text);transition:right .35s cubic-bezier(.2,.7,.3,1)}
-  .module:hover::before{right:0}
-  .module:hover{background:var(--surface-hover)}
-  [data-theme="light"] .module:hover{background:#fafafa}
-  .module-no{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--text-3)}
-  .module h3{font-size:19px;font-weight:800;color:var(--text);margin:16px 0 10px;letter-spacing:-.015em}
-  .module p{font-size:14px;line-height:1.7;color:var(--text-2)}
-  .module .tag{
-    display:inline-block;margin-top:18px;font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
-    color:var(--text);border:1px solid var(--line-strong);padding:5px 9px;border-radius:5px;
-  }
+  /* exhibits */
+  .exhibits{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);gap:56px 48px}
+  .exhibit{border-top:1px solid var(--hairline-2);padding-top:24px}
+  .exhibit .num{font-size:12px;font-weight:700;color:var(--gray-3);letter-spacing:.12em}
+  .exhibit h3{font-size:18px;font-weight:800;color:var(--ink);margin:12px 0 10px;letter-spacing:-.015em}
+  .exhibit p{font-size:14.5px;line-height:1.7;color:var(--gray-1)}
 
-  /* ————— trustscore ————— */
-  .score-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:76px;align-items:center;margin-top:64px}
-  .big-score{text-align:center;position:relative;padding:34px 0}
-  .big-score::before{content:'';position:absolute;inset:-8px 40px;border:1px solid var(--line);border-radius:18px;pointer-events:none}
-  .big-score::after{content:'';position:absolute;inset:2px 50px;border:1px solid var(--line);border-radius:14px;pointer-events:none}
-  .big-score .huge{
-    font-weight:800;font-size:clamp(120px,14vw,190px);line-height:.95;letter-spacing:-.05em;color:var(--text);
-    background:linear-gradient(165deg,var(--text) 40%,var(--text-3));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
+  /* trustscore */
+  .score-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:90px;align-items:center;margin-top:72px}
+  .huge-num{font-size:clamp(120px,13vw,180px);font-weight:800;color:var(--ink);letter-spacing:-.05em;line-height:.95;text-align:center}
+  .huge-sub{text-align:center;margin-top:14px;font-size:13px;font-weight:700;color:var(--gray-3);letter-spacing:.12em;text-transform:uppercase}
+  .reasons{list-style:none;border-top:1px solid var(--hairline-2)}
+  .reasons li{display:flex;gap:18px;align-items:baseline;padding:19px 0;border-bottom:1px solid var(--hairline)}
+  .reasons .sign{
+    width:24px;height:24px;border-radius:999px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;transform:translateY(4px);
   }
-  .big-score .of{display:block;margin-top:16px;font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--text-3)}
-  .reasons{list-style:none;border-top:1px solid var(--line-strong)}
-  .reasons li{display:grid;grid-template-columns:34px 1fr auto;gap:16px;align-items:baseline;padding:17px 0;border-bottom:1px solid var(--line)}
-  .reasons .sign{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text);width:22px;height:22px;border:1px solid var(--line-strong);border-radius:50%;display:flex;align-items:center;justify-content:center}
-  .reasons .sign.neg{background:var(--text);color:var(--bg);border-color:var(--text)}
-  .reasons .txt{font-size:15px;line-height:1.55;color:var(--text-2)}
-  .reasons .txt b{color:var(--text)}
-  .reasons .src{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase;white-space:nowrap}
-  .score-note{margin-top:26px;font-size:14.5px;line-height:1.75;color:var(--text-2)}
-  .score-note strong{color:var(--text)}
+  .sign.pos{border:1px solid var(--hairline-2);color:var(--ink)}
+  .sign.neg{background:var(--ink);color:var(--white)}
+  .reasons .txt{font-size:15.5px;line-height:1.6;color:var(--gray-1);flex:1}
+  .reasons .txt b{color:var(--ink);font-weight:700}
+  .reasons .src{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3);white-space:nowrap}
+  .score-note{margin-top:28px;font-size:15px;line-height:1.75;color:var(--gray-1)}
+  .score-note strong{color:var(--ink)}
 
-  /* ————— network ————— */
-  .net-grid{display:grid;grid-template-columns:repeat(3,1fr);counter-reset:step}
-  .step{padding:8px 36px 8px 0;margin-right:36px;border-right:1px solid var(--line)}
-  .step:last-child{border-right:none;margin-right:0;padding-right:0}
-  .step::before{
-    counter-increment:step;content:counter(step,decimal-leading-zero);
-    font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--bg);
-    background:var(--text);display:inline-block;padding:6px 10px;border-radius:6px;margin-bottom:20px;font-weight:600;
+  /* network */
+  .steps{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+  .step .num{
+    width:34px;height:34px;border-radius:999px;background:var(--ink);color:var(--white);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:20px;
   }
-  .step h3{font-size:20px;font-weight:800;color:var(--text);margin-bottom:12px;letter-spacing:-.015em}
-  .step p{font-size:14.5px;line-height:1.7;color:var(--text-2)}
-  .net-callout{
-    margin-top:76px;border:1px solid var(--line-strong);border-radius:16px;
-    background:var(--surface);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    padding:36px 40px;display:flex;justify-content:space-between;align-items:center;gap:30px;
+  .step h3{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:10px;letter-spacing:-.015em}
+  .step p{font-size:14.5px;line-height:1.7;color:var(--gray-1)}
+  .callout{
+    margin-top:80px;background:var(--white);border:1px solid var(--hairline-2);border-radius:16px;
+    padding:38px 42px;display:flex;justify-content:space-between;align-items:center;gap:32px;
+    box-shadow:0 1px 2px rgba(17,17,17,.03);
   }
-  .net-callout .label{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3)}
-  .net-callout h3{font-size:24px;font-weight:800;color:var(--text);margin-top:10px;letter-spacing:-.02em}
+  .callout h3{font-size:22px;font-weight:800;color:var(--ink);margin-top:10px;letter-spacing:-.02em}
 
-  /* ————— API ————— */
-  .api-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:72px;align-items:start;margin-top:64px}
-  .api-lede{font-size:16px;line-height:1.75;color:var(--text-2)}
-  .api-points{list-style:none;margin-top:36px;border-top:1px solid var(--line-strong)}
-  .api-points li{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.6;color:var(--text-2)}
-  .api-points li b{color:var(--text);font-weight:700}
-  .api-points .tick{color:var(--text);font-family:var(--mono)}
-  .terminal{
-    background:#050505;border:1px solid var(--line-strong);border-radius:14px;overflow:hidden;
-    box-shadow:0 30px 70px rgba(0,0,0,.45);
+  /* api */
+  .api-grid{display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center;margin-top:72px}
+  .api-list{list-style:none;border-top:1px solid var(--hairline-2)}
+  .api-list li{padding:18px 0;border-bottom:1px solid var(--hairline);font-size:15.5px;line-height:1.6;color:var(--gray-1)}
+  .api-list b{color:var(--ink);font-weight:700}
+  .payload{
+    background:var(--white);border:1px solid var(--hairline-2);border-radius:16px;padding:26px 30px;
+    box-shadow:0 1px 2px rgba(17,17,17,.03),0 12px 40px rgba(17,17,17,.05);
   }
-  [data-theme="light"] .terminal{box-shadow:0 30px 70px rgba(0,0,0,.18)}
-  .term-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
-  .dot{width:9px;height:9px;border-radius:50%;background:#262626}
-  .term-bar .mono{margin-left:10px;font-size:10px;letter-spacing:.2em;color:#71717a}
-  .terminal pre{padding:24px 26px;font-family:var(--mono);font-size:12.5px;line-height:1.8;overflow-x:auto;color:#d4d4d8}
-  .c-k{color:#a1a1aa}.c-s{color:#ffffff}.c-n{color:#e4e4e7;font-weight:600}.c-c{color:#52525b;font-style:italic}
+  .payload-title{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-3);padding-bottom:14px;border-bottom:1px solid var(--hairline)}
+  .payload ul{list-style:none}
+  .payload li{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--hairline);font-size:13.5px}
+  .payload li:last-child{border-bottom:none}
+  .payload .k{color:var(--gray-2);font-weight:500}
+  .payload .v{font-weight:700;color:var(--ink);text-align:right}
 
-  /* ————— CTA ————— */
-  .cta-sec{padding:130px 0;text-align:center;position:relative;overflow:hidden}
-  .cta-sec .kicker{justify-content:center}
-  .cta-sec h2{max-width:800px;margin:18px auto 0}
-  .cta-sec p{max-width:560px;margin:26px auto 0;font-size:16px;line-height:1.75;color:var(--text-2)}
-  .cta-row{margin-top:46px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  /* cta */
+  .cta{padding:150px 0;text-align:center}
+  .cta h2{max-width:720px;margin:16px auto 0}
+  .cta p{max-width:520px;margin:24px auto 0;font-size:16.5px;line-height:1.75;color:var(--gray-1)}
+  .cta-row{margin-top:42px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
-  /* ————— footer ————— */
-  footer{border-top:1px solid var(--line);background:var(--surface-solid);padding:70px 0 44px}
-  [data-theme="light"] footer{background:#f1f1ef}
-  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:44px}
-  .foot-brand p{margin-top:18px;font-size:13.5px;line-height:1.75;color:var(--text-2);max-width:300px}
-  .foot-col h4{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3);margin-bottom:20px}
-  .foot-col a{display:block;color:var(--text-2);text-decoration:none;font-size:14px;padding:5px 0;transition:color .2s}
-  .foot-col a:hover{color:var(--text)}
-  .legal{margin-top:60px;padding-top:28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
-  .legal p{font-size:11.5px;line-height:1.75;color:var(--text-3);max-width:780px}
-  .legal .mono{font-size:10px;letter-spacing:.2em;color:var(--text-3);white-space:nowrap}
+  /* footer */
+  footer{border-top:1px solid var(--hairline);padding:76px 0 48px;background:var(--panel)}
+  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px}
+  .foot-brand p{margin-top:18px;font-size:14px;line-height:1.75;color:var(--gray-2);max-width:300px}
+  .foot-col h4{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-3);margin-bottom:20px}
+  .foot-col a{display:block;color:var(--gray-1);text-decoration:none;font-size:14.5px;padding:6px 0;transition:color .2s}
+  .foot-col a:hover{color:var(--ink)}
+  .legal{margin-top:64px;padding-top:30px;border-top:1px solid var(--hairline-2);display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap}
+  .legal p{font-size:12px;line-height:1.75;color:var(--gray-3);max-width:760px}
+  .legal span{font-size:12px;font-weight:600;color:var(--gray-3);white-space:nowrap}
 
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:.01ms !important}
-    .ticker-track{animation:none}
-    .ledger li{opacity:1;transform:none}
-    .stamp{opacity:.55;transform:rotate(-11deg)}
+    .rows li{opacity:1;transform:none}
+    .rv{opacity:1;transform:none}
   }
 
-  @media (max-width:1020px){
-    .hero-grid{grid-template-columns:1fr;gap:76px}
-    .specimen{max-width:560px;margin:0 auto;transform:none}
-    .modules{grid-template-columns:repeat(2,1fr)}
-    .score-grid,.api-grid{grid-template-columns:1fr;gap:56px}
-    .net-grid{grid-template-columns:1fr}
-    .step{border-right:none;margin-right:0;padding:26px 0;border-top:1px solid var(--line)}
-    .step:first-child{border-top:none;padding-top:0}
+  @media (max-width:1000px){
+    .hero-grid{grid-template-columns:1fr;gap:70px}
+    .report{max-width:560px;margin:0 auto}
+    .exhibits{grid-template-columns:repeat(2,1fr)}
+    .score-grid,.api-grid{grid-template-columns:1fr;gap:60px}
+    .steps{grid-template-columns:1fr}
     .foot-grid{grid-template-columns:1fr 1fr}
     nav.primary{display:none}
   }
-  @media (max-width:640px){
-    .wrap{padding:0 20px}
-    .sec{padding:80px 0}
-    .modules{grid-template-columns:1fr}
-    .file-body{grid-template-columns:1fr}
-    .score-block{display:flex;align-items:center;gap:20px;text-align:left}
-    .stamp{right:-4px;font-size:14px;padding:8px 12px}
-    .net-callout{flex-direction:column;align-items:flex-start}
+  @media (max-width:620px){
+    .wrap{padding:0 22px}
+    .sec{padding:90px 0}
+    .hero{padding:80px 0 90px}
+    .exhibits{grid-template-columns:1fr;gap:44px}
+    .report-body{grid-template-columns:1fr}
+    .score-ring{margin:0 auto}
+    .callout{flex-direction:column;align-items:flex-start;padding:30px}
     .foot-grid{grid-template-columns:1fr}
     .signin{display:none}
-    .hero-meta{flex-wrap:wrap}
-    .metric{border-right:none;padding-right:0}
+    .hero-stats{flex-wrap:wrap}
+    .stat{border-right:none;margin-right:0;padding-right:0}
   }
 </style>
 </head>
 <body>
-<div class="noise"></div>
 
 <header>
   <div class="wrap bar">
     <a class="brand" href="/">
       <svg class="brand-icon" viewBox="0 0 24 24" fill="none">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="currentColor" opacity="0.08"/>
         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
         <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span>
-        <span class="brand-text">Trust<span>Bureau</span></span>
-        <span class="brand-sub">Commercial Credit Bureau</span>
-      </span>
+      <span class="brand-text">Trust<span>Bureau</span></span>
     </a>
     <nav class="primary">
       <a href="#report">The Report</a>
@@ -356,116 +258,116 @@
       <a href="#api">API</a>
     </nav>
     <div class="bar-actions">
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        <svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </button>
       <a class="signin" href="/login/">Sign in</a>
-      <a class="btn btn-solid" href="/signup/">Request Access</a>
+      <a class="btn btn-dark" href="/signup/">Request access</a>
     </div>
   </div>
 </header>
 
-<!-- ————————— HERO ————————— -->
+<!-- ————— HERO ————— -->
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="kicker"><span class="rule"></span><span>An AI Credit Reporting Agency</span></div>
-      <h1>The credit bureau,<br>rebuilt for the<br><span class="dim">machine age.</span></h1>
+      <span class="label">An AI credit reporting agency</span>
+      <h1>The credit bureau, rebuilt for the <span class="soft">machine age.</span></h1>
       <p class="hero-sub">Every business has a file. TrustBureau writes it in real time — <strong>registrations, UCC positions, litigation, contributed tradelines, bank-verified cash flow</strong> — read from primary sources by AI and synthesized into one defensible score.</p>
       <div class="hero-ctas">
-        <a class="btn btn-solid" href="/signup/">Request Early Access</a>
-        <a class="btn btn-line" href="#report">Inspect the Specimen</a>
+        <a class="btn btn-dark" href="/signup/">Request early access</a>
+        <a class="btn btn-ghost" href="#report">See a sample file</a>
       </div>
-      <div class="hero-meta">
-        <div class="metric"><b>34M+</b><span>US entities indexed</span></div>
-        <div class="metric"><b>6</b><span>evidence classes per file</span></div>
-        <div class="metric"><b>&lt;60s</b><span>fresh file, any subject</span></div>
+      <div class="hero-stats">
+        <div class="stat"><b>34M+</b><span>US entities indexed</span></div>
+        <div class="stat"><b>6</b><span>evidence classes per file</span></div>
+        <div class="stat"><b>&lt;60s</b><span>fresh file, any subject</span></div>
       </div>
     </div>
 
-    <div class="specimen">
-      <div class="stamp" id="stamp">SPECIMEN</div>
-      <div class="file">
-        <div class="file-head">
-          <div class="file-brand">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="#0a0a0a" stroke-width="1.6"/><path d="M9 12l2 2 4-4" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            TrustBureau
-          </div>
-          <div class="file-no">FILE № TB-2026-081447<br>PULLED 2026-08-01 09:41 ET</div>
-        </div>
-        <div class="subject">
-          <div class="subject-name">Meridian Coastal Provisions LLC</div>
-          <div class="subject-line">FL · EST. 2019 · SPECIALTY FOOD DISTRIBUTION · EIN ██-███1982</div>
-        </div>
-        <div class="file-body">
-          <div class="score-block">
-            <div class="score-ring">
-              <svg width="112" height="112" viewBox="0 0 112 112">
-                <circle class="track" cx="56" cy="56" r="50" fill="none" stroke-width="7"/>
-                <circle class="arc" id="arc" cx="56" cy="56" r="50" fill="none" stroke-width="7"
-                        stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
-              </svg>
-              <div class="score-num"><b id="scoreNum">0</b><span>TRUSTSCORE</span></div>
-            </div>
-            <div class="score-grade">B · STABLE</div>
-          </div>
-          <ul class="ledger" id="ledger">
-            <li><span class="k">SOS REGISTRATION</span><span class="v">ACTIVE · FL P19000041207</span></li>
-            <li><span class="k">UCC POSITIONS</span><span class="v">2 OPEN · 1ST FILED 2024-11</span></li>
-            <li><span class="k">LITIGATION (5YR)</span><span class="v">NONE FOUND</span></li>
-            <li><span class="k">CONTRIBUTED TRADELINES</span><span class="v">4 · SLOW-PAY ×1 (2025-Q3)</span></li>
-            <li><span class="k">VERIFIED AVG BALANCE (90D)</span><span class="v">$41,338 · 3 NSF DAYS</span></li>
-            <li><span class="k">STATEMENT FORENSICS</span><span class="v">NO TAMPER SIGNALS</span></li>
-            <li><span class="k">DIGITAL FOOTPRINT</span><span class="v flag">DOMAIN 14 MO · REVIEWS 3.9★</span></li>
-          </ul>
-        </div>
-        <div class="file-foot">
-          <div class="barcode" aria-hidden="true"></div>
-          <span class="mono">COMMERCIAL DATA · NOT A CONSUMER REPORT</span>
-        </div>
+    <div class="report" id="sample">
+      <span class="report-tag">Sample</span>
+      <div class="report-head">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <b>Trust<span>Bureau</span></b>
       </div>
-      <div class="specimen-note">SPECIMEN FILE · SYNTHETIC SUBJECT · ILLUSTRATIVE ONLY</div>
+      <div class="subject">
+        <div class="subject-name">Meridian Coastal Provisions LLC</div>
+        <div class="subject-line">Florida · Est. 2019 · Specialty food distribution · File TB-2026-081447</div>
+      </div>
+      <div class="report-body">
+        <div>
+          <div class="score-ring">
+            <svg width="110" height="110" viewBox="0 0 110 110">
+              <circle class="track" cx="55" cy="55" r="49" fill="none" stroke-width="8"/>
+              <circle class="arc" id="arc" cx="55" cy="55" r="49" fill="none" stroke-width="8"
+                      stroke-dasharray="307.9" stroke-dashoffset="307.9"/>
+            </svg>
+            <div class="score-center"><b id="scoreNum">0</b><span>TRUSTSCORE</span></div>
+          </div>
+          <div class="score-grade">Grade B · Stable</div>
+        </div>
+        <ul class="rows" id="rows">
+          <li><span class="k">Registration</span><span class="v">Active · FL P19000041207</span></li>
+          <li><span class="k">UCC positions</span><span class="v">2 open · first filed Nov 2024</span></li>
+          <li><span class="k">Litigation, 5 yr</span><span class="v dim">None found</span></li>
+          <li><span class="k">Contributed tradelines</span><span class="v">4 · one slow-pay, Q3 2025</span></li>
+          <li><span class="k">Verified avg balance, 90 d</span><span class="v">$41,338 · 3 NSF days</span></li>
+          <li><span class="k">Statement forensics</span><span class="v dim">No tamper signals</span></li>
+          <li><span class="k">Digital footprint</span><span class="v">Domain 14 mo · reviews 3.9</span></li>
+        </ul>
+      </div>
+      <div class="report-foot">
+        <span>Synthetic sample — illustrative only</span>
+        <span>Commercial data · not a consumer report</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ————————— TICKER ————————— -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track" id="tickerTrack">
-    <span>Secretary of State Registries</span><span>UCC-1 Filings</span><span>Court Dockets &amp; Judgments</span><span>Contributed Tradelines</span><span>Bank-Verified Cash Flow</span><span>Statement Forensics</span><span>Licensing Boards</span><span>Digital Footprint</span>
+<!-- ————— SOURCES ————— -->
+<div class="sources">
+  <div class="wrap">
+    <span>Secretary of State registries</span><span>UCC-1 filings</span><span>Court dockets &amp; judgments</span><span>Contributed tradelines</span><span>Bank-verified cash flow</span><span>Statement forensics</span><span>Licensing boards</span><span>Digital footprint</span>
   </div>
 </div>
 
-<!-- ————————— THE REPORT ————————— -->
+<!-- ————— THE REPORT ————— -->
 <section class="sec" id="report">
   <div class="wrap">
-    <div class="rv"><span class="sec-index">SEC. 01 — THE REPORT</span>
-    <h2>Anatomy of a <span class="dim">TrustBureau file.</span></h2></div>
-    <p class="sec-intro rv">Six evidence classes, pulled fresh on every request. Not a stale database row — an investigation, run by AI that reads the primary record and cites it.</p>
-    <div class="modules rv">
-      <div class="module"><div class="module-no">EXHIBIT 01</div><h3>Identity &amp; Registration</h3><p>Legal name resolution, DBA mapping, Secretary of State standing across all 50 states, officers, registered agents, incorporation history.</p><span class="tag">Primary-source cited</span></div>
-      <div class="module"><div class="module-no">EXHIBIT 02</div><h3>Public-Record Risk</h3><p>UCC-1 positions and terminations, tax liens, judgments, bankruptcies, court dockets — the stacking picture competitors miss.</p><span class="tag">Position detection</span></div>
-      <div class="module"><div class="module-no">EXHIBIT 03</div><h3>Contributed Tradelines</h3><p>Payment performance, defaults, and slow-pays reported by the funders who actually hold the paper. Give-to-get access.</p><span class="tag">Network exclusive</span></div>
-      <div class="module"><div class="module-no">EXHIBIT 04</div><h3>Verified Cash Flow</h3><p>Bank-statement intelligence: true revenue, balances, NSF days, existing debt service — with document forensics that flag tampered PDFs.</p><span class="tag">Tamper detection</span></div>
-      <div class="module"><div class="module-no">EXHIBIT 05</div><h3>Digital Footprint</h3><p>Web presence, domain age, review velocity, licensing, adverse media. The open-web signals that catch shells and resurrections early.</p><span class="tag">Live-crawled</span></div>
-      <div class="module"><div class="module-no">EXHIBIT 06</div><h3>TrustScore™</h3><p>One 0–100 score synthesized across every exhibit — delivered with reason codes, so an underwriter can defend the decision it informs.</p><span class="tag">Reason-coded</span></div>
+    <div class="sec-head rv">
+      <span class="label">The report</span>
+      <h2>Anatomy of a <span class="soft">TrustBureau file.</span></h2>
+      <p class="sec-intro">Six evidence classes, pulled fresh on every request. Not a stale database row — an investigation, run by AI that reads the primary record and cites it.</p>
+    </div>
+    <div class="exhibits rv">
+      <div class="exhibit"><div class="num">01</div><h3>Identity &amp; registration</h3><p>Legal name resolution, DBA mapping, Secretary of State standing across all 50 states, officers, registered agents, incorporation history.</p></div>
+      <div class="exhibit"><div class="num">02</div><h3>Public-record risk</h3><p>UCC-1 positions and terminations, tax liens, judgments, bankruptcies, court dockets — the stacking picture competitors miss.</p></div>
+      <div class="exhibit"><div class="num">03</div><h3>Contributed tradelines</h3><p>Payment performance, defaults, and slow-pays reported by the funders who actually hold the paper. Give-to-get access.</p></div>
+      <div class="exhibit"><div class="num">04</div><h3>Verified cash flow</h3><p>Bank-statement intelligence: true revenue, balances, NSF days, existing debt service — with document forensics that flag tampered PDFs.</p></div>
+      <div class="exhibit"><div class="num">05</div><h3>Digital footprint</h3><p>Web presence, domain age, review velocity, licensing, adverse media. The open-web signals that catch shells and resurrections early.</p></div>
+      <div class="exhibit"><div class="num">06</div><h3>TrustScore</h3><p>One 0–100 score synthesized across every exhibit — delivered with reason codes, so an underwriter can defend the decision it informs.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ————————— TRUSTSCORE ————————— -->
-<section class="sec alt" id="score">
+<!-- ————— TRUSTSCORE ————— -->
+<section class="sec panel" id="score">
   <div class="wrap">
-    <div class="rv"><span class="sec-index">SEC. 02 — TRUSTSCORE</span>
-    <h2>A score you can <span class="dim">defend.</span></h2></div>
+    <div class="sec-head rv">
+      <span class="label">TrustScore</span>
+      <h2>A score you can <span class="soft">defend.</span></h2>
+    </div>
     <div class="score-grid">
-      <div class="big-score rv"><span class="huge">71</span><span class="of">/ 100 · GRADE B · STABLE</span></div>
+      <div class="rv">
+        <div class="huge-num">71</div>
+        <div class="huge-sub">out of 100 · Grade B · Stable</div>
+      </div>
       <div class="rv">
         <ul class="reasons">
-          <li><span class="sign">+</span><span class="txt">Six-year filing history; two UCC positions <b>cleanly terminated</b> at payoff</span><span class="src">SOS / UCC</span></li>
-          <li><span class="sign">+</span><span class="txt">Verified 90-day average balance covers <b>1.8× current debt service</b></span><span class="src">Bank-verified</span></li>
-          <li><span class="sign neg">−</span><span class="txt">One contributed slow-pay, 2025-Q3, cured in 40 days</span><span class="src">Tradeline</span></li>
+          <li><span class="sign pos">+</span><span class="txt">Six-year filing history; two UCC positions <b>cleanly terminated</b> at payoff</span><span class="src">SOS / UCC</span></li>
+          <li><span class="sign pos">+</span><span class="txt">Verified 90-day average balance covers <b>1.8× current debt service</b></span><span class="src">Bank-verified</span></li>
+          <li><span class="sign neg">−</span><span class="txt">One contributed slow-pay, Q3 2025, cured in 40 days</span><span class="src">Tradeline</span></li>
           <li><span class="sign neg">−</span><span class="txt">Web domain registered 14 months ago — younger than stated vintage</span><span class="src">Footprint</span></li>
         </ul>
         <p class="score-note">Every point is traceable to a primary source. No black boxes, no "proprietary blend" hand-waving — <strong>reason codes on every file</strong>, because a score an underwriter can't explain is a score they can't use.</p>
@@ -474,88 +376,86 @@
   </div>
 </section>
 
-<!-- ————————— NETWORK ————————— -->
+<!-- ————— NETWORK ————— -->
 <section class="sec" id="network">
   <div class="wrap">
-    <div class="rv"><span class="sec-index">SEC. 03 — THE NETWORK</span>
-    <h2>Data in. <span class="dim">Access out.</span></h2></div>
-    <p class="sec-intro rv">The contributory model built every great bureau. Ours is the first where AI does the reading — matching, verifying, and structuring what the network reports.</p>
-    <div class="net-grid rv">
-      <div class="step"><h3>Contribute performance</h3><p>Funders report payment history, defaults, and slow-pays on their book — standardized on the way in, matched to the entity graph automatically.</p></div>
-      <div class="step"><h3>Verified &amp; matched</h3><p>Every submission is entity-resolved against registrations, EINs, and prior filings. Bad matches die here, not in your underwriting.</p></div>
-      <div class="step"><h3>Unlock the full file</h3><p>Contributors get network tradelines on every pull. Non-contributors see the public record. The best data goes to those who feed it.</p></div>
+    <div class="sec-head rv">
+      <span class="label">The network</span>
+      <h2>Data in. <span class="soft">Access out.</span></h2>
+      <p class="sec-intro">The contributory model built every great bureau. Ours is the first where AI does the reading — matching, verifying, and structuring what the network reports.</p>
     </div>
-    <div class="net-callout rv">
+    <div class="steps rv">
+      <div class="step"><div class="num">1</div><h3>Contribute performance</h3><p>Funders report payment history, defaults, and slow-pays on their book — standardized on the way in, matched to the entity graph automatically.</p></div>
+      <div class="step"><div class="num">2</div><h3>Verified &amp; matched</h3><p>Every submission is entity-resolved against registrations, EINs, and prior filings. Bad matches die here, not in your underwriting.</p></div>
+      <div class="step"><div class="num">3</div><h3>Unlock the full file</h3><p>Contributors get network tradelines on every pull. Non-contributors see the public record. The best data goes to those who feed it.</p></div>
+    </div>
+    <div class="callout rv">
       <div>
-        <span class="label">Founding Contributor Program · Now Forming</span>
+        <span class="label">Founding contributor program · now forming</span>
         <h3>First 20 funders lock lifetime contributor terms.</h3>
       </div>
-      <a class="btn btn-solid" href="/signup/">Join the Network</a>
+      <a class="btn btn-dark" href="/signup/">Join the network</a>
     </div>
   </div>
 </section>
 
-<!-- ————————— API ————————— -->
-<section class="sec alt" id="api">
+<!-- ————— API ————— -->
+<section class="sec panel" id="api">
   <div class="wrap">
-    <div class="rv"><span class="sec-index">SEC. 04 — API &amp; MONITORING</span>
-    <h2>One call. <span class="dim">The whole file.</span></h2></div>
+    <div class="sec-head rv">
+      <span class="label">API &amp; monitoring</span>
+      <h2>One call. <span class="soft">The whole file.</span></h2>
+    </div>
     <div class="api-grid">
       <div class="rv">
-        <p class="api-lede">Wire TrustBureau into your LOS, CRM, or submission flow. Pull files at intake, re-score at renewal, and monitor the book in between.</p>
-        <ul class="api-points">
-          <li><span class="tick">→</span><span><b>REST API</b> — file, score, and exhibits as structured JSON</span></li>
-          <li><span class="tick">→</span><span><b>Monitoring</b> — webhooks on new UCCs, judgments, and network defaults across your portfolio</span></li>
-          <li><span class="tick">→</span><span><b>Batch</b> — score a whole pipeline overnight</span></li>
-          <li><span class="tick">→</span><span><b>Early access</b> — API keys ship with the founding cohort</span></li>
+        <ul class="api-list">
+          <li><b>REST API</b> — the file, score, and every exhibit as structured data, wired into your LOS, CRM, or submission flow.</li>
+          <li><b>Monitoring</b> — alerts on new UCCs, judgments, and network defaults across your whole portfolio.</li>
+          <li><b>Batch</b> — score an entire pipeline overnight; re-score at renewal automatically.</li>
+          <li><b>Early access</b> — API keys ship with the founding cohort.</li>
         </ul>
       </div>
-      <div class="terminal rv">
-        <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="mono">api.trustbureau.ai</span></div>
-<pre><span class="c-c">$ curl https://api.trustbureau.ai/v1/files \
-    -d '{"name":"Meridian Coastal Provisions","state":"FL"}'</span>
-
-{
-  <span class="c-k">"file_no"</span>: <span class="c-s">"TB-2026-081447"</span>,
-  <span class="c-k">"subject"</span>: <span class="c-s">"MERIDIAN COASTAL PROVISIONS LLC"</span>,
-  <span class="c-k">"trust_score"</span>: <span class="c-n">71</span>,
-  <span class="c-k">"grade"</span>: <span class="c-s">"B"</span>,
-  <span class="c-k">"reason_codes"</span>: [<span class="c-s">"R11"</span>, <span class="c-s">"R24"</span>, <span class="c-s">"R41"</span>, <span class="c-s">"R63"</span>],
-  <span class="c-k">"ucc_positions"</span>: { <span class="c-k">"open"</span>: <span class="c-n">2</span>, <span class="c-k">"first_filed"</span>: <span class="c-s">"2024-11-02"</span> },
-  <span class="c-k">"tradelines"</span>: { <span class="c-k">"count"</span>: <span class="c-n">4</span>, <span class="c-k">"derogatory"</span>: <span class="c-n">1</span> },
-  <span class="c-k">"cash_flow"</span>: { <span class="c-k">"avg_balance_90d"</span>: <span class="c-n">41338</span>, <span class="c-k">"nsf_days"</span>: <span class="c-n">3</span> },
-  <span class="c-k">"exhibits"</span>: <span class="c-s">"https://trustbureau.ai/files/TB-2026-081447"</span>
-}</pre>
+      <div class="payload rv">
+        <div class="payload-title">What a pull returns</div>
+        <ul>
+          <li><span class="k">File</span><span class="v">TB-2026-081447</span></li>
+          <li><span class="k">Subject</span><span class="v">Meridian Coastal Provisions LLC</span></li>
+          <li><span class="k">TrustScore</span><span class="v">71 · Grade B</span></li>
+          <li><span class="k">Reason codes</span><span class="v">R11 · R24 · R41 · R63</span></li>
+          <li><span class="k">UCC positions</span><span class="v">2 open · first filed Nov 2024</span></li>
+          <li><span class="k">Tradelines</span><span class="v">4 · 1 derogatory</span></li>
+          <li><span class="k">Avg balance, 90 d</span><span class="v">$41,338 · 3 NSF days</span></li>
+          <li><span class="k">Exhibits</span><span class="v">Full citations included</span></li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ————————— CTA ————————— -->
-<section class="cta-sec">
+<!-- ————— CTA ————— -->
+<section class="cta">
   <div class="wrap">
-    <div class="kicker rv"><span class="rule"></span><span>Founding Cohort · Fall 2026</span><span class="rule"></span></div>
-    <h2 class="rv">The file on every business.<br><span class="dim">Written by machines. Defensible by you.</span></h2>
+    <span class="label rv">Founding cohort · Fall 2026</span>
+    <h2 class="rv">The file on every business.<br><span class="soft">Defensible by you.</span></h2>
     <p class="rv">TrustBureau is onboarding a founding cohort of funders, brokers, and platforms. Early access includes the report console, contributor terms, and first API keys.</p>
     <div class="cta-row rv">
-      <a class="btn btn-solid" href="/signup/">Request Early Access</a>
-      <a class="btn btn-line" href="/login/">Sign In</a>
+      <a class="btn btn-dark" href="/signup/">Request early access</a>
+      <a class="btn btn-ghost" href="/login/">Sign in</a>
     </div>
   </div>
 </section>
 
-<!-- ————————— FOOTER ————————— -->
+<!-- ————— FOOTER ————— -->
 <footer>
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
         <a class="brand" href="/">
-          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" style="width:26px;height:26px">
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="currentColor" opacity="0.08"/>
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" style="width:24px;height:24px">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
             <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span><span class="brand-text" style="font-size:16px">Trust<span>Bureau</span></span></span>
+          <span class="brand-text" style="font-size:15px">Trust<span>Bureau</span></span>
         </a>
         <p>An AI-native commercial credit reporting agency. The file on every US business — sourced, scored, and cited in real time.</p>
       </div>
@@ -567,70 +467,46 @@
         <a href="#api">API</a>
       </div>
       <div class="foot-col">
-        <h4>Current Suite</h4>
+        <h4>Current suite</h4>
         <a href="/deep-scrub.html">DeepScrub</a>
         <a href="/vision.html">Vision</a>
         <a href="/xxxapproval-toolbox.html">Approval ToolBox</a>
       </div>
       <div class="foot-col">
         <h4>Account</h4>
-        <a href="/signup/">Request Access</a>
-        <a href="/login/">Sign In</a>
+        <a href="/signup/">Request access</a>
+        <a href="/login/">Sign in</a>
       </div>
     </div>
     <div class="legal">
-      <p>TrustBureau provides commercial business information for legitimate business purposes only. TrustBureau reports are not "consumer reports" as defined by the Fair Credit Reporting Act (FCRA), and may not be used, in whole or in part, to determine an individual's eligibility for personal credit, insurance, employment, housing, or any other purpose covered by the FCRA. Specimen data shown is synthetic and illustrative.</p>
-      <span class="mono">© 2026 TRUSTBUREAU.AI</span>
+      <p>TrustBureau provides commercial business information for legitimate business purposes only. TrustBureau reports are not "consumer reports" as defined by the Fair Credit Reporting Act (FCRA), and may not be used, in whole or in part, to determine an individual's eligibility for personal credit, insurance, employment, housing, or any other purpose covered by the FCRA. Sample data shown is synthetic and illustrative.</p>
+      <span>© 2026 TrustBureau.ai</span>
     </div>
   </div>
 </footer>
 
 <script>
-  // theme (same key + behavior as the original hub)
+  // sample report: row fade-in + score count-up
   (function(){
-    const saved=localStorage.getItem('trustbureau_theme')||'dark';
-    document.documentElement.setAttribute('data-theme',saved);
-    document.getElementById('themeToggle').addEventListener('click',()=>{
-      const html=document.documentElement;
-      const next=html.getAttribute('data-theme')==='light'?'dark':'light';
-      html.setAttribute('data-theme',next);
-      localStorage.setItem('trustbureau_theme',next);
+    document.querySelectorAll('#rows li').forEach((li,i)=>{
+      li.style.animationDelay=(0.3+i*0.12)+'s';li.classList.add('on');
     });
-  })();
-
-  // barcode
-  (function(){
-    const bc=document.querySelector('.barcode');
-    const seed=[3,1,2,1,3,2,1,1,2,3,1,2,2,1,3,1,1,2,1,3,2,1,3,1,2,1,1,3];
-    seed.forEach((w,i)=>{const b=document.createElement('i');b.style.width=w+'px';b.style.height=(12+((i*7)%11))+'px';bc.appendChild(b);});
-  })();
-
-  // seamless ticker
-  (function(){
-    const t=document.getElementById('tickerTrack');
-    t.innerHTML+=t.innerHTML;
-  })();
-
-  // specimen assembly
-  (function(){
-    const lines=[...document.querySelectorAll('#ledger li')];
-    lines.forEach((li,i)=>{li.style.animationDelay=(0.25+i*0.13)+'s';li.classList.add('on');});
-    document.getElementById('stamp').classList.add('on');
-    const target=71,dur=1300,start=performance.now();
-    const num=document.getElementById('scoreNum'),arc=document.getElementById('arc');
-    const C=314.16;
+    var target=71,dur=1200,start=performance.now();
+    var num=document.getElementById('scoreNum'),arc=document.getElementById('arc'),C=307.9;
     requestAnimationFrame(function tick(now){
-      const p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
+      var p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
       num.textContent=Math.round(e*target);
       arc.style.strokeDashoffset=C-(C*e*target/100);
       if(p<1)requestAnimationFrame(tick);
     });
   })();
 
-  // scroll reveals
+  // gentle section reveals
   (function(){
-    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
-    document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+    },{threshold:.12});
+    document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
   })();
 </script>
 </body>
