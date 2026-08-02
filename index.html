@@ -2,634 +2,385 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TrustBureau — The AI Credit Bureau for Business</title>
-<meta name="description" content="TrustBureau is an AI-native commercial credit reporting agency. One call returns the file: registrations, UCC positions, litigation, contributed tradelines, and bank-verified cash flow — synthesized into a defensible TrustScore.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 stroke=%22%23111111%22 stroke-width=%221.5%22 fill=%22none%22/><path d=%22M9 12l2 2 4-4%22 stroke=%22%232563eb%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="description" content="TrustBureau is an AI-native commercial credit reporting agency. One pull returns the file: registrations, UCC positions, litigation, contributed tradelines and verified cash flow — scored on a deterministic, defensible rubric.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22><path d=%22M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z%22 stroke=%22%230f0f0f%22 stroke-width=%221.5%22/><path d=%22M9 12l2 2 4-4%22 stroke=%22%230f0f0f%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#111111;
-    --gray-1:#4b4b52;
-    --gray-2:#7d7d85;
-    --gray-3:#a8a8af;
-    --hairline:#ebebed;
-    --hairline-2:#dedee1;
-    --panel:#fafafa;
-    --white:#ffffff;
-    --blue:#2563eb;
-    --blue-dark:#1d4ed8;
-    --blue-soft:#eef4ff;
-    --blue-line:#d5e2fb;
-    --green:#059669;
-    --green-soft:#e7f6f0;
-    --amber:#d97706;
-    --amber-soft:#fdf3e2;
-    --red:#dc2626;
-    --red-soft:#fdecec;
-    --code-bg:#0d1424;
-    --code-line:rgba(255,255,255,.09);
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
-    background:var(--white);color:var(--gray-1);
-    -webkit-font-smoothing:antialiased;overflow-x:hidden;
-    font-feature-settings:'tnum';
-  }
-  ::selection{background:var(--blue);color:var(--white)}
-  .wrap{max-width:1160px;margin:0 auto;padding:0 32px}
+:root{
+  --canvas:#f5f5f5;--paper:#fff;--panel:#fafafa;
+  --ink:#0f0f0f;--ink2:#4a4a4a;--ink3:#7a7a7a;--ink4:#a8a8a8;
+  --line:#e5e5e5;--line2:#d4d4d4;--mast:#171717;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:var(--paper);color:var(--ink2);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--ink);color:#fff}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.lbl{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700;padding:13px 24px;border-radius:5px;
+  border:1px solid var(--line2);background:var(--paper);color:var(--ink);text-decoration:none;transition:border-color .15s,background .15s,color .15s}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.pri:hover{background:#000}
+.btn.inv{background:transparent;border-color:rgba(255,255,255,.28);color:#fff}
+.btn.inv:hover{border-color:#fff}
+.btn.sm{padding:9px 16px;font-size:12px}
 
-  .label{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gray-3)}
-  .label.blue{color:var(--blue)}
+/* header */
+header{background:var(--mast);position:sticky;top:0;z-index:40}
+.bar{max-width:1120px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand svg{width:23px;height:23px}
+.brand b{font-size:13px;font-weight:700;letter-spacing:.2em;color:#fff}
+.brand b span{color:rgba(255,255,255,.42);font-weight:400}
+nav{display:flex;gap:28px}
+nav a{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.62);text-decoration:none;transition:color .15s}
+nav a:hover{color:#fff}
+.hact{display:flex;align-items:center;gap:14px}
+.hact a.si{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.72);text-decoration:none}
+.hact a.si:hover{color:#fff}
 
-  /* ————— header ————— */
-  header{
-    position:sticky;top:0;z-index:50;
-    background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--hairline);
-  }
-  .bar{display:flex;align-items:center;justify-content:space-between;height:76px}
-  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-  .brand-icon{width:28px;height:28px;color:var(--ink);flex-shrink:0}
-  .brand-text{font-size:17px;font-weight:800;letter-spacing:.1em;color:var(--ink);text-transform:uppercase;line-height:1}
-  .brand-text span{color:var(--gray-3);font-weight:500}
-  nav.primary{display:flex;gap:34px}
-  nav.primary a{color:var(--gray-2);text-decoration:none;font-size:14px;font-weight:600;transition:color .2s}
-  nav.primary a:hover{color:var(--ink)}
-  .bar-actions{display:flex;align-items:center;gap:22px}
-  .signin{color:var(--gray-1);text-decoration:none;font-size:14px;font-weight:600;transition:color .2s}
-  .signin:hover{color:var(--ink)}
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    font-weight:700;font-size:14px;padding:13px 26px;border-radius:999px;
-    text-decoration:none;cursor:pointer;border:1px solid transparent;
-    transition:background .2s,color .2s,border-color .2s,transform .15s,box-shadow .2s;
-  }
-  .btn-blue{background:var(--blue);color:var(--white);box-shadow:0 6px 18px rgba(37,99,235,.22)}
-  .btn-blue:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:0 10px 24px rgba(37,99,235,.28)}
-  .btn-dark{background:var(--ink);color:var(--white)}
-  .btn-dark:hover{background:#2a2a2e;transform:translateY(-1px)}
-  .btn-ghost{border-color:var(--hairline-2);color:var(--ink);background:var(--white)}
-  .btn-ghost:hover{border-color:var(--ink)}
-  header .btn{padding:10px 20px;font-size:13.5px}
+/* hero */
+.hero{border-bottom:1px solid var(--line);padding:78px 0 0}
+.hgrid{display:grid;grid-template-columns:1.06fr .94fr;gap:60px;align-items:center;padding-bottom:70px}
+h1{font-size:clamp(38px,5vw,58px);font-weight:800;color:var(--ink);letter-spacing:-.035em;line-height:1.04}
+.hsub{font-size:17px;line-height:1.7;margin-top:22px;max-width:520px}
+.hsub b{color:var(--ink);font-weight:700}
+.hcta{margin-top:32px;display:flex;gap:12px;flex-wrap:wrap}
+.hstats{margin-top:50px;display:flex;border-top:1px solid var(--line)}
+.hstat{padding:20px 34px 0 0;margin-right:34px;border-right:1px solid var(--line)}
+.hstat:last-child{border:0;margin:0;padding-right:0}
+.hstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.025em}
+.hstat span{display:block;margin-top:5px;font-size:11.5px;color:var(--ink3);line-height:1.45}
 
-  /* ————— hero ————— */
-  .hero{
-    padding:104px 0 116px;position:relative;overflow:visible;
-    background:
-      radial-gradient(ellipse 52% 60% at 88% 8%, var(--blue-soft) 0%, transparent 62%),
-      linear-gradient(180deg, #fcfdff 0%, var(--white) 46%);
-  }
-  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;align-items:center}
-  h1{font-size:clamp(40px,4.9vw,64px);font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1.06}
-  h1 .soft{color:var(--gray-3)}
-  .hero .label{margin-bottom:26px;display:inline-flex;align-items:center;gap:10px}
-  .hero .label::before{content:'';width:7px;height:7px;border-radius:999px;background:var(--blue)}
-  .hero-sub{margin-top:28px;max-width:500px;font-size:17px;line-height:1.75;color:var(--gray-1)}
-  .hero-sub strong{color:var(--ink);font-weight:700}
-  .hero-ctas{margin-top:38px;display:flex;gap:14px;flex-wrap:wrap}
-  .hero-stats{margin-top:60px;display:flex;gap:0;border-top:1px solid var(--hairline);max-width:520px}
-  .stat{padding:24px 36px 0 0;margin-right:36px;border-right:1px solid var(--hairline)}
-  .stat:last-child{border-right:none;margin-right:0;padding-right:0}
-  .stat b{display:block;font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
-  .stat b em{font-style:normal;color:var(--blue)}
-  .stat span{display:block;margin-top:6px;font-size:12.5px;font-weight:500;color:var(--gray-3);line-height:1.45}
+/* specimen file */
+.spec{border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--paper);box-shadow:0 1px 2px rgba(15,15,15,.03),0 14px 40px rgba(15,15,15,.06)}
+.spec .top{background:var(--mast);padding:11px 18px;display:flex;justify-content:space-between;align-items:center}
+.spec .top b{font-size:10px;font-weight:700;letter-spacing:.18em;color:#fff}
+.spec .top span{font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.5)}
+.spec .vrd{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:20px;border-bottom:1px solid var(--line);border-left:4px solid var(--ink)}
+.spec .vs{display:flex;align-items:baseline;gap:5px}
+.spec .vs b{font-size:38px;font-weight:800;color:var(--ink);letter-spacing:-.035em;line-height:1}
+.spec .vs i{font-style:normal;font-size:12px;color:var(--ink4);font-weight:700}
+.spec .vg{margin-top:4px;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.spec .nm{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+.spec .mt{font-size:11.5px;color:var(--ink3);margin-top:4px;line-height:1.5}
+.spec ul{list-style:none;padding:6px 20px 14px}
+.spec li{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+.spec li:last-child{border:0}
+.spec .k{color:var(--ink3)}
+.spec .v{font-weight:700;color:var(--ink);text-align:right}
+.spec .fl{display:flex;justify-content:space-between;gap:10px;padding:10px 20px;background:var(--panel);border-top:1px solid var(--line);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
+.speccap{text-align:center;margin-top:12px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink4)}
 
-  /* ————— sample report ————— */
-  .report-stack{position:relative}
-  .report{
-    background:var(--white);border:1px solid var(--hairline-2);border-radius:16px;
-    box-shadow:0 1px 2px rgba(17,17,17,.03),0 16px 48px rgba(17,17,17,.07);
-    padding:28px 30px 22px;position:relative;z-index:2;
-  }
-  .report-tag{
-    position:absolute;top:22px;right:24px;
-    font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--blue);border:1px solid var(--blue-line);border-radius:999px;padding:5px 12px;background:var(--blue-soft);
-  }
-  .report-head{display:flex;align-items:center;gap:10px;padding-bottom:18px;border-bottom:1px solid var(--hairline)}
-  .report-head svg{width:18px;height:18px;color:var(--ink)}
-  .report-head b{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
-  .report-head b span{color:var(--gray-3);font-weight:500}
-  .subject{padding:18px 0 14px;border-bottom:1px solid var(--hairline)}
-  .subject-name{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.015em}
-  .subject-line{font-size:12.5px;font-weight:500;color:var(--gray-3);margin-top:6px}
-  .report-body{display:grid;grid-template-columns:128px 1fr;gap:30px;padding-top:20px;align-items:start}
-  .score-ring{position:relative;width:118px;height:118px;margin:0 auto}
-  .score-ring svg{transform:rotate(-90deg);display:block}
-  .score-ring .track{stroke:#eceff5}
-  .score-ring .arc{stroke:url(#arcGrad);stroke-linecap:round;filter:drop-shadow(0 2px 7px rgba(37,99,235,.35))}
-  .score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .score-center b{font-size:37px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.03em}
-  .score-center b small{font-size:13px;font-weight:700;color:var(--gray-3);letter-spacing:0;margin-left:2px}
-  .score-label{text-align:center;margin-top:12px;font-size:9.5px;font-weight:700;letter-spacing:.22em;color:var(--gray-3);text-transform:uppercase}
-  .score-grade{margin:8px auto 0;width:fit-content;font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:999px;padding:4px 12px;white-space:nowrap}
-  .rows{list-style:none}
-  .rows li{
-    display:flex;justify-content:space-between;gap:16px;align-items:center;
-    padding:9.5px 0;border-bottom:1px solid var(--hairline);
-    font-size:13px;opacity:0;transform:translateY(5px);
-  }
-  .rows li:last-child{border-bottom:none}
-  .rows li.on{animation:rowIn .5s ease forwards}
-  @keyframes rowIn{to{opacity:1;transform:none}}
-  .rows .k{color:var(--gray-2);font-weight:500;display:flex;align-items:center;gap:9px;white-space:nowrap}
-  .rows .k::before{content:'';width:6px;height:6px;border-radius:999px;background:var(--hairline-2);flex-shrink:0}
-  .rows li.ok .k::before{background:var(--green)}
-  .rows li.warn .k::before{background:var(--amber)}
-  .rows .v{font-weight:600;color:var(--ink);text-align:right;white-space:nowrap;font-size:12.5px}
-  .rows .v.dim{color:var(--gray-2)}
-  .report-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--hairline)}
-  .report-foot span{font-size:11px;font-weight:600;color:var(--gray-3)}
-  /* floating monitoring alert */
-  .alert-card{
-    position:absolute;z-index:3;right:-20px;bottom:-46px;
-    background:var(--white);border:1px solid var(--hairline-2);border-radius:14px;
-    box-shadow:0 10px 34px rgba(17,17,17,.1);
-    padding:14px 18px;display:flex;gap:12px;align-items:flex-start;max-width:300px;
-  }
-  .alert-dot{width:9px;height:9px;border-radius:999px;background:var(--amber);margin-top:5px;flex-shrink:0;animation:pulse 2.4s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
-  .alert-card b{display:block;font-size:12.5px;font-weight:700;color:var(--ink)}
-  .alert-card span{display:block;font-size:11.5px;color:var(--gray-2);margin-top:3px;line-height:1.5}
-  .alert-card em{font-style:normal;font-size:10.5px;font-weight:700;color:var(--amber)}
+/* sources strip */
+.strip{background:var(--panel);border-bottom:1px solid var(--line)}
+.strip .wrap{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;padding:22px 24px}
+.strip span{font-size:11.5px;font-weight:600;color:var(--ink2);background:var(--paper);border:1px solid var(--line2);border-radius:4px;padding:6px 13px;white-space:nowrap}
 
-  /* ————— sources ————— */
-  .sources{border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);background:var(--panel)}
-  .sources .wrap{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:24px 32px}
-  .sources span{
-    font-size:12.5px;font-weight:600;color:var(--gray-1);white-space:nowrap;
-    background:var(--white);border:1px solid var(--hairline-2);border-radius:999px;padding:7px 15px;
-  }
+/* sections */
+section{padding:88px 0;border-bottom:1px solid var(--line)}
+section.alt{background:var(--panel)}
+.shead{max-width:640px;margin-bottom:48px}
+h2{font-size:clamp(27px,3.2vw,38px);font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1.12;margin-top:13px}
+.sint{font-size:16px;line-height:1.75;margin-top:16px}
 
-  /* ————— sections ————— */
-  .sec{padding:118px 0}
-  .sec.panel{background:var(--panel);border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}
-  .sec-head{max-width:640px}
-  h2{font-size:clamp(30px,3.3vw,44px);font-weight:800;color:var(--ink);letter-spacing:-.025em;line-height:1.12;margin-top:16px}
-  h2 .soft{color:var(--gray-3)}
-  .sec-intro{margin-top:20px;font-size:16.5px;line-height:1.75;color:var(--gray-1)}
+/* two verticals */
+.verts{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.vert{background:var(--paper);border:1px solid var(--line2);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.vert .vh{background:var(--mast);padding:20px 24px}
+.vert .vh b{display:block;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.015em}
+.vert .vh span{display:block;font-size:12.5px;color:rgba(255,255,255,.6);margin-top:5px}
+.vert .vb{padding:24px;flex:1}
+.vert ul{list-style:none}
+.vert li{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.6;color:var(--ink)}
+.vert li:last-child{border:0}
+.vert li .m{width:5px;height:5px;border-radius:50%;background:var(--ink);margin-top:8px}
+.vert li em{font-style:normal;display:block;font-size:12.5px;color:var(--ink3);margin-top:2px}
+.vert .vf{padding:0 24px 24px}
 
-  .rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
-  .rv.in{opacity:1;transform:none}
+/* exhibits */
+.exh{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.exh > div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:28px;background:var(--paper)}
+.exh .n{font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--ink4)}
+.exh h3{font-size:16.5px;font-weight:800;color:var(--ink);margin:12px 0 9px;letter-spacing:-.015em}
+.exh p{font-size:13.5px;line-height:1.7}
 
-  /* exhibits */
-  .exhibits{margin-top:68px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .exhibit{
-    background:var(--white);border:1px solid var(--hairline-2);border-radius:16px;padding:28px;
-    transition:box-shadow .25s,transform .25s,border-color .25s;
-  }
-  .exhibit:hover{box-shadow:0 12px 34px rgba(17,17,17,.07);transform:translateY(-3px);border-color:var(--blue-line)}
-  .exhibit .ico{
-    width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;
-  }
-  .exhibit .ico svg{width:20px;height:20px}
-  .ico.c-blue{background:var(--blue-soft);color:var(--blue)}
-  .ico.c-green{background:var(--green-soft);color:var(--green)}
-  .ico.c-amber{background:var(--amber-soft);color:var(--amber)}
-  .ico.c-red{background:var(--red-soft);color:var(--red)}
-  .exhibit h3{font-size:17.5px;font-weight:800;color:var(--ink);margin-bottom:9px;letter-spacing:-.015em}
-  .exhibit p{font-size:14px;line-height:1.65;color:var(--gray-1)}
+/* rubric */
+.rub{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.rubnum{font-size:clamp(96px,13vw,150px);font-weight:800;color:var(--ink);letter-spacing:-.06em;line-height:.9;text-align:center}
+.rubsub{text-align:center;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-top:12px}
+.rubl{list-style:none;border-top:1px solid var(--line2)}
+.rubl li{display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-size:14.5px;color:var(--ink)}
+.rubl .s{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4)}
+.rubl .p{font-weight:800;color:var(--ink)}
 
-  /* trustscore */
-  .score-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:90px;align-items:center;margin-top:68px}
-  .huge-wrap{text-align:center}
-  .huge-num{
-    font-size:clamp(120px,13vw,180px);font-weight:800;letter-spacing:-.05em;line-height:.95;
-    background:linear-gradient(170deg,var(--ink) 40%,var(--blue));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .huge-sub{margin:16px auto 0;width:fit-content;font-size:12px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:999px;padding:6px 16px;letter-spacing:.06em;text-transform:uppercase}
-  .reasons{list-style:none;border-top:1px solid var(--hairline-2)}
-  .reasons li{display:flex;gap:18px;align-items:baseline;padding:19px 0;border-bottom:1px solid var(--hairline)}
-  .reasons .sign{
-    width:24px;height:24px;border-radius:999px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-    font-size:14px;font-weight:700;transform:translateY(4px);
-  }
-  .sign.pos{background:var(--green-soft);color:var(--green)}
-  .sign.neg{background:var(--amber-soft);color:var(--amber)}
-  .reasons .txt{font-size:15.5px;line-height:1.6;color:var(--gray-1);flex:1}
-  .reasons .txt b{color:var(--ink);font-weight:700}
-  .reasons .src{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3);white-space:nowrap}
-  .score-note{margin-top:28px;font-size:15px;line-height:1.75;color:var(--gray-1)}
-  .score-note strong{color:var(--ink)}
+/* api */
+.apig{display:grid;grid-template-columns:.85fr 1.15fr;gap:52px;align-items:center}
+.apil{list-style:none;border-top:1px solid var(--line2)}
+.apil li{padding:15px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.65}
+.apil b{color:var(--ink);font-weight:700}
+.term{background:var(--mast);border-radius:8px;overflow:hidden}
+.term .tb{padding:11px 18px;border-bottom:1px solid rgba(255,255,255,.1);font-size:10.5px;letter-spacing:.12em;color:rgba(255,255,255,.5);text-transform:uppercase}
+.term pre{padding:20px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.75;color:#d4d4d4;overflow-x:auto}
+.term .k{color:#8a8a8a}.term .v{color:#fff}.term .c{color:#6b6b6b}
 
-  /* network */
-  .steps{margin-top:68px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .step{background:var(--white);border:1px solid var(--hairline-2);border-radius:16px;padding:28px}
-  .step .num{
-    width:34px;height:34px;border-radius:999px;background:var(--blue);color:var(--white);
-    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:20px;
-  }
-  .step h3{font-size:17.5px;font-weight:800;color:var(--ink);margin-bottom:9px;letter-spacing:-.015em}
-  .step p{font-size:14px;line-height:1.65;color:var(--gray-1)}
-  .callout{
-    margin-top:64px;background:linear-gradient(115deg,var(--blue-soft),var(--white) 70%);
-    border:1px solid var(--blue-line);border-radius:16px;
-    padding:38px 42px;display:flex;justify-content:space-between;align-items:center;gap:32px;
-  }
-  .callout h3{font-size:22px;font-weight:800;color:var(--ink);margin-top:10px;letter-spacing:-.02em}
+/* cta */
+.cta{padding:96px 0;text-align:center;border-bottom:1px solid var(--line)}
+.cta h2{max-width:720px;margin:13px auto 0}
+.cta p{max-width:530px;margin:18px auto 0;font-size:16px;line-height:1.75}
+.ctar{margin-top:34px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 
-  /* ————— API showcase ————— */
-  .api-panel{
-    margin-top:68px;background:var(--code-bg);border-radius:20px;overflow:hidden;
-    box-shadow:0 30px 80px rgba(13,20,36,.35);
-    display:grid;grid-template-columns:.9fr 1.1fr;
-  }
-  .api-left{padding:52px 48px;border-right:1px solid var(--code-line)}
-  .api-left .label{color:#8ea4d6}
-  .api-left h3{font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-.02em;margin-top:14px}
-  .api-list{list-style:none;margin-top:30px}
-  .api-list li{display:flex;gap:14px;padding:13px 0;font-size:14.5px;line-height:1.6;color:#b6c2dd}
-  .api-list li b{color:#ffffff;font-weight:700}
-  .api-check{
-    width:20px;height:20px;border-radius:999px;background:rgba(37,99,235,.18);color:#7ea6ff;
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;transform:translateY(3px);
-    font-size:11px;font-weight:800;
-  }
-  .api-left .btn{margin-top:28px}
-  .api-right{padding:34px 36px;display:flex;flex-direction:column;gap:18px;min-width:0}
-  .endpoint{
-    display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);
-    border:1px solid var(--code-line);border-radius:12px;padding:11px 16px;
-  }
-  .method{font-size:11px;font-weight:800;letter-spacing:.08em;color:#4ade80;background:rgba(74,222,128,.13);border-radius:999px;padding:4px 11px}
-  .endpoint code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:#e6ecf9}
-  .code-card{background:rgba(255,255,255,.03);border:1px solid var(--code-line);border-radius:12px;overflow:hidden;flex:1}
-  .code-title{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--code-line)}
-  .code-title span{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#66759b}
-  .code-title em{font-style:normal;font-size:11px;font-weight:700;color:#4ade80}
-  pre{
-    padding:18px 20px;overflow-x:auto;
-    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.75;color:#c8d3ea;
-  }
-  .ck{color:#7ea6ff}.cs{color:#7ee2a8}.cn{color:#fbbf24}.cp{color:#66759b}
-  .webhook{
-    display:flex;gap:12px;align-items:flex-start;background:rgba(217,119,6,.09);
-    border:1px solid rgba(217,119,6,.28);border-radius:12px;padding:13px 16px;
-  }
-  .webhook .alert-dot{margin-top:4px}
-  .webhook b{display:block;font-size:12px;font-weight:700;color:#ffd9a8}
-  .webhook span{display:block;font-size:11.5px;color:#b6c2dd;margin-top:2px;line-height:1.5}
+/* footer */
+footer{background:var(--mast);padding:56px 0 34px;color:rgba(255,255,255,.55)}
+.fg{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}
+.fb p{margin-top:15px;font-size:13px;line-height:1.7;max-width:290px}
+.fc h4{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:15px}
+.fc a{display:block;color:rgba(255,255,255,.72);text-decoration:none;font-size:13.5px;padding:5px 0}
+.fc a:hover{color:#fff}
+.legal{margin-top:46px;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap}
+.legal p{font-size:11px;line-height:1.7;color:rgba(255,255,255,.38);max-width:760px}
+.legal span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.38);white-space:nowrap}
 
-  /* cta */
-  .cta{padding:140px 0;text-align:center;background:
-    radial-gradient(ellipse 55% 70% at 50% 120%, var(--blue-soft) 0%, transparent 65%), var(--white);}
-  .cta h2{max-width:720px;margin:16px auto 0}
-  .cta p{max-width:520px;margin:24px auto 0;font-size:16.5px;line-height:1.75;color:var(--gray-1)}
-  .cta-row{margin-top:42px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-
-  /* footer */
-  footer{border-top:1px solid var(--hairline);padding:76px 0 48px;background:var(--panel)}
-  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px}
-  .foot-brand p{margin-top:18px;font-size:14px;line-height:1.75;color:var(--gray-2);max-width:300px}
-  .foot-col h4{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-3);margin-bottom:20px}
-  .foot-col a{display:block;color:var(--gray-1);text-decoration:none;font-size:14.5px;padding:6px 0;transition:color .2s}
-  .foot-col a:hover{color:var(--blue)}
-  .legal{margin-top:64px;padding-top:30px;border-top:1px solid var(--hairline-2);display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap}
-  .legal p{font-size:12px;line-height:1.75;color:var(--gray-3);max-width:760px}
-  .legal span{font-size:12px;font-weight:600;color:var(--gray-3);white-space:nowrap}
-
-  @media (prefers-reduced-motion:reduce){
-    *{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:.01ms !important}
-    .rows li{opacity:1;transform:none}
-    .rv{opacity:1;transform:none}
-    .alert-dot{animation:none}
-  }
-
-  @media (max-width:1000px){
-    .hero-grid{grid-template-columns:1fr;gap:70px}
-    .report-stack{max-width:560px;margin:0 auto}
-    .alert-card{right:0;bottom:-40px}
-    .exhibits{grid-template-columns:repeat(2,1fr)}
-    .score-grid{grid-template-columns:1fr;gap:60px}
-    .steps{grid-template-columns:1fr}
-    .api-panel{grid-template-columns:1fr}
-    .api-left{border-right:none;border-bottom:1px solid var(--code-line)}
-    .foot-grid{grid-template-columns:1fr 1fr}
-    nav.primary{display:none}
-  }
-  @media (max-width:620px){
-    .wrap{padding:0 22px}
-    .sec{padding:88px 0}
-    .hero{padding:78px 0 110px}
-    .exhibits{grid-template-columns:1fr}
-    .report-body{grid-template-columns:1fr}
-    .score-ring{margin:0 auto}
-    .callout{flex-direction:column;align-items:flex-start;padding:30px}
-    .api-left,.api-right{padding:30px 24px}
-    .foot-grid{grid-template-columns:1fr}
-    .signin{display:none}
-    .hero-stats{flex-wrap:wrap}
-    .stat{border-right:none;margin-right:0;padding-right:0}
-    .alert-card{position:static;margin-top:16px;max-width:none}
-  }
+.rv{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.3,1)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+@media(max-width:960px){
+  .hgrid{grid-template-columns:1fr;gap:48px}.spec{max-width:520px}
+  .verts{grid-template-columns:1fr}.exh{grid-template-columns:1fr 1fr}
+  .rub,.apig{grid-template-columns:1fr;gap:38px}
+  .fg{grid-template-columns:1fr 1fr}nav{display:none}
+}
+@media(max-width:600px){
+  section{padding:64px 0}.exh{grid-template-columns:1fr}.fg{grid-template-columns:1fr}
+  .hstats{flex-wrap:wrap}.hstat{border-right:0;padding-right:0;margin-right:26px}
+  .hact a.si{display:none}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap bar">
+  <div class="bar">
     <a class="brand" href="/">
-      <svg class="brand-icon" viewBox="0 0 24 24" fill="none">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        <path d="M9 12l2 2 4-4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="brand-text">Trust<span>Bureau</span></span>
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="#fff" stroke-width="1.4"/><path d="M9 12l2 2 4-4" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>TRUST<span>BUREAU</span></b>
     </a>
-    <nav class="primary">
-      <a href="#report">The Report</a>
+    <nav>
+      <a href="#who">Who it's for</a>
+      <a href="#file">The file</a>
       <a href="#score">TrustScore</a>
-      <a href="#network">The Network</a>
       <a href="#api">API</a>
     </nav>
-    <div class="bar-actions">
-      <a class="signin" href="/login/">Sign in</a>
-      <a class="btn btn-blue" href="/signup/">Request access</a>
+    <div class="hact">
+      <a class="si" href="/login/">Sign in</a>
+      <a class="btn inv sm" href="/signup/">Request access</a>
     </div>
   </div>
 </header>
 
-<!-- ————— HERO ————— -->
-<section class="hero">
-  <div class="wrap hero-grid">
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap hgrid">
     <div>
-      <span class="label">An AI credit reporting agency</span>
-      <h1>The credit bureau, rebuilt for the <span class="soft">machine age.</span></h1>
-      <p class="hero-sub">Every business has a file. TrustBureau writes it in real time — <strong>registrations, UCC positions, litigation, contributed tradelines, bank-verified cash flow</strong> — read from primary sources by AI and synthesized into one defensible score.</p>
-      <div class="hero-ctas">
-        <a class="btn btn-blue" href="/signup/">Request early access</a>
-        <a class="btn btn-ghost" href="#api">Explore the API</a>
+      <span class="lbl">An AI commercial credit bureau</span>
+      <h1>The credit file on every American business.</h1>
+      <p class="hsub">One pull returns the record — <b>registrations, public-record risk, contributed tradelines, litigation and verified cash flow</b> — read from primary sources by AI and scored on a rubric an underwriter can defend line by line.</p>
+      <div class="hcta">
+        <a class="btn pri" href="/signup/">Request early access</a>
+        <a class="btn" href="#file">See what's in a file</a>
       </div>
-      <div class="hero-stats">
-        <div class="stat"><b>34<em>M+</em></b><span>US entities indexed</span></div>
-        <div class="stat"><b>6</b><span>evidence classes per file</span></div>
-        <div class="stat"><b>&lt;60<em>s</em></b><span>fresh file, any subject</span></div>
+      <div class="hstats">
+        <div class="hstat"><b>34M+</b><span>US entities indexed</span></div>
+        <div class="hstat"><b>9</b><span>registries per pull</span></div>
+        <div class="hstat"><b>&lt;60s</b><span>fresh file, any subject</span></div>
       </div>
     </div>
 
-    <div class="report-stack">
-      <div class="report" id="sample">
-        <span class="report-tag">Sample</span>
-        <div class="report-head">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            <path d="M9 12l2 2 4-4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <b>Trust<span>Bureau</span></b>
+    <div>
+      <div class="spec">
+        <div class="top"><b>TRUSTBUREAU FILE</b><span>TB-2026-215945</span></div>
+        <div class="vrd">
+          <div><div class="vs"><b>100</b><i>/100</i></div><div class="vg">Grade A</div></div>
+          <div><div class="nm">Meridian Coastal Provisions LLC</div><div class="mt">Denver, CO · Food service · Est. 1995 · small tier</div></div>
         </div>
-        <div class="subject">
-          <div class="subject-name">Meridian Coastal Provisions LLC</div>
-          <div class="subject-line">Florida · Est. 2019 · Specialty food distribution · File TB-2026-081447</div>
-        </div>
-        <div class="report-body">
-          <div>
-            <div class="score-ring">
-              <svg width="118" height="118" viewBox="0 0 118 118">
-                <defs>
-                  <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#1d4ed8"/>
-                    <stop offset="55%" stop-color="#2563eb"/>
-                    <stop offset="100%" stop-color="#60a5fa"/>
-                  </linearGradient>
-                </defs>
-                <circle class="track" cx="59" cy="59" r="52" fill="none" stroke-width="7"/>
-                <circle class="arc" id="arc" cx="59" cy="59" r="52" fill="none" stroke-width="7"
-                        stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
-              </svg>
-              <div class="score-center"><b><span id="scoreNum">0</span><small>/100</small></b></div>
-            </div>
-            <div class="score-label">TrustScore</div>
-            <div class="score-grade">B · Stable</div>
-          </div>
-          <ul class="rows" id="rows">
-            <li class="ok"><span class="k">Registration</span><span class="v">Active · FL P19000041207</span></li>
-            <li><span class="k">UCC positions</span><span class="v">2 open · first filed Nov 2024</span></li>
-            <li class="ok"><span class="k">Litigation (5 yr)</span><span class="v dim">None found</span></li>
-            <li><span class="k">Tradelines</span><span class="v">4 · one slow-pay, Q3 2025</span></li>
-            <li class="ok"><span class="k">Avg balance (90 d)</span><span class="v">$41,338 · 3 NSF days</span></li>
-            <li class="ok"><span class="k">Forensics</span><span class="v dim">No tamper signals</span></li>
-            <li class="warn"><span class="k">Web footprint</span><span class="v">Domain 14 mo · reviews 3.9</span></li>
-          </ul>
-        </div>
-        <div class="report-foot">
-          <span>Synthetic sample · Commercial data — not a consumer report</span>
-        </div>
+        <ul>
+          <li><span class="k">State registration</span><span class="v">Active · verified</span></li>
+          <li><span class="k">Tradelines</span><span class="v">Clear · 0 derogatory</span></li>
+          <li><span class="k">Litigation, 3 yr</span><span class="v">0 · within band</span></li>
+          <li><span class="k">Sanctions &amp; debarment</span><span class="v">Screened clean</span></li>
+          <li><span class="k">Standing</span><span class="v">96th percentile</span></li>
+        </ul>
+        <div class="fl"><span>TrustScore v1.0</span><span>Not a consumer report</span></div>
       </div>
-      <div class="alert-card">
-        <span class="alert-dot"></span>
-        <div>
-          <b>Monitoring alert <em>· UCC</em></b>
-          <span>New UCC-1 filed on a business in your portfolio — 2 hours ago.</span>
-        </div>
-      </div>
+      <div class="speccap">Specimen file · synthetic subject</div>
     </div>
-  </div>
-</section>
-
-<!-- ————— SOURCES ————— -->
-<div class="sources">
-  <div class="wrap">
-    <span>Secretary of State registries</span><span>UCC-1 filings</span><span>Court dockets &amp; judgments</span><span>Contributed tradelines</span><span>Bank-verified cash flow</span><span>Statement forensics</span><span>Licensing boards</span><span>Digital footprint</span>
   </div>
 </div>
 
-<!-- ————— THE REPORT ————— -->
-<section class="sec" id="report">
+<!-- SOURCES -->
+<div class="strip">
   <div class="wrap">
-    <div class="sec-head rv">
-      <span class="label blue">The report</span>
-      <h2>Anatomy of a <span class="soft">TrustBureau file.</span></h2>
-      <p class="sec-intro">Six evidence classes, pulled fresh on every request. Not a stale database row — an investigation, run by AI that reads the primary record and cites it.</p>
+    <span>Secretary of State registries</span><span>UCC-1 filings</span><span>Federal court dockets</span><span>Contributed tradelines</span>
+    <span>OFAC sanctions</span><span>SAM.gov debarment</span><span>FMCSA carrier safety</span><span>CMS provider registry</span><span>Bank-verified cash flow</span>
+  </div>
+</div>
+
+<!-- TWO VERTICALS -->
+<section id="who">
+  <div class="wrap">
+    <div class="shead rv">
+      <span class="lbl">Who it's for</span>
+      <h2>Two sides of the same file.</h2>
+      <p class="sint">The same underlying record, presented for the person reading it. A lender needs risk surfaced first and evidence they can defend. An owner needs to know where they stand and exactly what to fix.</p>
     </div>
-    <div class="exhibits rv">
-      <div class="exhibit"><div class="ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div><h3>Identity &amp; registration</h3><p>Legal name resolution, DBA mapping, Secretary of State standing across all 50 states, officers, registered agents, incorporation history.</p></div>
-      <div class="exhibit"><div class="ico c-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><h3>Public-record risk</h3><p>UCC-1 positions and terminations, tax liens, judgments, bankruptcies, court dockets — the stacking picture competitors miss.</p></div>
-      <div class="exhibit"><div class="ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Contributed tradelines</h3><p>Payment performance, defaults, and slow-pays reported by the funders who actually hold the paper. Give-to-get access.</p></div>
-      <div class="exhibit"><div class="ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></div><h3>Verified cash flow</h3><p>Bank-statement intelligence: true revenue, balances, NSF days, existing debt service — with document forensics that flag tampered PDFs.</p></div>
-      <div class="exhibit"><div class="ico c-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><h3>Digital footprint</h3><p>Web presence, domain age, review velocity, licensing, adverse media. The open-web signals that catch shells and resurrections early.</p></div>
-      <div class="exhibit"><div class="ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>TrustScore</h3><p>One 0–100 score synthesized across every exhibit — delivered with reason codes, so an underwriter can defend the decision it informs.</p></div>
+    <div class="verts">
+      <div class="vert rv">
+        <div class="vh"><b>For lenders &amp; underwriters</b><span>Decide faster, and defend the decision</span></div>
+        <div class="vb"><ul>
+          <li><span class="m"></span><span>Adverse findings first<em>Derogatory tradelines, bankruptcies, confessions of judgment and MCA breaches surface at the top — never buried.</em></span></li>
+          <li><span class="m"></span><span>Verification gaps stated plainly<em>We tell you what we could <b>not</b> confirm, so a thin file never reads as a clean one.</em></span></li>
+          <li><span class="m"></span><span>Size-aware litigation<em>Case volume is judged against the expected band for a business that size — a national carrier isn't punished for being sued.</em></span></li>
+          <li><span class="m"></span><span>Every finding traceable<em>Drill from any line to the primary record: the docket, the registry entry, the sanctions search.</em></span></li>
+          <li><span class="m"></span><span>API and batch<em>Pull at intake, re-score at renewal, monitor the book in between.</em></span></li>
+        </ul></div>
+        <div class="vf"><a class="btn pri" href="/signup/">Get underwriting access</a></div>
+      </div>
+      <div class="vert rv">
+        <div class="vh"><b>For business owners</b><span>Know your file before a lender pulls it</span></div>
+        <div class="vb"><ul>
+          <li><span class="m"></span><span>See exactly what lenders see<em>The same file a funder pulls on you, in plain language.</em></span></li>
+          <li><span class="m"></span><span>A plan to improve your score<em>Every opportunity with its exact point value and how to earn it — "verify your state registration, +15."</em></span></li>
+          <li><span class="m"></span><span>Know where you stand<em>Your percentile against comparable small businesses, not a number without context.</em></span></li>
+          <li><span class="m"></span><span>Share it as a credential<em>Send a lender a live link to your file instead of arguing about your paperwork.</em></span></li>
+          <li><span class="m"></span><span>Catch problems early<em>Find the mismatched registration or stray court record before it costs you a deal.</em></span></li>
+        </ul></div>
+        <div class="vf"><a class="btn" href="/signup/">Check my business</a></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ————— TRUSTSCORE ————— -->
-<section class="sec panel" id="score">
+<!-- THE FILE -->
+<section class="alt" id="file">
   <div class="wrap">
-    <div class="sec-head rv">
-      <span class="label blue">TrustScore</span>
-      <h2>A score you can <span class="soft">defend.</span></h2>
+    <div class="shead rv">
+      <span class="lbl">The file</span>
+      <h2>Six classes of evidence, pulled fresh.</h2>
+      <p class="sint">Not a stale database row — an investigation run at request time, against primary sources, with every finding cited.</p>
     </div>
-    <div class="score-grid">
-      <div class="huge-wrap rv">
-        <div class="huge-num">71</div>
-        <div class="huge-sub">Grade B · Stable</div>
-      </div>
-      <div class="rv">
-        <ul class="reasons">
-          <li><span class="sign pos">+</span><span class="txt">Six-year filing history; two UCC positions <b>cleanly terminated</b> at payoff</span><span class="src">SOS / UCC</span></li>
-          <li><span class="sign pos">+</span><span class="txt">Verified 90-day average balance covers <b>1.8× current debt service</b></span><span class="src">Bank-verified</span></li>
-          <li><span class="sign neg">−</span><span class="txt">One contributed slow-pay, Q3 2025, cured in 40 days</span><span class="src">Tradeline</span></li>
-          <li><span class="sign neg">−</span><span class="txt">Web domain registered 14 months ago — younger than stated vintage</span><span class="src">Footprint</span></li>
-        </ul>
-        <p class="score-note">Every point is traceable to a primary source. No black boxes, no "proprietary blend" hand-waving — <strong>reason codes on every file</strong>, because a score an underwriter can't explain is a score they can't use.</p>
-      </div>
+    <div class="exh rv">
+      <div><div class="n">EXHIBIT 01</div><h3>Identity &amp; registration</h3><p>Legal name resolution, DBA mapping, Secretary of State standing, officers, registered agents and incorporation history.</p></div>
+      <div><div class="n">EXHIBIT 02</div><h3>Public-record risk</h3><p>UCC-1 positions and terminations, tax liens, judgments, bankruptcies and federal dockets — the stacking picture others miss.</p></div>
+      <div><div class="n">EXHIBIT 03</div><h3>Contributed tradelines</h3><p>Payment performance, defaults and slow-pays reported by the funders who actually hold the paper. Give-to-get access.</p></div>
+      <div><div class="n">EXHIBIT 04</div><h3>Verified cash flow</h3><p>Bank-statement intelligence — true revenue, balances, NSF days, existing debt service — with forensics that flag tampered documents.</p></div>
+      <div><div class="n">EXHIBIT 05</div><h3>Digital footprint</h3><p>Verified website and domain tenure, review standing, licensing and adverse media. The signals that catch shells and resurrections.</p></div>
+      <div><div class="n">EXHIBIT 06</div><h3>TrustScore</h3><p>One 0–100 score computed from the exhibits by a fixed rubric, with reason codes on every point.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ————— NETWORK ————— -->
-<section class="sec" id="network">
+<!-- SCORE -->
+<section id="score">
   <div class="wrap">
-    <div class="sec-head rv">
-      <span class="label blue">The network</span>
-      <h2>Data in. <span class="soft">Access out.</span></h2>
-      <p class="sec-intro">The contributory model built every great bureau. Ours is the first where AI does the reading — matching, verifying, and structuring what the network reports.</p>
+    <div class="shead rv">
+      <span class="lbl">TrustScore</span>
+      <h2>A score you can defend, not a black box.</h2>
+      <p class="sint">The AI reads the record and classifies what it finds. The <b>score itself is computed in code</b> from a published rubric — so the same evidence always produces the same number, and every point traces to a source.</p>
     </div>
-    <div class="steps rv">
-      <div class="step"><div class="num">1</div><h3>Contribute performance</h3><p>Funders report payment history, defaults, and slow-pays on their book — standardized on the way in, matched to the entity graph automatically.</p></div>
-      <div class="step"><div class="num">2</div><h3>Verified &amp; matched</h3><p>Every submission is entity-resolved against registrations, EINs, and prior filings. Bad matches die here, not in your underwriting.</p></div>
-      <div class="step"><div class="num">3</div><h3>Unlock the full file</h3><p>Contributors get network tradelines on every pull. Non-contributors see the public record. The best data goes to those who feed it.</p></div>
-    </div>
-    <div class="callout rv">
+    <div class="rub rv">
       <div>
-        <span class="label blue">Founding contributor program · now forming</span>
-        <h3>First 20 funders lock lifetime contributor terms.</h3>
+        <div class="rubnum">100</div>
+        <div class="rubsub">Grade A · 96th percentile</div>
       </div>
-      <a class="btn btn-dark" href="/signup/">Join the network</a>
+      <ul class="rubl">
+        <li><span class="s">Registry</span><span>Registration verified active with the state</span><span class="p">+15</span></li>
+        <li><span class="s">Registry</span><span>Federal registry confirms active operations</span><span class="p">+12</span></li>
+        <li><span class="s">Age</span><span>In business 29+ years</span><span class="p">+10</span></li>
+        <li><span class="s">Tradeline</span><span>Clean contributed record — no derogatories</span><span class="p">+5</span></li>
+        <li><span class="s">Litigation</span><span>Within the expected band for its size</span><span class="p">0</span></li>
+        <li><span class="s">Sanctions</span><span>OFAC and federal debarment screened clean</span><span class="p">+8</span></li>
+      </ul>
     </div>
   </div>
 </section>
 
-<!-- ————— API ————— -->
-<section class="sec" id="api">
+<!-- API -->
+<section class="alt" id="api">
   <div class="wrap">
-    <div class="sec-head rv">
-      <span class="label blue">API &amp; monitoring</span>
-      <h2>One call. <span class="soft">The whole file.</span></h2>
-      <p class="sec-intro">Wire TrustBureau into your LOS, CRM, or submission flow. Pull files at intake, re-score at renewal, and let monitoring watch the book in between.</p>
+    <div class="shead rv">
+      <span class="lbl">API &amp; monitoring</span>
+      <h2>One call. The whole file.</h2>
+      <p class="sint">Wire TrustBureau into your LOS, CRM or submission flow. Pull at intake, re-score at renewal, and let monitoring watch the book in between.</p>
     </div>
-    <div class="api-panel rv">
-      <div class="api-left">
-        <span class="label">Built for integration</span>
-        <h3>The bureau, as an endpoint.</h3>
-        <ul class="api-list">
-          <li><span class="api-check">✓</span><span><b>REST API</b> — the file, score, and every exhibit as structured data.</span></li>
-          <li><span class="api-check">✓</span><span><b>Monitoring webhooks</b> — new UCCs, judgments, and network defaults across your portfolio.</span></li>
-          <li><span class="api-check">✓</span><span><b>Batch scoring</b> — run an entire pipeline overnight; re-score at renewal automatically.</span></li>
-          <li><span class="api-check">✓</span><span><b>Cited evidence</b> — every field links to the primary record behind it.</span></li>
+    <div class="apig">
+      <div class="rv">
+        <ul class="apil">
+          <li><b>REST API</b> — the file, score and every exhibit as structured data.</li>
+          <li><b>Monitoring</b> — alerts on new UCCs, judgments and network defaults across your portfolio.</li>
+          <li><b>Batch</b> — score an entire pipeline overnight.</li>
+          <li><b>Cited evidence</b> — every field links to the primary record behind it.</li>
         </ul>
-        <a class="btn btn-blue" href="/signup/">Get API access</a>
       </div>
-      <div class="api-right">
-        <div class="endpoint"><span class="method">POST</span><code>api.trustbureau.ai/v1/files</code></div>
-        <div class="code-card">
-          <div class="code-title"><span>Response</span><em>200 OK · 41 s</em></div>
+      <div class="term rv">
+        <div class="tb">POST api.trustbureau.ai/v1/files</div>
 <pre>{
-  <span class="ck">"file_no"</span><span class="cp">:</span> <span class="cs">"TB-2026-081447"</span><span class="cp">,</span>
-  <span class="ck">"subject"</span><span class="cp">:</span> <span class="cs">"Meridian Coastal Provisions LLC"</span><span class="cp">,</span>
-  <span class="ck">"trust_score"</span><span class="cp">:</span> <span class="cn">71</span><span class="cp">,</span>
-  <span class="ck">"grade"</span><span class="cp">:</span> <span class="cs">"B"</span><span class="cp">,</span>
-  <span class="ck">"reason_codes"</span><span class="cp">:</span> [<span class="cs">"R11"</span><span class="cp">,</span> <span class="cs">"R24"</span><span class="cp">,</span> <span class="cs">"R41"</span><span class="cp">,</span> <span class="cs">"R63"</span>]<span class="cp">,</span>
-  <span class="ck">"ucc_positions"</span><span class="cp">:</span> { <span class="ck">"open"</span><span class="cp">:</span> <span class="cn">2</span><span class="cp">,</span> <span class="ck">"first_filed"</span><span class="cp">:</span> <span class="cs">"2024-11-02"</span> }<span class="cp">,</span>
-  <span class="ck">"tradelines"</span><span class="cp">:</span> { <span class="ck">"count"</span><span class="cp">:</span> <span class="cn">4</span><span class="cp">,</span> <span class="ck">"derogatory"</span><span class="cp">:</span> <span class="cn">1</span> }<span class="cp">,</span>
-  <span class="ck">"cash_flow"</span><span class="cp">:</span> { <span class="ck">"avg_balance_90d"</span><span class="cp">:</span> <span class="cn">41338</span><span class="cp">,</span> <span class="ck">"nsf_days"</span><span class="cp">:</span> <span class="cn">3</span> }<span class="cp">,</span>
-  <span class="ck">"exhibits"</span><span class="cp">:</span> <span class="cs">"https://trustbureau.ai/files/TB-2026-081447"</span>
+  <span class="k">"file_no"</span>:      <span class="v">"TB-2026-215945"</span>,
+  <span class="k">"subject"</span>:      <span class="v">"MERIDIAN COASTAL PROVISIONS LLC"</span>,
+  <span class="k">"trust_score"</span>:  <span class="v">100</span>,
+  <span class="k">"grade"</span>:        <span class="v">"A"</span>,
+  <span class="k">"rubric"</span>:       <span class="v">"TrustScore v1.0"</span>,
+  <span class="k">"size_tier"</span>:    <span class="v">"small"</span>,
+  <span class="k">"adverse"</span>:      <span class="v">[]</span>,
+  <span class="k">"gaps"</span>:         <span class="v">["no public rating located"]</span>,
+  <span class="k">"reason_codes"</span>: <span class="v">[ … 7 factors … ]</span>,
+  <span class="k">"exhibits"</span>:     <span class="v">"…/files/TB-2026-215945"</span>
 }</pre>
-        </div>
-        <div class="webhook">
-          <span class="alert-dot"></span>
-          <div>
-            <b>webhook · portfolio.ucc_filed</b>
-            <span>"Meridian Coastal Provisions LLC" — new UCC-1, Broward County, FL. Delivered to your endpoint 8 s after filing was indexed.</span>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ————— CTA ————— -->
-<section class="cta">
+<!-- CTA -->
+<div class="cta">
   <div class="wrap">
-    <span class="label blue rv">Founding cohort · Fall 2026</span>
-    <h2 class="rv">The file on every business.<br><span class="soft">Defensible by you.</span></h2>
-    <p class="rv">TrustBureau is onboarding a founding cohort of funders, brokers, and platforms. Early access includes the report console, contributor terms, and first API keys.</p>
-    <div class="cta-row rv">
-      <a class="btn btn-blue" href="/signup/">Request early access</a>
-      <a class="btn btn-ghost" href="/login/">Sign in</a>
+    <span class="lbl rv">Founding cohort · Fall 2026</span>
+    <h2 class="rv">The file on every business.<br>Written by machines. Defensible by you.</h2>
+    <p class="rv">We're onboarding a founding cohort of funders, brokers and platforms — and opening owner accounts alongside them.</p>
+    <div class="ctar rv">
+      <a class="btn pri" href="/signup/">Request early access</a>
+      <a class="btn" href="/login/">Sign in</a>
     </div>
   </div>
-</section>
+</div>
 
-<!-- ————— FOOTER ————— -->
 <footer>
   <div class="wrap">
-    <div class="foot-grid">
-      <div class="foot-brand">
+    <div class="fg">
+      <div class="fb">
         <a class="brand" href="/">
-          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" style="width:24px;height:24px">
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            <path d="M9 12l2 2 4-4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="brand-text" style="font-size:15px">Trust<span>Bureau</span></span>
+          <svg viewBox="0 0 24 24" fill="none" style="width:22px;height:22px"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" stroke="#fff" stroke-width="1.4"/><path d="M9 12l2 2 4-4" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <b>TRUST<span>BUREAU</span></b>
         </a>
-        <p>An AI-native commercial credit reporting agency. The file on every US business — sourced, scored, and cited in real time.</p>
+        <p>An AI-native commercial credit reporting agency. The file on every US business — sourced, scored and cited in real time.</p>
       </div>
-      <div class="foot-col">
-        <h4>Bureau</h4>
-        <a href="#report">The Report</a>
-        <a href="#score">TrustScore</a>
-        <a href="#network">The Network</a>
-        <a href="#api">API</a>
-      </div>
-      <div class="foot-col">
-        <h4>Current suite</h4>
-        <a href="/deep-scrub.html">DeepScrub</a>
-        <a href="/vision.html">Vision</a>
-        <a href="/xxxapproval-toolbox.html">Approval ToolBox</a>
-      </div>
-      <div class="foot-col">
-        <h4>Account</h4>
-        <a href="/signup/">Request access</a>
-        <a href="/login/">Sign in</a>
-      </div>
+      <div class="fc"><h4>Bureau</h4><a href="#who">Who it's for</a><a href="#file">The file</a><a href="#score">TrustScore</a><a href="#api">API</a></div>
+      <div class="fc"><h4>Tools</h4><a href="/deep-scrub.html">DeepScrub</a><a href="/vision.html">Vision</a><a href="/xxxapproval-toolbox.html">Approval ToolBox</a></div>
+      <div class="fc"><h4>Account</h4><a href="/signup/">Request access</a><a href="/login/">Sign in</a></div>
     </div>
     <div class="legal">
-      <p>TrustBureau provides commercial business information for legitimate business purposes only. TrustBureau reports are not "consumer reports" as defined by the Fair Credit Reporting Act (FCRA), and may not be used, in whole or in part, to determine an individual's eligibility for personal credit, insurance, employment, housing, or any other purpose covered by the FCRA. Sample data shown is synthetic and illustrative.</p>
+      <p>TrustBureau provides commercial business information for legitimate business purposes only. TrustBureau reports are not "consumer reports" as defined by the Fair Credit Reporting Act (FCRA), and may not be used, in whole or in part, to determine an individual's eligibility for personal credit, insurance, employment, housing, or any other purpose covered by the FCRA. Specimen data shown is synthetic and illustrative.</p>
       <span>© 2026 TrustBureau.ai</span>
     </div>
   </div>
 </footer>
 
 <script>
-  // sample report: row fade-in + score count-up
-  (function(){
-    document.querySelectorAll('#rows li').forEach(function(li,i){
-      li.style.animationDelay=(0.3+i*0.12)+'s';li.classList.add('on');
-    });
-    var target=71,dur=1200,start=performance.now();
-    var num=document.getElementById('scoreNum'),arc=document.getElementById('arc'),C=326.7;
-    requestAnimationFrame(function tick(now){
-      var p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
-      num.textContent=Math.round(e*target);
-      arc.style.strokeDashoffset=C-(C*e*target/100);
-      if(p<1)requestAnimationFrame(tick);
-    });
-  })();
-
-  // gentle section reveals
-  (function(){
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
-    },{threshold:.12});
-    document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
-  })();
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
 </script>
 </body>
 </html>
